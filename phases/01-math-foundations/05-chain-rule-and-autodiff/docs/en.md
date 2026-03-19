@@ -52,37 +52,27 @@ Every layer in a neural network is one link in this chain.
 
 A computational graph makes the chain rule visual. Every operation becomes a node. Data flows forward through the graph. Gradients flow backward.
 
+**Forward pass (compute values):**
+
+```mermaid
+graph TD
+    x1["x1 = 2"] --> mul["* (multiply)"]
+    x2["x2 = 3"] --> mul
+    mul -->|"a = 6"| add["+ (add)"]
+    b["b = 1"] --> add
+    add -->|"c = 7"| relu["relu"]
+    relu -->|"y = 7"| y["output y"]
 ```
-Forward pass (compute values):
 
-  x1=2    x2=3
-    \     /
-     [*] -----> a=6        (a = x1 * x2)
-      |
-     [+] <---- b=1         (c = a + b)
-      |
-      v
-     c=7
-      |
-    [relu] -----> y=7      (y = relu(c))
+**Backward pass (compute gradients):**
 
-Backward pass (compute gradients):
-
-  dy/dy = 1
-
-  dy/dc = 1               (relu'(c) = 1 since c > 0)
-
-  dc/da = 1               (derivative of a + b w.r.t. a)
-  dc/db = 1               (derivative of a + b w.r.t. b)
-
-  dy/da = dy/dc * dc/da = 1 * 1 = 1
-  dy/db = dy/dc * dc/db = 1 * 1 = 1
-
-  da/dx1 = x2 = 3         (derivative of x1*x2 w.r.t. x1)
-  da/dx2 = x1 = 2         (derivative of x1*x2 w.r.t. x2)
-
-  dy/dx1 = dy/da * da/dx1 = 1 * 3 = 3
-  dy/dx2 = dy/da * da/dx2 = 1 * 2 = 2
+```mermaid
+graph TD
+    dy["dy/dy = 1"] -->|"relu'(c)=1 since c>0"| dc["dy/dc = 1"]
+    dc -->|"dc/da = 1"| da["dy/da = 1"]
+    dc -->|"dc/db = 1"| db["dy/db = 1"]
+    da -->|"da/dx1 = x2 = 3"| dx1["dy/dx1 = 3"]
+    da -->|"da/dx2 = x1 = 2"| dx2["dy/dx2 = 2"]
 ```
 
 The backward pass applies the chain rule at every node, propagating gradients from output to inputs.

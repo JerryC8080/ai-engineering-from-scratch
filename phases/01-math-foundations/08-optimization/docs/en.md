@@ -37,44 +37,32 @@ w = w - lr * gradient
 
 That is the entire algorithm. One line.
 
-```
-         Loss
-          |
-     *    |
-      \   |
-       \  |                  * = starting point
-        \ |                  o = minimum
-         \|
-          \
-           \    /
-            \  /
-             \/
-              o
+```mermaid
+graph TD
+    A["* Starting point (high loss)"] --> B["Moving downhill along gradient"]
+    B --> C["Approaching minimum"]
+    C --> D["o Minimum (low loss)"]
 ```
 
 ### Learning rate: the most important hyperparameter
 
 The learning rate controls step size. It determines everything about convergence.
 
-```
-Too large (lr = 1.0):              Too small (lr = 0.0001):
-
-    *                                  *
-   / \                                  *.
-  /   \    *                              *.
- /     \  / \                               *.
-/       \/   \  *   <-- diverging             *.
-                                                *.  <-- 10,000 steps later
-                                                  o
-
-Just right (lr = 0.01):
-
-    *
-     .
-      .
-       .
-        .
-         o   <-- converged in ~100 steps
+```mermaid
+graph LR
+    subgraph TooLarge["Too Large (lr = 1.0)"]
+        A1["Step 1"] -->|overshoot| A2["Step 2"]
+        A2 -->|overshoot| A3["Step 3"]
+        A3 -->|diverging| A4["..."]
+    end
+    subgraph TooSmall["Too Small (lr = 0.0001)"]
+        B1["Step 1"] -->|tiny step| B2["Step 2"]
+        B2 -->|tiny step| B3["Step 3"]
+        B3 -->|10,000 steps later| B4["Minimum"]
+    end
+    subgraph JustRight["Just Right (lr = 0.01)"]
+        C1["Start"] --> C2["..."] --> C3["Converged in ~100 steps"]
+    end
 ```
 
 There is no formula for the right learning rate. You find it by experiment. Common starting points: 0.001 for Adam, 0.01 for SGD with momentum.
@@ -106,18 +94,19 @@ w = w - lr * v
 
 The analogy: a ball rolling downhill. It does not stop and restart at every bump. It builds speed in consistent directions and dampens oscillations.
 
-```
-Without momentum:              With momentum:
-
-  * . * .                        *
-   . * .                          .
-    . * .                          .
-     . *                            .
-      . * .                          .
-       . *                            o
-        o
-
-Zigzag path, slow              Smooth path, fast
+```mermaid
+graph TD
+    subgraph Without["Without Momentum (zigzag, slow)"]
+        W1["Start"] -->|left| W2[" "]
+        W2 -->|right| W3[" "]
+        W3 -->|left| W4[" "]
+        W4 -->|right| W5[" "]
+        W5 -->|left| W6[" "]
+        W6 --> W7["Minimum"]
+    end
+    subgraph With["With Momentum (smooth, fast)"]
+        M1["Start"] --> M2[" "] --> M3[" "] --> M4["Minimum"]
+    end
 ```
 
 `beta` (typically 0.9) controls how much history to keep. Higher beta means more momentum, smoother paths, but slower response to direction changes.
@@ -164,18 +153,18 @@ A convex function has one minimum. Gradient descent always finds it. A quadratic
 
 Neural network loss functions are non-convex. They have many local minima, saddle points, and flat regions.
 
-```
-Convex:                    Non-convex:
-
-    \      /                 *
-     \    /                 / \    /\
-      \  /                 /   \  /  \
-       \/                 /     \/    \    /
-        o                /      local  \  /
-   global min                   min     \/
-                                      global min
-
-One valley, one answer     Multiple valleys, saddle points
+```mermaid
+graph LR
+    subgraph Convex["Convex: One valley, one answer"]
+        direction TB
+        CV1["High loss"] --> CV2["Global minimum"]
+    end
+    subgraph NonConvex["Non-convex: Multiple valleys, saddle points"]
+        direction TB
+        NC1["Start"] --> NC2["Local minimum"]
+        NC1 --> NC3["Saddle point"]
+        NC1 --> NC4["Global minimum"]
+    end
 ```
 
 In practice, local minima in high-dimensional neural networks are rarely a problem. Most local minima have loss values close to the global minimum. Saddle points (flat in some directions, curved in others) are the real obstacle. Momentum and noise from mini-batches help escape them.
@@ -184,23 +173,17 @@ In practice, local minima in high-dimensional neural networks are rarely a probl
 
 The loss is a function of all weights. For a model with 1 million weights, the loss landscape lives in 1,000,001-dimensional space. We visualize it by picking two random directions in weight space and plotting the loss along those directions, producing a 2D surface.
 
-```
-Loss landscape of a simple network:
-
-  High loss ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-             ~~~~~~~~~~/\~~~~~~~~~~~~~~~
-              ~~~~~~~~/  \~~~/\~~~~~~~~~
-               ~~~~~~/    \_/  \~~~~~~~~
-                ~~~~/ saddle    \~~~~~~~
-                 ~~/ point       \~~~~~~
-                  /               \~~~~~
-                 /  local          \~~~~
-                /   minimum    ____/~~~~
-               /           ___/~~~~~~~~~
-              /        ___/~~~~~~~~~~~~~
-             /     ___/  global minimum
-            /  ___/
-           /__/
+```mermaid
+graph TD
+    HL["High loss region"] --> SP["Saddle point"]
+    HL --> LM["Local minimum"]
+    SP --> LM
+    SP --> GM["Global minimum"]
+    LM -.->|"shallow barrier"| GM
+    style HL fill:#ff6666,color:#000
+    style SP fill:#ffcc66,color:#000
+    style LM fill:#66ccff,color:#000
+    style GM fill:#66ff66,color:#000
 ```
 
 Sharp minima generalize poorly. Flat minima generalize well. This is one reason SGD with momentum often outperforms Adam on final test accuracy: its noise prevents settling into sharp minima.

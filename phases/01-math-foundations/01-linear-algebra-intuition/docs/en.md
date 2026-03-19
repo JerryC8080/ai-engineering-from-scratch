@@ -19,17 +19,13 @@ You don't need to be a mathematician. You need to see what these operations mean
 
 A vector is just a list of numbers. But those numbers mean something — they're coordinates in space.
 
-```
-2D vector [3, 2]:
+**2D vector [3, 2]:**
 
-  y
-  4 ┤
-  3 ┤
-  2 ┤         • (3, 2)
-  1 ┤       ╱
-  0 ┼─────╱──────── x
-    0  1  2  3  4
-```
+| x | y | Point |
+|---|---|-------|
+| 3 | 2 | The vector points from origin (0,0) to (3, 2) on the plane |
+
+The vector has magnitude sqrt(3^2 + 2^2) = sqrt(13) and points up and to the right.
 
 In AI, vectors represent everything:
 - A word → a vector of 768 numbers (its "meaning" in embedding space)
@@ -40,14 +36,23 @@ In AI, vectors represent everything:
 
 A matrix transforms one vector into another. It can rotate, scale, stretch, or project.
 
-```
-Before transformation:        After matrix multiplication:
-
-  y                              y
-  ┤  •B                         ┤     •B'
-  ┤  •A                         ┤  •A'
-  ┤                              ┤
-  ┼──────── x                    ┼──────── x
+```mermaid
+graph LR
+    subgraph Before
+        A["Point A"]
+        B["Point B"]
+    end
+    subgraph Matrix["Matrix Multiplication"]
+        M["M (transformation)"]
+    end
+    subgraph After
+        A2["Point A'"]
+        B2["Point B'"]
+    end
+    A --> M
+    B --> M
+    M --> A2
+    M --> B2
 ```
 
 In AI, matrices ARE the model:

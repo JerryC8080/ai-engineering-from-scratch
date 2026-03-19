@@ -31,20 +31,10 @@ Given any matrix A, SVD factors it into:
 - Sigma scales along each axis (stretches or compresses)
 - U rotates the result into the output space (m-dimensional)
 
-```
-Input space (n-dim)         Scaled space           Output space (m-dim)
-
-       y                        y                        y
-       |    .                   |                        |      .
-       | . . .          V^T     |  .            U        |   .    .
-       |. . . . .   ---------> | . . .    ---------->   |  .  .  .
-       | . . .                  |  .                     |   .    .
-       |    .                   |                        |      .
-       +---------- x           +---------- x            +---------- x
-
-    Data cloud              Aligned with axes         Rotated to output
-    (arbitrary              then scaled               orientation
-     orientation)
+```mermaid
+graph LR
+    A["Input space (n-dim)\nData cloud\n(arbitrary orientation)"] -->|"V^T\n(rotate)"| B["Scaled space\nAligned with axes\nthen scaled by Sigma"]
+    B -->|"U\n(rotate)"| C["Output space (m-dim)\nRotated to output\norientation"]
 ```
 
 Think of it this way. You hand SVD a matrix. It tells you: "This matrix takes a sphere of inputs, first rotates it by V^T, then stretches it into an ellipsoid by Sigma, then rotates the ellipsoid by U." The singular values are the lengths of the ellipsoid's axes.
@@ -159,24 +149,20 @@ Approximation error = sigma_{k+1}  (in spectral norm)
 
 This is not just "a good" approximation. It is provably the best possible approximation of rank k. No other rank-k matrix is closer to A.
 
-```
-Original A (rank r):
+| Component | Relative magnitude | Kept in rank-3 approx? |
+|-----------|-------------------|------------------------|
+| sigma_1 | Largest | Yes |
+| sigma_2 | Large | Yes |
+| sigma_3 | Medium-large | Yes |
+| sigma_4 | Medium | No (error) |
+| sigma_5 | Medium-small | No (error) |
+| sigma_6 | Small | No (error) |
+| sigma_7 | Very small | No (error) |
+| sigma_8 | Tiny | No (error) |
 
-  sigma_1 ||||||||||||||||||||||||
-  sigma_2 |||||||||||||||||||
-  sigma_3 |||||||||||||||
-  sigma_4 ||||||||||
-  sigma_5 |||||||
-  sigma_6 ||||
-  sigma_7 ||
-  sigma_8 |
+Keep top 3: A_3 captures the three largest singular values. Error = remaining values (sigma_4 through sigma_8).
 
-Keep top 3:   A_3 captures the three tallest bars.
-              Error = remaining bars (sigma_4 through sigma_8).
-
-If singular values decay fast, a small k captures most of the matrix.
-If they decay slowly, the matrix has no low-rank structure.
-```
+If singular values decay fast, a small k captures most of the matrix. If they decay slowly, the matrix has no low-rank structure.
 
 ### Image compression with SVD
 
@@ -256,26 +242,34 @@ LSA was one of the first successful methods for capturing semantic similarity fr
 
 Noisy data has signal concentrated in the top singular values and noise spread across all singular values. Truncating removes the noise floor.
 
-```
-Clean signal:
-  sigma_1 ||||||||||||||||||||||||
-  sigma_2 |||||||||||||||||||
-  sigma_3 |||||||||||||||
-  sigma_4 |
-  sigma_5 |
+**Clean signal singular values:**
 
-Noisy signal (noise adds to all singular values):
-  sigma_1 |||||||||||||||||||||||||
-  sigma_2 ||||||||||||||||||||
-  sigma_3 ||||||||||||||||
-  sigma_4 |||||||
-  sigma_5 ||||||
-  sigma_6 |||||
-  sigma_7 ||||
+| Component | Magnitude | Type |
+|-----------|-----------|------|
+| sigma_1 | Very large | Signal |
+| sigma_2 | Large | Signal |
+| sigma_3 | Medium | Signal |
+| sigma_4 | Near zero | Negligible |
+| sigma_5 | Near zero | Negligible |
 
-Strategy: keep only the top k singular values where there is a clear gap.
-The gap separates signal from noise.
-Reconstruct with A_k to get the denoised version.
+**Noisy signal singular values (noise adds to all):**
+
+| Component | Magnitude | Type |
+|-----------|-----------|------|
+| sigma_1 | Very large | Signal |
+| sigma_2 | Large | Signal |
+| sigma_3 | Medium | Signal |
+| sigma_4 | Small | Noise |
+| sigma_5 | Small | Noise |
+| sigma_6 | Small | Noise |
+| sigma_7 | Small | Noise |
+
+```mermaid
+graph TD
+    A["All singular values"] --> B{"Clear gap?"}
+    B -->|"Above gap"| C["Signal: keep these (top k)"]
+    B -->|"Below gap"| D["Noise: discard these"]
+    C --> E["Reconstruct with A_k to get denoised version"]
 ```
 
 This is used in signal processing, scientific measurement, and data cleaning. Any time you have a matrix corrupted by additive noise, truncated SVD is a principled way to separate signal from noise.

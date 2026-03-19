@@ -24,28 +24,27 @@ A system of linear equations has a geometric interpretation. Each equation defin
 ```
 2x + y = 5          Two lines in 2D.
 x - y  = 1          They intersect at x=2, y=1.
+```
 
-  y
-  5 +\
-    |  \  2x + y = 5
-  3 +   \.
-    |     * (2, 1)    <-- solution
-  1 +   /
-    |  /  x - y = 1
-  0 +------------ x
-    0  1  2  3  4
+```mermaid
+graph LR
+    A["2x + y = 5"] --- S["Solution: (2, 1)"]
+    B["x - y = 1"] --- S
 ```
 
 Three things can happen:
 
-```
-One solution:      No solution:         Infinite solutions:
-Lines intersect    Lines are parallel   Lines are the same
-
-    \  /               /  /               /
-     \/               /  /               /  (same line)
-     /\              /  /               /
-    /  \            /  /               /
+```mermaid
+graph TD
+    subgraph "One Solution"
+        A1["Lines intersect at a single point"]
+    end
+    subgraph "No Solution"
+        A2["Lines are parallel — no intersection"]
+    end
+    subgraph "Infinite Solutions"
+        A3["Lines are identical — every point is a solution"]
+    end
 ```
 
 In matrix form, "one solution" means A is invertible. "No solution" means the system is inconsistent. "Infinite solutions" means A has a null space. Most ML problems fall in the "no exact solution" category because you have more equations (data points) than unknowns (parameters). That is where least squares comes in.

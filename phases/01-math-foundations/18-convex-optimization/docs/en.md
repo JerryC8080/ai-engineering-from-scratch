@@ -21,21 +21,11 @@ Understanding convexity does three things. First, it tells you when your problem
 
 A set S is convex if for any two points in S, the line segment between them also lies entirely in S.
 
-```
-Convex sets:                    Not convex:
-
-  .---------.                    .----.
-  |         |                    |    |
-  |  * --- *|   rectangle        | *  |   .---.
-  |         |                    |  \ |  /     \
-  '---------'                    '---\| /   *   |
-                                      X        /
-    /\                               / \      /
-   /  \                             /   '----'
-  / *--* \      triangle           /
- /        \                  line between points
-/----------\                 goes OUTSIDE the set
-```
+| Convex sets | Not convex |
+|---|---|
+| **Rectangle**: any two points inside can be connected by a line segment that stays inside | **Star/crescent shape**: a line between two interior points can pass outside the set |
+| **Triangle**: same property holds for all interior points | **Donut/annulus**: the hole means some line segments leave the set |
+| The line segment between any two points stays within the set | The line segment between some pairs of points exits the set |
 
 Formal test: for any points x, y in S and any t in [0, 1], the point tx + (1-t)y is also in S.
 
@@ -60,21 +50,11 @@ f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)
 
 Geometrically: the line segment between any two points on the graph lies above or on the graph.
 
-```
-Convex function:                Non-convex function:
-
-   * line between             *
-  /  two points  *           / \        *
- /     lies       \         /   \      / \
-/      ABOVE       \       /     \    /   \
-\      the          \     /       \  /     \
- \     curve         \   /      curve goes
-  \                   \ /       ABOVE the
-   \                   *        line segment
-    \                /
-     \              /
-      *            /
-```
+| Property | Convex function | Non-convex function |
+|---|---|---|
+| **Line segment test** | The line between any two points on the graph lies **above or on** the curve | The line between some points on the graph dips **below** the curve |
+| **Shape** | Single bowl/valley curving upward | Multiple peaks and valleys with mixed curvature |
+| **Local minima** | Every local minimum is the global minimum | Multiple local minima may exist at different heights |
 
 Common convex functions:
 - f(x) = x^2 (parabola)
@@ -106,20 +86,17 @@ The central theorem of convex optimization:
 
 This means gradient descent cannot get trapped. Any downhill path leads to the same answer. The algorithm is guaranteed to converge to the optimal solution.
 
-```
-Convex: ONE answer                Non-convex: MANY traps
-
-       Loss                             Loss
-        |                                |
-   \    |    /                      /\   |  /\
-    \   |   /                      /  \  | /  \
-     \  |  /                      /    \ |/    \
-      \ | /                      /      \|      \
-       \|/                      /    local min    \
-        * global min           /                   \
-                              /                     *
-   Gradient descent          global min
-   ALWAYS finds it           Might miss it
+```mermaid
+graph LR
+    subgraph "Convex: ONE answer"
+        direction TB
+        C1["Loss surface has a single valley"] --> C2["Gradient descent ALWAYS finds the global minimum"]
+    end
+    subgraph "Non-convex: MANY traps"
+        direction TB
+        N1["Loss surface has multiple valleys and peaks"] --> N2["Gradient descent may get stuck in a local minimum"]
+        N2 --> N3["Global minimum might be missed"]
+    end
 ```
 
 Consequences:
@@ -183,23 +160,21 @@ Compare to gradient descent:
 
 Newton's method replaces the scalar learning rate with the inverse Hessian. This automatically adjusts the step size and direction based on local curvature.
 
-```
-Gradient descent path:          Newton's method path:
-
-    *                               *
-     .                               .
-      .                               .
-       .                               .
-        .                               * done in ~5 steps
-         .
-          .
-           .
-            .
-             .
-              * done in ~500 steps
-
-Follows the gradient blindly      Uses curvature to take
-                                  optimal steps
+```mermaid
+graph TD
+    subgraph "Gradient Descent"
+        GD1["Start"] --> GD2["Step 1"]
+        GD2 --> GD3["Step 2"]
+        GD3 --> GD4["..."]
+        GD4 --> GD5["Step ~500: Converged"]
+        GD_note["Follows gradient blindly — many small steps"]
+    end
+    subgraph "Newton's Method"
+        NM1["Start"] --> NM2["Step 1"]
+        NM2 --> NM3["..."]
+        NM3 --> NM4["Step ~5: Converged"]
+        NM_note["Uses curvature for optimal steps"]
+    end
 ```
 
 Advantages:
@@ -219,18 +194,15 @@ Constrained optimization: minimize f(x) subject to constraints.
 
 Real problems have constraints. You want to minimize cost but your budget is limited. You want to minimize error but your model complexity is bounded.
 
-```
-Unconstrained minimum:          Constrained minimum:
-
-        Loss                          Loss
-   \    |    /                   \    |    /
-    \   |   /                     \   |   /
-     \  |  /                      \  |  /
-      \ | /    <- free min         \ | /
-       \|/                          \|/
-        *                            |   * <- constrained min
-                                     |  /
-                              constraint boundary
+```mermaid
+graph LR
+    subgraph "Unconstrained"
+        U1["Loss function"] --> U2["Free minimum: lowest point of the loss surface"]
+    end
+    subgraph "Constrained"
+        C1["Loss function"] --> C2["Constrained minimum: lowest point within the feasible region"]
+        C3["Constraint boundary limits the search space"]
+    end
 ```
 
 ### Lagrange multipliers
@@ -254,14 +226,11 @@ dL/dlambda = g(x) = 0
 
 Geometric intuition: at the constrained minimum, the gradient of f must be parallel to the gradient of the constraint g. If they were not parallel, you could move along the constraint surface and reduce f further.
 
-```
-Contours of f(x,y)          Constraint g(x,y) = 0
-
-  ---  ---  ---              \
- /   \/   \/   \              \
-|    ||    ||    |     +       * <- gradients are parallel
- \   /\   /\   /              /    here at the solution
-  ---  ---  ---              /
+```mermaid
+graph LR
+    A["Contours of f(x,y): concentric ellipses"] --- S["Solution point"]
+    B["Constraint curve g(x,y) = 0"] --- S
+    S --- C["At the solution, gradient of f is parallel to gradient of g"]
 ```
 
 Example: minimize f(x,y) = x^2 + y^2 subject to x + y = 1.
@@ -324,20 +293,12 @@ minimize  Loss(w) + lambda * ||w||_1
 
 The constraint ||w||_1 <= t defines a diamond (rotated square in 2D).
 
-```
-L2 constraint (circle):        L1 constraint (diamond):
-
-     .---.                          /\
-    /     \                        /  \
-   /   *---+--- loss contour      / *--+--- loss contour
-   \       /                      \    /    hits a CORNER
-    \     /                        \  /
-     '---'                          \/
-
-Solution on the circle            Solution at a corner
-Weights are small                 Some weights are ZERO
-                                  (sparse solution)
-```
+| Property | L2 constraint (circle) | L1 constraint (diamond) |
+|---|---|---|
+| **Constraint shape** | Circle (sphere in higher dims) | Diamond (rotated square in 2D) |
+| **Where loss contour touches** | Smooth boundary — any point on the circle | Corner — aligned with an axis |
+| **Solution behavior** | Weights are small but nonzero | Some weights are exactly zero (sparse) |
+| **Result** | Weight shrinkage | Feature selection |
 
 This explains why L1 produces sparse models (feature selection) while L2 only shrinks weights. The diamond has corners aligned with axes. Loss contours are more likely to touch a corner, setting one or more weights exactly to zero.
 
@@ -384,19 +345,12 @@ Neural network loss functions are wildly non-convex. By every classical measure,
 
 **Loss landscape structure:**
 
-```
-Low-dimensional space:           High-dimensional space:
-
-  /\    /\    /\                 ~~~~~~~~~~~~
- /  \  /  \  /  \               ~          ~~
-/    \/    \/    \              ~    ~~~~     ~
-                               ~   ~    ~     ~
-Many isolated minima           ~  ~      ~    ~
-Hard to navigate                ~~        ~~~~
-
-                               Connected valleys
-                               Many paths to good solutions
-```
+| Property | Low-dimensional space | High-dimensional space |
+|---|---|---|
+| **Landscape** | Many isolated peaks and valleys | Smoothly connected valleys |
+| **Minima** | Many isolated local minima | Few bad local minima; most are near-optimal |
+| **Navigation** | Hard to find global minimum | Many paths lead to good solutions |
+| **Critical points** | Mix of local minima and saddle points | Overwhelmingly saddle points, not local minima |
 
 **Stochastic noise acts as implicit regularization.** Mini-batch SGD adds noise that prevents settling into sharp minima. Sharp minima overfit; flat minima generalize. The noise biases optimization toward flat regions of the loss landscape.
 

@@ -51,21 +51,14 @@ The algorithm:
 
 Why eigendecomposition? The covariance matrix is symmetric and positive semi-definite. Its eigenvectors are orthogonal directions in feature space. The eigenvalues tell you how much variance each direction captures. The eigenvector with the largest eigenvalue points along the direction of maximum variance.
 
+```mermaid
+graph LR
+    A["Original data (2D)\nData spread in both\nx and y directions"] -->|"PCA rotation"| B["After PCA\nPC1 captures the elongated spread\nPC2 captures the narrow spread\nDrop PC2 and you lose little info"]
 ```
-Original data (2D):           After PCA rotation:
 
-  y                              PC2
-  ┤     ·  ·  ·                   ┤
-  ┤   · · ·· · ·                  ┤   ·····
-  ┤  · ·· ···· · ·        ───────►┤ ·········
-  ┤   · · ·· · ·                  ┤   ·····
-  ┤     ·  ·  ·                   ┤
-  ┼────────────── x               ┼──────────── PC1
-
-  Data spread in both          PC1 captures the elongated spread.
-  x and y directions.          PC2 captures the narrow spread.
-                               Drop PC2 and you lose little info.
-```
+- **Before PCA:** Data cloud is spread diagonally across both x and y axes
+- **After PCA:** Coordinate system is rotated so PC1 aligns with the direction of maximum variance (elongated spread) and PC2 aligns with the direction of minimum variance (narrow spread)
+- **Dimensionality reduction:** Dropping PC2 projects the data onto PC1, losing very little information
 
 ### Explained variance ratio
 

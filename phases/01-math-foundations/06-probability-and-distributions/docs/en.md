@@ -151,15 +151,13 @@ In ML, expected value appears as the loss function (average loss over the data d
 
 A joint distribution P(X, Y) describes two random variables together.
 
-```
 Joint PMF example (X = weather, Y = umbrella):
 
-               Y=0 (no umbrella)   Y=1 (umbrella)
-  X=0 (sun)        0.40                0.10        | P(X=0) = 0.50
-  X=1 (rain)       0.05                0.45        | P(X=1) = 0.50
-                  ------              ------
-                P(Y=0) = 0.45       P(Y=1) = 0.55
-```
+| | Y=0 (no umbrella) | Y=1 (umbrella) | Marginal P(X) |
+|---|---|---|---|
+| X=0 (sun) | 0.40 | 0.10 | P(X=0) = 0.50 |
+| X=1 (rain) | 0.05 | 0.45 | P(X=1) = 0.50 |
+| **Marginal P(Y)** | P(Y=0) = 0.45 | P(Y=1) = 0.55 | 1.00 |
 
 The marginal distribution sums out the other variable:
 

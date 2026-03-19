@@ -19,35 +19,42 @@ Matrices are not just grids of numbers. They are spatial machines. A rotation ma
 
 Every linear transformation in 2D can be written as a 2x2 matrix. The matrix tells you exactly where the basis vectors [1, 0] and [0, 1] end up. Everything else follows.
 
-```
-Standard basis:            After transformation M:
-
-  y                          y
-  |                          |     e2'
-  e2 = [0,1]                 |   /
-  |                          | /
-  +---- e1 = [1,0] -- x     +--------- e1' -- x
-
-M = | e1'_x  e2'_x |     The columns ARE the new basis vectors
-    | e1'_y  e2'_y |
+```mermaid
+graph LR
+    subgraph Before["Standard Basis"]
+        e1["e1 = [1, 0] (along x)"]
+        e2["e2 = [0, 1] (along y)"]
+    end
+    subgraph Transform["Matrix M"]
+        M["M = columns are new basis vectors"]
+    end
+    subgraph After["After Transformation M"]
+        e1p["e1' = new x-basis"]
+        e2p["e2' = new y-basis"]
+    end
+    e1 --> M --> e1p
+    e2 --> M --> e2p
 ```
 
 ### Rotation
 
 A 2D rotation by angle theta keeps distances and angles intact. It moves every point along a circular arc.
 
-```
-Rotation by 45 degrees:
-
-  y                          y
-  |    B(0,2)                |  B'
-  |                          |/
-  |         A(2,1)           + . A'
-  |                          |
-  +-------------- x         +-------------- x
-
-R(theta) = | cos(theta)  -sin(theta) |
-           | sin(theta)   cos(theta) |
+```mermaid
+graph LR
+    subgraph Before["Before Rotation"]
+        A["A(2, 1)"]
+        B["B(0, 2)"]
+    end
+    subgraph Rot["Rotate 45 degrees"]
+        R["R(θ) = [[cos θ, -sin θ], [sin θ, cos θ]]"]
+    end
+    subgraph After["After Rotation"]
+        Ap["A'(0.71, 2.12)"]
+        Bp["B'(-1.41, 1.41)"]
+    end
+    A --> R --> Ap
+    B --> R --> Bp
 ```
 
 In 3D, you rotate around an axis. Each axis has its own rotation matrix:
@@ -70,80 +77,93 @@ Ry(theta) = |  cos  0  sin |     Rotate around y-axis
 
 Scaling stretches or compresses along each axis independently.
 
-```
-Scale x by 2, y by 0.5:
-
-  y                          y
-  |                          |
-  2  B                       1  B'
-  |                          |
-  1     A(2,1)               +----------- A'(4, 0.5)
-  |                          |
-  +--1--2--3--4-- x         +--1--2--3--4-- x
-
-S = | sx  0 |     sx = 2, sy = 0.5
-    | 0  sy |
+```mermaid
+graph LR
+    subgraph Before["Before Scaling"]
+        A["A(2, 1)"]
+        B["B(0, 2)"]
+    end
+    subgraph Scale["Scale sx=2, sy=0.5"]
+        S["S = [[2, 0], [0, 0.5]]"]
+    end
+    subgraph After["After Scaling"]
+        Ap["A'(4, 0.5)"]
+        Bp["B'(0, 1)"]
+    end
+    A --> S --> Ap
+    B --> S --> Bp
 ```
 
 ### Shearing
 
 Shearing tilts one axis while keeping the other fixed. It turns rectangles into parallelograms.
 
+```mermaid
+graph LR
+    subgraph Before["Before Shear"]
+        A["A(1, 0)"]
+        B["B(0, 1)"]
+    end
+    subgraph Shear["Shear in x, k=1"]
+        Sh["Shx = [[1, k], [0, 1]]"]
+    end
+    subgraph After["After Shear"]
+        Ap["A(1, 0) unchanged"]
+        Bp["B'(1, 1) shifted"]
+    end
+    A --> Sh --> Ap
+    B --> Sh --> Bp
 ```
-Shear in x (k=1):
 
-  y                          y
-  |                          |
-  | B(0,1)                   |    B'(1,1)
-  |                          |  /
-  |     A(1,0)               | /   A(1,0)
-  +-------------- x         +-------------- x
-
-Shx = | 1  k |     Shifts x by k * y
-      | 0  1 |
-
-Shy = | 1  0 |     Shifts y by k * x
-      | k  1 |
-```
+Shear matrices:
+- `Shx = [[1, k], [0, 1]]` shifts x by k * y
+- `Shy = [[1, 0], [k, 1]]` shifts y by k * x
 
 ### Reflection
 
 Reflection mirrors points across an axis or line.
 
+```mermaid
+graph LR
+    subgraph Before["Before Reflection"]
+        A["A(2, 1)"]
+    end
+    subgraph Reflect["Reflect across y-axis"]
+        R["[[-1, 0], [0, 1]]"]
+    end
+    subgraph After["After Reflection"]
+        Ap["A'(-2, 1)"]
+    end
+    A --> R --> Ap
 ```
-Reflect across y-axis:
 
-  y                          y
-  |                          |
-  |         A(2,1)     A'(-2,1)         |
-  |                          |
-  +-------------- x         +-------------- x
-
-Reflect y-axis: | -1  0 |     Reflect x-axis: | 1   0 |
-                |  0  1 |                      | 0  -1 |
-```
+Reflection matrices:
+- Reflect across y-axis: `[[-1, 0], [0, 1]]`
+- Reflect across x-axis: `[[1, 0], [0, -1]]`
 
 ### Composition: chaining transformations
 
 Applying transformation A then B is the same as multiplying their matrices: `result = B @ A @ point`. Order matters. Rotate then scale gives different results than scale then rotate.
 
+```mermaid
+graph LR
+    subgraph Path1["Rotate 90 then Scale (2, 0.5)"]
+        P1["(1, 0)"] -->|"Rotate 90"| P2["(0, 1)"] -->|"Scale"| P3["(0, 0.5)"]
+    end
 ```
-Rotate 90 then scale (2, 0.5):
 
-  Point (1, 0) --rotate 90--> (0, 1) --scale--> (0, 0.5)
+Composed: `S @ R = [[0, -2], [0.5, 0]]`
 
-  Composed: S @ R = | 2  0 | @ | 0  -1 | = | 0  -2  |
-                    | 0 0.5|   | 1   0 |   | 0.5  0 |
+```mermaid
+graph LR
+    subgraph Path2["Scale (2, 0.5) then Rotate 90"]
+        Q1["(1, 0)"] -->|"Scale"| Q2["(2, 0)"] -->|"Rotate 90"| Q3["(0, 2)"]
+    end
+```
 
-Scale then rotate 90:
-
-  Point (1, 0) --scale--> (2, 0) --rotate 90--> (0, 2)
-
-  Composed: R @ S = | 0  -1 | @ | 2  0 | = | 0  -0.5 |
-                    | 1   0 |   | 0 0.5|   | 2    0  |
+Composed: `R @ S = [[0, -0.5], [2, 0]]`
 
 Different results. Matrix multiplication is not commutative.
-```
 
 ### Eigenvalues and eigenvectors
 

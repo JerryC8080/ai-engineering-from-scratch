@@ -21,20 +21,14 @@ A derivative measures the rate of change. For a function y = f(x), the derivativ
 
 Geometrically, the derivative is the slope of the tangent line at a point.
 
-```
-f(x) = x^2
+**f(x) = x^2:**
 
-  y
-  9 |         *
-    |
-    |
-  4 |     * /    <-- slope at x=2 is 4
-    |      /         (tangent line)
-  1 |   */
-    |  *
-  0 *------------- x
-    0  1  2  3
-```
+| x | f(x) | f'(x) (slope) |
+|---|------|---------------|
+| 0 | 0    | 0 (flat, at the bottom) |
+| 1 | 1    | 2 |
+| 2 | 4    | 4 (tangent line slope at this point) |
+| 3 | 9    | 6 |
 
 At x=2, the slope is 4. If you move x a tiny bit to the right, y increases by about 4 times that amount. At x=0, the slope is 0. You are at the bottom of the bowl.
 
@@ -71,21 +65,14 @@ grad f = [ df/dx, df/dy, df/dz ]
 
 The gradient points in the direction of steepest ascent. To minimize a function, go in the opposite direction.
 
-```
-Contour plot of f(x,y) = x^2 + y^2:
+**Contour plot of f(x,y) = x^2 + y^2:**
 
-  y
-  2 |  \  |  /
-    |   \ | /
-  0 | ----*----  <-- minimum at (0,0)
-    |   / | \
- -2 |  /  |  \
-    +------------- x
-   -2     0     2
+The function forms a bowl shape with concentric circles as contour lines. The minimum is at (0, 0).
 
-  grad f at (1,1) = [2, 2]  -- points uphill (away from minimum)
- -grad f at (1,1) = [-2,-2] -- points downhill (toward minimum)
-```
+| Point | grad f | -grad f (descent direction) |
+|-------|--------|----------------------------|
+| (1, 1) | [2, 2] (points uphill, away from minimum) | [-2, -2] (points downhill, toward minimum) |
+| (0, 0) | [0, 0] (flat, at the minimum) | [0, 0] |
 
 This is gradient descent in a picture. Compute the gradient, negate it, take a step.
 
@@ -106,23 +93,15 @@ For every weight:
 
 The learning rate controls step size. Too big and you overshoot. Too small and you crawl.
 
-```
-Loss landscape (1D slice):
+**Loss landscape (1D slice):**
 
-  L
-  |  *                      *
-  |   *                    *
-  |    *                  *
-  |     *       *        *
-  |      *     * *      *
-  |       *   *   *    *
-  |        * *     *  *
-  |         *       **
-  +-------------------------- w
-          ^         ^
-       global     local
-       minimum    minimum
-```
+The loss function L(w) forms a curve with peaks and valleys as the weight w varies.
+
+| Feature | Description |
+|---------|-------------|
+| Global minimum | The lowest point on the entire curve -- the best solution |
+| Local minimum | A valley that is lower than its neighbors but not the lowest overall |
+| Slope | Gradient descent follows the slope downhill from any starting point |
 
 Gradient descent follows the slope downhill. It can get stuck in local minima, but in high-dimensional spaces (millions of weights) this is rarely a practical problem.
 
@@ -203,14 +182,14 @@ Neural networks are chains of functions: input -> linear -> activation -> linear
 
 When a function maps a vector to a vector (like a neural network layer), its derivative is a matrix. The Jacobian contains every partial derivative of every output with respect to every input.
 
-```
-f: R^n -> R^m
+For f: R^n -> R^m, the Jacobian J is an m x n matrix:
 
-J = | df1/dx1  df1/dx2  ...  df1/dxn |
-    | df2/dx1  df2/dx2  ...  df2/dxn |
-    |   ...      ...    ...    ...   |
-    | dfm/dx1  dfm/dx2  ...  dfm/dxn |
-```
+| | x1 | x2 | ... | xn |
+|---|---|---|---|---|
+| f1 | df1/dx1 | df1/dx2 | ... | df1/dxn |
+| f2 | df2/dx1 | df2/dx2 | ... | df2/dxn |
+| ... | ... | ... | ... | ... |
+| fm | dfm/dx1 | dfm/dx2 | ... | dfm/dxn |
 
 You will not compute Jacobians by hand for neural networks. PyTorch handles it. But knowing it exists helps you understand shapes in backpropagation: if a layer maps R^n to R^m, its Jacobian is m x n. The gradient flows backward through the transpose of this matrix.
 
@@ -218,15 +197,23 @@ You will not compute Jacobians by hand for neural networks. PyTorch handles it. 
 
 Every weight in a neural network gets a gradient. The gradient tells you how to adjust that weight to reduce the loss.
 
+```mermaid
+graph LR
+    subgraph Forward["Forward Pass"]
+        I["input"] --> W1["W1"] --> R["relu"] --> W2["W2"] --> S["softmax"] --> L["loss"]
+    end
 ```
-Forward pass:   input --> [W1] --> [relu] --> [W2] --> [softmax] --> loss
-                                                                      |
-Backward pass:  dL/dW1 <-- ... <-- dL/dW2 <-- ... <------------- dL/dloss
+
+```mermaid
+graph RL
+    subgraph Backward["Backward Pass"]
+        dL["dL/dloss"] --> dW2["dL/dW2"] --> d2["..."] --> dW1["dL/dW1"]
+    end
+```
 
 Each weight update:
-  W1 = W1 - lr * dL/dW1
-  W2 = W2 - lr * dL/dW2
-```
+- `W1 = W1 - lr * dL/dW1`
+- `W2 = W2 - lr * dL/dW2`
 
 The forward pass computes the prediction and loss. The backward pass computes the gradient of the loss with respect to every weight. Then every weight takes a small step downhill. Repeat for millions of steps. That is deep learning.
 
