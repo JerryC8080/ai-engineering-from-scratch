@@ -15,13 +15,17 @@ Git is the tool. GitHub is where the code lives. This lesson covers what you nee
 
 ## The Concept
 
-```
-Working Directory    Staging Area    Local Repo    Remote (GitHub)
-      |                  |              |               |
-      |--- git add ----->|              |               |
-      |                  |-- git commit>|               |
-      |                  |              |--- git push ->|
-      |<-------------- git pull --------|<-- fetch -----|
+```mermaid
+sequenceDiagram
+    participant WD as Working Directory
+    participant SA as Staging Area
+    participant LR as Local Repo
+    participant R as Remote (GitHub)
+    WD->>SA: git add
+    SA->>LR: git commit
+    LR->>R: git push
+    R->>LR: git fetch
+    LR->>WD: git pull
 ```
 
 Three things to remember:

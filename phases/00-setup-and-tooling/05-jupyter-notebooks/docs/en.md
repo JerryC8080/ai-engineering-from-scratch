@@ -17,32 +17,20 @@ But notebooks have real traps. People use them for everything, including things 
 
 A notebook is a list of cells. Each cell is either code or text.
 
-```
-┌──────────────────────────────┐
-│  [Markdown Cell]             │
-│  # My Experiment             │
-│  Testing learning rate 0.01  │
-├──────────────────────────────┤
-│  [Code Cell]  ► Run          │
-│  model.fit(X, y, lr=0.01)   │
-│  ────────────────────────    │
-│  Output: loss = 0.342        │
-├──────────────────────────────┤
-│  [Code Cell]  ► Run          │
-│  plt.plot(losses)            │
-│  ────────────────────────    │
-│  Output: [inline plot]       │
-└──────────────────────────────┘
+```mermaid
+graph TD
+    A["**Markdown Cell**\n# My Experiment\nTesting learning rate 0.01"] --> B["**Code Cell** ► Run\nmodel.fit(X, y, lr=0.01)\n---\nOutput: loss = 0.342"]
+    B --> C["**Code Cell** ► Run\nplt.plot(losses)\n---\nOutput: inline plot"]
 ```
 
 The kernel is a Python process running in the background. When you run a cell, it sends the code to the kernel, which executes it and sends back the result. All cells share the same kernel, so variables persist between cells.
 
-```
-Notebook UI  <-->  Kernel (Python process)
-                     |
-                     ├── keeps variables in memory
-                     ├── runs cells in whatever order you click
-                     └── dies when you restart it
+```mermaid
+graph LR
+    A[Notebook UI] <--> B[Kernel\nPython process]
+    B --> C[Keeps variables in memory]
+    B --> D[Runs cells in whatever order you click]
+    B --> E[Dies when you restart it]
 ```
 
 That "whatever order you click" part is both the superpower and the foot-gun.

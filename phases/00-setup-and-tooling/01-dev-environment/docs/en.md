@@ -17,16 +17,11 @@ Most people skip environment setup. Then they spend hours debugging import error
 
 An AI engineering environment has four layers:
 
-```
-┌─────────────────────────────┐
-│  4. AI/ML Libraries         │  PyTorch, JAX, transformers, etc.
-├─────────────────────────────┤
-│  3. Language Runtimes       │  Python 3.11+, Node 20+, Rust, Julia
-├─────────────────────────────┤
-│  2. Package Managers        │  uv, pnpm, cargo, juliaup
-├─────────────────────────────┤
-│  1. System Foundation       │  OS, shell, git, editor, GPU drivers
-└─────────────────────────────┘
+```mermaid
+graph TD
+    A["4. AI/ML Libraries\nPyTorch, JAX, transformers, etc."] --> B["3. Language Runtimes\nPython 3.11+, Node 20+, Rust, Julia"]
+    B --> C["2. Package Managers\nuv, pnpm, cargo, juliaup"]
+    C --> D["1. System Foundation\nOS, shell, git, editor, GPU drivers"]
 ```
 
 We install bottom-up. Each layer depends on the one below it.

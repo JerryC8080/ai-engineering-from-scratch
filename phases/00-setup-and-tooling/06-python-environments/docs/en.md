@@ -22,25 +22,20 @@ The fix: every project gets its own isolated environment with its own packages.
 
 ## The Concept
 
-```
-Without virtual environments:
+```mermaid
+graph TD
+    subgraph without["Without virtual environments"]
+        SP[System Python] --> T24["torch 2.4.0 (CUDA 12.4)\nProject A needs this"]
+        SP --> T21["torch 2.1.0 (CUDA 11.8)\nProject B needs this"]
+        SP --> CONFLICT["CONFLICT: only one\ntorch version can exist"]
+    end
 
-  System Python
-  ├── torch 2.4.0 (CUDA 12.4)    <-- Project A needs this
-  ├── torch 2.1.0 (CUDA 11.8)    <-- Project B needs this
-  └── CONFLICT: only one torch version can exist
-
-With virtual environments:
-
-  Project A (.venv/)
-  ├── torch 2.4.0 (CUDA 12.4)
-  └── transformers 4.44
-
-  Project B (.venv/)
-  ├── torch 2.1.0 (CUDA 11.8)
-  └── diffusers 0.28
-
-  No conflict. Each project is isolated.
+    subgraph with["With virtual environments"]
+        PA["Project A (.venv/)"] --> PA1["torch 2.4.0 (CUDA 12.4)"]
+        PA --> PA2["transformers 4.44"]
+        PB["Project B (.venv/)"] --> PB1["torch 2.1.0 (CUDA 11.8)"]
+        PB --> PB2["diffusers 0.28"]
+    end
 ```
 
 ## Build It

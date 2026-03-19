@@ -15,22 +15,15 @@ This lesson covers the terminal skills that matter for AI work. No history of Un
 
 ## The Concept
 
-```
-Your AI terminal workflow:
-
-┌─────────────────────────────────────────────────────┐
-│  tmux session: "training"                           │
-│  ┌────────────────────────┬────────────────────────┐│
-│  │ pane 1: training run   │ pane 2: GPU monitor    ││
-│  │                        │                        ││
-│  │ python train.py        │ watch -n1 nvidia-smi   ││
-│  │ Epoch 12/100 ...       │ GPU: 78% | Mem: 14/24G ││
-│  │                        │                        ││
-│  ├────────────────────────┴────────────────────────┤│
-│  │ pane 3: logs + experiments                      ││
-│  │ tail -f logs/train.log | grep "loss"            ││
-│  └─────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph tmux["tmux session: training"]
+        subgraph top["Top row"]
+            P1["Pane 1: Training run<br/>python train.py<br/>Epoch 12/100 ..."]
+            P2["Pane 2: GPU monitor<br/>watch -n1 nvidia-smi<br/>GPU: 78% | Mem: 14/24G"]
+        end
+        P3["Pane 3: Logs + experiments<br/>tail -f logs/train.log | grep loss"]
+    end
 ```
 
 Three things running at once. One terminal. You can detach, go home, SSH back in, and reattach. The training keeps running.

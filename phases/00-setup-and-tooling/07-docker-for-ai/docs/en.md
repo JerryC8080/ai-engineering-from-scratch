@@ -17,23 +17,19 @@ AI projects are dependency nightmares. A typical stack includes Python, PyTorch,
 
 Docker wraps your code, runtime, libraries, and system tools into an isolated unit called a container. Think of it as a lightweight virtual machine, except it shares the host OS kernel instead of running its own, so it starts in seconds instead of minutes.
 
-```
-Without Docker:
-  Your machine     Their machine     Server
-  Python 3.12      Python 3.10       Python 3.11
-  CUDA 12.4        CUDA 11.8         CUDA 12.1
-  PyTorch 2.3      PyTorch 2.1       PyTorch 2.2
-  ??? crashes       ??? crashes        ??? crashes
+```mermaid
+graph TD
+    subgraph without["Without Docker"]
+        A1["Your machine<br/>Python 3.12<br/>CUDA 12.4<br/>PyTorch 2.3"] -->|crashes| X1["???"]
+        A2["Their machine<br/>Python 3.10<br/>CUDA 11.8<br/>PyTorch 2.1"] -->|crashes| X2["???"]
+        A3["Server<br/>Python 3.11<br/>CUDA 12.1<br/>PyTorch 2.2"] -->|crashes| X3["???"]
+    end
 
-With Docker:
-  Your machine     Their machine     Server
-  ┌────────────┐   ┌────────────┐   ┌────────────┐
-  │ Python 3.12│   │ Python 3.12│   │ Python 3.12│
-  │ CUDA 12.4  │   │ CUDA 12.4  │   │ CUDA 12.4  │
-  │ PyTorch 2.3│   │ PyTorch 2.3│   │ PyTorch 2.3│
-  │ Your code  │   │ Your code  │   │ Your code  │
-  └────────────┘   └────────────┘   └────────────┘
-  Same image.       Same image.       Same image.
+    subgraph with_docker["With Docker — Same image everywhere"]
+        B1["Your machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+        B2["Their machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+        B3["Server<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+    end
 ```
 
 ### Why AI projects need Docker more than most

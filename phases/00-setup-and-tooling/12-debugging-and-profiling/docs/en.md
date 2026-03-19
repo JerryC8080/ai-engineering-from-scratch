@@ -17,14 +17,11 @@ You need debugging tools that catch these silent failures before they waste your
 
 AI debugging operates at three levels:
 
-```
-┌─────────────────────────────────┐
-│  3. Training Dynamics           │  Loss curves, gradient norms, activations
-├─────────────────────────────────┤
-│  2. Tensor Operations           │  Shapes, dtypes, devices, NaN/Inf values
-├─────────────────────────────────┤
-│  1. Standard Python             │  Breakpoints, logging, profiling, memory
-└─────────────────────────────────┘
+```mermaid
+graph TD
+    L3["3. Training Dynamics<br/>Loss curves, gradient norms, activations"] --> L2
+    L2["2. Tensor Operations<br/>Shapes, dtypes, devices, NaN/Inf values"] --> L1
+    L1["1. Standard Python<br/>Breakpoints, logging, profiling, memory"]
 ```
 
 Most people jump straight to level 3 (staring at TensorBoard). But 80% of AI bugs live at levels 1 and 2.

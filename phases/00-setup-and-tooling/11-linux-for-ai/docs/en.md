@@ -17,15 +17,15 @@ This is a survival guide. It covers exactly what you need to operate on a remote
 
 Linux organizes everything under a single root `/`. There is no `C:\` or `/Volumes`. The directories you'll actually touch:
 
-```
-/
-├── home/your-username/    Your files. This is where you clone repos and run training.
-├── tmp/                   Temporary files. Cleared on reboot. Good for scratch work.
-├── usr/                   System programs and libraries. Don't touch this manually.
-├── etc/                   Config files. You'll edit things here occasionally.
-├── var/log/               Logs. Check here when something breaks.
-├── mnt/ or /media/        Where external drives and volumes get mounted.
-└── proc/ and /sys/        Virtual files exposing kernel and hardware info.
+```mermaid
+graph TD
+    root["/"] --> home["home/your-username/<br/>Your files — clone repos, run training"]
+    root --> tmp["tmp/<br/>Temporary files, cleared on reboot"]
+    root --> usr["usr/<br/>System programs and libraries"]
+    root --> etc["etc/<br/>Config files"]
+    root --> varlog["var/log/<br/>Logs — check when something breaks"]
+    root --> mnt["mnt/ or /media/<br/>External drives and volumes"]
+    root --> proc["proc/ and /sys/<br/>Virtual files — kernel and hardware info"]
 ```
 
 Your home directory is `~` or `/home/your-username`. Almost everything you do happens here.

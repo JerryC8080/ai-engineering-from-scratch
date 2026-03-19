@@ -13,10 +13,12 @@ Starting from Phase 11, you'll call LLM APIs (Anthropic, OpenAI, Google). In Pha
 
 ## The Concept
 
-```
-Your Code  -->  HTTP Request (with API key)  -->  API Server
-                                                      |
-Your Code  <--  HTTP Response (JSON)         <--------/
+```mermaid
+sequenceDiagram
+    participant C as Your Code
+    participant S as API Server
+    C->>S: HTTP Request (with API key)
+    S->>C: HTTP Response (JSON)
 ```
 
 Every API call has:

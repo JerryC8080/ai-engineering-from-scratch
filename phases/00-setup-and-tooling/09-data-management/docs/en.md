@@ -13,20 +13,14 @@ Every AI project starts with data. You need to find datasets, download them, con
 
 ## The Concept
 
-```
-Hugging Face Hub
-    |
-    v
-datasets library  -->  Load / Stream  -->  Local Cache (~/.cache/huggingface/)
-    |
-    v
-Format Conversion (CSV, JSON, Parquet, Arrow)
-    |
-    v
-Data Splits (train / val / test)
-    |
-    v
-Your Training Pipeline
+```mermaid
+graph TD
+    A["Hugging Face Hub"] --> B["datasets library"]
+    B --> C["Load / Stream"]
+    C --> D["Local Cache<br/>~/.cache/huggingface/"]
+    B --> E["Format Conversion<br/>CSV, JSON, Parquet, Arrow"]
+    E --> F["Data Splits<br/>train / val / test"]
+    F --> G["Your Training Pipeline"]
 ```
 
 The Hugging Face `datasets` library is the standard way to load data for AI work. It handles downloading, caching, format conversion, and streaming out of the box.

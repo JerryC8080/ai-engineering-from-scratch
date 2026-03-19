@@ -17,18 +17,13 @@ The right setup takes 20 minutes. Skipping it costs you 20 minutes every day.
 
 An AI engineering editor setup needs five things:
 
-```
-┌─────────────────────────────┐
-│  5. Remote Development      │  SSH into GPU boxes, cloud VMs
-├─────────────────────────────┤
-│  4. Terminal Integration    │  Run scripts, debug, monitor GPU
-├─────────────────────────────┤
-│  3. AI-Specific Settings    │  Auto-format, type checking, rulers
-├─────────────────────────────┤
-│  2. Extensions              │  Python, Jupyter, Pylance, GitLens
-├─────────────────────────────┤
-│  1. Base Editor              │  VS Code (free, extensible, universal)
-└─────────────────────────────┘
+```mermaid
+graph TD
+    L5["5. Remote Development<br/>SSH into GPU boxes, cloud VMs"] --> L4
+    L4["4. Terminal Integration<br/>Run scripts, debug, monitor GPU"] --> L3
+    L3["3. AI-Specific Settings<br/>Auto-format, type checking, rulers"] --> L2
+    L2["2. Extensions<br/>Python, Jupyter, Pylance, GitLens"] --> L1
+    L1["1. Base Editor<br/>VS Code — free, extensible, universal"]
 ```
 
 ## Build It
