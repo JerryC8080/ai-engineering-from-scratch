@@ -61,7 +61,7 @@ You learn AI. You build real things. You ship tools others can use.
 </td></tr>
 </table>
 
-<details>
+<details id="phase-1">
 <summary><strong>Phase 1: Math Foundations</strong> <code>18 lessons</code> &nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -87,7 +87,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-2">
 <summary><strong>Phase 2: ML Fundamentals</strong> <code>13 lessons</code> &nbsp; <em>Classical ML - still the backbone of most production AI.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -108,7 +108,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-3">
 <summary><strong>Phase 3: Deep Learning Core</strong> <code>13 lessons</code> &nbsp; <em>Neural networks from first principles. No frameworks until you build one.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -129,7 +129,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-4">
 <summary><strong>Phase 4: Computer Vision</strong> <code>16 lessons</code> &nbsp; <em>From pixels to understanding - image, video, and 3D.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -153,7 +153,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-5">
 <summary><strong>Phase 5: NLP: Foundations to Advanced</strong> <code>18 lessons</code> &nbsp; <em>Language is the interface to intelligence.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -179,7 +179,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-6">
 <summary><strong>Phase 6: Speech & Audio</strong> <code>12 lessons</code> &nbsp; <em>Hear, understand, speak.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -199,7 +199,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-7">
 <summary><strong>Phase 7: Transformers Deep Dive</strong> <code>14 lessons</code> &nbsp; <em>The architecture that changed everything.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -221,7 +221,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-8">
 <summary><strong>Phase 8: Generative AI</strong> <code>14 lessons</code> &nbsp; <em>Create images, video, audio, 3D, and more.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -243,7 +243,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-9">
 <summary><strong>Phase 9: Reinforcement Learning</strong> <code>12 lessons</code> &nbsp; <em>The foundation of RLHF and game-playing AI.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -263,7 +263,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-10">
 <summary><strong>Phase 10: LLMs from Scratch</strong> <code>14 lessons</code> &nbsp; <em>Build, train, and understand large language models.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -285,7 +285,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-11">
 <summary><strong>Phase 11: LLM Engineering</strong> <code>13 lessons</code> &nbsp; <em>Put LLMs to work in production.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -306,7 +306,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-12">
 <summary><strong>Phase 12: Multimodal AI</strong> <code>11 lessons</code> &nbsp; <em>See, hear, read, and reason across modalities.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -325,7 +325,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-13">
 <summary><strong>Phase 13: Tools & Protocols</strong> <code>10 lessons</code> &nbsp; <em>The interfaces between AI and the real world.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -343,7 +343,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-14">
 <summary><strong>Phase 14: Agent Engineering</strong> <code>15 lessons</code> &nbsp; <em>Build agents from first principles.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -366,7 +366,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-15">
 <summary><strong>Phase 15: Autonomous Systems</strong> <code>11 lessons</code> &nbsp; <em>Agents that run without human intervention safely.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -385,7 +385,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-16">
 <summary><strong>Phase 16: Multi-Agent & Swarms</strong> <code>14 lessons</code> &nbsp; <em>Coordination, emergence, and collective intelligence.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -407,7 +407,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-17">
 <summary><strong>Phase 17: Infrastructure & Production</strong> <code>11 lessons</code> &nbsp; <em>Ship AI to the real world.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -426,7 +426,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-18">
 <summary><strong>Phase 18: Ethics, Safety & Alignment</strong> <code>6 lessons</code> &nbsp; <em>Build AI that helps humanity. Not optional.</em></summary>
 
 | # | Lesson | Type | Lang |
@@ -440,7 +440,7 @@ You learn AI. You build real things. You ship tools others can use.
 
 </details>
 
-<details>
+<details id="phase-19">
 <summary><strong>Phase 19: Capstone Projects</strong> <code>5 projects</code> &nbsp; <em>Prove everything you learned.</em></summary>
 
 | # | Project | Combines | Lang |
