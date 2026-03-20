@@ -121,6 +121,68 @@ Key parameters:
 
 Rule of thumb: use PCA for preprocessing and data compression. Use t-SNE or UMAP when you need to visualize structure in 2D.
 
+### Kernel PCA
+
+Standard PCA finds linear subspaces. It rotates your coordinate system and drops axes. But what if the data lies on a nonlinear manifold? A circle in 2D cannot be separated by any line. Standard PCA will not help.
+
+Kernel PCA applies PCA in a high-dimensional feature space induced by a kernel function, without explicitly computing the coordinates in that space. This is the kernel trick -- the same idea behind SVMs.
+
+The algorithm:
+1. Compute the kernel matrix K where K_ij = k(x_i, x_j)
+2. Center the kernel matrix in feature space
+3. Eigendecompose the centered kernel matrix
+4. The top eigenvectors (scaled by 1/sqrt(eigenvalue)) are the projections
+
+Common kernel functions:
+
+| Kernel | Formula | Good for |
+|--------|---------|----------|
+| RBF (Gaussian) | exp(-gamma * \|\|x - y\|\|^2) | Most nonlinear data, smooth manifolds |
+| Polynomial | (x . y + c)^d | Polynomial relationships |
+| Sigmoid | tanh(alpha * x . y + c) | Neural network-like mappings |
+
+When to use kernel PCA vs standard PCA:
+
+| Criterion | Standard PCA | Kernel PCA |
+|-----------|-------------|------------|
+| Data structure | Linear subspace | Nonlinear manifold |
+| Speed | O(min(n^2 d, d^2 n)) | O(n^2 d + n^3) |
+| Interpretability | Components are linear combinations of features | Components lack direct feature interpretation |
+| Scalability | Works on millions of samples | Kernel matrix is n x n, memory-limited |
+| Reconstruction | Direct inverse transform | Requires pre-image approximation |
+
+The classic example: concentric circles in 2D. Two rings of points, one inside the other. Standard PCA projects both onto the same line -- useless for classification. Kernel PCA with an RBF kernel maps the inner circle and outer circle to different regions, making them linearly separable.
+
+### Reconstruction Error
+
+How good is your dimensionality reduction? You compressed 784 dimensions to 50. What did you lose?
+
+Measure reconstruction error:
+1. Project data to k dimensions: X_reduced = X @ W_k
+2. Reconstruct: X_hat = X_reduced @ W_k^T
+3. Compute MSE: mean((X - X_hat)^2)
+
+For PCA, reconstruction error has a clean relationship to explained variance:
+
+```
+Reconstruction error = sum of eigenvalues NOT included
+Total variance = sum of ALL eigenvalues
+Fraction lost = (sum of dropped eigenvalues) / (sum of all eigenvalues)
+```
+
+The explained variance ratio for each component is:
+
+```
+explained_ratio_k = eigenvalue_k / sum(all eigenvalues)
+```
+
+Plotting cumulative explained variance against number of components gives you the "elbow" curve. The right number of components is where:
+- The curve flattens out (diminishing returns)
+- Cumulative variance crosses your threshold (usually 0.90 or 0.95)
+- Downstream task performance plateaus
+
+Reconstruction error is useful beyond choosing k. You can use it for anomaly detection: samples with high reconstruction error are outliers that do not fit the learned subspace. This is the basis of PCA-based anomaly detection in production systems.
+
 ## Build It
 
 ### Step 1: PCA from scratch

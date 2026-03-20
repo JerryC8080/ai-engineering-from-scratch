@@ -72,6 +72,105 @@ def perplexity(avg_cross_entropy, base="e"):
     return 2 ** avg_cross_entropy
 
 
+def conditional_entropy(joint_probs, base=2):
+    rows = len(joint_probs)
+    cols = len(joint_probs[0])
+
+    margin_x = [sum(joint_probs[i][j] for j in range(cols)) for i in range(rows)]
+
+    h_yx = 0.0
+    for i in range(rows):
+        for j in range(cols):
+            pxy = joint_probs[i][j]
+            if pxy > 0 and margin_x[i] > 0:
+                p_y_given_x = pxy / margin_x[i]
+                h_yx -= pxy * math.log(p_y_given_x) / math.log(base)
+    return h_yx
+
+
+def joint_entropy(joint_probs, base=2):
+    total = 0.0
+    for row in joint_probs:
+        for pxy in row:
+            if pxy > 0:
+                total -= pxy * math.log(pxy) / math.log(base)
+    return total
+
+
+def label_smoothing_demo():
+    print()
+    print("=" * 60)
+    print("LABEL SMOOTHING AND CROSS-ENTROPY")
+    print("=" * 60)
+
+    num_classes = 4
+    true_class = 2
+    logits = [1.0, 0.5, 3.0, 0.2]
+    probs = softmax(logits)
+
+    hard_target = [0.0] * num_classes
+    hard_target[true_class] = 1.0
+
+    epsilons = [0.0, 0.05, 0.1, 0.2]
+    print(f"\n  Logits:  {logits}")
+    print(f"  Softmax: [{', '.join(f'{p:.4f}' for p in probs)}]")
+    print(f"  True class: {true_class}")
+    print()
+
+    for eps in epsilons:
+        soft_target = [eps / num_classes] * num_classes
+        soft_target[true_class] = (1 - eps) + eps / num_classes
+
+        ce = cross_entropy(soft_target, probs, base=math.e)
+        target_entropy = entropy(soft_target, base=math.e)
+        label = "hard" if eps == 0.0 else f"eps={eps}"
+        print(f"  {label:>8s}  target={[f'{t:.3f}' for t in soft_target]}  "
+              f"H(target)={target_entropy:.4f}  CE={ce:.4f}")
+
+    print()
+    print("  Higher epsilon -> higher target entropy -> acts as regularization")
+
+
+def feature_selection_mi_demo():
+    print()
+    print("=" * 60)
+    print("FEATURE SELECTION VIA MUTUAL INFORMATION")
+    print("=" * 60)
+
+    random.seed(42)
+    n = 200
+
+    target = [random.choice([0, 1]) for _ in range(n)]
+
+    features = {}
+    features["strong_signal"] = [t ^ (1 if random.random() < 0.1 else 0) for t in target]
+    features["weak_signal"] = [t ^ (1 if random.random() < 0.35 else 0) for t in target]
+    features["noise"] = [random.choice([0, 1]) for _ in range(n)]
+    features["constant"] = [0] * n
+
+    print(f"\n  Samples: {n}")
+    print(f"  Target balance: {sum(target)}/{n - sum(target)}")
+    print()
+
+    mi_scores = []
+    for name, feat in features.items():
+        joint = [[0, 0], [0, 0]]
+        for f, t in zip(feat, target):
+            joint[f][t] += 1
+        joint_p = [[c / n for c in row] for row in joint]
+        mi = mutual_information(joint_p, base=2)
+        mi_scores.append((name, mi))
+
+    mi_scores.sort(key=lambda x: x[1], reverse=True)
+    print("  Feature MI ranking:")
+    for name, mi in mi_scores:
+        bar = "#" * int(mi * 200)
+        print(f"    {name:>16s}  MI = {mi:.4f} bits  {bar}")
+
+    print()
+    print("  Strong signal has highest MI. Noise and constant have ~0.")
+
+
 if __name__ == "__main__":
 
     print("=" * 60)
@@ -232,3 +331,29 @@ if __name__ == "__main__":
     print(f"  Perplexity:        {ppl:.2f}")
     print(f"  Random baseline:   {vocab_size:.2f} (uniform over vocab)")
     print(f"  The model is better than random if perplexity < vocab size.")
+
+    print()
+    print("=" * 60)
+    print("CONDITIONAL AND JOINT ENTROPY")
+    print("=" * 60)
+
+    joint_dep = [[0.45, 0.05], [0.05, 0.45]]
+    joint_indep = [[0.25, 0.25], [0.25, 0.25]]
+
+    print(f"\n  Dependent joint distribution: {joint_dep}")
+    print(f"    Joint entropy H(X,Y):     {joint_entropy(joint_dep):.4f} bits")
+    print(f"    Conditional H(Y|X):       {conditional_entropy(joint_dep):.4f} bits")
+    print(f"    Mutual information I(X;Y):{mutual_information(joint_dep):.4f} bits")
+
+    hx_dep = entropy([sum(row) for row in joint_dep])
+    print(f"    H(X):                     {hx_dep:.4f} bits")
+    print(f"    Verify: H(X,Y) = H(X) + H(Y|X) = {hx_dep:.4f} + {conditional_entropy(joint_dep):.4f} = {hx_dep + conditional_entropy(joint_dep):.4f}")
+
+    print(f"\n  Independent joint distribution: {joint_indep}")
+    print(f"    Joint entropy H(X,Y):     {joint_entropy(joint_indep):.4f} bits")
+    print(f"    Conditional H(Y|X):       {conditional_entropy(joint_indep):.4f} bits")
+    print(f"    Mutual information I(X;Y):{mutual_information(joint_indep):.4f} bits")
+    print(f"    When independent: H(Y|X) = H(Y) and I(X;Y) = 0")
+
+    label_smoothing_demo()
+    feature_selection_mi_demo()

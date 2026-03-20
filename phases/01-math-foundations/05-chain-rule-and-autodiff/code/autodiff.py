@@ -1,3 +1,6 @@
+import random
+
+
 class Value:
     def __init__(self, data, children=(), op=''):
         self.data = float(data)
@@ -65,6 +68,23 @@ class Value:
         out = Value(t, (self,), 'tanh')
         def _backward():
             self.grad += (1 - t ** 2) * out.grad
+        out._backward = _backward
+        return out
+
+    def exp(self):
+        import math
+        e = math.exp(self.data)
+        out = Value(e, (self,), 'exp')
+        def _backward():
+            self.grad += e * out.grad
+        out._backward = _backward
+        return out
+
+    def log(self):
+        import math
+        out = Value(math.log(self.data), (self,), 'log')
+        def _backward():
+            self.grad += (1.0 / self.data) * out.grad
         out._backward = _backward
         return out
 
@@ -168,6 +188,138 @@ def demo_neuron():
         print("  PASSED (relu inactive, all grads zero)\n")
 
 
+class Neuron:
+    def __init__(self, n_inputs):
+        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+        self.b = Value(0.0)
+
+    def __call__(self, x):
+        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
+        return act.tanh()
+
+    def parameters(self):
+        return self.w + [self.b]
+
+
+class Layer:
+    def __init__(self, n_inputs, n_outputs):
+        self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
+
+    def __call__(self, x):
+        out = [n(x) for n in self.neurons]
+        return out[0] if len(out) == 1 else out
+
+    def parameters(self):
+        return [p for n in self.neurons for p in n.parameters()]
+
+
+class MLP:
+    def __init__(self, sizes):
+        self.layers = [Layer(sizes[i], sizes[i + 1]) for i in range(len(sizes) - 1)]
+
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
+
+
+def gradient_check(build_expr, x_val, h=1e-7):
+    x = Value(x_val)
+    y = build_expr(x)
+    y.backward()
+    autodiff_grad = x.grad
+
+    y_plus = build_expr(Value(x_val + h)).data
+    y_minus = build_expr(Value(x_val - h)).data
+    numerical_grad = (y_plus - y_minus) / (2 * h)
+
+    diff = abs(autodiff_grad - numerical_grad)
+    return autodiff_grad, numerical_grad, diff
+
+
+def demo_mlp_training():
+    print("=== Mini MLP Training on XOR ===")
+    random.seed(42)
+    model = MLP([2, 4, 1])
+
+    xs = [[Value(0), Value(0)], [Value(0), Value(1)],
+          [Value(1), Value(0)], [Value(1), Value(1)]]
+    ys = [-1.0, 1.0, 1.0, -1.0]
+
+    for step in range(100):
+        preds = [model(x) for x in xs]
+        loss = sum((p + Value(-y)) ** 2 for p, y in zip(preds, ys))
+
+        for p in model.parameters():
+            p.grad = 0.0
+        loss.backward()
+
+        lr = 0.05
+        for p in model.parameters():
+            p.data -= lr * p.grad
+
+        if step % 20 == 0 or step == 99:
+            print(f"  step {step:3d}  loss = {loss.data:.4f}")
+
+    print("\n  Predictions after training:")
+    for x, y in zip(xs, ys):
+        pred = model(x)
+        sign = "+" if pred.data > 0 else "-"
+        print(f"    input=[{x[0].data:.0f},{x[1].data:.0f}]  target={y:+.0f}  pred={pred.data:+.3f} ({sign})")
+    print("  DONE\n")
+
+
+def demo_gradient_check():
+    print("=== Gradient Checking ===")
+
+    expressions = [
+        ("x^3 + 2x + 1",       lambda x: x ** 3 + x * 2 + 1),
+        ("tanh(x^2)",           lambda x: (x ** 2).tanh()),
+        ("(x+1) / (x^2+1)",    lambda x: (x + 1) * ((x ** 2 + 1) ** -1)),
+        ("exp(x) * x",         lambda x: x.exp() * x),
+        ("log(x^2 + 1)",       lambda x: (x ** 2 + 1).log()),
+    ]
+
+    print(f"  {'Expression':<22} {'Autodiff':>12} {'Numerical':>12} {'Diff':>12}")
+    print("  " + "-" * 60)
+
+    all_passed = True
+    for name, expr in expressions:
+        ad, num, diff = gradient_check(expr, 0.5)
+        status = "OK" if diff < 1e-5 else "FAIL"
+        if diff >= 1e-5:
+            all_passed = False
+        print(f"  {name:<22} {ad:12.8f} {num:12.8f} {diff:12.2e}  {status}")
+
+    if all_passed:
+        print("  ALL CHECKS PASSED\n")
+    else:
+        print("  SOME CHECKS FAILED\n")
+
+
+def demo_exp_log():
+    print("=== Exp and Log operations ===")
+    x = Value(2.0)
+    y = x.exp()
+    y.backward()
+    import math
+    print(f"  exp(2.0) = {y.data:.4f}  (expected {math.exp(2.0):.4f})")
+    print(f"  d/dx exp(x) at x=2 = {x.grad:.4f}  (expected {math.exp(2.0):.4f})")
+    assert abs(x.grad - math.exp(2.0)) < 1e-4
+    print("  PASSED\n")
+
+    x = Value(3.0)
+    y = x.log()
+    y.backward()
+    print(f"  log(3.0) = {y.data:.4f}  (expected {math.log(3.0):.4f})")
+    print(f"  d/dx log(x) at x=3 = {x.grad:.4f}  (expected {1/3:.4f})")
+    assert abs(x.grad - 1.0 / 3.0) < 1e-4
+    print("  PASSED\n")
+
+
 def demo_verify_pytorch():
     print("=== Verify against PyTorch ===")
     try:
@@ -198,5 +350,8 @@ if __name__ == "__main__":
     demo_power()
     demo_complex()
     demo_neuron()
+    demo_exp_log()
+    demo_gradient_check()
+    demo_mlp_training()
     demo_verify_pytorch()
     print("All demos passed.")

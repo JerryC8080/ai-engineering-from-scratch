@@ -178,6 +178,170 @@ Example: y = (3x + 1)^2
 
 Neural networks are chains of functions: input -> linear -> activation -> linear -> activation -> loss. Backpropagation is the chain rule applied repeatedly from output to input. That is the entire algorithm.
 
+### The Hessian Matrix
+
+The gradient tells you the slope. The Hessian tells you the curvature.
+
+The Hessian is the matrix of second-order partial derivatives. For a function f(x1, x2, ..., xn), entry (i, j) of the Hessian is:
+
+```
+H[i][j] = d^2f / (dx_i * dx_j)
+```
+
+For a 2-variable function f(x, y):
+
+```
+H = | d^2f/dx^2    d^2f/dxdy |
+    | d^2f/dydx    d^2f/dy^2 |
+```
+
+**What the Hessian tells you at a critical point (where gradient = 0):**
+
+| Hessian property | Meaning | Example surface |
+|-----------------|---------|-----------------|
+| Positive definite (all eigenvalues > 0) | Local minimum | Bowl pointing up |
+| Negative definite (all eigenvalues < 0) | Local maximum | Bowl pointing down |
+| Indefinite (mixed eigenvalues) | Saddle point | Horse saddle shape |
+
+**Example:** f(x, y) = x^2 - y^2 (a saddle function)
+
+```
+df/dx = 2x       df/dy = -2y
+d^2f/dx^2 = 2    d^2f/dy^2 = -2    d^2f/dxdy = 0
+
+H = | 2   0 |
+    | 0  -2 |
+
+Eigenvalues: 2 and -2 (one positive, one negative)
+--> Saddle point at (0, 0)
+```
+
+Compare with f(x, y) = x^2 + y^2 (a bowl):
+
+```
+H = | 2  0 |
+    | 0  2 |
+
+Eigenvalues: 2 and 2 (both positive)
+--> Local minimum at (0, 0)
+```
+
+**Why the Hessian matters in ML:**
+
+Newton's method uses the Hessian to take better optimization steps than gradient descent. Instead of just following the slope, it accounts for curvature:
+
+```
+Newton's update:    w_new = w_old - H^(-1) * gradient
+Gradient descent:   w_new = w_old - lr * gradient
+```
+
+Newton's method converges faster because the Hessian "rescales" the gradient -- steep directions get smaller steps, flat directions get larger steps.
+
+The catch: for a neural network with N parameters, the Hessian is N x N. A model with 1 million parameters would need a 1 trillion-entry matrix. That is why we use approximations.
+
+| Method | What it uses | Cost | Convergence |
+|--------|-------------|------|-------------|
+| Gradient descent | First derivatives only | O(N) per step | Slow (linear) |
+| Newton's method | Full Hessian | O(N^3) per step | Fast (quadratic) |
+| L-BFGS | Approximate Hessian from gradient history | O(N) per step | Medium (superlinear) |
+| Adam | Per-parameter adaptive rates (diagonal Hessian approx) | O(N) per step | Medium |
+| Natural gradient | Fisher information matrix (statistical Hessian) | O(N^2) per step | Fast |
+
+In practice, Adam is the default optimizer for deep learning. It approximates second-order information cheaply by tracking the running mean and variance of gradients per parameter.
+
+### Taylor Series Approximation
+
+Any smooth function can be approximated locally by a polynomial:
+
+```
+f(x + h) = f(x) + f'(x)*h + (1/2)*f''(x)*h^2 + (1/6)*f'''(x)*h^3 + ...
+```
+
+The more terms you include, the better the approximation -- but only near the point x.
+
+**Why Taylor series matter for ML:**
+
+- **First-order Taylor = gradient descent.** When you use f(x + h) ~ f(x) + f'(x)*h, you are making a linear approximation. Gradient descent minimizes this linear model to choose h = -lr * f'(x).
+
+- **Second-order Taylor = Newton's method.** Using f(x + h) ~ f(x) + f'(x)*h + (1/2)*f''(x)*h^2, you get a quadratic model. Minimizing it gives h = -f'(x)/f''(x) -- Newton's step.
+
+- **Loss function design.** MSE and cross-entropy are smooth, which means their Taylor expansions are well-behaved. This is not an accident. Smooth losses make optimization predictable.
+
+```
+Approximation order    What it captures    Optimization method
+-------------------    -----------------   -------------------
+0th order (constant)   Just the value      Random search
+1st order (linear)     Slope               Gradient descent
+2nd order (quadratic)  Curvature           Newton's method
+Higher orders          Finer structure     Rarely used in ML
+```
+
+The key insight: all gradient-based optimization is really about approximating the loss function locally and stepping to the minimum of that approximation.
+
+### Integrals in ML
+
+Derivatives tell you rates of change. Integrals compute accumulations -- area under a curve.
+
+In ML, you rarely compute integrals by hand, but the concept is everywhere:
+
+**Probability.** For a continuous random variable with density p(x):
+```
+P(a < X < b) = integral from a to b of p(x) dx
+```
+The area under the probability density curve between a and b is the probability of landing in that range.
+
+**Expected value.** The average outcome weighted by probability:
+```
+E[f(X)] = integral of f(x) * p(x) dx
+```
+The expected loss over a data distribution is an integral. Training minimizes an empirical approximation of this.
+
+**KL divergence.** Measures how different two distributions are:
+```
+KL(p || q) = integral of p(x) * log(p(x) / q(x)) dx
+```
+Used in VAEs, knowledge distillation, and Bayesian inference.
+
+**Normalization constants.** In Bayesian inference:
+```
+p(w | data) = p(data | w) * p(w) / integral of p(data | w) * p(w) dw
+```
+The denominator is an integral over all possible parameter values. It is often intractable, which is why we use approximations like MCMC and variational inference.
+
+| Integral concept | Where it appears in ML |
+|-----------------|----------------------|
+| Area under curve | Probability from density functions |
+| Expected value | Loss functions, risk minimization |
+| KL divergence | VAEs, policy optimization, distillation |
+| Normalization | Bayesian posteriors, softmax denominator |
+| Marginal likelihood | Model comparison, evidence lower bound (ELBO) |
+
+### Multivariable Chain Rule in a Computation Graph
+
+The chain rule does not just apply to scalar functions in a line. In a neural network, variables fan out and merge. Here is how derivatives flow through a simple forward pass:
+
+```mermaid
+graph LR
+    x["x (input)"] -->|"*w"| z1["z1 = w*x"]
+    z1 -->|"+b"| z2["z2 = w*x + b"]
+    z2 -->|"sigmoid"| a["a = sigmoid(z2)"]
+    a -->|"loss fn"| L["L = -(y*log(a) + (1-y)*log(1-a))"]
+```
+
+The backward pass computes gradients right to left:
+
+```mermaid
+graph RL
+    dL["dL/dL = 1"] -->|"dL/da"| da["dL/da = -y/a + (1-y)/(1-a)"]
+    da -->|"da/dz2 = a(1-a)"| dz2["dL/dz2 = dL/da * a(1-a)"]
+    dz2 -->|"dz2/dw = x"| dw["dL/dw = dL/dz2 * x"]
+    dz2 -->|"dz2/db = 1"| db["dL/db = dL/dz2 * 1"]
+```
+
+Each arrow multiplies by the local derivative. The gradient for any parameter is the product of all local derivatives along the path from loss to that parameter. When paths branch and merge, you sum the contributions (multivariate chain rule).
+
+This is all backpropagation is: the chain rule applied systematically through a computation graph, from output to inputs.
+
 ### The Jacobian matrix
 
 When a function maps a vector to a vector (like a neural network layer), its derivative is a matrix. The Jacobian contains every partial derivative of every output with respect to every input.
@@ -312,7 +476,53 @@ for name, f, df in test_functions:
     print(f"{name:<12} {num:12.6f} {ana:12.6f} {err:12.2e}")
 ```
 
-### Step 6: Why this matters for a neural network
+### Step 6: Computing the Hessian numerically
+
+```python
+def hessian_2d(f, x, y, h=1e-5):
+    fxx = (f(x + h, y) - 2 * f(x, y) + f(x - h, y)) / (h ** 2)
+    fyy = (f(x, y + h) - 2 * f(x, y) + f(x, y - h)) / (h ** 2)
+    fxy = (f(x + h, y + h) - f(x + h, y - h) - f(x - h, y + h) + f(x - h, y - h)) / (4 * h ** 2)
+    return [[fxx, fxy], [fxy, fyy]]
+
+def saddle(x, y):
+    return x ** 2 - y ** 2
+
+def bowl(x, y):
+    return x ** 2 + y ** 2
+
+H_saddle = hessian_2d(saddle, 0.0, 0.0)
+H_bowl = hessian_2d(bowl, 0.0, 0.0)
+print(f"Saddle Hessian: {H_saddle}")  # [[2, 0], [0, -2]] -- mixed signs
+print(f"Bowl Hessian:   {H_bowl}")    # [[2, 0], [0, 2]]  -- both positive
+```
+
+The Hessian of the saddle function has eigenvalues 2 and -2 (mixed signs, confirming a saddle point). The bowl has eigenvalues 2 and 2 (both positive, confirming a minimum).
+
+### Step 7: Taylor approximation in action
+
+```python
+import math
+
+def taylor_approx(f, f_prime, f_double_prime, x0, h, order=2):
+    result = f(x0)
+    if order >= 1:
+        result += f_prime(x0) * h
+    if order >= 2:
+        result += 0.5 * f_double_prime(x0) * h ** 2
+    return result
+
+x0 = 0.0
+for h in [0.1, 0.5, 1.0, 2.0]:
+    true_val = math.sin(h)
+    t1 = taylor_approx(math.sin, math.cos, lambda x: -math.sin(x), x0, h, order=1)
+    t2 = taylor_approx(math.sin, math.cos, lambda x: -math.sin(x), x0, h, order=2)
+    print(f"h={h:.1f}  sin(h)={true_val:.4f}  order1={t1:.4f}  order2={t2:.4f}")
+```
+
+Near x0=0, sin(x) ~ x (first-order Taylor). The approximation is excellent for small h but breaks down for large h. This is why gradient descent works best with small learning rates -- each step assumes the linear approximation is accurate.
+
+### Step 8: Why this matters for a neural network
 
 ```python
 import random
@@ -396,6 +606,9 @@ You just built gradient descent from scratch. PyTorch automates the gradient com
 | Jacobian | "Matrix of derivatives" | When a function maps vectors to vectors, the Jacobian is the matrix of all partial derivatives of outputs with respect to inputs. |
 | Numerical derivative | "Finite differences" | Approximating a derivative by evaluating the function at two nearby points and computing the slope between them. |
 | Backpropagation | "Reverse-mode autodiff" | Computing gradients layer by layer from output to input using the chain rule. How neural networks learn. |
+| Hessian | "Matrix of second derivatives" | The matrix of all second-order partial derivatives. Describes the curvature of a function. Positive definite Hessian at a critical point means local minimum. |
+| Taylor series | "Polynomial approximation" | Approximating a function near a point using its derivatives: f(x+h) ~ f(x) + f'(x)h + (1/2)f''(x)h^2 + ... The basis for understanding why gradient descent and Newton's method work. |
+| Integral | "Area under the curve" | The accumulation of a quantity over a range. In ML, integrals define probabilities, expected values, and KL divergence. |
 
 ## Further Reading
 

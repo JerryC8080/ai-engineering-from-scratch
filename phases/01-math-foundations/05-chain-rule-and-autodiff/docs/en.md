@@ -227,7 +227,189 @@ Each operation creates a closure that knows how to compute local gradients and m
 
 Topological sort ensures every node's gradient is fully computed before it propagates to its children. The seed gradient is 1.0 (dy/dy = 1).
 
-### Step 4: Verify against manual calculation
+### Step 4: More operations for a complete engine
+
+The basic Value class handles addition, multiplication, and relu. A real autograd engine needs more. Here are the operations you need to build neural networks:
+
+```python
+    def __neg__(self):
+        return self * -1
+
+    def __sub__(self, other):
+        return self + (-other)
+
+    def __rsub__(self, other):
+        return other + (-self)
+
+    def __pow__(self, n):
+        out = Value(self.data ** n, (self,), f'**{n}')
+        def _backward():
+            self.grad += n * (self.data ** (n - 1)) * out.grad
+        out._backward = _backward
+        return out
+
+    def __truediv__(self, other):
+        return self * (other ** -1) if isinstance(other, Value) else self * (Value(other) ** -1)
+
+    def exp(self):
+        import math
+        e = math.exp(self.data)
+        out = Value(e, (self,), 'exp')
+        def _backward():
+            self.grad += e * out.grad
+        out._backward = _backward
+        return out
+
+    def log(self):
+        import math
+        out = Value(math.log(self.data), (self,), 'log')
+        def _backward():
+            self.grad += (1.0 / self.data) * out.grad
+        out._backward = _backward
+        return out
+
+    def tanh(self):
+        import math
+        t = math.tanh(self.data)
+        out = Value(t, (self,), 'tanh')
+        def _backward():
+            self.grad += (1 - t ** 2) * out.grad
+        out._backward = _backward
+        return out
+```
+
+**Why each operation matters:**
+
+| Operation | Backward rule | Used in |
+|-----------|--------------|---------|
+| `__sub__` | Reuses add + neg | Loss computation (pred - target) |
+| `__pow__` | n * x^(n-1) | Polynomial activations, MSE (error^2) |
+| `__truediv__` | Reuses mul + pow(-1) | Normalization, learning rate scaling |
+| `exp` | exp(x) * upstream | Softmax, log-likelihood |
+| `log` | (1/x) * upstream | Cross-entropy loss, log probabilities |
+| `tanh` | (1 - tanh^2) * upstream | Classic activation function |
+
+The clever part: `__sub__` and `__truediv__` are defined in terms of existing operations. They get correct gradients for free because the chain rule composes through the underlying add/mul/pow operations.
+
+### Step 5: Mini MLP from scratch
+
+With a complete Value class, you can build a neural network. No PyTorch. No NumPy. Just Values and the chain rule.
+
+```python
+import random
+
+class Neuron:
+    def __init__(self, n_inputs):
+        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+        self.b = Value(0.0)
+
+    def __call__(self, x):
+        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
+        return act.tanh()
+
+    def parameters(self):
+        return self.w + [self.b]
+
+class Layer:
+    def __init__(self, n_inputs, n_outputs):
+        self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
+
+    def __call__(self, x):
+        return [n(x) for n in self.neurons]
+
+    def parameters(self):
+        return [p for n in self.neurons for p in n.parameters()]
+
+class MLP:
+    def __init__(self, sizes):
+        self.layers = [Layer(sizes[i], sizes[i+1]) for i in range(len(sizes)-1)]
+
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x[0] if len(x) == 1 else x
+
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
+```
+
+A `Neuron` computes `tanh(w1*x1 + w2*x2 + ... + b)`. A `Layer` is a list of neurons. An `MLP` stacks layers. Every weight is a `Value`, so calling `loss.backward()` propagates gradients to every parameter.
+
+**Training on XOR:**
+
+```python
+random.seed(42)
+model = MLP([2, 4, 1])  # 2 inputs, 4 hidden neurons, 1 output
+
+xs = [[0, 0], [0, 1], [1, 0], [1, 1]]
+ys = [-1, 1, 1, -1]  # XOR pattern (using -1/1 for tanh)
+
+for step in range(100):
+    preds = [model(x) for x in xs]
+    loss = sum((p - y) ** 2 for p, y in zip(preds, ys))
+
+    for p in model.parameters():
+        p.grad = 0.0
+    loss.backward()
+
+    lr = 0.05
+    for p in model.parameters():
+        p.data -= lr * p.grad
+
+    if step % 20 == 0:
+        print(f"step {step:3d}  loss = {loss.data:.4f}")
+
+print("\nPredictions after training:")
+for x, y in zip(xs, ys):
+    print(f"  input={x}  target={y:2d}  pred={model(x).data:6.3f}")
+```
+
+This is micrograd. A complete neural network training loop in pure Python with automatic differentiation. Every commercial deep learning framework does the same thing at massive scale.
+
+### Step 6: Gradient checking
+
+How do you know your autodiff is correct? Compare it against numerical derivatives. This is gradient checking.
+
+```python
+def gradient_check(build_expr, x_val, h=1e-7):
+    x = Value(x_val)
+    y = build_expr(x)
+    y.backward()
+    autodiff_grad = x.grad
+
+    y_plus = build_expr(Value(x_val + h)).data
+    y_minus = build_expr(Value(x_val - h)).data
+    numerical_grad = (y_plus - y_minus) / (2 * h)
+
+    diff = abs(autodiff_grad - numerical_grad)
+    return autodiff_grad, numerical_grad, diff
+```
+
+Test it on a complex expression:
+
+```python
+def expr(x):
+    return (x ** 3 + x * 2 + 1).tanh()
+
+ad, num, diff = gradient_check(expr, 0.5)
+print(f"Autodiff:  {ad:.8f}")
+print(f"Numerical: {num:.8f}")
+print(f"Difference: {diff:.2e}")
+# Difference should be < 1e-5
+```
+
+Gradient checking is essential when implementing new operations. If your backward pass has a bug, the numerical check catches it. Every serious deep learning implementation runs gradient checks during development.
+
+**When to use gradient checking:**
+
+| Situation | Do gradient check? |
+|-----------|-------------------|
+| Adding a new operation to your autograd | Yes, always |
+| Debugging a training loop that won't converge | Yes, check gradients first |
+| Production training | No, too slow (2x forward passes per parameter) |
+| Unit tests for autograd code | Yes, automate it |
+
+### Step 7: Verify against manual calculation
 
 ```python
 x1 = Value(2.0)
@@ -311,6 +493,9 @@ The Value class built here is the foundation for the neural network training loo
 | Topological sort | "Dependency order" | Ordering graph nodes so every node comes after all its dependencies. Required for correct gradient propagation. |
 | Gradient accumulation | "Add, don't replace" | When a value feeds into multiple operations, its gradient is the sum of all incoming gradient contributions |
 | Dynamic graph | "Define by run" | A computation graph rebuilt on every forward pass, allowing Python control flow inside models (PyTorch style) |
+| Gradient checking | "Numerical verification" | Comparing autodiff gradients against numerical finite-difference gradients to verify correctness. Essential for debugging. |
+| MLP | "Multi-layer perceptron" | A neural network with one or more hidden layers of neurons. Each neuron computes a weighted sum plus bias, then applies an activation function. |
+| Neuron | "Weighted sum + activation" | The basic unit: output = activation(w1*x1 + w2*x2 + ... + b). The weights and bias are learnable parameters. |
 
 ## Further Reading
 

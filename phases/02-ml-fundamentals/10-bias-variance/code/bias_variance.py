@@ -228,10 +228,98 @@ def demo_diagnosis():
         print()
 
 
+def demo_learning_curves():
+    print()
+    print("=" * 70)
+    print("LEARNING CURVES")
+    print("Train vs test error as training set size grows")
+    print("=" * 70)
+    print()
+
+    rng = np.random.RandomState(42)
+    x_test = np.linspace(-2.5, 2.5, 200)
+    y_test = true_function(x_test)
+
+    sizes = [10, 15, 20, 30, 50, 75, 100, 150, 200, 300]
+
+    for degree, label in [(1, "Degree 1 (high bias)"), (5, "Degree 5 (balanced)"), (12, "Degree 12 (high variance)")]:
+        print(f"  {label}:")
+        print(f"  {'N_train':>8}  {'Train MSE':>10}  {'Test MSE':>10}  {'Gap':>10}")
+        print(f"  {'-' * 48}")
+
+        for n in sizes:
+            train_errors = []
+            test_errors = []
+            for seed in range(50):
+                x_train, y_train = generate_data(n_samples=n, seed=rng.randint(0, 100000))
+                try:
+                    w = fit_polynomial(x_train, y_train, degree)
+                    train_pred = predict_polynomial(x_train, w)
+                    test_pred = predict_polynomial(x_test, w)
+                    train_mse = np.mean((train_pred - y_train) ** 2)
+                    test_mse = np.mean((test_pred - y_test) ** 2)
+                    if test_mse < 1000:
+                        train_errors.append(train_mse)
+                        test_errors.append(test_mse)
+                except (np.linalg.LinAlgError, ValueError):
+                    continue
+
+            if train_errors:
+                avg_train = np.mean(train_errors)
+                avg_test = np.mean(test_errors)
+                gap = avg_test - avg_train
+                print(f"  {n:>8d}  {avg_train:>10.4f}  {avg_test:>10.4f}  {gap:>10.4f}")
+
+        print()
+
+    print("High bias (degree 1): both curves converge to HIGH error. Gap stays small.")
+    print("High variance (degree 12): train error stays low, test error stays high.")
+    print("More data reduces variance but cannot fix bias.")
+
+
+def demo_regularization_sweep():
+    print()
+    print("=" * 70)
+    print("REGULARIZATION SWEEP (Ridge alpha vs Bias/Variance)")
+    print("Fixed degree=15, sweeping alpha from 0.001 to 100")
+    print("=" * 70)
+    print()
+
+    alphas = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
+
+    print(f"  {'Alpha':>10}  {'Bias^2':>10}  {'Variance':>10}  {'Total':>10}  {'Dominant':>12}")
+    print(f"  {'-' * 60}")
+
+    best_alpha = None
+    best_total = float("inf")
+
+    for alpha in alphas:
+        results = bias_variance_decomposition([15], lam=alpha, n_bootstrap=200)
+        r = results[15]
+        dominant = "BIAS" if r["bias_sq"] > r["variance"] else "VARIANCE"
+        print(
+            f"  {alpha:>10.3f}  {r['bias_sq']:>10.4f}  {r['variance']:>10.4f}  "
+            f"{r['total_error']:>10.4f}  {dominant:>12}"
+        )
+        if r["total_error"] < best_total:
+            best_total = r["total_error"]
+            best_alpha = alpha
+
+    print()
+    print(f"Optimal alpha: {best_alpha}")
+    print(f"  Total error at optimal: {best_total:.4f}")
+    print()
+    print("Small alpha: variance dominates (model is unconstrained, fits noise)")
+    print("Large alpha: bias dominates (model is over-constrained, misses signal)")
+    print("Optimal alpha balances both, sitting at the bottom of the U-curve.")
+
+
 if __name__ == "__main__":
     demo_basic_decomposition()
     demo_complexity_tradeoff()
     demo_regularization_effect()
     demo_data_size_effect()
     demo_diagnosis()
+    demo_learning_curves()
+    demo_regularization_sweep()
     print("All bias-variance demos complete.")

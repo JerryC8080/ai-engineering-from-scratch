@@ -5,7 +5,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
-  <img src="https://img.shields.io/badge/Lessons-200+-purple" alt="200+ Lessons">
+  <img src="https://img.shields.io/badge/Lessons-230+-purple" alt="230+ Lessons">
   <img src="https://img.shields.io/badge/Phases-20-orange" alt="20 Phases">
   <img src="https://img.shields.io/github/stars/rohitg00/ai-engineering-from-scratch?style=social" alt="GitHub Stars">
 </p>
@@ -21,7 +21,7 @@
 
 ---
 
-200+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, MCP servers.
+230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, MCP servers.
 
 You learn AI. You build real things. You ship tools others can use.
 
@@ -62,7 +62,7 @@ You learn AI. You build real things. You ship tools others can use.
 </table>
 
 <details id="phase-1">
-<summary><strong>Phase 1: Math Foundations</strong> <code>18 lessons</code> &nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
+<summary><strong>Phase 1: Math Foundations</strong> <code>22 lessons</code> &nbsp; <em>The intuition behind every AI algorithm, through code.</em></summary>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
@@ -84,15 +84,19 @@ You learn AI. You build real things. You ship tools others can use.
 | 16 | [Sampling Methods](phases/01-math-foundations/16-sampling-methods/) | Build | Python |
 | 17 | [Linear Systems](phases/01-math-foundations/17-linear-systems/) | Build | Python |
 | 18 | [Convex Optimization](phases/01-math-foundations/18-convex-optimization/) | Build | Python |
+| 19 | [Complex Numbers for AI](phases/01-math-foundations/19-complex-numbers/) | Learn | Python |
+| 20 | [The Fourier Transform](phases/01-math-foundations/20-fourier-transform/) | Build | Python |
+| 21 | [Graph Theory for ML](phases/01-math-foundations/21-graph-theory/) | Build | Python |
+| 22 | [Stochastic Processes](phases/01-math-foundations/22-stochastic-processes/) | Learn | Python |
 
 </details>
 
 <details id="phase-2">
-<summary><strong>Phase 2: ML Fundamentals</strong> <code>13 lessons</code> &nbsp; <em>Classical ML - still the backbone of most production AI.</em></summary>
+<summary><strong>Phase 2: ML Fundamentals</strong> <code>18 lessons</code> &nbsp; <em>Classical ML - still the backbone of most production AI.</em></summary>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [What Is Machine Learning](phases/02-ml-fundamentals/01-what-is-machine-learning/) | Learn | -- |
+| 01 | [What Is Machine Learning](phases/02-ml-fundamentals/01-what-is-machine-learning/) | Learn | Python |
 | 02 | [Linear Regression from Scratch](phases/02-ml-fundamentals/02-linear-regression/) | Build | Python |
 | 03 | [Logistic Regression & Classification](phases/02-ml-fundamentals/03-logistic-regression/) | Build | Python |
 | 04 | [Decision Trees & Random Forests](phases/02-ml-fundamentals/04-decision-trees/) | Build | Python |
@@ -105,6 +109,11 @@ You learn AI. You build real things. You ship tools others can use.
 | 11 | [Ensemble Methods: Boosting, Bagging, Stacking](phases/02-ml-fundamentals/11-ensemble-methods/) | Build | Python |
 | 12 | [Hyperparameter Tuning](phases/02-ml-fundamentals/12-hyperparameter-tuning/) | Build | Python |
 | 13 | [ML Pipelines & Experiment Tracking](phases/02-ml-fundamentals/13-ml-pipelines/) | Build | Python |
+| 14 | [Naive Bayes](phases/02-ml-fundamentals/14-naive-bayes/) | Build | Python |
+| 15 | [Time Series Fundamentals](phases/02-ml-fundamentals/15-time-series/) | Build | Python |
+| 16 | [Anomaly Detection](phases/02-ml-fundamentals/16-anomaly-detection/) | Build | Python |
+| 17 | [Handling Imbalanced Data](phases/02-ml-fundamentals/17-imbalanced-data/) | Build | Python |
+| 18 | [Feature Selection](phases/02-ml-fundamentals/18-feature-selection/) | Build | Python |
 
 </details>
 

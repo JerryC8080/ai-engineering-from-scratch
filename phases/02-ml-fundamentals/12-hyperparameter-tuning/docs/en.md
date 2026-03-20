@@ -163,6 +163,81 @@ The concrete workflow:
 4. **Fine search.** Bayesian optimization or focused random search in the narrowed space. 50-100 trials.
 5. **Retrain on all training data** with the best hyperparameters found.
 
+### Cross-Validation Integration
+
+Tuning hyperparameters on a single validation split is risky. The best hyperparameters might overfit to the specific validation fold. Nested cross-validation solves this by using two loops:
+
+- **Outer loop** (evaluation): splits data into train+val and test. Reports unbiased performance.
+- **Inner loop** (tuning): splits train+val into train and val. Finds best hyperparameters.
+
+```mermaid
+flowchart TD
+    D[Full Dataset] --> O1[Outer Fold 1: Test]
+    D --> O2[Outer Fold 2: Test]
+    D --> O3[Outer Fold 3: Test]
+    D --> O4[Outer Fold 4: Test]
+    D --> O5[Outer Fold 5: Test]
+
+    O1 --> I1[Inner 5-fold CV on remaining data]
+    I1 --> T1[Best hyperparams for fold 1]
+    T1 --> E1[Evaluate on outer test fold 1]
+
+    O2 --> I2[Inner 5-fold CV on remaining data]
+    I2 --> T2[Best hyperparams for fold 2]
+    T2 --> E2[Evaluate on outer test fold 2]
+```
+
+Each outer fold finds its own best hyperparameters independently. The outer scores are an unbiased estimate of generalization performance.
+
+With sklearn:
+
+```python
+from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.ensemble import GradientBoostingRegressor
+
+inner_cv = GridSearchCV(
+    GradientBoostingRegressor(),
+    param_grid={
+        "learning_rate": [0.01, 0.05, 0.1],
+        "max_depth": [2, 3, 5],
+        "n_estimators": [50, 100, 200],
+    },
+    cv=5,
+    scoring="neg_mean_squared_error",
+)
+
+outer_scores = cross_val_score(
+    inner_cv, X, y, cv=5, scoring="neg_mean_squared_error"
+)
+
+print(f"Nested CV MSE: {-outer_scores.mean():.4f} +/- {outer_scores.std():.4f}")
+```
+
+This is expensive (5 outer folds x 5 inner folds x 27 grid points = 675 model fits), but it gives you a trustworthy performance estimate. Use it when reporting final results in papers or when the stake of the decision is high.
+
+### Practical Tips
+
+**Start with the learning rate.** It is always the most important hyperparameter for gradient-based methods. A bad learning rate makes everything else irrelevant. Fix other hyperparameters at defaults and sweep learning rate first.
+
+**Use log-uniform distributions for learning rate and regularization.** The difference between 0.001 and 0.01 matters as much as the difference between 0.1 and 1.0. Searching linearly wastes budget on the large end.
+
+**Use early stopping instead of tuning n_estimators.** For boosting and neural networks, set n_estimators or epochs high and let early stopping decide when to stop. This removes one hyperparameter from the search.
+
+**Budget allocation.** Spend 60% of your tuning budget on the top 2 most important hyperparameters. Spend the remaining 40% on everything else. The top 2 account for most of the performance variation.
+
+**Scale matters.** Never search batch size on a log scale (16, 32, 64 are fine). Always search learning rate on a log scale. Match the search distribution to how the hyperparameter affects the model.
+
+| Model Type | Top Hyperparameters | Recommended Search | Budget |
+|-----------|--------------------|--------------------|--------|
+| Random Forest | n_estimators, max_depth, min_samples_leaf | Random search, 50 trials | Low (fast training) |
+| Gradient Boosting | learning_rate, n_estimators, max_depth | Bayesian, 100 trials + early stopping | Medium |
+| Neural Network | learning_rate, weight_decay, batch_size | Bayesian or random, 100+ trials | High (slow training) |
+| SVM | C, gamma (RBF kernel) | Grid on log scale, 25-50 trials | Low (2 params) |
+| Lasso/Ridge | alpha | 1D search on log scale, 20 trials | Very low |
+| XGBoost | learning_rate, max_depth, subsample, colsample | Bayesian, 100-200 trials + early stopping | Medium |
+
+**When in doubt:** random search with 2x the number of hyperparameters as trials (e.g., 6 hyperparameters = 12+ trials minimum). You will be surprised how often random search with 50 trials beats carefully designed grid search.
+
 ## Build It
 
 ### Step 1: Grid Search from Scratch
@@ -215,16 +290,103 @@ def random_search(model_fn, param_distributions, X_train, y_train,
 
 ### Step 3: Bayesian Optimization (Simplified)
 
-The code implements a simplified Bayesian optimizer using a Gaussian process surrogate with the Expected Improvement acquisition function. It demonstrates the core idea: use past results to decide where to look next.
+The core idea: fit a Gaussian process to observed (hyperparameter, score) pairs, then use an acquisition function to decide where to look next.
+
+```python
+class SimpleBayesianOptimizer:
+    def __init__(self, search_space, n_initial=5):
+        self.search_space = search_space
+        self.n_initial = n_initial
+        self.X_observed = []
+        self.y_observed = []
+
+    def _kernel(self, x1, x2, length_scale=1.0):
+        dists = np.sum((x1[:, None, :] - x2[None, :, :]) ** 2, axis=2)
+        return np.exp(-0.5 * dists / length_scale ** 2)
+
+    def _fit_gp(self, X_new):
+        X_obs = np.array(self.X_observed)
+        y_obs = np.array(self.y_observed)
+        y_mean = y_obs.mean()
+        y_centered = y_obs - y_mean
+
+        K = self._kernel(X_obs, X_obs) + 1e-4 * np.eye(len(X_obs))
+        K_star = self._kernel(X_new, X_obs)
+
+        L = np.linalg.cholesky(K)
+        alpha = np.linalg.solve(L.T, np.linalg.solve(L, y_centered))
+        mu = K_star @ alpha + y_mean
+
+        v = np.linalg.solve(L, K_star.T)
+        var = 1.0 - np.sum(v ** 2, axis=0)
+        var = np.maximum(var, 1e-6)
+
+        return mu, var
+
+    def _expected_improvement(self, mu, var, best_y):
+        sigma = np.sqrt(var)
+        z = (mu - best_y) / (sigma + 1e-10)
+        ei = sigma * (z * norm_cdf(z) + norm_pdf(z))
+        return ei
+
+    def suggest(self):
+        if len(self.X_observed) < self.n_initial:
+            return sample_random(self.search_space)
+
+        candidates = [sample_random(self.search_space) for _ in range(500)]
+        X_cand = np.array([to_vector(c) for c in candidates])
+        mu, var = self._fit_gp(X_cand)
+        ei = self._expected_improvement(mu, var, max(self.y_observed))
+        return candidates[np.argmax(ei)]
+
+    def observe(self, params, score):
+        self.X_observed.append(to_vector(params))
+        self.y_observed.append(score)
+```
+
+The GP surrogate gives two things at each candidate point: a predicted score (mu) and an uncertainty (var). Expected Improvement balances these: it favors points where the model predicts high scores OR where uncertainty is high. Early on, most points have high uncertainty so the optimizer explores. Later, it focuses on the most promising region.
 
 ### Step 4: Compare All Methods
 
-The code runs all three methods on the same problem and compares:
-- Best score achieved
-- Number of evaluations needed
-- How quickly each method finds a good solution
+Run all three methods on the same synthetic objective and compare:
 
-It also demonstrates Optuna, the most practical Bayesian optimization library for real projects.
+```python
+def synthetic_objective(params):
+    lr = params["learning_rate"]
+    depth = params["max_depth"]
+    return -(np.log10(lr) + 2) ** 2 - (depth - 4) ** 2 + 10
+
+param_grid = {
+    "learning_rate": [0.001, 0.01, 0.1, 1.0],
+    "max_depth": [2, 3, 4, 5, 6, 7, 8],
+}
+
+grid_best, grid_score, grid_history = grid_search(
+    param_grid, objective=synthetic_objective
+)
+
+param_dist = {
+    "learning_rate": ("log_float", 0.001, 1.0),
+    "max_depth": ("int", 2, 8),
+}
+
+rand_best, rand_score, rand_history = random_search(
+    param_dist, objective=synthetic_objective, n_iter=28
+)
+
+optimizer = SimpleBayesianOptimizer(param_dist, n_initial=5)
+bayes_best, bayes_score, bayes_history = optimizer.optimize(
+    synthetic_objective, n_iter=28
+)
+
+print(f"{'Method':<20} {'Best Score':>12} {'Evaluations':>12}")
+print("-" * 50)
+print(f"{'Grid Search':<20} {grid_score:>12.4f} {len(grid_history):>12}")
+print(f"{'Random Search':<20} {rand_score:>12.4f} {len(rand_history):>12}")
+print(f"{'Bayesian Opt':<20} {bayes_score:>12.4f} {len(bayes_history):>12}")
+```
+
+With the same budget, Bayesian optimization usually finds the best score fastest because it does not waste evaluations in clearly bad regions. Random search covers more ground than grid search. Grid search only wins when you have very few hyperparameters and can afford to be exhaustive.
 
 ## Use It
 
@@ -261,6 +423,76 @@ Key Optuna features:
 - `suggest_categorical` for discrete choices
 - Built-in MedianPruner for early stopping of bad trials
 - `study.trials_dataframe()` for analysis
+
+### Optuna with Pruning
+
+Pruning stops unpromising trials early, saving massive compute. Here is the pattern:
+
+```python
+import optuna
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    params = {
+        "learning_rate": trial.suggest_float("lr", 1e-4, 0.5, log=True),
+        "max_depth": trial.suggest_int("max_depth", 2, 10),
+        "n_estimators": trial.suggest_int("n_estimators", 50, 500),
+        "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+    }
+
+    model = GradientBoostingRegressor(**params)
+    scores = cross_val_score(model, X_train, y_train, cv=3,
+                             scoring="neg_mean_squared_error")
+    return -scores.mean()
+
+pruner = optuna.pruners.MedianPruner(n_startup_trials=10, n_warmup_steps=5)
+study = optuna.create_study(direction="minimize", pruner=pruner)
+study.optimize(objective, n_trials=200)
+```
+
+The `MedianPruner` stops a trial if its intermediate value is worse than the median of all completed trials at the same step. The `n_startup_trials=10` ensures at least 10 trials complete fully before pruning kicks in. This typically saves 40-60% of total compute.
+
+### sklearn's Built-in Tuners
+
+For quick experiments, sklearn provides `GridSearchCV`, `RandomizedSearchCV`, and `HalvingRandomSearchCV`:
+
+```python
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform, randint
+
+param_dist = {
+    "learning_rate": loguniform(1e-4, 0.5),
+    "max_depth": randint(2, 10),
+    "n_estimators": randint(50, 500),
+}
+
+search = RandomizedSearchCV(
+    GradientBoostingRegressor(),
+    param_dist,
+    n_iter=100,
+    cv=5,
+    scoring="neg_mean_squared_error",
+    random_state=42,
+    n_jobs=-1,
+)
+search.fit(X_train, y_train)
+print(f"Best params: {search.best_params_}")
+print(f"Best CV MSE: {-search.best_score_:.4f}")
+```
+
+Use `loguniform` from scipy for learning rate and regularization. Use `randint` for integer hyperparameters. The `n_jobs=-1` flag parallelizes across all CPU cores.
+
+### Common Mistakes in Hyperparameter Tuning
+
+**Data leakage through preprocessing.** If you fit a scaler on the full dataset before cross-validation, information from the validation fold leaks into training. Always put preprocessing inside a `Pipeline` so it is fit only on the training fold.
+
+**Overfitting to the validation set.** Running thousands of trials effectively trains on the validation set. Use nested cross-validation for final performance estimates, or hold out a separate test set that you never touch during tuning.
+
+**Searching too narrow a range.** If your best value is at the boundary of your search space, you have not searched widely enough. The optimal value might be outside your range. Always check if the best parameters are at the edges.
+
+**Ignoring interaction effects.** Learning rate and number of estimators interact strongly in boosting. A low learning rate needs more estimators. Tuning them independently gives worse results than tuning them together.
+
+**Not using early stopping for iterative models.** For gradient boosting and neural networks, set n_estimators or epochs to a high value and use early stopping. This is strictly better than tuning the number of iterations as a hyperparameter.
 
 ## Exercises
 

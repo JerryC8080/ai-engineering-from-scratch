@@ -194,7 +194,136 @@ def demo_pca_preprocessing(X, y):
     print()
 
 
+def kernel_pca(X, n_components, kernel="rbf", gamma=1.0):
+    n = X.shape[0]
+
+    if kernel == "rbf":
+        sq_dists = np.sum(X ** 2, axis=1).reshape(-1, 1) + np.sum(X ** 2, axis=1).reshape(1, -1) - 2 * X @ X.T
+        K = np.exp(-gamma * sq_dists)
+    elif kernel == "poly":
+        K = (X @ X.T + 1) ** gamma
+    else:
+        K = X @ X.T
+
+    one_n = np.ones((n, n)) / n
+    K_centered = K - one_n @ K - K @ one_n + one_n @ K @ one_n
+
+    eigenvalues, eigenvectors = np.linalg.eigh(K_centered)
+
+    sorted_idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[sorted_idx]
+    eigenvectors = eigenvectors[:, sorted_idx]
+
+    top_vals = eigenvalues[:n_components]
+    top_vecs = eigenvectors[:, :n_components]
+
+    for i in range(n_components):
+        if top_vals[i] > 1e-10:
+            top_vecs[:, i] = top_vecs[:, i] / np.sqrt(top_vals[i])
+
+    return top_vecs * top_vals[:n_components]
+
+
+def reconstruction_error(X, X_reconstructed):
+    return np.mean((X - X_reconstructed) ** 2)
+
+
+def demo_kernel_pca():
+    print("=" * 60)
+    print("KERNEL PCA: Concentric circles")
+    print("=" * 60)
+
+    np.random.seed(42)
+    n_per_ring = 200
+
+    theta_inner = np.random.uniform(0, 2 * np.pi, n_per_ring)
+    r_inner = 1.0 + np.random.normal(0, 0.1, n_per_ring)
+    inner = np.column_stack([r_inner * np.cos(theta_inner), r_inner * np.sin(theta_inner)])
+
+    theta_outer = np.random.uniform(0, 2 * np.pi, n_per_ring)
+    r_outer = 3.0 + np.random.normal(0, 0.1, n_per_ring)
+    outer = np.column_stack([r_outer * np.cos(theta_outer), r_outer * np.sin(theta_outer)])
+
+    X_circles = np.vstack([inner, outer])
+    labels = np.array([0] * n_per_ring + [1] * n_per_ring)
+
+    pca_linear = PCA(n_components=1)
+    X_linear = pca_linear.fit_transform(X_circles)
+
+    inner_range_linear = (X_linear[labels == 0].min(), X_linear[labels == 0].max())
+    outer_range_linear = (X_linear[labels == 1].min(), X_linear[labels == 1].max())
+
+    print(f"\n  Data: {n_per_ring} points per ring, 2 concentric circles")
+    print(f"\n  Linear PCA (1 component):")
+    print(f"    Inner ring range: [{inner_range_linear[0]:.2f}, {inner_range_linear[1]:.2f}]")
+    print(f"    Outer ring range: [{outer_range_linear[0]:.2f}, {outer_range_linear[1]:.2f}]")
+    overlap = inner_range_linear[1] > outer_range_linear[0] and outer_range_linear[1] > inner_range_linear[0]
+    print(f"    Overlapping: {overlap} (linear PCA cannot separate circles)")
+
+    X_kpca = kernel_pca(X_circles, n_components=2, kernel="rbf", gamma=0.5)
+
+    inner_mean = X_kpca[labels == 0, 0].mean()
+    outer_mean = X_kpca[labels == 1, 0].mean()
+    separation = abs(outer_mean - inner_mean)
+
+    print(f"\n  Kernel PCA (RBF, gamma=0.5, 2 components):")
+    print(f"    Inner ring PC1 mean: {inner_mean:.4f}")
+    print(f"    Outer ring PC1 mean: {outer_mean:.4f}")
+    print(f"    Separation on PC1: {separation:.4f}")
+    print(f"    Kernel PCA separates the circles in the first component")
+
+    for g in [0.1, 0.5, 1.0, 5.0]:
+        X_k = kernel_pca(X_circles, n_components=2, kernel="rbf", gamma=g)
+        inner_m = X_k[labels == 0, 0].mean()
+        outer_m = X_k[labels == 1, 0].mean()
+        sep = abs(outer_m - inner_m)
+        print(f"    gamma={g:<4}  separation={sep:.4f}")
+
+    print()
+
+
+def demo_reconstruction_error():
+    print("=" * 60)
+    print("RECONSTRUCTION ERROR vs NUMBER OF COMPONENTS")
+    print("=" * 60)
+
+    np.random.seed(42)
+    n_samples = 300
+    n_features = 20
+    n_informative = 5
+
+    base = np.random.randn(n_samples, n_informative)
+    mixing = np.random.randn(n_informative, n_features)
+    noise = np.random.randn(n_samples, n_features) * 0.1
+    X = base @ mixing + noise
+
+    total_var_pca = PCA(n_components=n_features)
+    total_var_pca.fit(X)
+    all_eigenvalues = total_var_pca.eigenvalues
+
+    print(f"\n  Data: {n_samples} samples, {n_features} features, {n_informative} informative")
+    print(f"\n  {'k':>4s}  {'Recon MSE':>12s}  {'Explained Var':>14s}  {'Cumulative':>11s}")
+    print(f"  {'':->4s}  {'':->12s}  {'':->14s}  {'':->11s}")
+
+    cumulative = 0.0
+    for k in [1, 2, 3, 5, 10, 15, 20]:
+        pca_k = PCA(n_components=k)
+        X_reduced = pca_k.fit_transform(X)
+        X_reconstructed = pca_k.inverse_transform(X_reduced)
+        mse = reconstruction_error(X, X_reconstructed)
+        cumulative = sum(pca_k.explained_variance_ratio_)
+        ev = pca_k.explained_variance_ratio_[-1] if k > 0 else 0
+        print(f"  {k:>4d}  {mse:>12.4f}  {ev:>14.6f}  {cumulative:>11.4f}")
+
+    print(f"\n  The data is effectively {n_informative}-dimensional.")
+    print(f"  After k={n_informative}, reconstruction error drops to near-noise level.")
+    print(f"  Additional components capture only noise variance.")
+    print()
+
+
 if __name__ == "__main__":
+    demo_kernel_pca()
+    demo_reconstruction_error()
     demo_synthetic()
 
     X, y, X_pca2d = demo_mnist()

@@ -118,6 +118,108 @@ def demo_gradient_descent_2d():
     print(f"Minimum found at ({point[0]:.4f}, {point[1]:.4f}) (true: (0, 0))")
 
 
+def hessian_2d(f, x, y, h=1e-5):
+    fxx = (f(x + h, y) - 2 * f(x, y) + f(x - h, y)) / (h ** 2)
+    fyy = (f(x, y + h) - 2 * f(x, y) + f(x, y - h)) / (h ** 2)
+    fxy = (f(x + h, y + h) - f(x + h, y - h) - f(x - h, y + h) + f(x - h, y - h)) / (4 * h ** 2)
+    return [[fxx, fxy], [fxy, fyy]]
+
+
+def taylor_approx(f, f_prime, f_double_prime, x0, h, order=2):
+    result = f(x0)
+    if order >= 1:
+        result += f_prime(x0) * h
+    if order >= 2:
+        result += 0.5 * f_double_prime(x0) * h ** 2
+    return result
+
+
+def hessian_eigenvalues(H):
+    a, b = H[0][0], H[0][1]
+    c, d = H[1][0], H[1][1]
+    trace = a + d
+    det = a * d - b * c
+    discriminant = trace ** 2 - 4 * det
+    if discriminant < 0:
+        return None, None
+    sqrt_disc = discriminant ** 0.5
+    return (trace + sqrt_disc) / 2, (trace - sqrt_disc) / 2
+
+
+def demo_hessian():
+    print("\n" + "=" * 55)
+    print("HESSIAN MATRIX: SADDLE POINT vs MINIMUM")
+    print("=" * 55)
+
+    def saddle(x, y):
+        return x ** 2 - y ** 2
+
+    def bowl(x, y):
+        return x ** 2 + y ** 2
+
+    print("\nf(x,y) = x^2 - y^2 (saddle function)")
+    H = hessian_2d(saddle, 0.0, 0.0)
+    e1, e2 = hessian_eigenvalues(H)
+    print(f"  Hessian at (0,0):")
+    print(f"    [{H[0][0]:6.2f}  {H[0][1]:6.2f}]")
+    print(f"    [{H[1][0]:6.2f}  {H[1][1]:6.2f}]")
+    print(f"  Eigenvalues: {e1:.2f}, {e2:.2f}")
+    print(f"  Mixed signs --> SADDLE POINT")
+
+    print(f"\nf(x,y) = x^2 + y^2 (bowl function)")
+    H = hessian_2d(bowl, 0.0, 0.0)
+    e1, e2 = hessian_eigenvalues(H)
+    print(f"  Hessian at (0,0):")
+    print(f"    [{H[0][0]:6.2f}  {H[0][1]:6.2f}]")
+    print(f"    [{H[1][0]:6.2f}  {H[1][1]:6.2f}]")
+    print(f"  Eigenvalues: {e1:.2f}, {e2:.2f}")
+    print(f"  Both positive --> LOCAL MINIMUM")
+
+    def rosenbrock(x, y):
+        return (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+
+    print(f"\nRosenbrock f(x,y) = (1-x)^2 + 100*(y-x^2)^2")
+    H = hessian_2d(rosenbrock, 1.0, 1.0)
+    e1, e2 = hessian_eigenvalues(H)
+    print(f"  Hessian at minimum (1,1):")
+    print(f"    [{H[0][0]:8.2f}  {H[0][1]:8.2f}]")
+    print(f"    [{H[1][0]:8.2f}  {H[1][1]:8.2f}]")
+    print(f"  Eigenvalues: {e1:.2f}, {e2:.2f}")
+    print(f"  Both positive --> LOCAL MINIMUM (confirmed)")
+
+
+def demo_taylor():
+    print("\n" + "=" * 55)
+    print("TAYLOR SERIES APPROXIMATION")
+    print("=" * 55)
+
+    x0 = 1.0
+    print(f"\nApproximating f(x) = e^x near x0 = {x0}")
+    print(f"{'h':>8}  {'True f(x0+h)':>14}  {'Order 0':>10}  {'Order 1':>10}  {'Order 2':>10}")
+    print("-" * 60)
+
+    for h in [0.1, 0.5, 1.0, 2.0]:
+        true_val = math.exp(x0 + h)
+        t0 = taylor_approx(math.exp, math.exp, math.exp, x0, h, order=0)
+        t1 = taylor_approx(math.exp, math.exp, math.exp, x0, h, order=1)
+        t2 = taylor_approx(math.exp, math.exp, math.exp, x0, h, order=2)
+        print(f"{h:8.1f}  {true_val:14.6f}  {t0:10.6f}  {t1:10.6f}  {t2:10.6f}")
+
+    print(f"\nApproximating f(x) = sin(x) near x0 = 0")
+    print(f"{'h':>8}  {'True sin(h)':>14}  {'Order 0':>10}  {'Order 1':>10}  {'Order 2':>10}")
+    print("-" * 60)
+
+    for h in [0.1, 0.5, 1.0, 2.0]:
+        true_val = math.sin(h)
+        t0 = taylor_approx(math.sin, math.cos, lambda x: -math.sin(x), 0.0, h, order=0)
+        t1 = taylor_approx(math.sin, math.cos, lambda x: -math.sin(x), 0.0, h, order=1)
+        t2 = taylor_approx(math.sin, math.cos, lambda x: -math.sin(x), 0.0, h, order=2)
+        print(f"{h:8.1f}  {true_val:14.6f}  {t0:10.6f}  {t1:10.6f}  {t2:10.6f}")
+
+    print("\nKey insight: more terms = better approximation near x0,")
+    print("but all Taylor approximations diverge far from x0.")
+
+
 def demo_linear_regression():
     print("\n" + "=" * 55)
     print("GRADIENT DESCENT: LINEAR REGRESSION y = 2x + 1")
@@ -158,4 +260,6 @@ if __name__ == "__main__":
     demo_gradient()
     demo_gradient_descent_1d()
     demo_gradient_descent_2d()
+    demo_hessian()
+    demo_taylor()
     demo_linear_regression()

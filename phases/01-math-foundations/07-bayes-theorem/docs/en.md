@@ -328,6 +328,108 @@ Same algorithm. CountVectorizer handles tokenization and vocabulary building. Mu
 
 The NaiveBayes class built here demonstrates the full pipeline: tokenization, probability estimation with Laplace smoothing, log-space prediction. The code in `code/bayes.py` runs end-to-end with no dependencies beyond Python's standard library.
 
+### Conjugate Priors
+
+When the prior and posterior belong to the same family of distributions, the prior is called "conjugate." This makes Bayesian updating algebraically clean -- you get a closed-form posterior without numerical integration.
+
+| Likelihood | Conjugate Prior | Posterior | Example |
+|-----------|----------------|-----------|---------|
+| Bernoulli | Beta(a, b) | Beta(a + successes, b + failures) | Coin flip bias estimation |
+| Normal (known variance) | Normal(mu_0, sigma_0) | Normal(weighted mean, smaller variance) | Sensor calibration |
+| Poisson | Gamma(a, b) | Gamma(a + sum of counts, b + n) | Modeling arrival rates |
+| Multinomial | Dirichlet(alpha) | Dirichlet(alpha + counts) | Topic modeling, language models |
+
+Why this matters: without conjugate priors, you need Monte Carlo sampling or variational inference to approximate the posterior. With conjugate priors, you just update two numbers.
+
+The Beta distribution is the most common conjugate prior in practice. Beta(a, b) represents your belief about a probability parameter. The mean is a/(a+b). The larger a+b, the more concentrated (confident) the distribution.
+
+Special cases of the Beta prior:
+- Beta(1, 1) = uniform. You have no opinion about the parameter.
+- Beta(10, 10) = peaked at 0.5. You strongly believe the parameter is near 0.5.
+- Beta(1, 10) = skewed toward 0. You believe the parameter is small.
+
+The update rule is dead simple:
+
+```
+Prior:     Beta(a, b)
+Data:      s successes, f failures
+Posterior: Beta(a + s, b + f)
+```
+
+No integrals. No sampling. Just addition.
+
+### Sequential Bayesian Updating
+
+Bayesian inference is naturally sequential. Today's posterior becomes tomorrow's prior. This is how real systems learn incrementally without reprocessing all historical data.
+
+Concrete example: estimating whether a coin is fair.
+
+**Day 1: No data yet.**
+Start with Beta(1, 1) -- a uniform prior. You have no opinion.
+- Prior mean: 0.5
+- Prior is flat across [0, 1]
+
+**Day 2: Observe 7 heads, 3 tails.**
+Posterior = Beta(1 + 7, 1 + 3) = Beta(8, 4)
+- Posterior mean: 8/12 = 0.667
+- Evidence suggests the coin is biased toward heads
+
+**Day 3: Observe 5 more heads, 5 more tails.**
+Use yesterday's posterior as today's prior.
+Posterior = Beta(8 + 5, 4 + 5) = Beta(13, 9)
+- Posterior mean: 13/22 = 0.591
+- The balanced new data pulled the estimate back toward 0.5
+
+```mermaid
+graph LR
+    A["Prior<br/>Beta(1,1)<br/>mean = 0.50"] -->|"7H, 3T"| B["Posterior 1<br/>Beta(8,4)<br/>mean = 0.67"]
+    B -->|"becomes prior"| C["Prior 2<br/>Beta(8,4)"]
+    C -->|"5H, 5T"| D["Posterior 2<br/>Beta(13,9)<br/>mean = 0.59"]
+```
+
+The order of observations does not matter. Beta(1,1) updated with all 12 heads and 8 tails at once gives Beta(13, 9) -- the same result. Sequential updating and batch updating are mathematically equivalent. But sequential updating lets you make decisions at each step without storing raw data.
+
+This is the foundation of online learning in production ML systems. Thompson sampling for bandits, incremental recommendation systems, and streaming anomaly detectors all use this pattern.
+
+### Connection to A/B Testing
+
+A/B testing is Bayesian inference in disguise.
+
+Setup: you are testing two button colors. Variant A (blue) and variant B (green). You want to know which one gets more clicks.
+
+The Bayesian A/B test:
+
+1. **Prior.** Start with Beta(1, 1) for both variants. No prior preference.
+2. **Data.** Variant A: 50 clicks out of 1000 views. Variant B: 65 clicks out of 1000 views.
+3. **Posteriors.**
+   - A: Beta(1 + 50, 1 + 950) = Beta(51, 951). Mean = 0.051
+   - B: Beta(1 + 65, 1 + 935) = Beta(66, 936). Mean = 0.066
+4. **Decision.** Compute P(B > A) -- the probability that B's true conversion rate is higher than A's.
+
+Computing P(B > A) analytically is hard. But Monte Carlo makes it trivial:
+
+```
+1. Draw 100,000 samples from Beta(51, 951)  -> samples_A
+2. Draw 100,000 samples from Beta(66, 936)  -> samples_B
+3. P(B > A) = fraction of samples where B > A
+```
+
+If P(B > A) > 0.95, you ship variant B. If it is between 0.05 and 0.95, you keep collecting data. If P(B > A) < 0.05, you ship variant A.
+
+Advantages over frequentist A/B testing:
+- You get a direct probability statement: "there is a 97% chance B is better"
+- No p-value confusion. No "fail to reject the null hypothesis" hedging.
+- You can check results at any time without inflating false positive rates (no "peeking problem")
+- You can incorporate prior knowledge (e.g., previous tests suggest conversion rates are usually 3-8%)
+
+| Aspect | Frequentist A/B | Bayesian A/B |
+|--------|----------------|--------------|
+| Output | p-value | P(B > A) |
+| Interpretation | "How surprising is this data if A=B?" | "How likely is B better than A?" |
+| Early stopping | Inflates false positives | Safe at any point |
+| Prior knowledge | Not used | Encoded as Beta prior |
+| Decision rule | p < 0.05 | P(B > A) > threshold |
+
 ## Exercises
 
 1. **Multiple tests.** A patient tests positive twice on independent tests (both 99% accurate, disease prevalence 1 in 10,000). What is P(sick) after both tests? Use the posterior from the first test as the prior for the second.
