@@ -43,6 +43,10 @@ Progress tracking for every phase and lesson.
 | 16 | Sampling Methods | ✅ |
 | 17 | Linear Systems | ✅ |
 | 18 | Convex Optimization | ✅ |
+| 19 | Complex Numbers for AI | ✅ |
+| 20 | The Fourier Transform | ✅ |
+| 21 | Graph Theory for ML | ✅ |
+| 22 | Stochastic Processes | ✅ |
 
 ## Phase 2: ML Fundamentals — ✅
 
@@ -61,6 +65,11 @@ Progress tracking for every phase and lesson.
 | 11 | Ensemble Methods — Boosting, Bagging, Stacking | ✅ |
 | 12 | Hyperparameter Tuning & AutoML | ✅ |
 | 13 | ML Pipelines & Experiment Tracking | ✅ |
+| 14 | Naive Bayes — Multinomial, Gaussian, Bernoulli | ✅ |
+| 15 | Time Series Fundamentals | ✅ |
+| 16 | Anomaly Detection | ✅ |
+| 17 | Handling Imbalanced Data | ✅ |
+| 18 | Feature Selection | ✅ |
 
 ## Phase 3: Deep Learning Core — 🚧
 
@@ -358,6 +367,6 @@ Progress tracking for every phase and lesson.
 
 ---
 
-**Total: 20 phases, 220+ lessons | 48 complete**
+**Total: 20 phases, 230+ lessons | 57 complete**
 
 Want to help? Pick any ⬚ lesson and submit a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).

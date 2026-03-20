@@ -100,6 +100,129 @@ If X and Y are independent, mutual information is zero. Knowing one tells you no
 
 In feature selection, high mutual information between a feature and the target means the feature is useful. Low mutual information means it is noise.
 
+### Conditional Entropy
+
+H(Y|X) measures how much uncertainty remains about Y after you observe X.
+
+```
+H(Y|X) = H(X,Y) - H(X)
+```
+
+Two extremes:
+- If X completely determines Y, then H(Y|X) = 0. Knowing X eliminates all uncertainty about Y. Example: X = temperature in Celsius, Y = temperature in Fahrenheit.
+- If X tells you nothing about Y, then H(Y|X) = H(Y). Knowing X does not reduce your uncertainty at all. Example: X = coin flip, Y = tomorrow's weather.
+
+Conditional entropy is always non-negative and never exceeds H(Y):
+
+```
+0 <= H(Y|X) <= H(Y)
+```
+
+In machine learning, conditional entropy appears in decision trees. At each split, the algorithm picks the feature X that minimizes H(Y|X) -- the feature that removes the most uncertainty about the label Y.
+
+### Joint Entropy
+
+H(X,Y) is the entropy of the joint distribution of X and Y together.
+
+```
+H(X,Y) = -sum sum p(x,y) * log(p(x,y))   for all x, y
+```
+
+Key property:
+
+```
+H(X,Y) <= H(X) + H(Y)
+```
+
+Equality holds when X and Y are independent. If they share information, the joint entropy is less than the sum of individual entropies. The "missing" entropy is exactly the mutual information.
+
+```mermaid
+graph TD
+    subgraph "Information Venn Diagram"
+        direction LR
+        HX["H(X)"]
+        HY["H(Y)"]
+        MI["I(X;Y)<br/>Mutual<br/>Information"]
+        HXgY["H(X|Y)<br/>= H(X) - I(X;Y)"]
+        HYgX["H(Y|X)<br/>= H(Y) - I(X;Y)"]
+        HXY["H(X,Y) = H(X) + H(Y) - I(X;Y)"]
+    end
+
+    HXgY --- MI
+    MI --- HYgX
+    HX -.- HXgY
+    HX -.- MI
+    HY -.- MI
+    HY -.- HYgX
+    HXY -.- HXgY
+    HXY -.- MI
+    HXY -.- HYgX
+```
+
+The relationships:
+- H(X,Y) = H(X) + H(Y|X) = H(Y) + H(X|Y)
+- I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)
+- H(X,Y) = H(X) + H(Y) - I(X;Y)
+
+### Mutual Information (Deep Dive)
+
+Mutual information I(X;Y) quantifies how much knowing one variable reduces uncertainty about the other.
+
+```
+I(X;Y) = H(X) - H(X|Y)
+       = H(Y) - H(Y|X)
+       = H(X) + H(Y) - H(X,Y)
+       = sum sum p(x,y) * log(p(x,y) / (p(x) * p(y)))
+```
+
+Properties:
+- I(X;Y) >= 0 always. You never lose information by observing something.
+- I(X;Y) = 0 if and only if X and Y are independent.
+- I(X;Y) = I(Y;X). It is symmetric, unlike KL divergence.
+- I(X;X) = H(X). A variable shares all its information with itself.
+
+**Mutual information for feature selection.** In ML, you want features that are informative about the target. Mutual information gives you a principled way to rank features:
+
+1. For each feature X_i, compute I(X_i; Y) where Y is the target variable.
+2. Rank features by MI score.
+3. Keep the top k features.
+
+This works for any relationship between feature and target -- linear, nonlinear, monotonic, or not. Correlation only catches linear relationships. MI catches everything.
+
+| Method | Detects | Computational cost | Handles categorical? |
+|--------|---------|-------------------|---------------------|
+| Pearson correlation | Linear relationships | O(n) | No |
+| Spearman correlation | Monotonic relationships | O(n log n) | No |
+| Mutual information | Any statistical dependency | O(n log n) with binning | Yes |
+
+### Label Smoothing and Cross-Entropy
+
+Standard classification uses hard targets: [0, 0, 1, 0]. The true class gets probability 1, everything else gets 0. Label smoothing replaces these with soft targets:
+
+```
+soft_target = (1 - epsilon) * hard_target + epsilon / num_classes
+```
+
+With epsilon = 0.1 and 4 classes:
+- Hard target:  [0, 0, 1, 0]
+- Soft target:  [0.025, 0.025, 0.925, 0.025]
+
+From an information theory perspective, label smoothing increases the entropy of the target distribution. Hard one-hot targets have entropy 0 -- there is no uncertainty. Soft targets have positive entropy.
+
+Why this helps:
+- Prevents the model from driving logits to extreme values (infinite logits would be needed to perfectly match a one-hot target under cross-entropy)
+- Acts as regularization: the model cannot be 100% confident
+- Improves calibration: predicted probabilities better reflect true uncertainty
+- Reduces the gap between training and inference behavior
+
+The cross-entropy loss with label smoothing becomes:
+
+```
+L = (1 - epsilon) * CE(hard_target, prediction) + epsilon * H_uniform(prediction)
+```
+
+The second term penalizes predictions that are far from uniform -- a direct regularization on confidence.
+
 ### Why Cross-Entropy Is THE Classification Loss
 
 Three perspectives, same conclusion.

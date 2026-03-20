@@ -3,7 +3,7 @@
 > Machine learning is teaching computers to find patterns in data instead of writing rules by hand.
 
 **Type:** Learn
-**Languages:** --
+**Languages:** Python
 **Prerequisites:** Phase 1 (Math Foundations)
 **Time:** ~45 minutes
 
@@ -75,6 +75,24 @@ flowchart TD
 - "Control this robot arm. +1 for picking up the object, -0.01 for each second wasted."
 
 Most of what you will build in practice uses supervised learning. Unsupervised learning is common for preprocessing and exploration. Reinforcement learning powers game AI, robotics, and RLHF for language models.
+
+### Beyond the Big Three
+
+The three categories above are clean, but real-world ML often blurs the lines.
+
+**Semi-supervised learning** uses a small set of labeled data and a large set of unlabeled data. You might have 100 labeled medical images and 100,000 unlabeled ones. Techniques include:
+
+- **Label propagation:** Build a graph connecting similar data points. Labels spread from labeled nodes to unlabeled neighbors through the graph.
+- **Pseudo-labeling:** Train a model on the labeled data, use it to predict labels for unlabeled data, then retrain on everything. The model bootstraps its own training set.
+- **Consistency regularization:** The model should give the same prediction for an input and a slightly perturbed version of that input. This works even without labels.
+
+**Self-supervised learning** creates supervision from the data itself. No human labels needed at all. The model creates its own prediction task from the structure of the data.
+
+- **Masked language modeling (BERT):** Hide 15% of words in a sentence, train the model to predict the missing words. The "labels" come from the original text.
+- **Contrastive learning (SimCLR):** Take an image, create two augmented versions. Train the model to recognize they came from the same image while distinguishing them from augmented versions of other images.
+- **Next-token prediction (GPT):** Predict the next word given all previous words. Every text document becomes a training example.
+
+These are not separate categories from the big three. They are strategies that combine supervised and unsupervised ideas. Self-supervised learning is technically supervised (the model predicts something), but the labels are generated automatically, not by humans.
 
 ### Classification vs Regression
 
@@ -231,6 +249,130 @@ In practice, the choice depends on:
 - Whether the relationship is linear or nonlinear
 - Whether you need interpretability
 - How much compute you can afford
+
+### When NOT to Use Machine Learning
+
+ML is powerful but not always the right tool. Before reaching for a model, ask whether you actually need one.
+
+**Do not use ML when:**
+
+- **Rules are simple and well-defined.** Tax calculation, sorting algorithms, unit conversions. If you can write the logic in a few if-statements, a model adds complexity for no benefit.
+- **You have no data or very little data.** ML needs examples to learn from. With 10 data points, you cannot train anything meaningful. Collect data first.
+- **The cost of being wrong is catastrophic and you need guaranteed correctness.** Medical dosage calculation, nuclear reactor control, cryptographic verification. ML models are probabilistic. They will sometimes be wrong. If "sometimes wrong" is unacceptable, use deterministic methods.
+- **A lookup table or heuristic solves the problem.** If a simple threshold or table covers 99% of cases, adding ML increases maintenance cost without meaningful improvement.
+- **You cannot explain the decision and explainability is required.** Regulated industries (lending, insurance, criminal justice) sometimes require that every decision be fully explainable. Some ML models are interpretable (linear regression, small decision trees). Most are not.
+- **The problem changes faster than you can retrain.** If the rules change daily and retraining takes a week, the model is always stale.
+
+Use this decision flowchart:
+
+```mermaid
+flowchart TD
+    A["Do you have data?"] -->|No| B["Collect data first or use rules"]
+    A -->|Yes| C["Can you write the rules explicitly?"]
+    C -->|"Yes, and they are simple"| D["Use rules. Skip ML."]
+    C -->|"No, or they are too complex"| E["Is the cost of errors acceptable?"]
+    E -->|"No, need guaranteed correctness"| F["Use deterministic methods"]
+    E -->|Yes| G["Do you need explainability?"]
+    G -->|"Yes, strictly"| H["Use interpretable models only"]
+    G -->|"No, or partially"| I["Use ML"]
+    I --> J["Do you have enough labeled data?"]
+    J -->|Yes| K["Supervised learning"]
+    J -->|"Some labels"| L["Semi-supervised learning"]
+    J -->|"No labels"| M["Unsupervised or self-supervised"]
+```
+
+## Build It
+
+The code in `code/ml_intro.py` implements a nearest centroid classifier from scratch, the simplest possible ML algorithm. It demonstrates the core idea: learn from data, then predict on new data.
+
+### Step 1: Nearest Centroid Classifier from Scratch
+
+The nearest centroid classifier computes the center (mean) of each class in the training data. To predict, it assigns each new point to the class whose center is closest.
+
+```python
+class NearestCentroid:
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        self.centroids = np.array([
+            X[y == c].mean(axis=0) for c in self.classes
+        ])
+
+    def predict(self, X):
+        distances = np.array([
+            np.sqrt(((X - c) ** 2).sum(axis=1))
+            for c in self.centroids
+        ])
+        return self.classes[distances.argmin(axis=0)]
+```
+
+That is the entire algorithm. Fit computes two means. Predict computes distances. No gradient descent, no iteration, no hyperparameters.
+
+### Step 2: Train on Synthetic Data
+
+We generate a 2D classification dataset with two classes that overlap slightly. The centroid classifier draws a linear decision boundary between the class centers.
+
+```python
+rng = np.random.RandomState(42)
+X_class0 = rng.randn(100, 2) + np.array([1.0, 1.0])
+X_class1 = rng.randn(100, 2) + np.array([-1.0, -1.0])
+X = np.vstack([X_class0, X_class1])
+y = np.array([0] * 100 + [1] * 100)
+```
+
+### Step 3: Compare Against a Baseline
+
+Every ML model should be compared against a trivial baseline. Here, the baseline predicts a random class. If your ML model does not beat random guessing, something is wrong.
+
+```python
+baseline_preds = rng.choice([0, 1], size=len(y_test))
+baseline_acc = np.mean(baseline_preds == y_test)
+```
+
+The centroid classifier should get around 90%+ accuracy on this clean dataset. Random baseline gets around 50%.
+
+### Why This Matters
+
+The nearest centroid classifier is trivially simple. It has no hyperparameters, no iteration, no gradient descent. Yet it captures the fundamental ML pattern:
+
+1. **Learn** a representation from training data (the centroids)
+2. **Predict** on new data using that representation (nearest distance)
+3. **Evaluate** against a baseline (random guessing)
+
+Every ML algorithm, from logistic regression to transformers, follows this same three-step pattern. The representation gets more complex, but the workflow stays the same.
+
+### Step 4: What the Centroid Classifier Cannot Do
+
+The nearest centroid classifier assumes each class forms a single blob. It draws linear decision boundaries. It fails when:
+
+- Classes have multiple clusters (e.g., the digit "1" can be written in several different ways)
+- The decision boundary is nonlinear (e.g., one class wraps around another)
+- Features have very different scales (distance is dominated by the largest-scale feature)
+
+These limitations motivate every other algorithm you will learn. K-nearest neighbors handles multiple clusters. Decision trees handle nonlinear boundaries. Feature scaling fixes the scale problem. Each lesson builds on the limitations of the previous one.
+
+## Use It
+
+sklearn provides `NearestCentroid` and synthetic data generators:
+
+```python
+from sklearn.neighbors import NearestCentroid
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=500, n_features=2, n_redundant=0,
+    n_clusters_per_class=1, random_state=42
+)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+clf = NearestCentroid()
+clf.fit(X_train, y_train)
+print(f"Accuracy: {clf.score(X_test, y_test):.3f}")
+```
+
+## Ship It
+
+This lesson produces: `outputs/prompt-ml-problem-framer.md`
 
 ## Key Terms
 
