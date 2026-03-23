@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering from Scratch — 230+ Lessons, 20 Phases</title>
+<meta name="description" content="A comprehensive, open-source AI engineering curriculum. 230+ hands-on lessons across 20 phases, from linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia.">
+<meta property="og:title" content="AI Engineering from Scratch">
+<meta property="og:description" content="230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23D97757'>AI</text></svg>">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="header__inner">
+    <a href="#" class="header__logo" aria-label="AI Engineering from Scratch">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="6" fill="var(--color-accent)"/>
+        <path d="M8 22L16 10L24 22" stroke="var(--color-bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="14" r="2" fill="var(--color-bg)"/>
+      </svg>
+      <span>AI Eng<span class="hide-mobile"> from Scratch</span></span>
+    </a>
+    <nav class="header__nav" aria-label="Primary">
+      <a href="#phases">Phases</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#glossary">Glossary</a>
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="header__github">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span class="hide-mobile">GitHub</span>
+      </a>
+    </nav>
+    <button class="header__theme" data-theme-toggle aria-label="Toggle theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__inner">
+    <div class="hero__badge">Open Source &middot; MIT License</div>
+    <h1 class="hero__title">AI Engineering<br><span class="hero__accent">from Scratch</span></h1>
+    <p class="hero__sub">230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable.</p>
+    <div class="hero__stats">
+      <div class="stat">
+        <span class="stat__num" id="stat-lessons">--</span>
+        <span class="stat__label">Lessons</span>
+      </div>
+      <div class="stat">
+        <span class="stat__num" id="stat-phases">--</span>
+        <span class="stat__label">Phases</span>
+      </div>
+      <div class="stat">
+        <span class="stat__num">4</span>
+        <span class="stat__label">Languages</span>
+      </div>
+      <div class="stat">
+        <span class="stat__num" id="stat-complete">--</span>
+        <span class="stat__label">Complete</span>
+      </div>
+    </div>
+    <div class="hero__actions">
+      <a href="#phases" class="btn btn--primary">Explore Phases</a>
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="btn btn--ghost">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        Clone Repo
+      </a>
+    </div>
+  </div>
+  <div class="hero__glow" aria-hidden="true"></div>
+</section>
+
+<!-- DIFFERENTIATOR -->
+<section class="diff">
+  <div class="diff__inner">
+    <h2 class="section-title">Why This Course</h2>
+    <div class="diff__grid">
+      <div class="diff__card">
+        <div class="diff__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>Full Scope</h3>
+        <p>Math, ML, deep learning, NLP, vision, speech, transformers, LLMs, agents, swarms. Everything in one place.</p>
+      </div>
+      <div class="diff__card">
+        <div class="diff__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Multi-Language</h3>
+        <p>Python, TypeScript, Rust, Julia. Build in whatever language fits the problem, not just one.</p>
+      </div>
+      <div class="diff__card">
+        <div class="diff__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3>Build, Don't Watch</h3>
+        <p>Every lesson produces reusable prompts, skills, agents, or MCP servers. A portfolio, not a certificate.</p>
+      </div>
+      <div class="diff__card">
+        <div class="diff__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3>Scratch First</h3>
+        <p>Implement from first principles, then learn the framework. Understand why, not just how.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASES -->
+<section class="phases" id="phases">
+  <div class="phases__inner">
+    <h2 class="section-title">The Journey</h2>
+    <p class="section-sub">20 phases. Each builds on the last. Click any phase to explore its lessons.</p>
+
+    <div class="phases__grid" id="phases-grid">
+    </div>
+  </div>
+</section>
+
+<!-- PHASE DETAIL MODAL -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+  <div class="modal__backdrop" id="modal-backdrop"></div>
+  <div class="modal__content">
+    <div class="modal__header">
+      <div>
+        <span class="modal__phase-num" id="modal-phase-num"></span>
+        <h2 class="modal__title" id="modal-title"></h2>
+      </div>
+      <button class="modal__close" id="modal-close" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal__desc" id="modal-desc"></p>
+    <div class="modal__progress-bar">
+      <div class="modal__progress-fill" id="modal-progress-fill"></div>
+    </div>
+    <span class="modal__progress-text" id="modal-progress-text"></span>
+    <div class="modal__lessons" id="modal-lessons"></div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<section class="roadmap" id="roadmap">
+  <div class="roadmap__inner">
+    <h2 class="section-title">Progress Roadmap</h2>
+    <p class="section-sub" id="roadmap-sub">Track overall course completion.</p>
+    <div class="roadmap__bar-container">
+      <div class="roadmap__bar">
+        <div class="roadmap__fill" id="roadmap-fill"></div>
+      </div>
+      <span class="roadmap__pct" id="roadmap-pct"></span>
+    </div>
+    <div class="roadmap__timeline" id="roadmap-timeline">
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="how__inner">
+    <h2 class="section-title">How Each Lesson Works</h2>
+    <div class="how__steps">
+      <div class="how__step">
+        <span class="how__num">01</span>
+        <h3>Motto</h3>
+        <p>One-line core idea that frames the lesson.</p>
+      </div>
+      <div class="how__step">
+        <span class="how__num">02</span>
+        <h3>Problem</h3>
+        <p>Why this matters. What problem does it solve.</p>
+      </div>
+      <div class="how__step">
+        <span class="how__num">03</span>
+        <h3>Concept</h3>
+        <p>Visual diagrams and intuition-first explanations.</p>
+      </div>
+      <div class="how__step">
+        <span class="how__num">04</span>
+        <h3>Build It</h3>
+        <p>Implement from scratch. No frameworks yet.</p>
+      </div>
+      <div class="how__step">
+        <span class="how__num">05</span>
+        <h3>Use It</h3>
+        <p>Same thing with real frameworks and tools.</p>
+      </div>
+      <div class="how__step">
+        <span class="how__num">06</span>
+        <h3>Ship It</h3>
+        <p>The prompt, skill, or agent this lesson produces.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section class="glossary" id="glossary">
+  <div class="glossary__inner">
+    <h2 class="section-title">Glossary</h2>
+    <p class="section-sub">Key AI terms, demystified. What people say vs. what they actually mean.</p>
+    <div class="glossary__search-wrap">
+      <input type="text" id="glossary-search" class="glossary__search" placeholder="Search terms..." aria-label="Search glossary terms">
+    </div>
+    <div class="glossary__grid" id="glossary-grid">
+    </div>
+  </div>
+</section>
+
+<!-- GET STARTED -->
+<section class="cta">
+  <div class="cta__inner">
+    <h2>Start Learning</h2>
+    <div class="cta__code">
+      <code>git clone https://github.com/rohitg00/ai-engineering-from-scratch.git</code>
+      <button class="cta__copy" aria-label="Copy to clipboard" onclick="navigator.clipboard.writeText('git clone https://github.com/rohitg00/ai-engineering-from-scratch.git')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+    <p class="cta__prereq">Prerequisites: You can write code (Python or any language) and you want to understand how AI actually works.</p>
+    <div class="cta__links">
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="btn btn--primary">View on GitHub</a>
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="btn btn--ghost">Contribute</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer__inner">
+    <p>AI Engineering from Scratch &mdash; MIT License</p>
+    <p class="footer__attr">by <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
