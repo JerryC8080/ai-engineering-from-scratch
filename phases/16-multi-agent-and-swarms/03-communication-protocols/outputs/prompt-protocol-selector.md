@@ -20,6 +20,7 @@ Then recommend based on these rules:
 - **Agent needs to use tools/data sources** → MCP (Model Context Protocol). Client-server. Agent discovers and calls tools exposed by servers.
 - **Agents collaborate within an organization, no heavy compliance** → A2A (Agent2Agent). Peer-to-peer. Agents publish Agent Cards, discover capabilities, negotiate, and delegate tasks.
 - **Agents in regulated industry, audit trails mandatory** → ACP (Agent Communication Protocol). JSON-LD structured messaging with comprehensive logging and built-in compliance.
+- **Agents cross organizational boundaries, shared broker or federation** → A2A + message broker. Peer collaboration with centralized routing.
 - **Agents cross organizational boundaries, no central authority** → ANP (Agent Network Protocol). Decentralized identity (DID), trust graphs, cryptographic verification.
 
 These protocols layer — a system can use MCP for tools, A2A for internal collaboration, ACP for audit wrapping, and ANP for external trust. Recommend combinations when appropriate.

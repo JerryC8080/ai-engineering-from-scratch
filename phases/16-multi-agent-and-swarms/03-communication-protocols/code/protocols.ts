@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 type MessageType = "request" | "response" | "notify" | "negotiate";
 
 type AgentMessage = {
@@ -76,7 +78,7 @@ class AuditableMessageBus {
 
   async send(message: AgentMessage): Promise<unknown> {
     const entry: AuditEntry = {
-      message,
+      message: structuredClone(message),
       receivedAt: Date.now(),
       status: "delivered",
     };
@@ -102,12 +104,14 @@ class AuditableMessageBus {
   }
 
   getAuditLog(): AuditEntry[] {
-    return [...this.log];
+    return structuredClone(this.log);
   }
 
   getAuditLogFor(agentName: string): AuditEntry[] {
-    return this.log.filter(
-      (e) => e.message.from === agentName || e.message.to === agentName
+    return structuredClone(
+      this.log.filter(
+        (e) => e.message.from === agentName || e.message.to === agentName
+      )
     );
   }
 }
@@ -136,7 +140,7 @@ class TrustGraph {
 
     if (from.endorsements.includes(toDid)) return 1.0;
     if (sharedEndorsements.length > 0)
-      return 0.5 + sharedEndorsements.length * 0.1;
+      return Math.min(1.0, 0.5 + sharedEndorsements.length * 0.1);
     return 0;
   }
 
@@ -193,14 +197,20 @@ async function protocolDemo() {
   const agents = registry.discover("summarization");
   console.log(`Found ${agents.length} agent(s) with summarization capability`);
 
+  if (agents.length === 0) {
+    console.log("No agents found with summarization capability");
+    return;
+  }
+
+  const target = agents[0];
   const canTrust = trust.canTrust(
     "did:web:coder.local",
-    "did:web:researcher.local"
+    `did:web:${target.name}.local`
   );
-  console.log(`Coder trusts researcher: ${canTrust}`);
+  console.log(`Coder trusts ${target.name}: ${canTrust}`);
 
   if (canTrust) {
-    const researchRequest = createMessage("request", "coder", "researcher", {
+    const researchRequest = createMessage("request", "coder", target.name, {
       task: "Research React 19 features",
     });
 

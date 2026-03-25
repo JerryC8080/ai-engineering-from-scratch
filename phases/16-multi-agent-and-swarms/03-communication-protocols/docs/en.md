@@ -3,7 +3,7 @@
 > Agents that can't speak the same language aren't a team — they're strangers shouting into the void.
 
 **Type:** Learn
-**Languages:** TypeScript, Python
+**Languages:** TypeScript
 **Prerequisites:** Phase 14 (Agent Engineering), Lesson 16.01 (Why Multi-Agent)
 **Time:** ~75 minutes
 
@@ -21,7 +21,7 @@ This is the communication protocol problem. Without a shared contract for how ag
 
 Think of these four protocols as layers, each addressing a different question:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                    ANP                                   │
 │         "How do agents trust strangers?"                │
@@ -47,7 +47,7 @@ They're not competitors. They solve different problems at different levels.
 
 MCP is covered in depth in Phase 13. Quick recap: MCP standardizes how an LLM connects to external tools and data sources. It's a **client-server** protocol — the agent (client) discovers and calls tools exposed by a server.
 
-```
+```text
 ┌──────────┐    "list tools"     ┌──────────────┐
 │  Agent   │ ──────────────────▸ │  MCP Server  │
 │ (client) │                     │  (database,  │
@@ -69,7 +69,7 @@ MCP is about **agent-to-tool** communication. It doesn't help agents talk to eac
 
 A2A is the protocol for **peer-to-peer agent collaboration**. Where MCP connects an agent to tools, A2A connects an agent to other agents. Each agent publishes an **Agent Card** — a machine-readable description of what it can do — and other agents discover, negotiate with, and delegate tasks to it.
 
-```
+```text
 ┌──────────────┐                          ┌──────────────┐
 │   Agent A    │                          │   Agent B    │
 │              │    1. Discover           │              │
@@ -105,7 +105,7 @@ When to use A2A: when you need agents to discover each other's capabilities at r
 
 ACP is the **enterprise protocol**. It doesn't care about decentralized discovery or peer negotiation — it cares about structured, traceable, compliant communication between agents in controlled environments.
 
-```
+```text
 ┌──────────────┐                          ┌──────────────┐
 │   Agent A    │                          │   Agent B    │
 │              │                          │              │
@@ -142,7 +142,7 @@ When to use ACP: when agents operate in regulated industries and every interacti
 
 ANP is the **decentralized protocol**. While A2A assumes agents can discover each other through known endpoints, ANP builds a trust layer using decentralized identities. Any agent can join the network, prove its identity cryptographically, and build trust through endorsements from other agents.
 
-```
+```text
 ┌──────────────┐          ┌──────────────┐
 │   Agent A    │          │   Agent B    │
 │              │          │              │
@@ -194,7 +194,7 @@ When to use ANP: when agents from different organizations, ecosystems, or trust 
 
 These protocols are not mutually exclusive. A realistic enterprise system might use all four:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────┐
 │                     Your Organization                     │
 │                                                          │
@@ -234,6 +234,8 @@ These protocols are not mutually exclusive. A realistic enterprise system might 
 Before picking a protocol, every multi-agent system needs a message format. Start with the basics:
 
 ```typescript
+import crypto from "node:crypto";
+
 type MessageType = "request" | "response" | "notify" | "negotiate";
 
 type AgentMessage = {
@@ -337,7 +339,7 @@ class AuditableMessageBus {
 
   async send(message: AgentMessage): Promise<unknown> {
     const entry: AuditEntry = {
-      message,
+      message: structuredClone(message),
       receivedAt: Date.now(),
       status: "delivered",
     };
@@ -363,12 +365,14 @@ class AuditableMessageBus {
   }
 
   getAuditLog(): AuditEntry[] {
-    return [...this.log];
+    return structuredClone(this.log);
   }
 
   getAuditLogFor(agentName: string): AuditEntry[] {
-    return this.log.filter(
-      (e) => e.message.from === agentName || e.message.to === agentName
+    return structuredClone(
+      this.log.filter(
+        (e) => e.message.from === agentName || e.message.to === agentName
+      )
     );
   }
 }
@@ -403,7 +407,7 @@ class TrustGraph {
 
     if (from.endorsements.includes(toDid)) return 1.0;
     if (sharedEndorsements.length > 0)
-      return 0.5 + sharedEndorsements.length * 0.1;
+      return Math.min(1.0, 0.5 + sharedEndorsements.length * 0.1);
     return 0;
   }
 
@@ -450,17 +454,23 @@ async function protocolDemo() {
   const agents = registry.discover("summarization");
   console.log(`Found ${agents.length} agent(s) with summarization capability`);
 
+  if (agents.length === 0) {
+    console.log("No agents found with summarization capability");
+    return;
+  }
+
+  const target = agents[0];
   const canTrust = trust.canTrust(
     "did:web:coder.local",
-    "did:web:researcher.local"
+    `did:web:${target.name}.local`
   );
-  console.log(`Coder trusts researcher: ${canTrust}`);
+  console.log(`Coder trusts ${target.name}: ${canTrust}`);
 
   if (canTrust) {
     const researchRequest = createMessage(
       "request",
       "coder",
-      "researcher",
+      target.name,
       { task: "Research React 19 features" }
     );
 
@@ -493,7 +503,7 @@ protocolDemo();
 
 ### Picking the Right Protocol
 
-```
+```text
 Do agents need to use tools?
 ├── Yes → MCP
 └── No
@@ -507,7 +517,8 @@ Do agents need to use tools?
         │   ├── Regulated industry? → ACP
         │   └── Not regulated? → A2A (or simple message passing)
         └── No
-            └── Cross-organization, no central authority? → ANP + A2A
+            ├── Shared broker or federation? → A2A + message broker
+            └── No central authority? → ANP + A2A
 ```
 
 ## Ship It
