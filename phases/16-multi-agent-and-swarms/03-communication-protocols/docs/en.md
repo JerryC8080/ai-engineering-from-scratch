@@ -187,7 +187,7 @@ stateDiagram-v2
     note right of completed: Terminal states are immutable.\nFollow-ups create new tasks\nwithin the same contextId.
 ```
 
-All 9 states:
+All 8 states (the spec also defines `UNSPECIFIED` as a sentinel, omitted here):
 
 | State | Terminal? | Meaning |
 |---|---|---|
@@ -261,7 +261,7 @@ A2A uses JSON-RPC 2.0. Here's what a real message exchange looks like:
 ```
 
 **Streaming via SSE:**
-```
+```text
 POST /message:stream HTTP/1.1
 Content-Type: application/json
 A2A-Version: 1.0
@@ -717,6 +717,7 @@ type TaskState =
   | "submitted"
   | "working"
   | "input-required"
+  | "auth-required"
   | "completed"
   | "failed"
   | "canceled"
@@ -799,7 +800,13 @@ class TaskManager {
     task.history.push(message);
     task.status = { state: "submitted", timestamp: Date.now() };
 
-    await this.processTask(task, handler, message);
+    this.processTask(task, handler, message).catch((err) => {
+      task.status = {
+        state: "failed",
+        timestamp: Date.now(),
+        message: textMessage("agent", String(err)),
+      };
+    });
     return task;
   }
 
@@ -845,6 +852,8 @@ class TaskManager {
 
     try {
       for await (const event of handler(task, message)) {
+        if (TERMINAL_STATES.includes(task.status.state)) break;
+
         if (event.kind === "statusUpdate") {
           task.status = event.status;
         }
@@ -859,8 +868,6 @@ class TaskManager {
           }
         }
         this.emit(task.id, event);
-
-        if (TERMINAL_STATES.includes(task.status.state)) break;
       }
     } catch (err) {
       task.status = {
@@ -949,8 +956,8 @@ class AuditableRunner {
     entry.status = "in-progress";
     try {
       const result = await handler(input);
-      entry.output = result.output;
-      entry.trajectory = result.trajectory;
+      entry.output = structuredClone(result.output);
+      entry.trajectory = structuredClone(result.trajectory);
       entry.status = "completed";
       entry.completedAt = Date.now();
     } catch (err) {
@@ -998,7 +1005,7 @@ type VerificationMethod = {
   id: string;
   type: string;
   controller: string;
-  publicKeyHex: string;
+  publicKeyDer: string;
 };
 
 type DIDDocument = {
@@ -1013,7 +1020,8 @@ type DIDDocument = {
 type AgentIdentity = {
   did: string;
   document: DIDDocument;
-  privateKeyHex: string;
+  privateKey: crypto.KeyObject;
+  publicKey: crypto.KeyObject;
 };
 
 class IdentityRegistry {
@@ -1037,8 +1045,18 @@ class IdentityRegistry {
     );
 
     for (const key of authKeys) {
-      const expected = this.simpleSign(payload, key.publicKeyHex);
-      if (expected === signature) return true;
+      const publicKey = crypto.createPublicKey({
+        key: Buffer.from(key.publicKeyDer, "base64"),
+        format: "der",
+        type: "spki",
+      });
+      const isValid = crypto.verify(
+        null,
+        Buffer.from(payload),
+        publicKey,
+        Buffer.from(signature, "hex")
+      );
+      if (isValid) return true;
     }
     return false;
   }
@@ -1048,22 +1066,15 @@ class IdentityRegistry {
     if (!doc) return false;
     return doc.humanAuthorization.includes(operationKeyId);
   }
-
-  private simpleSign(payload: string, keyHex: string): string {
-    return crypto
-      .createHmac("sha256", keyHex)
-      .update(payload)
-      .digest("hex");
-  }
 }
 
 function createIdentity(domain: string, agentName: string): AgentIdentity {
   const did = `did:wba:${domain}:agent:${agentName}`;
-  const privateKeyHex = crypto.randomBytes(32).toString("hex");
-  const publicKeyHex = crypto
-    .createHash("sha256")
-    .update(privateKeyHex)
-    .digest("hex");
+  const { publicKey, privateKey } = crypto.generateKeyPairSync("ed25519");
+
+  const publicKeyDer = publicKey
+    .export({ format: "der", type: "spki" })
+    .toString("base64");
 
   const keyId = `${did}#key-1`;
   const encKeyId = `${did}#key-x25519-1`;
@@ -1073,18 +1084,15 @@ function createIdentity(domain: string, agentName: string): AgentIdentity {
     verificationMethod: [
       {
         id: keyId,
-        type: "EcdsaSecp256k1VerificationKey2019",
+        type: "Ed25519VerificationKey2020",
         controller: did,
-        publicKeyHex,
+        publicKeyDer,
       },
       {
         id: encKeyId,
         type: "X25519KeyAgreementKey2019",
         controller: did,
-        publicKeyHex: crypto
-          .createHash("sha256")
-          .update(publicKeyHex)
-          .digest("hex"),
+        publicKeyDer,
       },
     ],
     authentication: [keyId],
@@ -1099,14 +1107,13 @@ function createIdentity(domain: string, agentName: string): AgentIdentity {
     ],
   };
 
-  return { did, document, privateKeyHex };
+  return { did, document, privateKey, publicKey };
 }
 
 function signPayload(identity: AgentIdentity, payload: string): string {
   return crypto
-    .createHmac("sha256", identity.privateKeyHex)
-    .update(payload)
-    .digest("hex");
+    .sign(null, Buffer.from(payload), identity.privateKey)
+    .toString("hex");
 }
 ```
 
