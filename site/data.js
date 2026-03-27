@@ -1558,7 +1558,7 @@ const PHASES = [
       {
         "name": "Communication Protocols",
         "status": "complete",
-        "type": "Learn",
+        "type": "Build",
         "lang": "TS",
         "url": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/"
       },

@@ -401,7 +401,7 @@ You learn AI. You build real things. You ship tools others can use.
 |:---:|--------|:----:|------|
 | 01 | [Why Multi-Agent](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | Learn | -- |
 | 02 | Agent Teams: Roles & Delegation | Build | TS |
-| 03 | [Communication Protocols](phases/16-multi-agent-and-swarms/03-communication-protocols/) | Learn | TS |
+| 03 | [Communication Protocols](phases/16-multi-agent-and-swarms/03-communication-protocols/) | Build | TS |
 | 04 | Shared State & Coordination | Build | TS, Rust |
 | 05 | Message Passing & Mailboxes | Build | TS |
 | 06 | Task Markets | Build | TS |
