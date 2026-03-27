@@ -5,526 +5,329 @@
 **Type:** Build
 **Language:** Python
 **Prerequisites:** Phase 1, Lessons 01 (Linear Algebra Intuition), 02 (Vectors, Matrices & Operations)
-**Time:** ~120 minutes
+**Time:** ~90 minutes
 
-## Why Tensors
+## The Problem
 
-Every deep learning framework speaks tensors. Not matrices. Not arrays. Tensors. The reason is that real-world data does not fit into two dimensions.
+You build a transformer. The forward pass looks clean. You run it and get: `RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x768 and 512x768)`. You stare at the shapes. You try a transpose. Now it says `Expected 4D input (got 3D input)`. You add an unsqueeze. Something else breaks.
 
-A single grayscale image is a 2D grid of pixel intensities. Add color channels and it becomes 3D. Batch 32 of those images together for training and it becomes 4D. A language model processes a batch of sequences, each token represented by an embedding vector. That is 3D. Self-attention adds a head dimension, making it 4D.
+Shape errors are the most common bug in deep learning code. They are not hard conceptually -- each operation has a shape contract -- but they multiply fast. A transformer has dozens of reshapes, transposes, and broadcasts chained together. One wrong axis and the error cascades. Worse, some shape mistakes do not throw errors at all. They silently produce garbage by broadcasting along the wrong dimension or summing over the wrong axis.
 
-Matrices handle pairwise relationships between two sets of things. Tensors handle relationships between any number of sets of things. They are the minimal data structure that can represent all the shapes deep learning needs.
+Matrices handle pairwise relationships between two sets of things. Real data does not fit into two dimensions. A batch of 32 RGB images at 224x224 is a 4D tensor: `(32, 3, 224, 224)`. Self-attention with 12 heads is also 4D: `(batch, heads, seq_len, head_dim)`. You need a data structure that generalizes to any number of dimensions, with operations that compose cleanly across all of them. That structure is the tensor. Master its operations and shape errors become trivially debuggable.
 
-## What a Tensor Is
+## The Concept
 
-A tensor is a multi-dimensional array of numbers with a uniform data type. The number of dimensions is called the **rank** or **order**.
+### What a tensor is
 
-```
-Rank 0: Scalar          3.14                          shape: ()
-Rank 1: Vector          [1, 2, 3]                     shape: (3,)
-Rank 2: Matrix          [[1, 2], [3, 4]]              shape: (2, 2)
-Rank 3: 3D Tensor       [[[1,2],[3,4]], [[5,6],[7,8]]]  shape: (2, 2, 2)
-Rank 4: 4D Tensor       A batch of color images        shape: (B, C, H, W)
-```
+A tensor is a multi-dimensional array of numbers with a uniform data type. The number of dimensions is the **rank** (or **order**). Each dimension is an **axis**. The **shape** is a tuple listing the size along each axis.
 
-Each dimension is called an **axis**. The shape is a tuple listing the size along each axis. The total number of elements is the product of all sizes in the shape.
-
-```
-shape = (2, 3, 4)
-total elements = 2 * 3 * 4 = 24
+```mermaid
+graph LR
+    S["Scalar<br/>rank 0<br/>shape: ()"] --> V["Vector<br/>rank 1<br/>shape: (3,)"]
+    V --> M["Matrix<br/>rank 2<br/>shape: (2,3)"]
+    M --> T3["3D Tensor<br/>rank 3<br/>shape: (2,2,2)"]
+    T3 --> T4["4D Tensor<br/>rank 4<br/>shape: (B,C,H,W)"]
 ```
 
-Mathematically, a rank-n tensor over a vector space V is a multilinear map from n copies of V (or its dual) to the scalars. In practice, for deep learning, you can think of it as an n-dimensional grid of numbers with defined operations.
+Total elements = product of all sizes. A shape `(2, 3, 4)` holds `2 * 3 * 4 = 24` elements.
 
-## Shapes and Axes in Deep Learning
+### Tensor shapes in deep learning
 
-Different data types map to specific tensor shapes by convention. Knowing these conventions is essential for debugging shape errors, which are the most common bugs in deep learning code.
+Different data types map to specific tensor shapes by convention.
 
-### Vision: (B, C, H, W)
-
-```
-B = batch size        how many images processed together
-C = channels          3 for RGB, 1 for grayscale, 64 for a conv layer output
-H = height            spatial rows
-W = width             spatial columns
-```
-
-A batch of 32 RGB images of size 224x224:
-
-```
-shape: (32, 3, 224, 224)
-total elements: 32 * 3 * 224 * 224 = 4,816,896
-```
-
-PyTorch uses NCHW (channels-first). TensorFlow defaults to NHWC (channels-last). This matters for performance. Hardware accelerators have preferences, and mismatched layouts cause silent slowdowns or errors.
-
-### NLP: (B, T, D)
-
-```
-B = batch size        how many sequences
-T = sequence length   number of tokens (words, subwords, characters)
-D = embedding dim     vector size representing each token
+```mermaid
+graph TD
+    subgraph Vision
+        V1["(B, C, H, W)<br/>32, 3, 224, 224"]
+    end
+    subgraph NLP
+        N1["(B, T, D)<br/>16, 128, 768"]
+    end
+    subgraph Attention
+        A1["(B, H, T, D)<br/>16, 12, 128, 64"]
+    end
+    subgraph Weights
+        W1["Linear: (out, in)<br/>Conv2D: (out_c, in_c, kH, kW)<br/>Embedding: (vocab, dim)"]
+    end
 ```
 
-A batch of 16 sentences, each 128 tokens, each token embedded as a 768-dimensional vector:
+PyTorch uses NCHW (channels-first). TensorFlow defaults to NHWC (channels-last). Mismatched layouts cause silent slowdowns or errors.
 
-```
-shape: (16, 128, 768)
-total elements: 16 * 128 * 768 = 1,572,864
-```
+### How memory layout works
 
-### Attention: (B, H, T, D)
+A 2D array in memory is a 1D sequence of bytes. **Strides** tell you how many elements to skip to move one step along each axis.
 
-```
-B = batch size
-H = number of attention heads
-T = sequence length
-D = head dimension (usually embedding_dim / num_heads)
-```
-
-BERT with 12 heads, 768-dim embeddings: each head gets 768/12 = 64 dimensions.
-
-```
-Q, K, V shape: (B, 12, T, 64)
+```mermaid
+graph LR
+    subgraph "Row-major (C order)"
+        R["a b c d e f<br/>strides: (3, 1)"]
+    end
+    subgraph "Column-major (F order)"
+        C["a d b e c f<br/>strides: (1, 2)"]
+    end
 ```
 
-### Audio: (B, C, F, T)
+Transpose does not move data. It swaps the strides, making the tensor **non-contiguous** -- the elements for a row are no longer adjacent in memory.
 
-```
-B = batch size
-C = channels (1 for mono, 2 for stereo)
-F = frequency bins (e.g., 128 mel bands)
-T = time frames
-```
+### Broadcasting rules
 
-### Weights
-
-Neural network weight tensors also follow conventions:
-
-```
-Linear layer:        (out_features, in_features)
-Conv2D kernel:       (out_channels, in_channels, kernel_h, kernel_w)
-Embedding table:     (vocab_size, embedding_dim)
-LayerNorm:           (normalized_shape,)
-```
-
-## Reshaping Operations
-
-Reshaping changes how elements are arranged into dimensions without changing the elements themselves. The total number of elements must stay the same.
-
-### Reshape
-
-```
-Original: shape (2, 6) with 12 elements
- [[0, 1, 2, 3, 4, 5],
-  [6, 7, 8, 9, 10, 11]]
-
-Reshape to (3, 4):
- [[0, 1, 2, 3],
-  [4, 5, 6, 7],
-  [8, 9, 10, 11]]
-
-Reshape to (12,):
- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-
-Reshape to (2, 2, 3):
- [[[0, 1, 2],
-   [3, 4, 5]],
-  [[6, 7, 8],
-   [9, 10, 11]]]
-```
-
-One dimension can be -1, meaning "infer this size from the others."
-
-```
-shape (2, 6) reshaped to (-1, 3) gives (4, 3)
-because 12 / 3 = 4
-```
-
-### Squeeze and Unsqueeze
-
-Squeeze removes dimensions of size 1. Unsqueeze adds a dimension of size 1 at a specified position.
-
-```
-shape (1, 3, 1, 5)  after squeeze()      -> (3, 5)
-shape (1, 3, 1, 5)  after squeeze(dim=0) -> (3, 1, 5)
-shape (3, 5)         after unsqueeze(0)   -> (1, 3, 5)
-shape (3, 5)         after unsqueeze(1)   -> (3, 1, 5)
-shape (3, 5)         after unsqueeze(-1)  -> (3, 5, 1)
-```
-
-Unsqueezing is critical for broadcasting. If you have a bias vector of shape (D,) and want to add it to a batch of shape (B, T, D), you unsqueeze to (1, 1, D) so broadcasting aligns the last axis.
-
-### Transpose and Permute
-
-Transpose swaps two axes. Permute reorders all axes.
-
-```
-shape (B, T, D) transposed at (1, 2) gives (B, D, T)
-shape (B, C, H, W) permuted as (0, 2, 3, 1) gives (B, H, W, C)
-```
-
-This is how you convert between PyTorch's NCHW and TensorFlow's NHWC:
-
-```
-NCHW: (B, C, H, W)
-permute(0, 2, 3, 1) -> NHWC: (B, H, W, C)
-permute(0, 3, 1, 2) -> NCHW: (B, C, H, W)
-```
-
-### Flatten
-
-Flatten collapses multiple dimensions into one. In a CNN, after convolution layers produce a (B, C, H, W) tensor, you flatten the last three dimensions to get (B, C*H*W) before feeding into a fully connected layer.
-
-```
-shape (32, 64, 7, 7) flattened from dim 1 -> (32, 3136)
-```
-
-### View vs Reshape
-
-In PyTorch, `view` requires the tensor to be contiguous in memory. `reshape` works on any tensor (it may copy data if needed). After a transpose or permute, the tensor is typically non-contiguous, so `view` fails but `reshape` succeeds. You can call `.contiguous()` to make a copy that is contiguous, then use `view`.
-
-## Broadcasting
-
-Broadcasting lets you perform operations between tensors of different shapes without explicitly copying data. NumPy, PyTorch, and TensorFlow all follow the same rules.
-
-### The Rules
-
-Two dimensions are compatible when:
-
-1. They are equal, or
-2. One of them is 1
-
-Broadcasting aligns shapes from the right (trailing dimensions) and works outward. If one tensor has fewer dimensions, it is padded with 1s on the left.
+Broadcasting lets you operate on tensors of different shapes without copying data. Align shapes from the right. Two dimensions are compatible when they are equal or one is 1. Fewer dimensions get padded with 1s on the left.
 
 ```
 Tensor A:     (8, 1, 6, 1)
 Tensor B:        (7, 1, 5)
-
-Step 1 - Pad B:  (1, 7, 1, 5)
-
-Step 2 - Check each dimension:
-  dim 0:  8 vs 1  -> broadcast to 8
-  dim 1:  1 vs 7  -> broadcast to 7
-  dim 2:  6 vs 1  -> broadcast to 6
-  dim 3:  1 vs 5  -> broadcast to 5
-
-Result: (8, 7, 6, 5)
+Padded B:     (1, 7, 1, 5)
+Result:       (8, 7, 6, 5)
 ```
 
-### Common Broadcasting Patterns
+### Einsum: the universal tensor operation
 
-**Adding bias to every sample in a batch:**
+Einstein summation labels each axis with a letter. Axes in the input but not the output get summed. Axes in both are kept.
 
-```
-activations: (B, D)       = (32, 768)
-bias:        (D,)         = (768,)
-Padded bias: (1, 768)
-Result:      (32, 768)    each row gets the same bias added
-```
-
-**Scaling each channel of an image batch:**
-
-```
-images: (B, C, H, W)     = (32, 3, 224, 224)
-scale:  (C, 1, 1)         = (3, 1, 1)
-Padded: (1, 3, 1, 1)
-Result: (32, 3, 224, 224) each channel scaled by its factor
+```mermaid
+graph LR
+    subgraph "matmul: ik,kj -> ij"
+        A["A(I,K)"] --> |"sum over k"| C["C(I,J)"]
+        B["B(K,J)"] --> |"sum over k"| C
+    end
 ```
 
-**Outer product via broadcasting:**
+Key patterns: `i,i->` (dot product), `i,j->ij` (outer product), `ii->` (trace), `ij->ji` (transpose), `bij,bjk->bik` (batch matmul), `bhtd,bhsd->bhts` (attention scores).
 
-```
-a: (M, 1)
-b: (1, N)
-a * b: (M, N)   every element a[i] multiplied with every element b[j]
-```
+## Build It
 
-### When Broadcasting Fails
+The code lives in `code/tensors.py`. Each step references the implementation there.
 
-```
-Tensor A: (3, 4)
-Tensor B: (5,)
+### Step 1: Tensor storage and strides
 
-dim -1: 4 vs 5  -> not equal, neither is 1 -> ERROR
-```
+A tensor stores a flat list of numbers plus shape metadata. Strides tell the indexing logic how to map multi-dimensional indices to flat positions.
 
-Broadcasting errors produce messages like "shapes (3, 4) and (5,) are not broadcastable." When you see these, check your shapes from right to left.
+```python
+class Tensor:
+    def __init__(self, data, shape=None):
+        if isinstance(data, (list, tuple)):
+            self._data, self._shape = self._flatten_nested(data)
+        elif isinstance(data, np.ndarray):
+            self._data = data.flatten().tolist()
+            self._shape = tuple(data.shape)
+        else:
+            self._data = [data]
+            self._shape = ()
 
-## Memory Layout
+        if shape is not None:
+            total = reduce(lambda a, b: a * b, shape, 1)
+            if total != len(self._data):
+                raise ValueError(
+                    f"Cannot reshape {len(self._data)} elements into shape {shape}"
+                )
+            self._shape = tuple(shape)
 
-### Row-Major vs Column-Major
+        self._strides = self._compute_strides(self._shape)
 
-A 2D array stored in memory is a 1D sequence of bytes. The question is which dimension is contiguous.
-
-```
-Matrix: [[a, b, c],
-         [d, e, f]]
-
-Row-major (C order):    [a, b, c, d, e, f]
-  Rows are contiguous. Move along last axis = contiguous access.
-
-Column-major (F order): [a, d, b, e, c, f]
-  Columns are contiguous. Move along first axis = contiguous access.
-```
-
-NumPy defaults to row-major (C order). MATLAB and Fortran use column-major (F order). This matters for performance: iterating along contiguous dimensions is fast because it uses CPU cache lines efficiently.
-
-### Strides
-
-Strides tell you how many bytes (or elements) to skip to move one step along each dimension.
-
-```
-shape (3, 4), row-major, dtype=float32 (4 bytes each)
-
-strides = (16, 4)
-  To move one step in dim 0 (next row): skip 16 bytes (4 elements * 4 bytes)
-  To move one step in dim 1 (next col): skip 4 bytes (1 element * 4 bytes)
+    @staticmethod
+    def _compute_strides(shape):
+        if len(shape) == 0:
+            return ()
+        strides = [1] * len(shape)
+        for i in range(len(shape) - 2, -1, -1):
+            strides[i] = strides[i + 1] * shape[i + 1]
+        return tuple(strides)
 ```
 
-Transpose does not move data. It swaps the strides:
+For shape `(3, 4)`, strides are `(4, 1)` -- skip 4 elements to advance one row, skip 1 element to advance one column.
 
-```
-Original:    shape (3, 4), strides (4, 1)   (element strides)
-Transposed:  shape (4, 3), strides (1, 4)   (non-contiguous)
-```
+### Step 2: Reshape, squeeze, unsqueeze
 
-This is why transposed tensors are non-contiguous: the elements for a row are no longer adjacent in memory.
+Reshape changes the shape without changing element order. The total number of elements must stay the same. Use `-1` for one dimension to infer its size.
 
-### Contiguous vs Non-Contiguous
-
-A contiguous tensor has elements stored in a single block of memory with no gaps or reordering. Operations that change the logical order without moving data (transpose, permute, narrow, expand) create non-contiguous views.
-
-Non-contiguous tensors:
-- May be slower for element-wise operations
-- Cannot use `view` in PyTorch (use `reshape` or call `.contiguous()` first)
-- May cause issues with certain CUDA kernels
-
-Check contiguity: `tensor.is_contiguous()` in PyTorch, `array.flags['C_CONTIGUOUS']` in NumPy.
-
-## Einsum: The Universal Tensor Operation
-
-Einstein summation notation (einsum) can express almost any tensor operation in a single line. The idea: label each axis with a letter. Axes that appear in the input but not the output get summed over. Axes that appear in both are kept.
-
-### Syntax
-
-```
-result = einsum("input_subscripts -> output_subscripts", tensor_a, tensor_b, ...)
+```python
+t = Tensor(list(range(12)), shape=(2, 6))
+r = t.reshape((3, 4))
+r = t.reshape((-1, 3))
 ```
 
-Each tensor gets a set of subscript letters. Letters that appear in the output are kept; letters that disappear are summed.
+Squeeze removes axes of size 1. Unsqueeze inserts one. Unsqueezing is critical for broadcasting -- a bias vector `(D,)` added to a batch `(B, T, D)` needs unsqueezing to `(1, 1, D)`.
 
-### Building Blocks
-
-**Matrix multiply: ik,kj->ij**
-
-```
-A is (I, K), B is (K, J)
-k appears in inputs but not output -> sum over k
-Result is (I, J)
-
-This is:  C[i,j] = sum_k A[i,k] * B[k,j]
+```python
+t = Tensor(list(range(6)), shape=(1, 3, 1, 2))
+s = t.squeeze()
+v = Tensor([1, 2, 3])
+u = v.unsqueeze(0)
 ```
 
-**Dot product: i,i->**
+### Step 3: Transpose and permute
 
-```
-a is (I,), b is (I,)
-i disappears -> sum over i
-Result is scalar
+Transpose swaps two axes. Permute reorders all axes. This is how you convert between NCHW and NHWC.
 
-This is:  sum_i a[i] * b[i]
-```
+```python
+mat = Tensor(list(range(6)), shape=(2, 3))
+tr = mat.transpose(0, 1)
 
-**Outer product: i,j->ij**
-
-```
-a is (I,), b is (J,)
-Both i and j appear in output -> keep both
-Result is (I, J)
-
-This is:  C[i,j] = a[i] * b[j]
+t4d = Tensor(list(range(24)), shape=(1, 2, 3, 4))
+perm = t4d.permute((0, 2, 3, 1))
 ```
 
-**Trace: ii->**
+After transpose or permute, the tensor is non-contiguous in memory. In PyTorch, `view` fails on non-contiguous tensors -- use `reshape` or call `.contiguous()` first.
 
-```
-A is (N, N)
-Repeated index in same tensor = diagonal
-i disappears -> sum diagonal
+### Step 4: Element-wise operations and reductions
 
-This is:  sum_i A[i,i]
-```
+Element-wise ops (add, multiply, subtract) apply independently to each element and preserve shape. Reductions (sum, mean, max) collapse one or more axes.
 
-**Transpose: ij->ji**
-
-```
-A is (I, J)
-Both indices kept, order swapped
-Result is (J, I)
+```python
+a = Tensor([[1, 2], [3, 4]])
+b = Tensor([[10, 20], [30, 40]])
+c = a + b
+d = a * 2
+s = a.sum(axis=0)
 ```
 
-**Batch matrix multiply: bij,bjk->bik**
+Global average pooling in a CNN: `(B, C, H, W).mean(axis=[2, 3])` produces `(B, C)`. Sequence mean pooling in NLP: `(B, T, D).mean(axis=1)` produces `(B, D)`.
 
-```
-A is (B, I, J), B_tensor is (B, J, K)
-b is a batch index (appears in both inputs and output)
-j is summed over
-Result is (B, I, K)
+### Step 5: Broadcasting with NumPy
 
-Each matrix in the batch is multiplied independently.
-```
+The `demo_broadcasting_numpy()` function in `tensors.py` shows the core patterns.
 
-### Einsum for Attention
+```python
+activations = np.random.randn(4, 3)
+bias = np.array([0.1, 0.2, 0.3])
+result = activations + bias
 
-The core of transformer attention involves several tensor operations that einsum handles cleanly.
+images = np.random.randn(2, 3, 4, 4)
+scale = np.array([0.5, 1.0, 1.5]).reshape(1, 3, 1, 1)
+result = images * scale
 
-**Computing attention scores:**
-
-```
-Q: (B, H, T, D)
-K: (B, H, T, D)
-
-scores = einsum("bhtd,bhsd->bhts", Q, K)
-Result: (B, H, T, T)
-
-For each batch and head, compute dot product between every query
-position t and every key position s. The d index is summed.
+a = np.array([1, 2, 3]).reshape(-1, 1)
+b = np.array([10, 20, 30, 40]).reshape(1, -1)
+outer = a * b
 ```
 
-**Applying attention weights to values:**
+Pairwise distance via broadcasting: reshape `(M, 2)` to `(M, 1, 2)` and `(N, 2)` to `(1, N, 2)`, subtract, square, sum along last axis, take square root. Result: `(M, N)`.
 
-```
-weights: (B, H, T, T)   (after softmax of scores)
-V:       (B, H, T, D)
+### Step 6: Einsum operations
 
-output = einsum("bhts,bhsd->bhtd", weights, V)
-Result: (B, H, T, D)
+The `demo_einsum()` and `demo_einsum_gallery()` functions walk through every common pattern.
 
-For each batch and head, each output position t is a weighted
-sum of value vectors, with weights from the attention matrix.
-```
+```python
+a = np.array([1.0, 2.0, 3.0])
+b = np.array([4.0, 5.0, 6.0])
+dot = np.einsum("i,i->", a, b)
 
-**Multi-head output projection:**
+A = np.array([[1, 2], [3, 4], [5, 6]], dtype=float)
+B = np.array([[7, 8, 9], [10, 11, 12]], dtype=float)
+matmul = np.einsum("ik,kj->ij", A, B)
 
-```
-heads_output: (B, T, H, D)
-W_o:          (H, D, E)       where E = H * D = model dim
-
-output = einsum("bthd,hde->bte", heads_output, W_o)
-Result: (B, T, E)
+batch_A = np.random.randn(4, 3, 5)
+batch_B = np.random.randn(4, 5, 2)
+batch_mm = np.einsum("bij,bjk->bik", batch_A, batch_B)
 ```
 
-### Contraction
+The computational cost of a contraction is the product of all index sizes (kept and summed). For `bij,bjk->bik` with B=32, I=128, J=64, K=128: `32 * 128 * 64 * 128 = 33,554,432` multiply-adds.
 
-Contraction is the general term for summing over shared indices. Matrix multiplication is a contraction. The dot product is a contraction. Trace is a contraction. Any einsum operation where an index disappears from the output is performing a contraction along that axis.
+### Step 7: Attention mechanism via einsum
 
-The computational cost of a contraction is proportional to the product of all index sizes (both kept and summed). For `bij,bjk->bik` with B=32, I=128, J=64, K=128, the cost is 32 * 128 * 64 * 128 = 33,554,432 multiply-add operations.
+The `demo_attention_einsum()` function implements multi-head attention end to end.
 
-### Outer Product
+```python
+B, H, T, D = 2, 4, 8, 16
+E = H * D
 
-When no indices are shared between two input tensors, einsum produces an outer product.
+X = np.random.randn(B, T, E)
+W_q = np.random.randn(E, E) * 0.02
 
-```
-a: (I,), b: (J,)
-einsum("i,j->ij", a, b) produces shape (I, J)
+Q = np.einsum("bte,ek->btk", X, W_q)
+Q = Q.reshape(B, T, H, D).transpose(0, 2, 1, 3)
 
-a: (I, J), b: (K, L)
-einsum("ij,kl->ijkl", a, b) produces shape (I, J, K, L)
-```
+scores = np.einsum("bhtd,bhsd->bhts", Q, K) / np.sqrt(D)
+weights = softmax(scores, axis=-1)
+attn_output = np.einsum("bhts,bhsd->bhtd", weights, V)
 
-The outer product is the building block of rank-1 updates, attention patterns, and factored representations.
-
-## Tensor Operations as Neural Network Operations
-
-Every layer in a neural network is a tensor operation.
-
-```
-Operation                  Tensor Form                 Einsum
----------                  -----------                 ------
-Linear layer               Y = X @ W.T + b            "bd,od->bo" + bias
-Conv2D (as matmul)         unfold + matmul + fold      complex, typically GEMM
-Batch norm                 (X - mu) / sigma * gamma    element-wise + broadcast
-Attention QKV projection   Q = X @ W_q                "btd,dh->bth"
-Attention scores           Q @ K.T / sqrt(d)           "bhtd,bhsd->bhts"
-Attention output           softmax(scores) @ V         "bhts,bhsd->bhtd"
-Embedding lookup           E[token_ids]                indexing, no einsum
-Softmax                    exp(x) / sum(exp(x))        element-wise + reduction
+concat = attn_output.transpose(0, 2, 1, 3).reshape(B, T, E)
+output = np.einsum("bte,ek->btk", concat, W_o)
 ```
 
-### Reductions
+Every step is a tensor operation: projection (matmul via einsum), head splitting (reshape + transpose), attention scores (batch matmul via einsum), weighted sum (batch matmul via einsum), head merging (transpose + reshape), output projection (matmul via einsum).
 
-Reductions collapse one or more axes by applying an aggregation function.
+## Use It
 
+### Scratch vs NumPy
+
+| Operation | Scratch (Tensor class) | NumPy |
+|---|---|---|
+| Create | `Tensor([[1,2],[3,4]])` | `np.array([[1,2],[3,4]])` |
+| Reshape | `t.reshape((3,4))` | `a.reshape(3,4)` |
+| Transpose | `t.transpose(0,1)` | `a.T` or `a.transpose(0,1)` |
+| Squeeze | `t.squeeze(0)` | `np.squeeze(a, 0)` |
+| Sum | `t.sum(axis=0)` | `a.sum(axis=0)` |
+| Einsum | N/A | `np.einsum("ij,jk->ik", a, b)` |
+
+### Scratch vs PyTorch
+
+```python
+import torch
+
+t = torch.tensor([[1, 2, 3], [4, 5, 6]], dtype=torch.float32)
+t.shape
+t.stride()
+t.is_contiguous()
+
+t.reshape(3, 2)
+t.unsqueeze(0)
+t.transpose(0, 1)
+t.transpose(0, 1).contiguous()
+
+torch.einsum("ik,kj->ij", A, B)
 ```
-sum along axis:     (B, T, D).sum(dim=1)    -> (B, D)
-mean along axis:    (B, T, D).mean(dim=1)   -> (B, D)
-max along axis:     (B, T, D).max(dim=1)    -> (B, D) + argmax indices
-```
 
-Global average pooling in a CNN takes (B, C, H, W) and averages over H and W to get (B, C). This is `.mean(dim=[2, 3])`.
+PyTorch adds autograd, GPU support, and optimized BLAS kernels. The shape semantics are identical. If you understand the scratch version, PyTorch shape errors become readable.
 
-### Element-wise Operations
+### Every neural network layer as a tensor operation
 
-Operations that apply independently to each element: ReLU, sigmoid, tanh, GELU, addition, multiplication. These preserve the shape.
+| Operation | Tensor Form | Einsum |
+|---|---|---|
+| Linear layer | `Y = X @ W.T + b` | `"bd,od->bo"` + bias |
+| Attention QKV | `Q = X @ W_q` | `"btd,dh->bth"` |
+| Attention scores | `Q @ K.T / sqrt(d)` | `"bhtd,bhsd->bhts"` |
+| Attention output | `softmax(scores) @ V` | `"bhts,bhsd->bhtd"` |
+| Batch norm | `(X - mu) / sigma * gamma` | element-wise + broadcast |
+| Softmax | `exp(x) / sum(exp(x))` | element-wise + reduction |
 
-```
-ReLU:     max(0, x)           shape unchanged
-Sigmoid:  1 / (1 + exp(-x))  shape unchanged
-Add:      x + y               shapes must broadcast
-Multiply: x * y               shapes must broadcast
-```
+## Ship It
 
-## Practical Shape Debugging
+This lesson produces two reusable prompts:
 
-Shape errors account for a large fraction of deep learning bugs. A systematic approach:
+1. **`outputs/prompt-tensor-shapes.md`** -- A systematic prompt for debugging tensor shape mismatches. Includes decision tables for every common operation (matmul, broadcast, cat, Linear, Conv2d, BatchNorm, softmax) and a fix lookup table.
 
-1. Print shapes at every step when building a new model
-2. Verify that batch dimension is always first and survives through the forward pass
-3. After reshape/permute, verify total element count is unchanged
-4. When broadcasting, align shapes from the right and check each dimension pair
-5. After transpose, remember the tensor is likely non-contiguous
+2. **`outputs/prompt-tensor-debugger.md`** -- A step-by-step debugging prompt you paste into any AI assistant when a shape error is blocking you. Feed it the error message and your tensor shapes, get back the exact fix.
 
-```
-Common shape errors and fixes:
+## Exercises
 
-Error: mat1 and mat2 shapes cannot be multiplied (32x768 and 512x768)
-Fix:   Transpose the weight matrix, or check that input dim matches W's input dim
+1. **Easy -- Reshape round-trip.** Take a tensor of shape `(2, 3, 4)`. Reshape it to `(6, 4)`, then to `(24,)`, then back to `(2, 3, 4)`. Verify element order is preserved at each step by printing the flat data.
 
-Error: Expected 4D input (got 3D input)
-Fix:   unsqueeze a batch or channel dimension
+2. **Medium -- Implement broadcasting.** Extend the `Tensor` class with a `broadcast_to(shape)` method that expands dimensions of size 1 to match a target shape. Then modify `_elementwise_op` to automatically broadcast before operating. Test with shapes `(3, 1)` and `(1, 4)` producing `(3, 4)`.
 
-Error: shape mismatch in concatenation
-Fix:   Check that all tensors match in every dimension except the cat dimension
-```
+3. **Hard -- Build einsum from scratch.** Implement a basic `einsum(subscripts, *tensors)` function that handles at least: dot product (`i,i->`), matrix multiply (`ij,jk->ik`), outer product (`i,j->ij`), and transpose (`ij->ji`). Parse the subscript string, identify contracted indices, and loop over all index combinations. Compare your results against `np.einsum`.
+
+4. **Hard -- Attention shape tracker.** Write a function that takes `batch_size`, `seq_len`, `embed_dim`, and `num_heads` as inputs and prints the exact shape at every step of multi-head attention: input, Q/K/V projection, head split, attention scores, softmax weights, weighted sum, head merge, output projection. Verify against the `demo_attention_einsum()` output.
 
 ## Key Terms
 
-| Term | Definition |
-|---|---|
-| Tensor | Multi-dimensional array of numbers with uniform type |
-| Rank (Order) | Number of dimensions in a tensor |
-| Axis (Dimension) | One of the indexing directions of a tensor |
-| Shape | Tuple of sizes along each axis |
-| Stride | Number of elements to skip to advance one position along an axis |
-| Contiguous | Elements stored in sequential memory with no gaps |
-| Broadcasting | Automatic expansion of dimensions of size 1 to match a partner tensor |
-| Reshape | Change the shape without changing the data order in memory |
-| Squeeze | Remove axes of size 1 |
-| Unsqueeze | Insert an axis of size 1 at a given position |
-| Transpose | Swap two axes |
-| Permute | Reorder all axes according to a given sequence |
-| Flatten | Collapse multiple axes into a single axis |
-| Einsum | Einstein summation notation for expressing tensor operations via index labels |
-| Contraction | Summation over a shared index between two tensors |
-| Outer product | Tensor formed by multiplying every element of one tensor with every element of another |
-| Row-major | Memory layout where the last index changes fastest (C order) |
-| Column-major | Memory layout where the first index changes fastest (Fortran order) |
-| View | A tensor that shares memory with another, differing only in shape or stride metadata |
-| NCHW | Tensor layout: batch, channels, height, width (PyTorch default) |
-| NHWC | Tensor layout: batch, height, width, channels (TensorFlow default) |
-| Reduction | Operation that collapses one or more axes (sum, mean, max) |
+| Term | What people say | What it actually means |
+|---|---|---|
+| Tensor | "A matrix but more dimensions" | A multi-dimensional array with uniform type and defined shape, strides, and operations |
+| Rank | "The number of dimensions" | The number of axes. A matrix has rank 2, not rank equal to its matrix rank |
+| Shape | "The size of the tensor" | A tuple listing the size along each axis. `(2, 3)` means 2 rows, 3 columns |
+| Stride | "How memory is laid out" | The number of elements to skip to advance one position along each axis |
+| Broadcasting | "It just works when shapes differ" | A strict set of rules: align from right, dimensions must be equal or one must be 1 |
+| Contiguous | "The tensor is normal" | Elements stored sequentially in memory with no gaps or reordering from the logical layout |
+| Einsum | "A fancy way to write matmul" | A general notation that expresses any tensor contraction, outer product, trace, or transpose in one line |
+| View | "Same as reshape" | A tensor sharing the same memory buffer but with different shape/stride metadata. Fails on non-contiguous data |
+| Contraction | "Summing over an index" | The general operation where a shared index between tensors is multiplied and summed, producing a lower-rank result |
+| NCHW / NHWC | "PyTorch vs TensorFlow format" | Memory layout conventions for image tensors. NCHW puts channels before spatial dims, NHWC puts them after |
 
-## What Comes Next
+## Further Reading
 
-With tensors mastered, you can read the shape annotations on any neural network architecture diagram and understand what each operation does to the data. The code file builds a basic Tensor class from scratch, demonstrates broadcasting, walks through einsum examples, and shows common AI tensor shape patterns. Run it, modify the shapes, and build intuition for how data flows through networks.
+- [NumPy Broadcasting](https://numpy.org/doc/stable/user/basics.broadcasting.html) -- The canonical rules with visual examples
+- [PyTorch Tensor Views](https://pytorch.org/docs/stable/tensor_view.html) -- When views work and when they copy
+- [einops](https://github.com/arogozhnikov/einops) -- A library that makes tensor reshaping readable and safe
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) -- Visualizes the tensor shapes flowing through attention
+- [Einstein Summation in NumPy](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html) -- Full einsum documentation with examples
