@@ -5,8 +5,9 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
-  <img src="https://img.shields.io/badge/Lessons-230+-purple" alt="230+ Lessons">
-  <img src="https://img.shields.io/badge/Phases-20-orange" alt="20 Phases">
+  <img src="https://img.shields.io/badge/Lessons-260+-D97757" alt="260+ Lessons">
+  <img src="https://img.shields.io/badge/Phases-20-191A23" alt="20 Phases">
+  <img src="https://img.shields.io/badge/Complete-60-3D8B6E" alt="60 Complete">
   <img src="https://img.shields.io/github/stars/rohitg00/ai-engineering-from-scratch?style=social" alt="GitHub Stars">
 </p>
 
@@ -21,7 +22,7 @@
 
 ---
 
-230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, MCP servers.
+260+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, MCP servers.
 
 You learn AI. You build real things. You ship tools others can use.
 
