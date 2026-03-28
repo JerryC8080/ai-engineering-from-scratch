@@ -1,3 +1,106 @@
+// Neural network canvas animation
+(function() {
+  const canvas = document.getElementById('neural-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, nodes, mouse = { x: -999, y: -999 };
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    w = canvas.width = rect.width * devicePixelRatio;
+    h = canvas.height = rect.height * devicePixelRatio;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    initNodes();
+  }
+
+  function initNodes() {
+    const rw = w / devicePixelRatio;
+    const rh = h / devicePixelRatio;
+    const count = Math.min(60, Math.floor(rw * rh / 8000));
+    nodes = [];
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * rw,
+        y: Math.random() * rh,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: 1.5 + Math.random() * 2,
+        pulse: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function getAccent() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || '#D97757';
+  }
+
+  function draw() {
+    const rw = w / devicePixelRatio;
+    const rh = h / devicePixelRatio;
+    ctx.clearRect(0, 0, rw, rh);
+    const accent = getAccent();
+    const maxDist = 140;
+    const t = Date.now() * 0.001;
+
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < -10) n.x = rw + 10;
+      if (n.x > rw + 10) n.x = -10;
+      if (n.y < -10) n.y = rh + 10;
+      if (n.y > rh + 10) n.y = -10;
+
+      for (let j = i + 1; j < nodes.length; j++) {
+        const m = nodes[j];
+        const dx = n.x - m.x;
+        const dy = n.y - m.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          const alpha = (1 - dist / maxDist) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.strokeStyle = accent;
+          ctx.globalAlpha = alpha;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (const n of nodes) {
+      const glow = 0.3 + 0.15 * Math.sin(t * 1.2 + n.pulse);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = glow;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * 3, 0, Math.PI * 2);
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = glow * 0.15;
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  canvas.parentElement.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
 // Theme toggle
 (function() {
   const toggle = document.querySelector('[data-theme-toggle]');

@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Engineering from Scratch — 230+ Lessons, 20 Phases</title>
-<meta name="description" content="A comprehensive, open-source AI engineering curriculum. 230+ hands-on lessons across 20 phases, from linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia.">
+<title>AI Engineering from Scratch — 260+ Lessons, 20 Phases</title>
+<meta name="description" content="A comprehensive, open-source AI engineering curriculum. 260+ hands-on lessons across 20 phases, from linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia.">
 <meta property="og:title" content="AI Engineering from Scratch">
-<meta property="og:description" content="230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms.">
+<meta property="og:description" content="260+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms.">
 <meta property="og:type" content="website">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,10 +48,18 @@
 
 <!-- HERO -->
 <section class="hero">
+  <canvas class="hero__canvas" id="neural-canvas" aria-hidden="true"></canvas>
   <div class="hero__inner">
     <div class="hero__badge">Open Source &middot; MIT License</div>
     <h1 class="hero__title">AI Engineering<br><span class="hero__accent">from Scratch</span></h1>
-    <p class="hero__sub">230+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable.</p>
+    <p class="hero__sub">260+ hands-on lessons across 20 phases. From linear algebra to autonomous agent swarms. Build neural networks, transformers, and LLMs from first principles.</p>
+
+    <div class="hero__equation" aria-hidden="true">
+      <span class="eq eq--fade-1">y = &sigma;(Wx + b)</span>
+      <span class="eq eq--fade-2">&nabla;L = &part;L/&part;w</span>
+      <span class="eq eq--fade-3">softmax(QK&#7488;/&radic;d)V</span>
+    </div>
+
     <div class="hero__stats">
       <div class="stat">
         <span class="stat__num" id="stat-lessons">--</span>
@@ -70,6 +78,16 @@
         <span class="stat__label">Complete</span>
       </div>
     </div>
+
+    <div class="hero__tech">
+      <span class="tech-pill">Python</span>
+      <span class="tech-pill">PyTorch</span>
+      <span class="tech-pill">NumPy</span>
+      <span class="tech-pill">Transformers</span>
+      <span class="tech-pill">TypeScript</span>
+      <span class="tech-pill">Rust</span>
+    </div>
+
     <div class="hero__actions">
       <a href="#phases" class="btn btn--primary">Explore Phases</a>
       <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="btn btn--ghost">
@@ -78,8 +96,56 @@
       </a>
     </div>
   </div>
-  <div class="hero__glow" aria-hidden="true"></div>
 </section>
+
+<!-- JOURNEY STRIP -->
+<div class="journey-strip" aria-hidden="true">
+  <div class="journey-strip__track">
+    <span>Linear Algebra</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>ML Fundamentals</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Deep Learning</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>NLP</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Computer Vision</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Transformers</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>LLMs</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Fine-Tuning</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>RAG</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Agents</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Agent Swarms</span>
+    <span class="journey-strip__dot">&middot;</span>
+    <span>Linear Algebra</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>ML Fundamentals</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Deep Learning</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>NLP</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Computer Vision</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Transformers</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>LLMs</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Fine-Tuning</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>RAG</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Agents</span>
+    <span class="journey-strip__arrow">&rarr;</span>
+    <span>Agent Swarms</span>
+  </div>
+</div>
 
 <!-- DIFFERENTIATOR -->
 <section class="diff">
