@@ -21,16 +21,14 @@ Understanding the perceptron means understanding what "learning" actually means 
 
 A perceptron takes n inputs, multiplies each by a weight, sums them up, adds a bias, and passes the result through an activation function.
 
-```
-Inputs        Weights
-
-  x1 ────── w1 ──┐
-                  │
-  x2 ────── w2 ──┼──▶ Σ(wi·xi) + b ──▶ step(z) ──▶ output (0 or 1)
-                  │
-  x3 ────── w3 ──┘
-                  │
-           bias ──┘
+```mermaid
+graph LR
+    x1["x1"] -- "w1" --> sum["Σ(wi*xi) + b"]
+    x2["x2"] -- "w2" --> sum
+    x3["x3"] -- "w3" --> sum
+    bias["bias"] --> sum
+    sum --> step["step(z)"]
+    step --> out["output (0 or 1)"]
 ```
 
 The step function is brutal: if the weighted sum plus bias is >= 0, output 1. Otherwise, output 0.
@@ -206,12 +204,15 @@ It will never converge. This is the hard proof that a single perceptron cannot l
 
 The trick: XOR = (x1 OR x2) AND NOT (x1 AND x2). Combine three perceptrons:
 
-```
-Layer 1:                    Layer 2:
-
-  x1 ──┬── OR neuron ──────┐
-       │                    ├── AND neuron ──▶ output
-  x2 ──┴── NAND neuron ────┘
+```mermaid
+graph LR
+    x1["x1"] --> OR["OR neuron"]
+    x1 --> NAND["NAND neuron"]
+    x2["x2"] --> OR
+    x2 --> NAND
+    OR --> AND["AND neuron"]
+    NAND --> AND
+    AND --> out["output"]
 ```
 
 ```python
@@ -242,12 +243,98 @@ for inputs, expected in xor_data:
 
 All four cases correct. Stacking perceptrons into layers creates decision boundaries that no single perceptron can produce.
 
+### Step 5: Train a Two-Layer Network
+
+Step 4 hand-wired the weights. That works for XOR, but not for real problems where you don't know the right weights in advance. The fix: replace the step function with sigmoid and learn the weights automatically through backpropagation.
+
+```python
+class TwoLayerNetwork:
+    def __init__(self, learning_rate=0.5):
+        import random
+        random.seed(0)
+        self.w_hidden = [[random.uniform(-1, 1), random.uniform(-1, 1)] for _ in range(2)]
+        self.b_hidden = [random.uniform(-1, 1), random.uniform(-1, 1)]
+        self.w_output = [random.uniform(-1, 1), random.uniform(-1, 1)]
+        self.b_output = random.uniform(-1, 1)
+        self.lr = learning_rate
+
+    def sigmoid(self, x):
+        import math
+        x = max(-500, min(500, x))
+        return 1.0 / (1.0 + math.exp(-x))
+
+    def forward(self, inputs):
+        self.inputs = inputs
+        self.hidden_outputs = []
+        for i in range(2):
+            z = sum(w * x for w, x in zip(self.w_hidden[i], inputs)) + self.b_hidden[i]
+            self.hidden_outputs.append(self.sigmoid(z))
+        z_out = sum(w * h for w, h in zip(self.w_output, self.hidden_outputs)) + self.b_output
+        self.output = self.sigmoid(z_out)
+        return self.output
+
+    def train(self, training_data, epochs=10000):
+        for epoch in range(epochs):
+            total_error = 0
+            for inputs, target in training_data:
+                output = self.forward(inputs)
+                error = target - output
+                total_error += error ** 2
+
+                d_output = error * output * (1 - output)
+
+                saved_w_output = self.w_output[:]
+                hidden_deltas = []
+                for i in range(2):
+                    h = self.hidden_outputs[i]
+                    hd = d_output * saved_w_output[i] * h * (1 - h)
+                    hidden_deltas.append(hd)
+
+                for i in range(2):
+                    self.w_output[i] += self.lr * d_output * self.hidden_outputs[i]
+                self.b_output += self.lr * d_output
+
+                for i in range(2):
+                    for j in range(len(inputs)):
+                        self.w_hidden[i][j] += self.lr * hidden_deltas[i] * inputs[j]
+                    self.b_hidden[i] += self.lr * hidden_deltas[i]
+```
+
+```python
+net = TwoLayerNetwork(learning_rate=2.0)
+net.train(xor_data, epochs=10000)
+for inputs, expected in xor_data:
+    result = net.forward(inputs)
+    predicted = 1 if result >= 0.5 else 0
+    print(f"  {inputs} -> {result:.4f} (rounded: {predicted}, expected {expected})")
+```
+
+Two key differences from Step 4. First, sigmoid replaces the step function -- it's smooth, so gradients exist. Second, the `train` method propagates error backward from output to hidden layer, adjusting every weight proportionally to its contribution to the error. That's backpropagation in 20 lines.
+
+This is the bridge to Lesson 03. The math behind `d_output` and `hidden_deltas` is the chain rule applied to the network graph. We'll derive it properly there.
+
 ## Use It
 
-This two-layer XOR network is the seed of every deep neural network. What changes in modern networks:
+Everything you just built from scratch exists in one import:
+
+```python
+from sklearn.linear_model import Perceptron as SkPerceptron
+import numpy as np
+
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+y = np.array([0, 0, 0, 1])
+
+clf = SkPerceptron(max_iter=100, tol=1e-3)
+clf.fit(X, y)
+print([clf.predict([x])[0] for x in X])
+```
+
+Five lines. Your 30-line `Perceptron` class does the same thing. The sklearn version adds convergence checks, multiple loss functions, and sparse input support -- but the core loop is identical: weighted sum, step function, weight update on error.
+
+The real gap shows up at scale. What changes in production networks:
 
 - The step function becomes sigmoid, ReLU, or other smooth activations
-- Weights are learned automatically via backpropagation (next lesson)
+- Weights are learned automatically via backpropagation (Lesson 03)
 - Layers get deeper: 3, 10, 100+ layers
 - The same principle holds: each layer creates new features from the previous layer's outputs
 
@@ -276,3 +363,9 @@ This lesson produces:
 | XOR problem | "The thing perceptrons can't do" | Proof that single-layer networks cannot learn non-linearly-separable functions |
 | Decision boundary | "Where the classifier switches" | The hyperplane w*x + b = 0 that divides input space into two classes |
 | Multi-layer perceptron | "A real neural network" | Perceptrons stacked in layers, where each layer's output feeds the next layer's input |
+
+## Further Reading
+
+- Frank Rosenblatt, "The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain" (1958) -- the original paper that started it all
+- Minsky & Papert, "Perceptrons" (1969) -- the book that proved XOR was unsolvable by single-layer networks and killed perceptron research for a decade
+- Michael Nielsen, "Neural Networks and Deep Learning", Chapter 1 (http://neuralnetworksanddeeplearning.com/) -- free online, best visual explanation of how perceptrons compose into networks

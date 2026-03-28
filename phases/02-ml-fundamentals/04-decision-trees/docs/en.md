@@ -329,6 +329,10 @@ print(f"Feature importances: {rf.feature_importances_}")
 
 In practice, gradient boosted trees (XGBoost, LightGBM, CatBoost) are often stronger than random forests because they build trees sequentially, with each tree correcting the errors of the previous ones. But random forests are harder to misconfigure and require almost no hyperparameter tuning.
 
+## Ship It
+
+This lesson produces `outputs/prompt-tree-interpreter.md` -- a prompt that interprets decision tree splits for business stakeholders. Feed it a trained tree's structure (depth, features, split thresholds, accuracy) and it translates the model into plain-language rules, ranks feature importance, flags overfitting or leakage, and recommends next steps. Use it any time you need to explain a tree-based model to someone who does not read code.
+
 ## Exercises
 
 1. Train a single decision tree on a 2D dataset with 3 classes. Manually trace the splits and draw the rectangular decision boundaries. Compare the boundaries at max_depth=2 vs max_depth=10.
@@ -343,20 +347,20 @@ In practice, gradient boosted trees (XGBoost, LightGBM, CatBoost) are often stro
 
 ## Key Terms
 
-| Term | What it actually means |
-|------|----------------------|
-| Decision tree | A model that partitions feature space into rectangular regions by learning a sequence of if/else splits |
-| Gini impurity | Probability of misclassifying a random sample at a node. 0 = pure, 0.5 = maximum impurity for binary |
-| Entropy | Information content (disorder) at a node. 0 = pure, 1.0 = maximum uncertainty for binary. From information theory |
-| Information gain | Reduction in impurity after a split. The greedy criterion for choosing splits |
-| Pre-pruning | Stopping tree growth early by setting max depth, min samples, or min gain thresholds |
-| Post-pruning | Growing the full tree, then removing subtrees that do not improve validation performance |
-| Bagging | Bootstrap aggregating. Train each model on a different random sample with replacement |
-| Random forest | Ensemble of decision trees, each trained on a bootstrap sample with random feature subsets at each split |
-| Feature importance (MDI) | Total impurity decrease contributed by each feature, summed across all trees and nodes |
-| Permutation importance | Accuracy drop when a feature's values are randomly shuffled. More reliable than MDI for noisy features |
-| Variance reduction | The regression tree analogue of information gain. Picks the split that reduces target variance the most |
-| Bootstrap sample | A random sample drawn with replacement from the original dataset. Same size, but with duplicates |
+| Term | What people say | What it actually means |
+|------|----------------|----------------------|
+| Decision tree | "A flowchart for predictions" | A model that partitions feature space into rectangular regions by learning a sequence of if/else splits |
+| Gini impurity | "How mixed the node is" | Probability of misclassifying a random sample at a node. 0 = pure, 0.5 = maximum impurity for binary |
+| Entropy | "The disorder in a node" | Information content at a node. 0 = pure, 1.0 = maximum uncertainty for binary. From information theory |
+| Information gain | "How good a split is" | Reduction in impurity after a split. The greedy criterion for choosing splits |
+| Pre-pruning | "Stop the tree early" | Stopping tree growth early by setting max depth, min samples, or min gain thresholds |
+| Post-pruning | "Trim the tree after" | Growing the full tree, then removing subtrees that do not improve validation performance |
+| Bagging | "Train on random subsets" | Bootstrap aggregating. Train each model on a different random sample with replacement |
+| Random forest | "A bunch of trees" | Ensemble of decision trees, each trained on a bootstrap sample with random feature subsets at each split |
+| Feature importance (MDI) | "Which features matter" | Total impurity decrease contributed by each feature, summed across all trees and nodes |
+| Permutation importance | "Shuffle and check" | Accuracy drop when a feature's values are randomly shuffled. More reliable than MDI for noisy features |
+| Variance reduction | "The regression version of info gain" | The regression tree analogue of information gain. Picks the split that reduces target variance the most |
+| Bootstrap sample | "Random sample with repeats" | A random sample drawn with replacement from the original dataset. Same size, but with duplicates |
 
 ## Further Reading
 

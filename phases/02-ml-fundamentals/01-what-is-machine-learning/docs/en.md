@@ -372,7 +372,7 @@ print(f"Accuracy: {clf.score(X_test, y_test):.3f}")
 
 ## Ship It
 
-This lesson produces: `outputs/prompt-ml-problem-framer.md`
+This lesson produces `outputs/prompt-ml-problem-framer.md` -- a prompt that turns vague business problems into concrete ML tasks. Give it a problem description ("we want to reduce churn" or "predict demand for next quarter") and it identifies the learning type, defines the prediction target, lists candidate features, picks a success metric, establishes a baseline, and flags pitfalls like data leakage or class imbalance. Use it at the start of any ML project to avoid building the wrong thing.
 
 ## Key Terms
 
