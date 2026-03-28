@@ -341,39 +341,27 @@ document.addEventListener('keydown', function(e) {
 })();
 
 (function() {
-  var grid = document.getElementById('glossary-grid');
-  var search = document.getElementById('glossary-search');
-  if (!grid) return;
+  var preview = document.getElementById('glossary-preview');
+  var countEl = document.getElementById('glossary-count');
+  if (!preview || typeof GLOSSARY === 'undefined') return;
 
-  function render(terms) {
-    grid.innerHTML = '';
-    terms.forEach(function(t) {
-      var card = document.createElement('div');
-      card.className = 'gloss-card';
-      card.innerHTML =
-        '<h3 class="gloss-card__term">' + t.term + '</h3>' +
-        '<div class="gloss-card__row">' +
-          '<span class="gloss-card__label">What people say</span>' +
-          '<p>"' + t.says + '"</p>' +
-        '</div>' +
-        '<div class="gloss-card__row">' +
-          '<span class="gloss-card__label">What it actually means</span>' +
-          '<p>' + t.means + '</p>' +
-        '</div>';
-      grid.appendChild(card);
-    });
-  }
+  if (countEl) countEl.textContent = GLOSSARY.length;
 
-  render(GLOSSARY);
-
-  search.addEventListener('input', function() {
-    var q = search.value.toLowerCase();
-    render(GLOSSARY.filter(function(t) {
-      return t.term.toLowerCase().includes(q) ||
-        t.says.toLowerCase().includes(q) ||
-        t.means.toLowerCase().includes(q);
-    }));
+  var sample = GLOSSARY.slice(0, 12);
+  sample.forEach(function(t) {
+    var tag = document.createElement('span');
+    tag.className = 'glossary-callout__tag';
+    tag.textContent = t.term;
+    preview.appendChild(tag);
   });
+
+  var more = document.createElement('a');
+  more.href = 'glossary.html';
+  more.className = 'glossary-callout__tag';
+  more.textContent = '+' + (GLOSSARY.length - 12) + ' more';
+  more.style.borderColor = 'var(--color-accent)';
+  more.style.color = 'var(--color-accent)';
+  preview.appendChild(more);
 })();
 
 document.querySelectorAll('a[href^="#"]').forEach(function(a) {

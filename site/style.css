@@ -1056,23 +1056,146 @@ a.lesson-row:hover {
   .how__step { max-width: none; }
 }
 
-.glossary {
-  padding: clamp(var(--space-12), 6vw, var(--space-24)) var(--space-6);
+.glossary-callout {
+  padding: clamp(var(--space-12), 6vw, var(--space-20)) var(--space-6);
 }
 
-.glossary__inner {
+.glossary-callout__inner {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.glossary-callout__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+}
+
+.glossary-callout__title svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.glossary-callout__desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 auto var(--space-6);
+  max-width: 400px;
+}
+
+.glossary-callout__preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.glossary-callout__tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.glossary-callout__tag:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.glossary-page {
+  padding: calc(var(--space-16) + 56px) var(--space-6) var(--space-16);
+  min-height: 100vh;
+}
+
+.glossary-page__inner {
   max-width: var(--content-wide);
   margin: 0 auto;
 }
 
+.glossary-page__header {
+  margin-bottom: var(--space-8);
+}
+
+.glossary-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  transition: color var(--transition);
+}
+
+.glossary-page__back:hover {
+  color: var(--color-accent);
+}
+
+.glossary-page__title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-2);
+}
+
+.glossary-page__sub {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.glossary-page__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.glossary-page__meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+}
+
+.glossary-page__empty {
+  text-align: center;
+  padding: var(--space-16) var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.header__nav-active {
+  color: var(--color-accent) !important;
+}
+
 .glossary__search-wrap {
   max-width: 400px;
-  margin: 0 auto var(--space-8);
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.glossary__search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-faint);
+  pointer-events: none;
 }
 
 .glossary__search {
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-3) 42px;
   font-size: var(--text-sm);
   font-family: var(--font-body);
   background: var(--color-surface);

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Glossary — AI Engineering from Scratch</title>
+<meta name="description" content="64 AI and machine learning terms demystified. What people say vs. what they actually mean. From attention mechanisms to zero-shot learning.">
+<meta property="og:title" content="AI Glossary — AI Engineering from Scratch">
+<meta property="og:description" content="64 AI terms demystified. What people say vs. what they actually mean.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23D97757'>AI</text></svg>">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header" id="header">
+  <div class="header__inner">
+    <a href="index.html" class="header__logo" aria-label="AI Engineering from Scratch">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="6" fill="var(--color-accent)"/>
+        <path d="M8 22L16 10L24 22" stroke="var(--color-bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="14" r="2" fill="var(--color-bg)"/>
+      </svg>
+      <span>AI Eng<span class="hide-mobile"> from Scratch</span></span>
+    </a>
+    <nav class="header__nav" aria-label="Primary">
+      <a href="index.html#phases">Phases</a>
+      <a href="index.html#roadmap">Roadmap</a>
+      <a href="glossary.html" class="header__nav-active">Glossary</a>
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="header__github">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span class="hide-mobile">GitHub</span>
+      </a>
+    </nav>
+    <button class="header__theme" data-theme-toggle aria-label="Toggle theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="glossary-page">
+  <div class="glossary-page__inner">
+    <div class="glossary-page__header">
+      <a href="index.html" class="glossary-page__back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to course
+      </a>
+      <h1 class="glossary-page__title">AI Glossary</h1>
+      <p class="glossary-page__sub"><span id="glossary-count">64</span> terms. What people say vs. what they actually mean.</p>
+    </div>
+
+    <div class="glossary-page__controls">
+      <div class="glossary__search-wrap">
+        <svg class="glossary__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="glossary-search" class="glossary__search" placeholder="Search terms, definitions..." aria-label="Search glossary terms">
+      </div>
+      <div class="glossary-page__meta">
+        <span id="glossary-showing">Showing all</span>
+      </div>
+    </div>
+
+    <div class="glossary__grid" id="glossary-grid"></div>
+
+    <div class="glossary-page__empty" id="glossary-empty" hidden>
+      <p>No terms match your search.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <p>AI Engineering from Scratch -- MIT License</p>
+    <p class="footer__attr">by <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+(function() {
+  var toggle = document.querySelector('[data-theme-toggle]');
+  var root = document.documentElement;
+  var theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  root.setAttribute('data-theme', theme);
+  updateIcon();
+
+  toggle && toggle.addEventListener('click', function() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    updateIcon();
+  });
+
+  function updateIcon() {
+    if (!toggle) return;
+    toggle.innerHTML = theme === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+})();
+
+(function() {
+  var header = document.getElementById('header');
+  var lastY = 0;
+  window.addEventListener('scroll', function() {
+    var y = window.scrollY;
+    header.classList.toggle('header--scrolled', y > 40);
+    header.classList.toggle('header--hidden', y > 300 && y > lastY);
+    lastY = y;
+  }, { passive: true });
+})();
+
+(function() {
+  var grid = document.getElementById('glossary-grid');
+  var search = document.getElementById('glossary-search');
+  var countEl = document.getElementById('glossary-count');
+  var showingEl = document.getElementById('glossary-showing');
+  var emptyEl = document.getElementById('glossary-empty');
+  if (!grid) return;
+
+  function render(terms) {
+    grid.innerHTML = '';
+    if (terms.length === 0) {
+      emptyEl.hidden = false;
+      showingEl.textContent = 'No results';
+      return;
+    }
+    emptyEl.hidden = true;
+    showingEl.textContent = terms.length === GLOSSARY.length
+      ? 'Showing all ' + terms.length + ' terms'
+      : 'Showing ' + terms.length + ' of ' + GLOSSARY.length;
+
+    terms.forEach(function(t) {
+      var card = document.createElement('div');
+      card.className = 'gloss-card fade-in visible';
+      card.innerHTML =
+        '<h3 class="gloss-card__term">' + t.term + '</h3>' +
+        '<div class="gloss-card__row">' +
+          '<span class="gloss-card__label">What people say</span>' +
+          '<p>\u201C' + t.says + '\u201D</p>' +
+        '</div>' +
+        '<div class="gloss-card__row">' +
+          '<span class="gloss-card__label">What it actually means</span>' +
+          '<p>' + t.means + '</p>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  countEl.textContent = GLOSSARY.length;
+  render(GLOSSARY);
+
+  var debounceTimer;
+  search.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() {
+      var q = search.value.toLowerCase().trim();
+      if (!q) {
+        render(GLOSSARY);
+        return;
+      }
+      render(GLOSSARY.filter(function(t) {
+        return t.term.toLowerCase().includes(q) ||
+          t.says.toLowerCase().includes(q) ||
+          t.means.toLowerCase().includes(q);
+      }));
+    }, 150);
+  });
+
+  search.focus();
+})();
+</script>
+</body>
+</html>
