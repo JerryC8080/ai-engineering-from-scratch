@@ -123,9 +123,9 @@ You learn AI. You build real things. You ship tools others can use.
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
 | 01 | [The Perceptron: Where It All Started](phases/03-deep-learning-core/01-the-perceptron/) | Build | Python |
-| 02 | Multi-Layer Networks & Forward Pass | Build | Python |
-| 03 | Backpropagation from Scratch | Build | Python |
-| 04 | Activation Functions: ReLU, Sigmoid, GELU & Why | Learn | Python |
+| 02 | [Multi-Layer Networks & Forward Pass](phases/03-deep-learning-core/02-multi-layer-networks/) | Build | Python |
+| 03 | [Backpropagation from Scratch](phases/03-deep-learning-core/03-backpropagation/) | Build | Python |
+| 04 | [Activation Functions: ReLU, Sigmoid, GELU & Why](phases/03-deep-learning-core/04-activation-functions/) | Build | Python |
 | 05 | Loss Functions: MSE, Cross-Entropy, Contrastive | Build | Python |
 | 06 | Optimizers -SGD, Momentum, Adam, AdamW | Build | Python |
 | 07 | Regularization -Dropout, Weight Decay, BatchNorm | Build | Python |

@@ -405,21 +405,24 @@ const PHASES = [
       },
       {
         "name": "Multi-Layer Networks & Forward Pass",
-        "status": "planned",
+        "status": "complete",
         "type": "Build",
-        "lang": "Python"
+        "lang": "Python",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/02-multi-layer-networks/"
       },
       {
         "name": "Backpropagation from Scratch",
-        "status": "planned",
+        "status": "complete",
         "type": "Build",
-        "lang": "Python"
+        "lang": "Python",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/03-backpropagation/"
       },
       {
         "name": "Activation Functions: ReLU, Sigmoid, GELU & Why",
-        "status": "planned",
-        "type": "Learn",
-        "lang": "Python"
+        "status": "complete",
+        "type": "Build",
+        "lang": "Python",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/04-activation-functions/"
       },
       {
         "name": "Loss Functions: MSE, Cross-Entropy, Contrastive",
