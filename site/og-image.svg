@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d18"/>
+      <stop offset="40%" style="stop-color:#141430"/>
+      <stop offset="100%" style="stop-color:#0d0d18"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g opacity="0.15">
+    <circle cx="200" cy="150" r="4" fill="#ff6b6b"/>
+    <circle cx="350" cy="100" r="3" fill="#ff6b6b"/>
+    <circle cx="500" cy="180" r="5" fill="#ff6b6b"/>
+    <circle cx="700" cy="120" r="3" fill="#6ba3ff"/>
+    <circle cx="850" cy="170" r="4" fill="#ff6b6b"/>
+    <circle cx="1000" cy="130" r="3" fill="#6ba3ff"/>
+    <line x1="200" y1="150" x2="350" y2="100" stroke="#ff6b6b" stroke-width="1"/>
+    <line x1="350" y1="100" x2="500" y2="180" stroke="#ff6b6b" stroke-width="1"/>
+    <line x1="500" y1="180" x2="700" y2="120" stroke="#ff6b6b" stroke-width="1"/>
+    <line x1="700" y1="120" x2="850" y2="170" stroke="#6ba3ff" stroke-width="1"/>
+    <line x1="850" y1="170" x2="1000" y2="130" stroke="#ff6b6b" stroke-width="1"/>
+    <circle cx="150" cy="480" r="3" fill="#6ba3ff"/>
+    <circle cx="400" cy="520" r="4" fill="#ff6b6b"/>
+    <circle cx="800" cy="500" r="3" fill="#6ba3ff"/>
+    <circle cx="1050" cy="480" r="4" fill="#ff6b6b"/>
+    <line x1="150" y1="480" x2="400" y2="520" stroke="#6ba3ff" stroke-width="1"/>
+    <line x1="400" y1="520" x2="800" y2="500" stroke="#ff6b6b" stroke-width="1"/>
+    <line x1="800" y1="500" x2="1050" y2="480" stroke="#6ba3ff" stroke-width="1"/>
+  </g>
+  <text x="600" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="#f0ede8" text-anchor="middle" letter-spacing="-2">AI Engineering</text>
+  <text x="600" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="#ff6b6b" text-anchor="middle" font-style="italic" letter-spacing="-2">from Scratch</text>
+  <text x="600" y="400" font-family="system-ui, sans-serif" font-size="24" fill="#9a9aaa" text-anchor="middle">260+ lessons across 20 phases. Build neural networks, transformers, and LLMs from first principles.</text>
+  <g transform="translate(330, 450)">
+    <rect x="0" y="0" width="80" height="32" rx="16" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="1"/>
+    <text x="40" y="21" font-family="monospace" font-size="14" fill="#ff6b6b" text-anchor="middle">Python</text>
+    <rect x="96" y="0" width="110" height="32" rx="16" fill="rgba(107,163,255,0.1)" stroke="#6ba3ff" stroke-width="1"/>
+    <text x="151" y="21" font-family="monospace" font-size="14" fill="#6ba3ff" text-anchor="middle">TypeScript</text>
+    <rect x="222" y="0" width="65" height="32" rx="16" fill="rgba(255,107,107,0.1)" stroke="#9a9aaa" stroke-width="1"/>
+    <text x="254" y="21" font-family="monospace" font-size="14" fill="#9a9aaa" text-anchor="middle">Rust</text>
+    <rect x="303" y="0" width="65" height="32" rx="16" fill="rgba(107,163,255,0.1)" stroke="#9a9aaa" stroke-width="1"/>
+    <text x="335" y="21" font-family="monospace" font-size="14" fill="#9a9aaa" text-anchor="middle">Julia</text>
+    <rect x="384" y="0" width="130" height="32" rx="16" fill="rgba(90,184,143,0.15)" stroke="#5ab88f" stroke-width="1"/>
+    <text x="449" y="21" font-family="monospace" font-size="14" fill="#5ab88f" text-anchor="middle">Open Source</text>
+  </g>
+  <text x="600" y="560" font-family="monospace" font-size="16" fill="#555" text-anchor="middle">aiengineeringfromscratch.com</text>
+</svg>
