@@ -315,6 +315,32 @@ a:hover {
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.hero-stars {
+  text-align: center;
+}
+
+.star-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #ffb800;
+  background: rgba(255, 184, 0, 0.1);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  padding: 6px 16px;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.star-badge:hover {
+  background: rgba(255, 184, 0, 0.2);
+  transform: translateY(-2px);
+  color: #ffb800;
 }
 
 .btn {
