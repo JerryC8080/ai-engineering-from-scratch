@@ -11,10 +11,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23D97757'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23ff4d4d'>AI</text></svg>">
 
 <link rel="stylesheet" href="style.css">
 </head>
@@ -23,12 +22,8 @@
 <header class="header" id="header">
   <div class="header__inner">
     <a href="#" class="header__logo" aria-label="AI Engineering from Scratch">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="6" fill="var(--color-accent)"/>
-        <path d="M8 22L16 10L24 22" stroke="var(--color-bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="16" cy="14" r="2" fill="var(--color-bg)"/>
-      </svg>
-      <span>AI<span class="hide-mobile"> from Scratch</span></span>
+      <span class="header__logo-icon">AI</span>
+      <span>from Scratch</span>
     </a>
     <nav class="header__nav" aria-label="Primary">
       <a href="#phases">Phases</a>
@@ -40,14 +35,21 @@
         <span class="hide-mobile">GitHub</span>
       </a>
     </nav>
-    <button class="header__theme" data-theme-toggle aria-label="Toggle theme">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
   </div>
 </header>
 
 <section class="hero">
-  <canvas class="hero__canvas" id="neural-canvas" aria-hidden="true"></canvas>
+  <div class="hero__spline">
+    <iframe
+      src="https://my.spline.design/PyzDhpQ9E5f1E3MT/"
+      frameborder="0"
+      width="100%"
+      height="100%"
+      style="position:absolute;inset:0;"
+      loading="lazy"
+    ></iframe>
+  </div>
+  <div class="hero__overlay"></div>
   <div class="hero__inner">
     <div class="hero__badge">Open Source &middot; MIT License</div>
     <h1 class="hero__title">AI Engineering<br><span class="hero__accent">from Scratch</span></h1>
@@ -58,17 +60,14 @@
         <span class="stat__num" id="stat-lessons" data-target="0">--</span>
         <span class="stat__label">Lessons</span>
       </div>
-      <div class="stat__divider"></div>
       <div class="stat">
         <span class="stat__num" id="stat-phases" data-target="0">--</span>
         <span class="stat__label">Phases</span>
       </div>
-      <div class="stat__divider"></div>
       <div class="stat">
         <span class="stat__num" data-target="4">4</span>
         <span class="stat__label">Languages</span>
       </div>
-      <div class="stat__divider"></div>
       <div class="stat">
         <span class="stat__num" id="stat-complete" data-target="0">--</span>
         <span class="stat__label">Complete</span>
@@ -90,23 +89,23 @@
     <div class="pathway__item">
       <span class="pathway__text">Math</span>
     </div>
-    <svg class="pathway__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    <span class="pathway__arrow">~&gt;</span>
     <div class="pathway__item">
       <span class="pathway__text">ML</span>
     </div>
-    <svg class="pathway__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    <span class="pathway__arrow">~&gt;</span>
     <div class="pathway__item pathway__item--active">
       <span class="pathway__text">Deep Learning</span>
     </div>
-    <svg class="pathway__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    <span class="pathway__arrow">~&gt;</span>
     <div class="pathway__item pathway__item--active">
       <span class="pathway__text">Transformers</span>
     </div>
-    <svg class="pathway__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    <span class="pathway__arrow">~&gt;</span>
     <div class="pathway__item">
       <span class="pathway__text">LLMs</span>
     </div>
-    <svg class="pathway__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+    <span class="pathway__arrow">~&gt;</span>
     <div class="pathway__item">
       <span class="pathway__text">Agents</span>
     </div>
@@ -198,36 +197,34 @@
   <div class="how__inner">
     <h2 class="section-title">How Each Lesson Works</h2>
     <div class="how__steps fade-in">
+      <svg class="how__dashed-line" viewBox="0 0 800 2" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0" y1="1" x2="800" y2="1" stroke="#2d2d2d" stroke-width="2" stroke-dasharray="8 6" />
+      </svg>
       <div class="how__step">
         <span class="how__num">01</span>
         <h3>Motto</h3>
         <p>One-line core idea that frames the lesson.</p>
       </div>
-      <div class="how__connector"></div>
       <div class="how__step">
         <span class="how__num">02</span>
         <h3>Problem</h3>
         <p>Why this matters. What problem does it solve.</p>
       </div>
-      <div class="how__connector"></div>
       <div class="how__step">
         <span class="how__num">03</span>
         <h3>Concept</h3>
         <p>Visual diagrams and intuition-first explanations.</p>
       </div>
-      <div class="how__connector"></div>
       <div class="how__step">
         <span class="how__num">04</span>
         <h3>Build It</h3>
         <p>Implement from scratch. No frameworks yet.</p>
       </div>
-      <div class="how__connector"></div>
       <div class="how__step">
         <span class="how__num">05</span>
         <h3>Use It</h3>
         <p>Same thing with real frameworks and tools.</p>
       </div>
-      <div class="how__connector"></div>
       <div class="how__step">
         <span class="how__num">06</span>
         <h3>Ship It</h3>
@@ -240,6 +237,7 @@
 <section class="glossary-callout" id="glossary">
   <div class="glossary-callout__inner">
     <div class="glossary-callout__content">
+      <div class="glossary-callout__pin" aria-hidden="true"></div>
       <h2 class="glossary-callout__title">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         AI Glossary

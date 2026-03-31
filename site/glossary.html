@@ -11,10 +11,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23D97757'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23ff4d4d'>AI</text></svg>">
 
 <link rel="stylesheet" href="style.css">
 </head>
@@ -23,12 +22,8 @@
 <header class="header" id="header">
   <div class="header__inner">
     <a href="index.html" class="header__logo" aria-label="AI Engineering from Scratch">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="6" fill="var(--color-accent)"/>
-        <path d="M8 22L16 10L24 22" stroke="var(--color-bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="16" cy="14" r="2" fill="var(--color-bg)"/>
-      </svg>
-      <span>AI<span class="hide-mobile"> from Scratch</span></span>
+      <span class="header__logo-icon">AI</span>
+      <span>from Scratch</span>
     </a>
     <nav class="header__nav" aria-label="Primary">
       <a href="index.html#phases">Phases</a>
@@ -40,9 +35,6 @@
         <span class="hide-mobile">GitHub</span>
       </a>
     </nav>
-    <button class="header__theme" data-theme-toggle aria-label="Toggle theme">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
   </div>
 </header>
 
@@ -77,34 +69,13 @@
 
 <footer class="footer">
   <div class="footer__inner">
-    <p>AI Engineering from Scratch -- MIT License</p>
+    <p>AI Engineering from Scratch &mdash; MIT License</p>
     <p class="footer__attr">by <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a></p>
   </div>
 </footer>
 
 <script src="data.js"></script>
 <script>
-(function() {
-  var toggle = document.querySelector('[data-theme-toggle]');
-  var root = document.documentElement;
-  var theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  root.setAttribute('data-theme', theme);
-  updateIcon();
-
-  toggle && toggle.addEventListener('click', function() {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', theme);
-    updateIcon();
-  });
-
-  function updateIcon() {
-    if (!toggle) return;
-    toggle.innerHTML = theme === 'dark'
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  }
-})();
-
 (function() {
   var header = document.getElementById('header');
   var lastY = 0;
