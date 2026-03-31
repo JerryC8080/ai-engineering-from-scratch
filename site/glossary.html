@@ -1,180 +1,290 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Glossary — AI Engineering from Scratch</title>
-<meta name="description" content="64 AI and machine learning terms demystified. What people say vs. what they actually mean. From attention mechanisms to zero-shot learning.">
-<meta property="og:title" content="AI Glossary — AI Engineering from Scratch">
-<meta property="og:description" content="64 AI terms demystified. What people say vs. what they actually mean.">
-<meta property="og:type" content="website">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Glossary - AI Engineering from Scratch</title>
+  <meta name="description" content="AI glossary: what people say vs what things actually mean. Every term explained without hand-waving.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .glossary-page {
+      padding: 100px 0 80px;
+      min-height: 100vh;
+    }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    .glossary-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23191A23'/><text x='4' y='24' font-size='22' fill='%23D97757'>AI</text></svg>">
+    .glossary-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 8px;
+    }
 
-<link rel="stylesheet" href="style.css">
+    .glossary-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .glossary-search-wrap {
+      max-width: 500px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+
+    .glossary-search {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      padding: 14px 20px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border);
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .glossary-search::placeholder {
+      color: var(--text-muted);
+    }
+
+    .glossary-search:focus {
+      border-color: var(--accent);
+    }
+
+    .glossary-count {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .glossary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .glossary-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border);
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      padding: 24px;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .glossary-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .glossary-term {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .glossary-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .glossary-col {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .glossary-col-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .glossary-col-says {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    .glossary-col-means {
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .glossary-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .glossary-page {
+        padding: 80px 0 48px;
+      }
+
+      .glossary-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .glossary-card {
+        padding: 18px 16px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header class="header" id="header">
-  <div class="header__inner">
-    <a href="index.html" class="header__logo" aria-label="AI Engineering from Scratch">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="6" fill="var(--color-accent)"/>
-        <path d="M8 22L16 10L24 22" stroke="var(--color-bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="16" cy="14" r="2" fill="var(--color-bg)"/>
-      </svg>
-      <span>AI<span class="hide-mobile"> from Scratch</span></span>
-    </a>
-    <nav class="header__nav" aria-label="Primary">
-      <a href="index.html#phases">Phases</a>
-      <a href="index.html#roadmap">Roadmap</a>
-      <a href="glossary.html" class="header__nav-active">Glossary</a>
-      <a href="catalog.html">Catalog</a>
-      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener" class="header__github">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        <span class="hide-mobile">GitHub</span>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">&#9679;</span> AI Eng
       </a>
-    </nav>
-    <button class="header__theme" data-theme-toggle aria-label="Toggle theme">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
-  </div>
-</header>
-
-<section class="glossary-page">
-  <div class="glossary-page__inner">
-    <div class="glossary-page__header">
-      <a href="index.html" class="glossary-page__back">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to course
-      </a>
-      <h1 class="glossary-page__title">AI Glossary</h1>
-      <p class="glossary-page__sub"><span id="glossary-count">64</span> terms. What people say vs. what they actually mean.</p>
+      <nav class="header-nav">
+        <a href="index.html#phases">Phases</a>
+        <a href="index.html#roadmap">Roadmap</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon" id="themeIcon">&#9789;</span>
+      </button>
     </div>
+  </header>
 
-    <div class="glossary-page__controls">
-      <div class="glossary__search-wrap">
-        <svg class="glossary__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="glossary-search" class="glossary__search" placeholder="Search terms, definitions..." aria-label="Search glossary terms">
+  <main class="glossary-page">
+    <div class="container">
+      <div class="glossary-header">
+        <h1>AI Glossary</h1>
+        <p>What people <em>say</em> vs what things actually <em>mean</em></p>
       </div>
-      <div class="glossary-page__meta">
-        <span id="glossary-showing">Showing all</span>
+      <div class="glossary-search-wrap">
+        <input type="text" class="glossary-search" id="glossarySearch" placeholder="Search terms...">
+      </div>
+      <div class="glossary-count" id="glossaryCount"></div>
+      <div class="glossary-list" id="glossaryList"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>AI Engineering from Scratch &mdash; open source, free forever.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">GitHub</a>
+        <a href="catalog.html">Catalog</a>
       </div>
     </div>
+  </footer>
 
-    <div class="glossary__grid" id="glossary-grid"></div>
-
-    <div class="glossary-page__empty" id="glossary-empty" hidden>
-      <p>No terms match your search.</p>
-    </div>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="footer__inner">
-    <p>AI Engineering from Scratch -- MIT License</p>
-    <p class="footer__attr">by <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a></p>
-  </div>
-</footer>
-
-<script src="data.js"></script>
-<script>
-(function() {
-  var toggle = document.querySelector('[data-theme-toggle]');
-  var root = document.documentElement;
-  var theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  root.setAttribute('data-theme', theme);
-  updateIcon();
-
-  toggle && toggle.addEventListener('click', function() {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', theme);
-    updateIcon();
-  });
-
-  function updateIcon() {
-    if (!toggle) return;
-    toggle.innerHTML = theme === 'dark'
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  }
-})();
-
-(function() {
-  var header = document.getElementById('header');
-  var lastY = 0;
-  window.addEventListener('scroll', function() {
-    var y = window.scrollY;
-    header.classList.toggle('header--scrolled', y > 40);
-    header.classList.toggle('header--hidden', y > 300 && y > lastY);
-    lastY = y;
-  }, { passive: true });
-})();
-
-(function() {
-  var grid = document.getElementById('glossary-grid');
-  var search = document.getElementById('glossary-search');
-  var countEl = document.getElementById('glossary-count');
-  var showingEl = document.getElementById('glossary-showing');
-  var emptyEl = document.getElementById('glossary-empty');
-  if (!grid) return;
-
-  function render(terms) {
-    grid.innerHTML = '';
-    if (terms.length === 0) {
-      emptyEl.hidden = false;
-      showingEl.textContent = 'No results';
-      return;
-    }
-    emptyEl.hidden = true;
-    showingEl.textContent = terms.length === GLOSSARY.length
-      ? 'Showing all ' + terms.length + ' terms'
-      : 'Showing ' + terms.length + ' of ' + GLOSSARY.length;
-
-    terms.forEach(function(t) {
-      var card = document.createElement('div');
-      card.className = 'gloss-card fade-in visible';
-      card.innerHTML =
-        '<h3 class="gloss-card__term">' + t.term + '</h3>' +
-        '<div class="gloss-card__row">' +
-          '<span class="gloss-card__label">What people say</span>' +
-          '<p>\u201C' + t.says + '\u201D</p>' +
-        '</div>' +
-        '<div class="gloss-card__row">' +
-          '<span class="gloss-card__label">What it actually means</span>' +
-          '<p>' + t.means + '</p>' +
-        '</div>';
-      grid.appendChild(card);
-    });
-  }
-
-  countEl.textContent = GLOSSARY.length;
-  render(GLOSSARY);
-
-  var debounceTimer;
-  search.addEventListener('input', function() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() {
-      var q = search.value.toLowerCase().trim();
-      if (!q) {
-        render(GLOSSARY);
-        return;
+  <script src="data.js"></script>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var stored = localStorage.getItem('theme');
+      if (stored) {
+        root.setAttribute('data-theme', stored);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        root.setAttribute('data-theme', 'light');
       }
-      render(GLOSSARY.filter(function(t) {
-        return t.term.toLowerCase().includes(q) ||
-          t.says.toLowerCase().includes(q) ||
-          t.means.toLowerCase().includes(q);
-      }));
-    }, 150);
-  });
 
-  search.focus();
-})();
-</script>
+      function updateIcon() {
+        var icon = document.getElementById('themeIcon');
+        if (!icon) return;
+        icon.innerHTML = root.getAttribute('data-theme') === 'light' ? '&#9728;' : '&#9789;';
+      }
+
+      updateIcon();
+
+      document.addEventListener('DOMContentLoaded', function () {
+        updateIcon();
+
+        var btn = document.getElementById('themeToggle');
+        if (btn) {
+          btn.addEventListener('click', function () {
+            var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcon();
+          });
+        }
+
+        var searchInput = document.getElementById('glossarySearch');
+        var listEl = document.getElementById('glossaryList');
+        var countEl = document.getElementById('glossaryCount');
+
+        function escapeHtml(str) {
+          var div = document.createElement('div');
+          div.textContent = str;
+          return div.innerHTML;
+        }
+
+        function renderGlossary(filter) {
+          var terms = GLOSSARY;
+          if (filter) {
+            var q = filter.toLowerCase();
+            terms = terms.filter(function (t) {
+              return t.term.toLowerCase().indexOf(q) !== -1 ||
+                t.says.toLowerCase().indexOf(q) !== -1 ||
+                t.means.toLowerCase().indexOf(q) !== -1;
+            });
+          }
+
+          countEl.textContent = terms.length + ' of ' + GLOSSARY.length + ' terms';
+
+          if (terms.length === 0) {
+            listEl.innerHTML = '<div class="glossary-empty">No terms match your search.</div>';
+            return;
+          }
+
+          var html = '';
+          for (var i = 0; i < terms.length; i++) {
+            var t = terms[i];
+            html += '<div class="glossary-card">';
+            html += '<div class="glossary-term">' + escapeHtml(t.term) + '</div>';
+            html += '<div class="glossary-row">';
+            html += '<div class="glossary-col">';
+            html += '<div class="glossary-col-label">What people say</div>';
+            html += '<div class="glossary-col-says">"' + escapeHtml(t.says) + '"</div>';
+            html += '</div>';
+            html += '<div class="glossary-col">';
+            html += '<div class="glossary-col-label">What it actually means</div>';
+            html += '<div class="glossary-col-means">' + escapeHtml(t.means) + '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+          }
+          listEl.innerHTML = html;
+        }
+
+        renderGlossary('');
+
+        if (searchInput) {
+          searchInput.addEventListener('input', function () {
+            renderGlossary(searchInput.value.trim());
+          });
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
