@@ -995,77 +995,279 @@ a:hover {
   transform: translateY(0);
 }
 
+@media (max-width: 1280px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .phases-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .phases-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .why-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .roadmap-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .how-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .header-nav {
+  .header-nav a:not(.header-github) {
     display: none;
   }
 
   .header-inner {
     height: 56px;
+    padding: 0 16px;
   }
 
-  .hero-stats {
-    gap: 24px;
-  }
-
-  .stat-number {
-    font-size: 1.8rem;
+  .hero {
+    min-height: 90vh;
   }
 
   .hero-content {
-    padding-bottom: 48px;
+    padding: 60px 16px 48px;
   }
 
-  .section {
-    padding: 48px 0;
+  .hero-line1 {
+    font-size: clamp(2rem, 8vw, 3.2rem);
   }
 
-  .why-grid {
-    grid-template-columns: 1fr;
+  .hero-line2 {
+    font-size: clamp(1.8rem, 7vw, 3rem);
   }
 
-  .phases-grid {
-    grid-template-columns: 1fr;
+  .hero-subtitle {
+    font-size: 1rem;
+    padding: 0 8px;
   }
 
-  .roadmap-grid {
-    grid-template-columns: 1fr;
+  .hero-stats {
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .modal {
-    padding: 24px 16px;
-    max-height: 85vh;
+  .stat-item {
+    min-width: 70px;
   }
 
-  .glossary-callout {
-    flex-direction: column;
-    text-align: center;
-    padding: 28px 20px;
+  .stat-number {
+    font-size: 1.6rem;
   }
 
-  .cta-code {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .footer-inner {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    font-size: 16px;
+  .stat-label {
+    font-size: 0.6rem;
   }
 
   .hero-actions {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   .btn {
     width: 100%;
+    max-width: 260px;
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  .hero-badge {
+    font-size: 0.65rem;
+    padding: 3px 12px;
+  }
+
+  .star-badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+  }
+
+  .pathway-strip {
+    padding: 10px 0;
+  }
+
+  .pathway-tag {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+
+  .pathway-arrow {
+    font-size: 0.8rem;
+  }
+
+  .section {
+    padding: 40px 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+    padding: 0 16px;
+  }
+
+  .why-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .why-card {
+    padding: 20px 16px;
+  }
+
+  .phases-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .phase-card {
+    padding: 18px 16px;
+  }
+
+  .phase-card-name {
+    font-size: 1.1rem;
+  }
+
+  .roadmap-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .how-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .how-step {
+    padding: 16px 12px;
+  }
+
+  .modal {
+    padding: 20px 12px;
+    max-height: 90vh;
+    max-width: 95vw;
+  }
+
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .glossary-callout {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 16px;
+    gap: 16px;
+  }
+
+  .glossary-chips {
+    justify-content: center;
+  }
+
+  .cta-section {
+    padding: 40px 0;
+  }
+
+  .cta-code {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+
+  .hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .hero-line1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-line2 {
+    font-size: 1.6rem;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
     max-width: 280px;
+    margin: 0 auto 20px;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 1.4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .how-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .phase-card {
+    transform: none !important;
+  }
+
+  .phase-card:hover {
+    transform: none !important;
+  }
+
+  .modal {
+    border-radius: 12px;
+    padding: 16px 10px;
+  }
+
+  .modal-lesson {
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1300px;
+  }
+
+  .phases-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .why-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
