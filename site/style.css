@@ -209,14 +209,6 @@ a:hover {
   object-fit: cover;
 }
 
-.hero-scene spline-viewer #logo {
-  display: none !important;
-}
-
-.hero-scene spline-viewer a[href*="spline"] {
-  display: none !important;
-}
-
 
 
 .hero-overlay {
