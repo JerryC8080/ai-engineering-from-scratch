@@ -301,7 +301,8 @@ def gmm(data, k, max_iterations=100, seed=42):
     weights = [1.0 / k] * k
 
     def gaussian_pdf(x, mean, variance):
-        coeff = 1.0 / math.sqrt(2 * math.pi * variance)
+        d = len(x)
+        coeff = 1.0 / ((2 * math.pi * variance) ** (d / 2))
         exponent = -sum((xi - mi) ** 2 for xi, mi in zip(x, mean)) / (2 * variance)
         return coeff * math.exp(max(exponent, -500))
 

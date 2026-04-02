@@ -93,7 +93,7 @@ log P(not-spam | email) = log(0.6) + 2*log(0.051) + 1*log(0.093) + 0*log(0.856)
                         = -8.838
 ```
 
-Spam wins by a large margin. The word "free" appearing twice is strong evidence for spam, and "meeting" not appearing removes evidence for not-spam.
+Spam wins by a large margin. The word "free" appearing twice is strong evidence for spam. Note that "meeting" not appearing contributes zero to both log sums (0 * log(P)) -- in Multinomial NB, absent words have no effect. It is Bernoulli NB that explicitly models word absence.
 
 ### Three Variants
 

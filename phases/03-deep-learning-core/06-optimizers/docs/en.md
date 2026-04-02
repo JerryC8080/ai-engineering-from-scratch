@@ -40,11 +40,11 @@ Learning rate is the only knob. Too high: the loss diverges. Too low: training t
 The ball-rolling-downhill analogy is overused but accurate. Instead of stepping by the gradient alone, you maintain a velocity that accumulates past gradients.
 
 ```
-v_t = beta * v_{t-1} + gradient
-w = w - lr * v_t
+m_t = beta * m_{t-1} + gradient
+w = w - lr * m_t
 ```
 
-Beta (typically 0.9) controls how much history to keep. With beta = 0.9, the velocity is roughly the average of the last 10 gradients (1 / (1 - 0.9) = 10).
+Beta (typically 0.9) controls how much history to keep. With beta = 0.9, the momentum is roughly the average of the last 10 gradients (1 / (1 - 0.9) = 10).
 
 Why this fixes oscillation: gradients that point in the same direction accumulate. Gradients that flip direction cancel out. In that narrow valley, the "across" component flips sign each step and gets dampened. The "along" component stays consistent and gets amplified. The result is smooth acceleration in the useful direction.
 
