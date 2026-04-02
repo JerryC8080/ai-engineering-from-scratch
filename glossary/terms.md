@@ -20,11 +20,27 @@
 - **What people say:** "The AI generates one word at a time"
 - **What it actually means:** A model that predicts the next token conditioned on all previous tokens, then feeds that prediction back as input for the next step. GPT, LLaMA, and Claude are all autoregressive.
 
+### Activation Function
+- **What people say:** "The nonlinear thing between layers"
+- **What it actually means:** A function applied after each linear layer that introduces nonlinearity. Without it, stacking any number of linear layers collapses to a single linear transformation. ReLU, GELU, and SiLU are the most common. The choice directly affects whether gradients flow during training.
+
 ### Adam (Optimizer)
 - **What people say:** "The default optimizer"
 - **What it actually means:** Adaptive Moment Estimation. Combines momentum (first moment) with adaptive learning rates per parameter (second moment). Has bias correction for early steps. Works well across most tasks without much tuning.
 
+### AdamW
+- **What people say:** "Adam but better"
+- **What it actually means:** Adam with decoupled weight decay. In standard Adam, L2 regularization gets scaled by the adaptive learning rate per parameter, which is not what you want. AdamW applies weight decay directly to the weights, independent of the gradient statistics. The default optimizer for training transformers.
+
+### Autograd
+- **What people say:** "Automatic gradients"
+- **What it actually means:** A system that records operations on tensors and automatically computes gradients via reverse-mode differentiation. PyTorch's autograd builds a computation graph on-the-fly (dynamic graph), while JAX uses function transformations (grad). This is what makes backpropagation practical -- you write the forward pass, and the framework computes all the derivatives.
+
 ## B
+
+### Batch Size
+- **What people say:** "How many examples at once"
+- **What it actually means:** The number of training examples processed in one forward/backward pass before updating weights. Larger batches give more stable gradient estimates but use more memory. Typical values: 32-512 for training, larger for inference. Batch size interacts with learning rate -- double the batch, double the LR (linear scaling rule).
 
 ### Backpropagation
 - **What people say:** "How neural networks learn"
@@ -49,9 +65,21 @@
 - **What people say:** "GPU programming"
 - **What it actually means:** NVIDIA's parallel computing platform. Lets you run matrix operations on thousands of GPU cores simultaneously. PyTorch and TensorFlow use CUDA under the hood.
 
+### Chunking
+- **What people say:** "Splitting documents into pieces"
+- **What it actually means:** Breaking text into segments before embedding for retrieval. Chunk size determines the granularity of search results. Too small: loses context. Too large: dilutes relevance. Common strategies: fixed-size with overlap, sentence-based, or semantic splitting. Typical chunk size: 256-512 tokens with 10-20% overlap.
+
 ### Contrastive Learning
 - **What people say:** "Learning by comparison"
 - **What it actually means:** Training by pulling similar pairs closer and pushing dissimilar pairs apart in embedding space. CLIP uses this: matching image-text pairs vs non-matching ones.
+
+### Cosine Similarity
+- **What people say:** "How similar two vectors are"
+- **What it actually means:** The cosine of the angle between two vectors: dot(a, b) / (||a|| * ||b||). Ranges from -1 (opposite) to 1 (identical direction). Ignores magnitude, only cares about direction. The standard similarity metric for embeddings and semantic search.
+
+### Cross-Entropy
+- **What people say:** "The classification loss"
+- **What it actually means:** Measures the difference between two probability distributions. For classification: -sum(y_true * log(y_pred)). For language models: the negative log probability of the correct next token. Lower is better. Perplexity is just exp(cross-entropy).
 
 ## D
 
@@ -100,11 +128,23 @@
 - **What people say:** "A column in your data"
 - **What it actually means:** An individual measurable property of the data. In classical ML, you engineer features by hand. In deep learning, the network learns features automatically from raw data.
 
+### Few-Shot
+- **What people say:** "Give the AI some examples first"
+- **What it actually means:** Including a small number of input-output examples in the prompt before asking the model to perform a task. Typically 3-5 examples. The model pattern-matches on these examples to understand the desired format and behavior. Contrast with zero-shot (no examples) and fine-tuning (thousands of examples baked into weights).
+
 ### Fine-tuning
 - **What people say:** "Training the AI on your data"
 - **What it actually means:** Starting with a pre-trained model's weights and continuing training on a smaller, task-specific dataset. Only updates existing weights, doesn't add new knowledge from scratch
 
+### Function Calling
+- **What people say:** "AI that can use tools"
+- **What it actually means:** A structured way for LLMs to request execution of external functions. You define tools with JSON Schema descriptions, the model outputs a structured JSON object specifying which function to call with what arguments, your code executes it, and the result goes back to the model. Not the same as agents -- function calling is the mechanism, agents are the loop.
+
 ## G
+
+### Guardrails
+- **What people say:** "Safety filters for AI"
+- **What it actually means:** Input/output validation layers around an LLM that detect and block harmful content, prompt injection attempts, PII leakage, or off-topic responses. Typically a pipeline: input filter -> LLM -> output filter. Can be rule-based (regex, keyword lists) or model-based (classifier that scores safety).
 
 ### GPT
 - **What people say:** "ChatGPT" or "The AI"
@@ -142,6 +182,10 @@
 ### Inductive Bias
 - **What people say:** Never heard of it
 - **What it actually means:** The assumptions built into a model's architecture. CNNs assume local patterns matter (convolution). RNNs assume order matters (sequential processing). Transformers assume everything might relate to everything (attention). The right bias helps the model learn faster from less data.
+
+### JAX
+- **What people say:** "Google's ML framework"
+- **What it actually means:** A NumPy-compatible library that adds automatic differentiation (grad), JIT compilation (jit), automatic vectorization (vmap), and multi-device parallelism (pmap). Unlike PyTorch's object-oriented style, JAX is purely functional -- no hidden state, no in-place mutation. Used by Google DeepMind for AlphaFold, Gemini, and large-scale research.
 
 ## K
 
@@ -215,9 +259,23 @@
 - **What people say:** "How confused the model is"
 - **What it actually means:** The exponential of the average cross-entropy loss. Lower is better. A perplexity of 10 means the model is as uncertain as if it were choosing uniformly among 10 tokens at each step.
 
+### Precision & Recall
+- **What people say:** "Accuracy metrics"
+- **What it actually means:** Precision = of items you flagged, how many were correct. Recall = of all correct items, how many did you find. They trade off: catching every spam email (high recall) means more false alarms (low precision). F1 score is their harmonic mean. Use precision when false positives are costly, recall when false negatives are costly.
+
 ### Prompt Engineering
 - **What people say:** "Talking to AI the right way"
-- **What it actually means:** Designing the input text to reliably produce desired outputs — including system prompts, few-shot examples, format instructions, and chain-of-thought triggers
+- **What it actually means:** Designing the input text to reliably produce desired outputs -- including system prompts, few-shot examples, format instructions, and chain-of-thought triggers
+
+### Prompt Injection
+- **What people say:** "Hacking the AI with words"
+- **What it actually means:** An attack where malicious text in the input overrides the system prompt or instructions. Direct injection: user types "Ignore previous instructions." Indirect injection: a retrieved document contains hidden instructions. The LLM equivalent of SQL injection. No complete solution exists -- defense is layers of input validation, output filtering, and privilege separation.
+
+## Q
+
+### QLoRA
+- **What people say:** "LoRA but cheaper"
+- **What it actually means:** Quantized LoRA. Keeps the frozen base model weights in 4-bit precision (NF4 format) while training LoRA adapters in 16-bit. Reduces memory by another 3-4x compared to standard LoRA. A 7B model that needs 14GB with LoRA fits in 4-6GB with QLoRA. Quality is within 1% of full fine-tuning on most benchmarks.
 
 ## R
 
@@ -238,7 +296,19 @@
 - **What people say:** "Activation function"
 - **What it actually means:** Rectified Linear Unit: f(x) = max(0, x). The simplest non-linear activation. Fast to compute, doesn't saturate for positive values. Used everywhere because it works and is cheap. Variants: LeakyReLU, GELU, SiLU.
 
+### ROUGE
+- **What people say:** "Summarization metric"
+- **What it actually means:** Recall-Oriented Understudy for Gisting Evaluation. Measures overlap between generated text and reference text. ROUGE-1 counts unigram matches, ROUGE-2 counts bigram matches, ROUGE-L finds the longest common subsequence. Cheap to compute but only measures surface similarity -- two sentences with the same meaning but different words score poorly.
+
 ## S
+
+### Semantic Search
+- **What people say:** "Smart search that understands meaning"
+- **What it actually means:** Finding documents by meaning rather than keyword matching. Embed the query and all documents into the same vector space, then return documents whose embeddings are closest to the query embedding. "payment failed" finds "transaction declined" even though they share no words. Powered by embedding models + vector databases.
+
+### Streaming
+- **What people say:** "Seeing the response appear word by word"
+- **What it actually means:** The LLM sends tokens as they are generated rather than waiting for the complete response. Uses Server-Sent Events (SSE) or WebSocket protocols. Reduces perceived latency from seconds to milliseconds for the first token. Essential for production chat interfaces. Each chunk contains a delta (partial token or word).
 
 ### Self-Attention
 - **What people say:** "How the model decides what to focus on"
@@ -257,6 +327,14 @@
 - **What it actually means:** Multiple agents sharing state and coordinating through message passing, with emergent behavior arising from simple individual rules rather than central control
 
 ## T
+
+### System Prompt
+- **What people say:** "The AI's instructions"
+- **What it actually means:** A special message at the start of a conversation that sets the model's behavior, persona, and constraints. Processed before user messages. Not visible to the user in most UIs. Defines what the model should and shouldn't do, its tone, format preferences, and domain focus. Different from user prompts -- system prompts are set by the developer.
+
+### Tensor
+- **What people say:** "A multi-dimensional array"
+- **What it actually means:** The fundamental data structure in deep learning frameworks. A 0D tensor is a scalar, 1D is a vector, 2D is a matrix, 3D+ is a tensor. In PyTorch and JAX, tensors track their computation history for automatic differentiation and can live on CPU or GPU. All neural network inputs, outputs, weights, and gradients are tensors.
 
 ### Token
 - **What people say:** "A word"
