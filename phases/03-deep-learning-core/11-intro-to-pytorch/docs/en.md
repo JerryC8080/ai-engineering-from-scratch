@@ -205,7 +205,7 @@ for epoch in range(num_epochs):
         optimizer.step()
 ```
 
-Five lines inside the batch loop. Five lines that trained GPT-4, Stable Diffusion, and AlphaFold. The architecture changes. The data changes. These five lines do not.
+Five lines inside the batch loop. Five lines that trained GPT-4, Stable Diffusion, and LLaMA. The architecture changes. The data changes. These five lines do not.
 
 ### Dataset and DataLoader
 

@@ -1,6 +1,6 @@
 # Few-Shot, Chain-of-Thought, Tree-of-Thought
 
-> Telling a model what to do is prompting. Showing it how to think is engineering. The gap between a 78% and 95% accuracy on the same model, same task, same data is not a better model. It is a better reasoning strategy.
+> Telling a model what to do is prompting. Showing it how to think is engineering. The gap between 78% and 91% accuracy on the same model, same task, same data is not a better model. It is a better reasoning strategy.
 
 **Type:** Build
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 You build a math tutoring app. Your prompt says: "Solve this word problem." GPT-4o gets it right 78% of the time on GSM8K, the standard grade-school math benchmark. You think you need a bigger model. You do not.
 
-Add five words -- "Let's think step by step" -- and accuracy jumps to 95%. Same model. Same temperature. Same API cost. The only difference is that you gave the model scratch paper.
+Add five words -- "Let's think step by step" -- and accuracy jumps to 91%. Add a few worked examples and it reaches 95%. Same model. Same temperature. Same API cost. The only difference is that you gave the model scratch paper.
 
 This is not a hack. It is how reasoning works. Humans do not solve multi-step problems in one mental leap. Neither do transformers. When you force a model to generate intermediate tokens, those tokens become part of the context for the next token. Each reasoning step feeds the next. The model literally computes its way to the answer.
 

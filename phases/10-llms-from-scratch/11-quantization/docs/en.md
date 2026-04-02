@@ -1,6 +1,6 @@
 # Quantization: Making Models Fit
 
-> A 70B model in FP16 needs 140GB. Two A100s just for weights. Quantize to FP8: one GPU. INT4: a MacBook.
+> A 70B model in FP16 needs 140GB. Two A100s just for weights. Quantize to FP8: one 80GB GPU. INT4: a MacBook.
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -17,7 +17,7 @@ Quantization replaces high-precision numbers with lower-precision ones. FP16 to 
 
 The cost is accuracy. Every bit you remove destroys information. The question is how much accuracy you lose and where. A well-quantized INT4 model retains 95-99% of the original's quality on most benchmarks. A naive quantization to INT4 can destroy the model entirely. The difference is technique.
 
-Meta quantized Llama 3 to INT4 with GPTQ and lost 1.2 perplexity points on WikiText. Mistral released FP8 checkpoints of Mixtral 8x22B with zero measurable quality loss on MMLU. The GGUF format powers llama.cpp, running 70B models on MacBooks with M-series chips. Quantization is not a hack. It is the standard deployment path for every model larger than 7B.
+Community quantizations of Llama 3 to INT4 with GPTQ show roughly 1-2 perplexity points lost on WikiText. Mistral released FP8 checkpoints of Mixtral 8x22B with zero measurable quality loss on MMLU. The GGUF format powers llama.cpp, running 70B models on MacBooks with M-series chips. Quantization is not a hack. It is the standard deployment path for every model larger than 7B.
 
 ## The Concept
 

@@ -91,7 +91,7 @@ Maximum derivative is 1.0 at x = 0 -- four times better than sigmoid. But the va
 
 ### ReLU: The Breakthrough
 
-Rectified Linear Unit. Published by Nair and Hinton in 2010, it changed everything.
+Rectified Linear Unit. Popularized for deep learning by Nair and Hinton in 2010 (the function itself dates to Fukushima's 1969 work), it changed everything.
 
 ```
 relu(x) = max(0, x)
@@ -143,7 +143,7 @@ Self-gated activation discovered by Ramachandran et al. in 2017 through automate
 swish(x) = x * sigmoid(x)
 ```
 
-Swish got its name from its resemblance to the Nike logo. Formally it's x * sigmoid(x). Google discovered it through automated search over activation function space -- a neural network designing parts of neural networks.
+Swish is formally x * sigmoid(x). Google discovered it through automated search over activation function space -- a neural network designing parts of neural networks.
 
 Like GELU, it is smooth, non-monotonic, and allows small negative values. The difference is subtle: Swish uses sigmoid for gating while GELU uses the Gaussian CDF. In practice, performance is nearly identical. Swish is used in EfficientNet and some vision models. GELU dominates in language models.
 

@@ -86,7 +86,7 @@ Every major provider supports function calling, but the API surface differs.
 | Provider | API Parameter | Tool Call Format | Parallel Calls | Forced Calling |
 |----------|--------------|-----------------|---------------|----------------|
 | OpenAI (GPT-4o, o3) | `tools` | `tool_calls[].function` | Yes (multiple per turn) | `tool_choice="required"` |
-| Anthropic (Claude 3.5/4) | `tools` | `content[].type="tool_use"` | Yes (multiple blocks) | `tool_choice={"type":"any"}` |
+| Anthropic (Claude 3.5/3.7) | `tools` | `content[].type="tool_use"` | Yes (multiple blocks) | `tool_choice={"type":"any"}` |
 | Google (Gemini 2.0) | `function_declarations` | `functionCall` | Yes | `function_calling_config` |
 | Open Models (Llama 3, Hermes) | Varies | Hermes-style XML/JSON | Model-dependent | Prompt-based |
 
@@ -636,7 +636,7 @@ OpenAI returns tool calls as `response.choices[0].message.tool_calls`. Each call
 # )
 ```
 
-Anthropic returns tool calls as content blocks with `type: "tool_use"`. The tool result goes in a user message with `type: "tool_result"`. Note the key difference: OpenAI uses `input_schema` is the Anthropic field name vs OpenAI's `parameters`.
+Anthropic returns tool calls as content blocks with `type: "tool_use"`. The tool result goes in a user message with `type: "tool_result"`. Note the key difference: Anthropic uses `input_schema` for tool parameter definitions, while OpenAI uses `parameters`.
 
 ### MCP Integration
 

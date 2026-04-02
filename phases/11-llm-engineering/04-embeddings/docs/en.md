@@ -83,7 +83,7 @@ The market has settled into a handful of production-grade options:
 | nomic-embed-text-v1.5 | Nomic | 768 | 62.3 | 8192 | Free (open source) |
 | GTE-large-en-v1.5 | Alibaba | 1024 | 65.4 | 8192 | Free (open source) |
 
-MTEB (Massive Text Embedding Benchmark) is the standard evaluation suite -- 56 datasets across 8 tasks. Higher is better. The gap between the best open-source model (BGE-M3 at 68.2) and the best commercial model (Voyage-3 at 67.3) has essentially closed. Open source wins on cost. Commercial wins on convenience.
+MTEB (Massive Text Embedding Benchmark) is the standard evaluation suite -- 56 datasets across 8 tasks. Higher is better. Open-source models now match or exceed commercial ones -- BGE-M3 scores 68.2 while Voyage-3 scores 67.3. Open source wins on cost. Commercial wins on convenience.
 
 ### Similarity Metrics
 

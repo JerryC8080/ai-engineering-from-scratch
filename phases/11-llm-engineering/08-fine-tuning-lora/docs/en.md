@@ -1,6 +1,6 @@
 # Fine-Tuning with LoRA & QLoRA
 
-> Full fine-tuning a 7B model requires 56GB of VRAM. You don't have that. Neither do most companies. LoRA lets you fine-tune the same model in 6GB by training 0.78% of the parameters. This isn't a compromise -- it matches full fine-tuning quality on most tasks. The entire open-source fine-tuning ecosystem runs on this one trick.
+> Full fine-tuning a 7B model requires 56GB of VRAM. You don't have that. Neither do most companies. LoRA lets you fine-tune the same model in 6GB by training less than 1% of the parameters. This isn't a compromise -- it matches full fine-tuning quality on most tasks. The entire open-source fine-tuning ecosystem runs on this one trick.
 
 **Type:** Build
 **Languages:** Python
@@ -77,7 +77,7 @@ y = Wx + (alpha / r) * BAx
 When alpha = r, the scaling is 1x. When alpha = 2r (the common default), the scaling is 2x. This hyperparameter controls the learning rate of the LoRA path independently of the base learning rate.
 
 Practical guidance:
-- alpha = 2 * rank is the most common setting (the original paper's default)
+- alpha = 2 * rank is a common community convention (the original paper used alpha = rank in most experiments)
 - alpha = rank gives 1x scaling, conservative but stable
 - Higher alpha means larger updates per step, which can speed convergence or cause instability
 

@@ -148,7 +148,7 @@ SentencePiece supports two algorithms:
 - **BPE mode**: same merge logic as standard BPE, applied to raw character sequences
 - **Unigram mode**: starts with a large vocabulary and iteratively removes tokens that least affect the overall likelihood. The reverse of BPE -- prune instead of merge.
 
-Llama 3 uses SentencePiece with a vocabulary of 128,256 tokens. T5 uses SentencePiece Unigram with 32,000 tokens.
+Llama 2 uses SentencePiece BPE with a vocabulary of 32,000 tokens. T5 uses SentencePiece Unigram with 32,000 tokens. Note: Llama 3 switched to a tiktoken-based byte-level BPE tokenizer with 128,256 tokens.
 
 ### Vocabulary Size Tradeoffs
 
@@ -182,7 +182,7 @@ The trend is clear: vocabulary sizes are growing. GPT-2 used 50,257. GPT-4 uses 
 | GPT-2 | 50,257 | Byte-level BPE | ~1.3 |
 | Llama 2 | 32,000 | SentencePiece BPE | ~1.4 |
 | GPT-4 | ~100,256 | Byte-level BPE | ~1.2 |
-| Llama 3 | 128,256 | SentencePiece BPE | ~1.1 |
+| Llama 3 | 128,256 | Byte-level BPE (tiktoken) | ~1.1 |
 | GPT-4o | 200,019 | Byte-level BPE | ~1.0 |
 
 ### The Multilingual Tax
