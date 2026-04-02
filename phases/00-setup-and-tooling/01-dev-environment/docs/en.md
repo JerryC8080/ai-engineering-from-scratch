@@ -7,6 +7,13 @@
 **Prerequisites:** None
 **Time:** ~45 minutes
 
+## Learning Objectives
+
+- Set up Python 3.11+, Node.js 20+, and Rust toolchains from scratch
+- Configure virtual environments and package managers for reproducible builds
+- Verify GPU access with CUDA/MPS and run a test tensor operation
+- Understand the four-layer stack: system, packages, runtimes, AI libraries
+
 ## The Problem
 
 You're about to learn AI engineering across 200+ lessons using Python, TypeScript, Rust, and Julia. If your environment is broken, every single lesson becomes a fight against tooling instead of learning.

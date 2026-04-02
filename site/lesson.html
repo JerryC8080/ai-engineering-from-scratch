@@ -524,6 +524,190 @@
       font-style: italic;
     }
 
+    .learning-objectives {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 20px 0 28px;
+    }
+
+    .learning-objectives-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: #818cf8;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .learning-objectives ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .learning-objectives li {
+      margin-bottom: 6px;
+      color: var(--text-body);
+      line-height: 1.6;
+    }
+
+    [data-theme="light"] .learning-objectives {
+      background: rgba(99, 102, 241, 0.06);
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .lesson-meta-tag.time-tag {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      color: #fbbf24;
+    }
+
+    .quiz-section {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+
+    .quiz-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      color: #10b981;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quiz-question {
+      margin-bottom: 20px;
+    }
+
+    .quiz-question:last-child {
+      margin-bottom: 0;
+    }
+
+    .quiz-question-text {
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-body);
+      font-size: 0.95rem;
+    }
+
+    .quiz-option:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .quiz-option.correct {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+    }
+
+    .quiz-option.incorrect {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.08);
+      color: #ef4444;
+    }
+
+    .quiz-option.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .quiz-option .quiz-marker {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .quiz-option.correct .quiz-marker {
+      border-color: #10b981;
+      background: #10b981;
+      color: #fff;
+    }
+
+    .quiz-option.incorrect .quiz-marker {
+      border-color: #ef4444;
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .quiz-explanation {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: rgba(16, 185, 129, 0.06);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .quiz-score {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      color: #10b981;
+      display: none;
+    }
+
+    .lab-challenge {
+      background: rgba(251, 146, 60, 0.06);
+      border: 2px dashed rgba(251, 146, 60, 0.3);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 28px 0;
+    }
+
+    .lab-challenge h2 {
+      font-family: var(--font-heading);
+      color: #fb923c !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 0 12px !important;
+    }
+
+    [data-theme="light"] .quiz-section {
+      background: rgba(16, 185, 129, 0.04);
+    }
+
+    [data-theme="light"] .lab-challenge {
+      background: rgba(251, 146, 60, 0.04);
+    }
+
     .lesson-article .mermaid-container {
       margin: 24px 0;
       display: flex;
@@ -1647,13 +1831,20 @@
 
       function fetchLesson(path) {
         var rawUrl = 'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/' + path + '/docs/en.md';
-        fetch(rawUrl)
-          .then(function (res) {
-            if (!res.ok) throw new Error('Not found');
-            return res.text();
-          })
-          .then(function (md) {
-            renderLesson(md);
+        var quizUrl = 'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/' + path + '/quiz.json';
+        var lessonPromise = fetch(rawUrl).then(function (res) {
+          if (!res.ok) throw new Error('Not found');
+          return res.text();
+        });
+        var quizPromise = fetch(quizUrl).then(function (res) {
+          if (!res.ok) return null;
+          return res.json();
+        }).catch(function () { return null; });
+
+        Promise.all([lessonPromise, quizPromise])
+          .then(function (results) {
+            renderLesson(results[0]);
+            if (results[1]) renderQuiz(results[1]);
           })
           .catch(function () {
             showError('Lesson not found', 'Could not fetch the lesson at <code>' + escapeHtml(path) + '</code>. It may not have been written yet.');
@@ -1710,6 +1901,13 @@
         var inBlockquote = false;
         var blockquoteLines = [];
         var mermaidBlocks = 0;
+        var inLabChallenge = false;
+
+        function flushLabChallenge() {
+          if (!inLabChallenge) return '';
+          inLabChallenge = false;
+          return '</div>';
+        }
 
         function flushList() {
           if (!inList) return '';
@@ -1826,6 +2024,7 @@
           var h1 = line.match(/^# (.+)/);
           if (h1) {
             out += flushList();
+            out += flushLabChallenge();
             var slug = slugify(h1[1]);
             out += '<h1 id="' + slug + '">' + inlineFormat(h1[1]) + '</h1>';
             continue;
@@ -1840,6 +2039,34 @@
             if (txt.indexOf('build it') >= 0 || txt.indexOf('build ') === 0) sectionClass = ' section-build';
             else if (txt.indexOf('use it') >= 0 || txt.indexOf('use ') === 0) sectionClass = ' section-use';
             else if (txt.indexOf('ship it') >= 0 || txt.indexOf('ship ') === 0) sectionClass = ' section-ship';
+            if (txt.indexOf('learning objectives') >= 0) {
+              var objItems = [];
+              for (var lo = i + 1; lo < lines.length; lo++) {
+                var loLine = lines[lo];
+                if (loLine.match(/^[-*]\s+(.+)/)) {
+                  objItems.push(loLine.replace(/^[-*]\s+/, ''));
+                } else if (loLine.trim() === '') {
+                  continue;
+                } else {
+                  break;
+                }
+              }
+              out += '<div class="learning-objectives"><div class="learning-objectives-title">&#127919; Learning Objectives</div><ul>';
+              for (var oi = 0; oi < objItems.length; oi++) {
+                out += '<li>' + inlineFormat(objItems[oi]) + '</li>';
+              }
+              out += '</ul></div>';
+              i = lo - 1;
+              continue;
+            }
+            if (txt.indexOf('lab challenge') >= 0) {
+              out += flushLabChallenge();
+              inLabChallenge = true;
+              out += '<div class="lab-challenge">';
+              out += '<h2 id="' + slug2 + '">&#128171; Lab Challenge</h2>';
+              continue;
+            }
+            out += flushLabChallenge();
             out += '<h2 id="' + slug2 + '" class="' + sectionClass + '">' + inlineFormat(h2[1]) + '</h2>';
             continue;
           }
@@ -1913,6 +2140,7 @@
         out += flushList();
         out += flushTable();
         out += flushBlockquote();
+        out += flushLabChallenge();
 
         return out;
       }
@@ -2010,6 +2238,113 @@
           });
         }, 100);
         setTimeout(function () { clearInterval(check); }, 10000);
+      }
+
+      function renderQuiz(data) {
+        var questions = data.questions || data;
+        if (!questions || !questions.length) return;
+
+        var article = document.querySelector('.lesson-article');
+        if (!article) return;
+
+        var conceptH2 = article.querySelector('#the-concept, #concept');
+        var buildH2 = article.querySelector('#build-it, #build');
+        var keyTermsH2 = article.querySelector('#key-terms');
+
+        var preQuizHtml = buildQuizHtml(questions.filter(function (q) { return q.stage === 'pre'; }), 'pre', 'Pre-Lesson Check');
+        var postQuizHtml = buildQuizHtml(questions.filter(function (q) { return q.stage === 'post'; }), 'post', 'Post-Lesson Quiz');
+
+        if (!preQuizHtml && !postQuizHtml) {
+          var allHtml = buildQuizHtml(questions, 'all', 'Quiz');
+          if (allHtml && keyTermsH2) {
+            keyTermsH2.insertAdjacentHTML('beforebegin', allHtml);
+          } else if (allHtml) {
+            article.insertAdjacentHTML('beforeend', allHtml);
+          }
+          return;
+        }
+
+        if (preQuizHtml && conceptH2) {
+          conceptH2.insertAdjacentHTML('beforebegin', preQuizHtml);
+        } else if (preQuizHtml && buildH2) {
+          buildH2.insertAdjacentHTML('beforebegin', preQuizHtml);
+        }
+
+        if (postQuizHtml && keyTermsH2) {
+          keyTermsH2.insertAdjacentHTML('beforebegin', postQuizHtml);
+        } else if (postQuizHtml) {
+          article.insertAdjacentHTML('beforeend', postQuizHtml);
+        }
+      }
+
+      function buildQuizHtml(questions, id, title) {
+        if (!questions.length) return '';
+        var html = '<div class="quiz-section" id="quiz-' + id + '">';
+        html += '<div class="quiz-title">&#9989; ' + escapeHtml(title) + '</div>';
+        for (var qi = 0; qi < questions.length; qi++) {
+          var q = questions[qi];
+          var qid = id + '-q' + qi;
+          html += '<div class="quiz-question" data-correct="' + q.correct + '" id="' + qid + '">';
+          html += '<div class="quiz-question-text">' + (qi + 1) + '. ' + escapeHtml(q.question) + '</div>';
+          html += '<div class="quiz-options">';
+          for (var oi = 0; oi < q.options.length; oi++) {
+            html += '<div class="quiz-option" data-index="' + oi + '" onclick="handleQuizClick(this)">';
+            html += '<span class="quiz-marker"></span>';
+            html += '<span>' + escapeHtml(q.options[oi]) + '</span>';
+            html += '</div>';
+          }
+          html += '</div>';
+          if (q.explanation) {
+            html += '<div class="quiz-explanation" id="' + qid + '-exp">' + escapeHtml(q.explanation) + '</div>';
+          }
+          html += '</div>';
+        }
+        html += '<div class="quiz-score" id="quiz-' + id + '-score"></div>';
+        html += '</div>';
+        return html;
+      }
+
+      function handleQuizClick(el) {
+        var questionDiv = el.closest('.quiz-question');
+        if (questionDiv.classList.contains('answered')) return;
+        questionDiv.classList.add('answered');
+
+        var correct = parseInt(questionDiv.getAttribute('data-correct'));
+        var chosen = parseInt(el.getAttribute('data-index'));
+        var options = questionDiv.querySelectorAll('.quiz-option');
+
+        for (var i = 0; i < options.length; i++) {
+          options[i].classList.add('disabled');
+          if (i === correct) {
+            options[i].classList.add('correct');
+            options[i].querySelector('.quiz-marker').textContent = '\u2713';
+          }
+        }
+        if (chosen !== correct) {
+          el.classList.add('incorrect');
+          el.querySelector('.quiz-marker').textContent = '\u2717';
+        }
+
+        var exp = questionDiv.querySelector('.quiz-explanation');
+        if (exp) exp.style.display = 'block';
+
+        var section = questionDiv.closest('.quiz-section');
+        var allQs = section.querySelectorAll('.quiz-question');
+        var answeredQs = section.querySelectorAll('.quiz-question.answered');
+        if (allQs.length === answeredQs.length) {
+          var correctCount = 0;
+          for (var j = 0; j < allQs.length; j++) {
+            var c = parseInt(allQs[j].getAttribute('data-correct'));
+            var picked = allQs[j].querySelector('.quiz-option.correct.disabled:not(.incorrect), .quiz-option[data-index="' + c + '"]');
+            var userPick = allQs[j].querySelector('.quiz-option.incorrect');
+            if (!userPick) correctCount++;
+          }
+          var scoreEl = section.querySelector('.quiz-score');
+          if (scoreEl) {
+            scoreEl.textContent = correctCount + '/' + allQs.length + ' correct';
+            scoreEl.style.display = 'block';
+          }
+        }
       }
 
       function addBottomNav(html) {
