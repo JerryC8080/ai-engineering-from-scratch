@@ -5,6 +5,7 @@
   "installCommand": "echo skip",
   "rewrites": [
     { "source": "/glossary", "destination": "/glossary.html" },
-    { "source": "/catalog", "destination": "/catalog.html" }
+    { "source": "/catalog", "destination": "/catalog.html" },
+    { "source": "/path", "destination": "/prereqs.html" }
   ]
 }
