@@ -6,7 +6,7 @@
 
 # 🧠 AI Engineering from Scratch
 
-### *From linear algebra to autonomous agent swarms — learn AI **with** AI, then ship the tools.*
+### *From linear algebra to autonomous agent swarms. learn AI **with** AI, then ship the tools.*
 
 <br/>
 
@@ -54,7 +54,7 @@
 
 </div>
 
-**260+ lessons. 20 phases. ~290 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable — prompts, skills, agents, MCP servers.
+**260+ lessons. 20 phases. ~290 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, and MCP servers.
 
 You don't just learn AI. You learn AI **with** AI. Then you build real things. Then you ship tools others can use.
 
@@ -806,25 +806,14 @@ We welcome contributions of all kinds — new lessons, translations, fixes, and 
 
 [![Star History Chart](https://api.star-history.com/svg?repos=rohitg00/ai-engineering-from-scratch&type=Date)](https://star-history.com/#rohitg00/ai-engineering-from-scratch&Date)
 
-<br/>
-
-### 🌟 If this helped you, please star the repo — it keeps the project alive.
-
-<br/>
+### 🌟 If this helped you, please star the repo! It keeps the project alive.
 
 ### 💚 Built with care by [Rohit Ghumare](https://github.com/rohitg00) and the community.
 
-<br/>
-
-[![Twitter Follow](https://img.shields.io/twitter/follow/ghumare64?style=for-the-badge&logo=x&labelColor=0D1117&color=1DA1F2)](https://x.com/ghumare64)
+[![Twitter Follow](https://img.shields.io/twitter/follow/ghumare64?style=for-the-badge&logo=x&labelColor=0D1117)](https://x.com/ghumare64)
 [![Website](https://img.shields.io/badge/Website-aiengineeringfromscratch.com-D97757?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=0D1117)](https://aiengineeringfromscratch.com)
-[![GitHub](https://img.shields.io/badge/GitHub-rohitg00-181717?style=for-the-badge&logo=github&labelColor=0D1117)](https://github.com/rohitg00)
-
-<br/>
 
 <sub><b>📜 MIT License</b> — Use it however you want. Fork it. Teach it. Sell it. Ship it.</sub>
-
-<br/>
 
 <sub>✨ <i>From linear algebra to autonomous agent swarms — one lesson at a time.</i> ✨</sub>
 
