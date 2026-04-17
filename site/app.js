@@ -44,11 +44,18 @@
   function computeStats() {
     var totalLessons = 0;
     var completeLessons = 0;
+    var hasProgress = !!window.AIFSProgress;
     for (var i = 0; i < PHASES.length; i++) {
       var lessons = PHASES[i].lessons;
       totalLessons += lessons.length;
       for (var j = 0; j < lessons.length; j++) {
-        if (lessons[j].status === 'complete') completeLessons++;
+        var staticDone = lessons[j].status === 'complete';
+        var userDone = false;
+        if (hasProgress && lessons[j].url) {
+          var lp = window.AIFSProgress.extractPath(lessons[j].url);
+          if (lp) userDone = window.AIFSProgress.isLessonComplete(lp);
+        }
+        if (staticDone || userDone) completeLessons++;
       }
     }
     return {
@@ -90,12 +97,19 @@
     if (!grid) return;
     var html = '';
     var rotations = [-1.5, 0.8, -0.7, 1.2, -1, 0.5, -0.3, 1.4, -1.2, 0.6, -0.8, 1.1, -0.4, 0.9, -1.3, 0.7, -0.6, 1.3, -0.9, 0.4];
+    var hasProgress = !!window.AIFSProgress;
     for (var i = 0; i < PHASES.length; i++) {
       var p = PHASES[i];
       var total = p.lessons.length;
       var done = 0;
       for (var j = 0; j < p.lessons.length; j++) {
-        if (p.lessons[j].status === 'complete') done++;
+        var staticDone = p.lessons[j].status === 'complete';
+        var userDone = false;
+        if (hasProgress && p.lessons[j].url) {
+          var lp = window.AIFSProgress.extractPath(p.lessons[j].url);
+          if (lp) userDone = window.AIFSProgress.isLessonComplete(lp);
+        }
+        if (staticDone || userDone) done++;
       }
       var pct = total > 0 ? Math.round((done / total) * 100) : 0;
       var rot = rotations[i % rotations.length];
@@ -169,41 +183,125 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeModal();
     });
+
+    var resetBtn = document.getElementById('modalReset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!window.AIFSProgress) return;
+        var ok = window.confirm('Clear all your local progress (quiz answers and completed lessons)? This cannot be undone.');
+        if (!ok) return;
+        window.AIFSProgress.reset();
+      });
+    }
   }
+
+  var currentPhaseIdx = -1;
 
   function openModal(idx) {
     var p = PHASES[idx];
     if (!p) return;
+    currentPhaseIdx = idx;
 
     document.getElementById('modalPhaseNum').textContent = 'Phase ' + String(p.id).padStart(2, '0');
     document.getElementById('modalTitle').textContent = p.name;
     document.getElementById('modalDesc').textContent = p.desc;
 
+    renderModalLessons(p);
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function renderModalLessons(p) {
     var container = document.getElementById('modalLessons');
+    if (!container) return;
+
+    var hasProgress = !!window.AIFSProgress;
+    var userDone = 0;
     var html = '';
+
     for (var i = 0; i < p.lessons.length; i++) {
       var l = p.lessons[i];
-      html += '<div class="modal-lesson">';
-      html += '<span class="modal-lesson-status ' + l.status + '"></span>';
+      var pathMatch = l.url ? l.url.match(/(phases\/[^/]+\/[^/]+)\/?$/) : null;
+      var lessonPath = pathMatch ? pathMatch[1] : '';
+      var userComplete = hasProgress && lessonPath && window.AIFSProgress.isLessonComplete(lessonPath);
+      if (userComplete) userDone++;
+
+      var statusClass = l.status;
+      if (userComplete) statusClass = 'complete';
+
+      html += '<div class="modal-lesson' + (userComplete ? ' user-done' : '') + '">';
+      html += '<span class="modal-lesson-status ' + statusClass + '"' + (userComplete ? ' title="You completed this lesson"' : '') + '></span>';
       if (l.url) {
         html += '<a href="' + l.url + '" target="_blank" rel="noopener">' + escapeHtml(l.name) + '</a>';
       } else {
         html += '<a>' + escapeHtml(l.name) + '</a>';
       }
-      if (l.status === 'complete' && l.url) {
-        var pathMatch = l.url.match(/(phases\/[^/]+\/[^/]+)\/?$/);
-        if (pathMatch) {
-          html += '<a href="lesson.html?path=' + pathMatch[1] + '" class="modal-lesson-read">Read</a>';
-        }
-      }
-      html += '<span class="modal-lesson-type">' + escapeHtml(l.type) + '</span>';
+      html += '<span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '">' + escapeHtml(l.type) + '</span>';
       html += '<span class="modal-lesson-lang">' + escapeHtml(l.lang) + '</span>';
+
+      var actionHtml = '';
+      if ((l.status === 'complete' || userComplete) && lessonPath) {
+        actionHtml = '<a href="lesson.html?path=' + lessonPath + '" class="modal-lesson-read">' + (userComplete ? 'Review' : 'Read') + '</a>';
+      }
+      var toggleHtml = '';
+      if (hasProgress && lessonPath) {
+        toggleHtml = '<button type="button" class="modal-lesson-toggle' + (userComplete ? ' done' : '') + '" data-path="' + lessonPath + '" title="' + (userComplete ? 'Mark as not done' : 'Mark complete') + '" aria-label="' + (userComplete ? 'Mark as not done' : 'Mark complete') + '">' + (userComplete ? '\u2713' : '+') + '</button>';
+      }
+      html += (actionHtml || '<span class="modal-lesson-read-placeholder" aria-hidden="true"></span>') + toggleHtml;
       html += '</div>';
     }
+
     container.innerHTML = html;
 
-    document.getElementById('modalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    var toggles = container.querySelectorAll('.modal-lesson-toggle');
+    for (var t = 0; t < toggles.length; t++) {
+      toggles[t].addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var path = this.getAttribute('data-path');
+        if (!path || !window.AIFSProgress) return;
+        if (window.AIFSProgress.isLessonComplete(path)) {
+          window.AIFSProgress.unmarkLessonComplete(path);
+        } else {
+          window.AIFSProgress.markLessonComplete(path);
+        }
+      });
+    }
+
+    var progEl = document.getElementById('modalProgress');
+    var barEl = document.getElementById('modalProgressBar');
+    var barFill = document.getElementById('modalProgressBarFill');
+    if (hasProgress && p.lessons.length > 0) {
+      var pct = Math.round((userDone / p.lessons.length) * 100);
+      if (progEl) {
+        progEl.style.display = '';
+        progEl.innerHTML = '<span class="modal-progress-count">' + userDone + ' / ' + p.lessons.length + '</span> <span class="modal-progress-label">completed by you</span> <span class="modal-progress-pct">' + pct + '%</span>';
+      }
+      if (barEl && barFill) {
+        barEl.style.display = '';
+        barFill.style.width = pct + '%';
+      }
+    } else {
+      if (progEl) progEl.style.display = 'none';
+      if (barEl) barEl.style.display = 'none';
+    }
+  }
+
+  if (window.AIFSProgress) {
+    window.AIFSProgress.onChange(function () {
+      if (currentPhaseIdx >= 0 && PHASES[currentPhaseIdx]) {
+        renderModalLessons(PHASES[currentPhaseIdx]);
+      }
+      updateHeroProgressStat();
+      renderPhases();
+    });
+  }
+
+  function updateHeroProgressStat() {
+    var stats = computeStats();
+    var el = document.querySelector('.stat-number[data-target="complete"]');
+    if (el) el.textContent = String(stats.complete);
   }
 
   function closeModal() {
