@@ -714,6 +714,125 @@
       justify-content: center;
     }
 
+    .mermaid-block {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .mermaid-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .mermaid-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .mermaid-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .mermaid-btn:active {
+      transform: scale(0.98);
+    }
+
+    .mermaid-render {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mermaid-source {
+      display: none;
+    }
+
+    .mermaid-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--overlay-bg);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .mermaid-modal-overlay.open {
+      display: flex;
+    }
+
+    .mermaid-modal {
+      width: min(1100px, 96vw);
+      height: min(760px, 88vh);
+      background: var(--modal-bg);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow-hard-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .mermaid-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .mermaid-modal-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mermaid-modal-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .mermaid-modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 18px;
+      background: var(--bg);
+    }
+
+    .mermaid-modal-center {
+      min-height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mermaid-modal-body svg {
+      max-width: none;
+      height: auto;
+    }
+
     .lesson-article .mermaid-container pre {
       overflow: visible;
       background: none;
@@ -1612,6 +1731,18 @@
 
   <button class="lesson-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">&#9776;</button>
 
+  <div class="mermaid-modal-overlay" id="mermaidModalOverlay" aria-hidden="true">
+    <div class="mermaid-modal" role="dialog" aria-modal="true" aria-label="Expanded diagram">
+      <div class="mermaid-modal-header">
+        <div class="mermaid-modal-title" id="mermaidModalTitle">Diagram</div>
+        <div class="mermaid-modal-actions">
+          <button class="mermaid-btn" type="button" id="mermaidModalClose">Close</button>
+        </div>
+      </div>
+      <div class="mermaid-modal-body" id="mermaidModalBody"><div class="mermaid-modal-center" id="mermaidModalCenter"></div></div>
+    </div>
+  </div>
+
   <div class="lesson-layout">
     <aside class="lesson-sidebar" id="lessonSidebar"></aside>
     <main class="lesson-main">
@@ -1662,6 +1793,7 @@
           root.setAttribute('data-theme', next);
           localStorage.setItem('theme', next);
           updateThemeIcon();
+          updateMermaidThemeAndRerender();
         });
       }
 
@@ -1967,7 +2099,15 @@
               var raw = codeLines.join('\n');
               if (codeLang === 'mermaid') {
                 mermaidBlocks++;
-                out += '<div class="mermaid-container"><pre class="mermaid" id="mermaid-' + mermaidBlocks + '">' + escapeHtml(raw) + '</pre></div>';
+                out += '<div class="mermaid-container">';
+                out += '<div class="mermaid-block" data-mermaid-index="' + mermaidBlocks + '">';
+                out += '<div class="mermaid-toolbar">';
+                out += '<button type="button" class="mermaid-btn mermaid-expand" data-mermaid-index="' + mermaidBlocks + '">Expand</button>';
+                out += '</div>';
+                out += '<pre class="mermaid mermaid-source" id="mermaid-' + mermaidBlocks + '">' + escapeHtml(raw) + '</pre>';
+                out += '<div class="mermaid-render" id="mermaid-render-' + mermaidBlocks + '"></div>';
+                out += '</div>';
+                out += '</div>';
               } else {
                 out += renderCodeBlock(raw, codeLang);
               }
@@ -2216,18 +2356,175 @@
         var check = setInterval(function () {
           if (!window._mermaidReady) return;
           clearInterval(check);
-          var blocks = document.querySelectorAll('.mermaid');
-          blocks.forEach(function (block) {
-            var id = block.id;
-            var def = block.textContent;
-            window._mermaidReady.render(id + '-svg', def).then(function (result) {
-              block.innerHTML = result.svg;
-            }).catch(function () {
-              block.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Diagram could not be rendered.</p>';
-            });
-          });
+          rerenderMermaidBlocks();
+          bindMermaidToolbar();
+          initMermaidModal();
         }, 100);
         setTimeout(function () { clearInterval(check); }, 10000);
+      }
+
+      function mermaidTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'dark';
+      }
+
+      function updateMermaidThemeAndRerender() {
+        if (!window._mermaidReady) return;
+        try {
+          window._mermaidReady.initialize({ startOnLoad: false, theme: mermaidTheme(), fontFamily: 'Patrick Hand, cursive' });
+        } catch (_) {}
+        rerenderMermaidBlocks();
+        rerenderMermaidModal();
+      }
+
+      function rerenderMermaidBlocks() {
+        if (!window._mermaidReady) return;
+        var sources = document.querySelectorAll('pre.mermaid.mermaid-source');
+        sources.forEach(function (pre) {
+          var idxMatch = pre.id && pre.id.match(/mermaid-(\d+)/);
+          var idx = idxMatch ? idxMatch[1] : null;
+          if (!idx) return;
+          var target = document.getElementById('mermaid-render-' + idx);
+          if (!target) return;
+          var def = pre.textContent;
+          target.innerHTML = '<div class="panel-loading">Rendering diagram...</div>';
+
+          var token = ++mermaidRenderSeq;
+          target._mermaidRenderToken = token;
+
+          window._mermaidReady.render('mermaid-' + idx + '-svg', def).then(function (result) {
+            if (target._mermaidRenderToken !== token) return;
+            target.innerHTML = result.svg;
+          }).catch(function () {
+            if (target._mermaidRenderToken !== token) return;
+            target.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Diagram could not be rendered.</p>';
+          });
+        });
+      }
+
+      function bindMermaidToolbar() {
+        document.querySelectorAll('.mermaid-expand').forEach(function (btn) {
+          if (btn._bound) return;
+          btn._bound = true;
+          btn.addEventListener('click', function () {
+            var idx = btn.getAttribute('data-mermaid-index');
+            openMermaidModal(idx, btn);
+          });
+        });
+      }
+
+      function initMermaidModal() {
+        var overlay = document.getElementById('mermaidModalOverlay');
+        var closeBtn = document.getElementById('mermaidModalClose');
+        if (!overlay || !closeBtn) return;
+        if (overlay._bound) return;
+        overlay._bound = true;
+
+        closeBtn.addEventListener('click', closeMermaidModal);
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeMermaidModal();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (!overlay.classList.contains('open')) return;
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeMermaidModal();
+            return;
+          }
+
+          if (e.key === 'Tab') {
+            var focusables = getMermaidModalFocusables();
+            if (!focusables.length) return;
+            var first = focusables[0];
+            var last = focusables[focusables.length - 1];
+            var active = document.activeElement;
+
+            if (e.shiftKey) {
+              if (active === first || active === overlay) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (active === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        });
+      }
+
+      var lastMermaidTrigger = null;
+      var openMermaidIndex = null;
+      var mermaidRenderSeq = 0;
+
+      function getMermaidModalFocusables() {
+        var modal = document.querySelector('#mermaidModalOverlay .mermaid-modal');
+        if (!modal) return [];
+        return Array.prototype.slice.call(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+          .filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+      }
+
+      function openMermaidModal(idx, triggerEl) {
+        var overlay = document.getElementById('mermaidModalOverlay');
+        var body = document.getElementById('mermaidModalBody');
+        var center = document.getElementById('mermaidModalCenter');
+        var title = document.getElementById('mermaidModalTitle');
+        var closeBtn = document.getElementById('mermaidModalClose');
+        var pre = document.getElementById('mermaid-' + idx);
+        if (!overlay || !body || !center || !pre || !closeBtn) return;
+
+        lastMermaidTrigger = triggerEl || document.activeElement;
+        openMermaidIndex = idx;
+
+        if (title) title.textContent = 'Diagram';
+
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        closeBtn.focus();
+
+        rerenderMermaidModal();
+      }
+
+      function rerenderMermaidModal() {
+        var overlay = document.getElementById('mermaidModalOverlay');
+        var center = document.getElementById('mermaidModalCenter');
+        if (!overlay || !center) return;
+        if (!overlay.classList.contains('open')) return;
+        if (!openMermaidIndex) return;
+        if (!window._mermaidReady) return;
+
+        var pre = document.getElementById('mermaid-' + openMermaidIndex);
+        if (!pre) return;
+        var def = pre.textContent;
+
+        center.innerHTML = '<div class="panel-loading">Rendering diagram...</div>';
+        var token = ++mermaidRenderSeq;
+        center._mermaidRenderToken = token;
+
+        window._mermaidReady.render('mermaid-modal-svg', def).then(function (result) {
+          if (center._mermaidRenderToken !== token) return;
+          center.innerHTML = result.svg;
+        }).catch(function () {
+          if (center._mermaidRenderToken !== token) return;
+          center.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Diagram could not be rendered.</p>';
+        });
+      }
+
+      function closeMermaidModal() {
+        var overlay = document.getElementById('mermaidModalOverlay');
+        var center = document.getElementById('mermaidModalCenter');
+        if (!overlay) return;
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        if (center) center.innerHTML = '';
+        document.body.style.overflow = '';
+        openMermaidIndex = null;
+
+        if (lastMermaidTrigger && typeof lastMermaidTrigger.focus === 'function') {
+          lastMermaidTrigger.focus();
+        }
       }
 
       function renderQuiz(data) {
