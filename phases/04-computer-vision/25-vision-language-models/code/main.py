@@ -30,6 +30,8 @@ class ToyVLM(nn.Module):
 
 def cross_modal_error_rate(image_emb, text_emb, text_confidence,
                            sim_threshold=0.25, conf_threshold=0.8):
+    image_emb = F.normalize(image_emb, dim=-1)
+    text_emb = F.normalize(text_emb, dim=-1)
     sim = (image_emb * text_emb).sum(dim=-1)
     high_conf_low_sim = (text_confidence > conf_threshold) & (sim < sim_threshold)
     return high_conf_low_sim.float().mean().item()
