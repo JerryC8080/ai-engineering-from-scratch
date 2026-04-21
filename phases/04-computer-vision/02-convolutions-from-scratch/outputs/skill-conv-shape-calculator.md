@@ -34,9 +34,11 @@ A deterministic helper for planning or debugging a CNN. Given an input shape and
 
 2. **For each layer**, update in this order:
    - Compute `C_out` (conv/linear), or carry `C_in` through (pool).
-   - Compute spatial output using `(H + 2P - K) / S + 1` for conv and pool, `out_h/out_w` for adaptive pool, 1x1 for linear.
-   - Update receptive field: `RF_new = RF_old + (K - 1) * effective_stride`.
-   - Update effective stride: `effective_stride *= S`.
+   - Compute spatial output using `(H + 2P - K) / S + 1` for conv and pool, `out_h/out_w` for adaptive pool, `(1, 1)` for flatten output shape `(C * H * W, 1, 1)` before the linear, and scalar `1x1` for linear.
+   - Update receptive field and effective stride:
+     - Conv/pool: `RF_new = RF_old + (K - 1) * effective_stride`, `effective_stride *= S`.
+     - Adaptive pool: treat as a pool with effective `S = H_in / out_h` (round down). `RF_new = RF_old + (H_in - 1) * effective_stride_old`; `effective_stride *= S`. Note that adaptive pool's RF equals the full previous spatial extent.
+     - Flatten / linear: RF and effective stride are no longer meaningful; freeze them to the values before the flatten and omit from subsequent rows.
    - Compute params:
      - Conv: `C_out * (C_in / groups) * K * K + (C_out if bias else 0)`.
      - Linear: `out_features * in_features + (out_features if bias else 0)`.
