@@ -163,6 +163,8 @@ def rope_3d(tokens, t_dim, h_dim, w_dim, grid):
     """
     T, H, W = grid
     n, seq, d = tokens.shape
+    if t_dim + h_dim + w_dim != d:
+        raise ValueError(f"t_dim+h_dim+w_dim ({t_dim}+{h_dim}+{w_dim}) must equal D={d}")
     assert seq == T * H * W
     t_idx = torch.arange(T, device=tokens.device).repeat_interleave(H * W)
     h_idx = torch.arange(H, device=tokens.device).repeat_interleave(W).repeat(T)
@@ -182,9 +184,6 @@ Simplified additive form. Real RoPE rotates paired channels at frequencies; the 
 ### Step 3: Divided attention block
 
 ```python
-import torch.nn.functional as F
-
-
 class DividedAttentionBlock(nn.Module):
     def __init__(self, dim=64, heads=2):
         super().__init__()
