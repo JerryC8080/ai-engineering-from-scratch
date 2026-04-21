@@ -91,26 +91,38 @@ Progress tracking for every phase and lesson.
 | 12 | Introduction to JAX | ✅ | ~75 min |
 | 13 | Debugging Neural Networks | ✅ | ~75 min |
 
-## Phase 4: Computer Vision — ⬚ (~19 hours)
+## Phase 4: Computer Vision — ✅ (~27 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Image Fundamentals — Pixels, Channels, Color Spaces | ⬚ | ~45 min |
-| 02 | Convolutions from Scratch | ⬚ | ~75 min |
-| 03 | CNNs — LeNet to ResNet | ⬚ | ~75 min |
-| 04 | Image Classification | ⬚ | ~75 min |
-| 05 | Transfer Learning & Fine-Tuning | ⬚ | ~75 min |
-| 06 | Object Detection — YOLO from Scratch | ⬚ | ~75 min |
-| 07 | Semantic Segmentation — U-Net | ⬚ | ~75 min |
-| 08 | Instance Segmentation — Mask R-CNN | ⬚ | ~75 min |
-| 09 | Image Generation — GANs | ⬚ | ~75 min |
-| 10 | Image Generation — Diffusion Models | ⬚ | ~75 min |
-| 11 | Stable Diffusion — Architecture & Fine-Tuning | ⬚ | ~75 min |
-| 12 | Video Understanding — Temporal Modeling | ⬚ | ~45 min |
-| 13 | 3D Vision — Point Clouds, NeRFs | ⬚ | ~45 min |
-| 14 | Vision Transformers (ViT) | ⬚ | ~45 min |
-| 15 | Real-Time Vision — Edge Deployment | ⬚ | ~75 min |
-| 16 | Build a Complete Vision Pipeline | ⬚ | ~120 min |
+| 01 | Image Fundamentals — Pixels, Channels, Color Spaces | ✅ | ~45 min |
+| 02 | Convolutions from Scratch | ✅ | ~75 min |
+| 03 | CNNs — LeNet to ResNet | ✅ | ~75 min |
+| 04 | Image Classification | ✅ | ~75 min |
+| 05 | Transfer Learning & Fine-Tuning | ✅ | ~75 min |
+| 06 | Object Detection — YOLO from Scratch | ✅ | ~75 min |
+| 07 | Semantic Segmentation — U-Net | ✅ | ~75 min |
+| 08 | Instance Segmentation — Mask R-CNN | ✅ | ~75 min |
+| 09 | Image Generation — GANs | ✅ | ~75 min |
+| 10 | Image Generation — Diffusion Models | ✅ | ~75 min |
+| 11 | Stable Diffusion — Architecture & Fine-Tuning | ✅ | ~75 min |
+| 12 | Video Understanding — Temporal Modeling | ✅ | ~45 min |
+| 13 | 3D Vision — Point Clouds, NeRFs | ✅ | ~45 min |
+| 14 | Vision Transformers (ViT) | ✅ | ~45 min |
+| 15 | Real-Time Vision — Edge Deployment | ✅ | ~75 min |
+| 16 | Build a Complete Vision Pipeline | ✅ | ~120 min |
+| 17 | Self-Supervised Vision — SimCLR, DINO, MAE | ✅ | ~75 min |
+| 18 | Open-Vocabulary Vision — CLIP | ✅ | ~45 min |
+| 19 | OCR & Document Understanding | ✅ | ~45 min |
+| 20 | Image Retrieval & Metric Learning | ✅ | ~45 min |
+| 21 | Keypoint Detection & Pose Estimation | ✅ | ~45 min |
+| 22 | 3D Gaussian Splatting from Scratch | ✅ | ~90 min |
+| 23 | Diffusion Transformers & Rectified Flow | ✅ | ~75 min |
+| 24 | SAM 3 & Open-Vocabulary Segmentation | ✅ | ~60 min |
+| 25 | Vision-Language Models (ViT-MLP-LLM) | ✅ | ~75 min |
+| 26 | Monocular Depth & Geometry Estimation | ✅ | ~60 min |
+| 27 | Multi-Object Tracking & Video Memory | ✅ | ~60 min |
+| 28 | World Models & Video Diffusion | ✅ | ~75 min |
 
 ## Phase 5: NLP — Foundations to Advanced — ⬚ (~19 hours)
 
@@ -369,6 +381,6 @@ Progress tracking for every phase and lesson.
 
 ---
 
-**Total: 20 phases, 260+ lessons | 96 complete | ~290 hours estimated**
+**Total: 20 phases, 272+ lessons | 124 complete | ~306 hours estimated**
 
 Want to help? Pick any ⬚ lesson and submit a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).

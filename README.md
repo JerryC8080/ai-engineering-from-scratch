@@ -54,7 +54,7 @@
 
 </div>
 
-**260+ lessons. 20 phases. ~290 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, and MCP servers.
+**272+ lessons. 20 phases. ~306 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, and MCP servers.
 
 You don't just learn AI. You learn AI **with** AI. Then you build real things. Then you ship tools others can use.
 
@@ -158,7 +158,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </tr>
 </table>
 
-> 277-term searchable glossary. Full lesson catalog. ~290 hours of content with per-lesson time estimates.<br/>
+> 277-term searchable glossary. Full lesson catalog. ~306 hours of content with per-lesson time estimates.<br/>
 > 🌐 [**Browse the website →**](https://aiengineeringfromscratch.com)
 
 ---
@@ -167,7 +167,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 
 ## 🗺️ The Journey
 
-### *20 phases · 260+ lessons · click any phase to expand*
+### *20 phases · 272+ lessons · click any phase to expand*
 
 [![Phase 0](https://img.shields.io/badge/0-Setup-95A5A6?style=flat-square)](#phase-0)
 [![Phase 1](https://img.shields.io/badge/1-Math-9B59B6?style=flat-square)](#phase-1)
@@ -302,7 +302,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </details>
 
 <details id="phase-4">
-<summary><b>🟠 Phase 4 — Computer Vision</b> &nbsp;<code>16 lessons</code>&nbsp; <em>From pixels to understanding — image, video, and 3D.</em></summary>
+<summary><b>🟠 Phase 4 — Computer Vision</b> &nbsp;<code>28 lessons</code>&nbsp; <em>From pixels to understanding — image, video, 3D, VLMs, and world models.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -323,6 +323,18 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 | 14 | Vision Transformers (ViT) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 | 15 | Real-Time Vision: Edge Deployment | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 🦀 |
 | 16 | Build a Complete Vision Pipeline | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 17 | Self-Supervised Vision — SimCLR, DINO, MAE | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 18 | Open-Vocabulary Vision — CLIP | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 19 | OCR & Document Understanding | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 20 | Image Retrieval & Metric Learning | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 21 | Keypoint Detection & Pose Estimation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 22 | 3D Gaussian Splatting from Scratch | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 23 | Diffusion Transformers & Rectified Flow | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 24 | SAM 3 & Open-Vocabulary Segmentation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 25 | Vision-Language Models (ViT-MLP-LLM) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 26 | Monocular Depth & Geometry Estimation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 27 | Multi-Object Tracking & Video Memory | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 28 | World Models & Video Diffusion | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 
 </details>
 
@@ -733,7 +745,7 @@ This 10-question quiz maps your knowledge to a starting phase and builds a perso
 
 | 🧑‍💻 You are... | 🚪 Start at... | ⏱️ Time to complete |
 |---------------|----------------|---------------------|
-| 🌱 New to programming + AI | Phase 0 (Setup) | ~290 hours |
+| 🌱 New to programming + AI | Phase 0 (Setup) | ~306 hours |
 | 🐍 Know Python, new to ML | Phase 1 (Math) | ~270 hours |
 | 📊 Know ML, new to DL | Phase 3 (Deep Learning) | ~200 hours |
 | 🧠 Know DL, want LLMs/agents | Phase 10 (LLMs from Scratch) | ~100 hours |
