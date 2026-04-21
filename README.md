@@ -307,34 +307,34 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | Image Fundamentals: Pixels, Channels, Color Spaces | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
-| 02 | Convolutions from Scratch | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 03 | CNNs: LeNet to ResNet | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 04 | Image Classification | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 05 | Transfer Learning & Fine-Tuning | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 06 | Object Detection — YOLO from Scratch | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 07 | Semantic Segmentation — U-Net | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 08 | Instance Segmentation — Mask R-CNN | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 09 | Image Generation — GANs | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 10 | Image Generation — Diffusion Models | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 11 | Stable Diffusion — Architecture & Fine-Tuning | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 12 | Video Understanding — Temporal Modeling | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 13 | 3D Vision: Point Clouds, NeRFs | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 14 | Vision Transformers (ViT) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 15 | Real-Time Vision: Edge Deployment | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 🦀 |
-| 16 | Build a Complete Vision Pipeline | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 17 | Self-Supervised Vision — SimCLR, DINO, MAE | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 18 | Open-Vocabulary Vision — CLIP | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 19 | OCR & Document Understanding | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 20 | Image Retrieval & Metric Learning | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 21 | Keypoint Detection & Pose Estimation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 22 | 3D Gaussian Splatting from Scratch | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 23 | Diffusion Transformers & Rectified Flow | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 24 | SAM 3 & Open-Vocabulary Segmentation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 25 | Vision-Language Models (ViT-MLP-LLM) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 26 | Monocular Depth & Geometry Estimation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 27 | Multi-Object Tracking & Video Memory | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 28 | World Models & Video Diffusion | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 01 | [Image Fundamentals: Pixels, Channels, Color Spaces](phases/04-computer-vision/01-image-fundamentals/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 02 | [Convolutions from Scratch](phases/04-computer-vision/02-convolutions-from-scratch/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 03 | [CNNs: LeNet to ResNet](phases/04-computer-vision/03-cnns-lenet-to-resnet/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 04 | [Image Classification](phases/04-computer-vision/04-image-classification/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 05 | [Transfer Learning & Fine-Tuning](phases/04-computer-vision/05-transfer-learning/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 06 | [Object Detection — YOLO from Scratch](phases/04-computer-vision/06-object-detection-yolo/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 07 | [Semantic Segmentation — U-Net](phases/04-computer-vision/07-semantic-segmentation-unet/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 08 | [Instance Segmentation — Mask R-CNN](phases/04-computer-vision/08-instance-segmentation-mask-rcnn/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 09 | [Image Generation — GANs](phases/04-computer-vision/09-image-generation-gans/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 10 | [Image Generation — Diffusion Models](phases/04-computer-vision/10-image-generation-diffusion/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 11 | [Stable Diffusion — Architecture & Fine-Tuning](phases/04-computer-vision/11-stable-diffusion/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 12 | [Video Understanding — Temporal Modeling](phases/04-computer-vision/12-video-understanding/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 13 | [3D Vision: Point Clouds, NeRFs](phases/04-computer-vision/13-3d-vision-nerf/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 14 | [Vision Transformers (ViT)](phases/04-computer-vision/14-vision-transformers/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 15 | [Real-Time Vision: Edge Deployment](phases/04-computer-vision/15-real-time-edge/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 🦀 |
+| 16 | [Build a Complete Vision Pipeline](phases/04-computer-vision/16-vision-pipeline-capstone/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 17 | [Self-Supervised Vision — SimCLR, DINO, MAE](phases/04-computer-vision/17-self-supervised-vision/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 18 | [Open-Vocabulary Vision — CLIP](phases/04-computer-vision/18-open-vocab-clip/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 19 | [OCR & Document Understanding](phases/04-computer-vision/19-ocr-document-understanding/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 20 | [Image Retrieval & Metric Learning](phases/04-computer-vision/20-image-retrieval-metric/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 21 | [Keypoint Detection & Pose Estimation](phases/04-computer-vision/21-keypoint-pose/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 22 | [3D Gaussian Splatting from Scratch](phases/04-computer-vision/22-3d-gaussian-splatting/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 23 | [Diffusion Transformers & Rectified Flow](phases/04-computer-vision/23-diffusion-transformers-rectified-flow/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 24 | [SAM 3 & Open-Vocabulary Segmentation](phases/04-computer-vision/24-sam3-open-vocab-segmentation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 25 | [Vision-Language Models (ViT-MLP-LLM)](phases/04-computer-vision/25-vision-language-models/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 26 | [Monocular Depth & Geometry Estimation](phases/04-computer-vision/26-monocular-depth/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 27 | [Multi-Object Tracking & Video Memory](phases/04-computer-vision/27-multi-object-tracking/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 28 | [World Models & Video Diffusion](phases/04-computer-vision/28-world-models-video-diffusion/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 
 </details>
 
