@@ -23,7 +23,7 @@
     },
     {
       "stage": "post",
-      "question": "You fine-tune a ResNet on a medical dataset of 800 grayscale images (replicated to 3 channels). Accuracy is 10% (random). What is the most likely cause?",
+      "question": "You fine-tune a ResNet on a 10-class medical dataset of 800 grayscale images (replicated to 3 channels). Accuracy is 10% (random chance for 10 classes). What is the most likely cause?",
       "options": ["You used the wrong loss function", "BatchNorm running statistics are from ImageNet RGB photos and badly mismatch the grayscale-medical distribution, so the first few BN layers produce noise that propagates forward", "ResNet cannot handle grayscale input", "800 images is simply too few for any transfer learning"],
       "correct": 1,
       "explanation": "BatchNorm keeps running_mean and running_var from ImageNet. On a small, distribution-shifted dataset those buffers never adapt fast enough during a short fine-tune, and BN normalises activations with the wrong stats. Fixes: freeze BN statistics, switch to GroupNorm, or pretrain BN stats with a BN-only warmup pass on the target dataset."

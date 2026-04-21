@@ -40,7 +40,7 @@ Transfer-learning bugs hide in three places: parameters that should be frozen bu
 4. **Detect the four failure modes:**
    - `leaked_train`: a param has `requires_grad=True` but does not appear in the optimizer (gradient is computed but never applied).
    - `ghost_train`: a param appears in the optimizer but has `requires_grad=False` (optimizer state is wasted; can also cause bugs if you later re-enable requires_grad).
-   - `bn_mismatch`: a BN layer is in train mode (accumulates running stats) but its affine parameters are frozen — or the reverse.
+   - `bn_mismatch`: either (a) a BN layer is in train mode (accumulates running stats) while its affine parameters (`weight`, `bias`) are frozen, or (b) a BN layer is in eval mode (frozen stats) while its affine parameters are trainable. Both states are inconsistent and almost always a bug.
    - `expected_vs_actual`: any prefix listed in `expected_frozen_prefixes` still has a trainable parameter.
 
 ## Report
