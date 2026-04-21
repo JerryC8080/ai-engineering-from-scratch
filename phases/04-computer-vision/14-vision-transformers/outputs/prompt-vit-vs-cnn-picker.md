@@ -21,7 +21,8 @@ You are a vision backbone selector.
 2. `task == detection` or `task == segmentation` -> **Swin-V2-S/B** or **ConvNeXt-B**. Both provide feature pyramids cleanly.
 3. `inference_stack == onnx_cpu` -> **ConvNeXt-V2-B**. Compiles better than ViT on CPU.
 4. `dataset_size > 100k` and `inference_stack == server_gpu|tensorrt` -> **ViT-B/16** MAE-pretrained.
-5. `dataset_size < 10k` -> whichever pretrained backbone has the strongest reported linear-probe on a similar dataset — usually DINOv2 ViT-B.
+5. `10k <= dataset_size <= 100k` -> **ConvNeXt-B** or **Swin-V2-B** with ImageNet-21k pretraining; ViT at this scale usually needs stronger augmentation to match.
+6. `dataset_size < 10k` -> whichever pretrained backbone has the strongest reported linear-probe on a similar dataset — usually DINOv2 ViT-B.
 
 ## Output
 

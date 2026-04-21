@@ -26,7 +26,7 @@ The most common ViT porting bug: loading a checkpoint pretrained at 224x224 into
 ## Steps
 
 1. Locate the patch embedding conv inside the model. Report its `kernel_size`, `stride`, `in_channels`, `out_channels`.
-2. Compute the expected number of patches: `(image_size / patch_size)^2`.
+2. Compute the expected number of patches. For a square image: `(image_size / patch_size)^2`. For a rectangle: `(H / patch_size) * (W / patch_size)`. Require `H % patch_size == 0` and `W % patch_size == 0`; otherwise flag and refuse.
 3. Locate the learned positional embedding. Report its shape `(1, N, dim)`.
 4. Compare `N` against `num_patches + 1` (with CLS) or `num_patches` (without CLS). Mismatch means the checkpoint was pretrained at a different resolution or patch size.
 5. Check that `out_channels` of the patch conv equals `dim` of the positional embedding.
