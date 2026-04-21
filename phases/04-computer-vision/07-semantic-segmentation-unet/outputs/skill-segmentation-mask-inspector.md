@@ -27,7 +27,7 @@ A diagnostic for the gap between "the loss went down" and "the masks actually lo
 
 ## Steps
 
-1. **Class pixel histograms.** Compute the percentage of pixels per class for `preds` and `targets`. Flag any class whose predicted share differs from ground truth by more than 30% relative.
+1. **Class pixel histograms.** Compute the percentage of pixels per class for `preds` and `targets`. Flag any class where `|pred% - gt%| / max(gt%, 1e-6) > 0.30` (relative deviation above 30%). For classes absent from ground truth (`gt% == 0`), flag any predicted share above `0.3` directly.
 
 2. **IoU per class** and **boundary F1 per class**. Boundary F1 is computed by dilating each mask by 3 pixels, intersecting, and scoring. Classes with IoU > 0.7 but boundary F1 < 0.5 are blurring edges.
 
@@ -35,7 +35,7 @@ A diagnostic for the gap between "the loss went down" and "the masks actually lo
 
 4. **Confusion pairs.** For each class, find the class it most often confuses with (most common wrong predicted class within its ground-truth mask). Report the top 3 pairs.
 
-5. **Saturation check.** Fraction of predictions that are exactly argmax-zero probability; high saturation (>0.9 for a class) suggests overconfidence, a candidate for label smoothing or calibration.
+5. **Saturation check (requires `probs` or `logits`, not just `preds`).** If the caller passes the raw per-pixel probability distribution `probs: (N, C, H, W)`, compute the fraction of pixels where `probs.max(dim=1) > 0.99` per class. High saturation (>0.9 of a class's pixels) suggests overconfidence — candidate for label smoothing or calibration. When only argmaxed `preds` are available, skip this step and note it in the report.
 
 ## Report format
 
@@ -48,7 +48,7 @@ A diagnostic for the gap between "the loss went down" and "the masks actually lo
   ...
 
 [metrics]
-  class       IoU     bF1    recall_tiny  recall_small  recall_large
+  class       IoU     bF1    recall_tiny  recall_small  recall_medium  recall_large
   ...
 
 [confusion pairs]
