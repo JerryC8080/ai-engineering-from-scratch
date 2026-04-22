@@ -48,6 +48,16 @@ Moshi (Kyutai, 2024) clocked 200 ms full-duplex. GPT-4o-realtime (2024) clocks ~
 - **TTS priming.** Even fast TTS like Kokoro has a 100–200 ms warm-up on first request. Cache model + warm it with a dummy run before the first real turn.
 - **Echo cancellation.** Without AEC, TTS output re-enters the mic and triggers ASR on the bot's own voice. WebRTC AEC3 is the open-source default.
 
+### The right latency metrics to report
+
+Real-time pipelines have two user-visible numbers and one capacity number. Borrow the vocabulary from LLM inference (stas00's ML Engineering book calls these out explicitly):
+
+- **TTFT (Time To First Token).** For voice: time from "user finishes speaking" to "first audio byte plays." This is what the user actually feels. Target `< 500 ms` on a laptop.
+- **TPOT (Time Per Output Token).** For voice: time between consecutive TTS audio chunks. Should be faster than listening speed (≈60 ms per token at normal speech rate). If TPOT is slower than TPS of listening, the pipeline under-runs and you get gaps.
+- **Throughput (concurrent sessions).** Sessions-per-GPU. Only matters when you multi-tenant. For a single-user laptop demo, ignore.
+
+Always report **P50 / P95 / P99 latency**, never a bare average. Benchmarks that quote "350 ms average latency" often hide a 1.5 s P99 that ruins 1 in 20 turns. `http_req_duration..: avg=13.74s med=13.81s p(90)=13.79s p(95)=13.83s` is the shape of report you want from `k6` or equivalent.
+
 ## Build It
 
 ### Step 1: ring buffer
@@ -168,3 +178,4 @@ Save as `outputs/skill-realtime-designer.md`. Design a real-time audio pipeline 
 - [LiveKit Agents framework (2024)](https://docs.livekit.io/agents/) — production audio agent orchestration.
 - [Silero VAD repo](https://github.com/snakers4/silero-vad) — sub-1 ms VAD, Apache 2.0.
 - [WebRTC AEC3 paper](https://webrtc.googlesource.com/src/+/main/modules/audio_processing/aec3/) — echo cancellation under open source.
+- [Stas ML Engineering — inference chapter](https://github.com/stas00/ml-engineering/blob/master/inference/README.md) — TTFT / TPOT / prefill-vs-decode / percentile reporting; the vocabulary that applies directly to voice pipelines.
