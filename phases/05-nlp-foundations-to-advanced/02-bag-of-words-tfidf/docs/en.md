@@ -48,7 +48,7 @@ def build_vocab(docs):
     return vocab
 ```
 
-Input: list of tokenized documents (reuse `tokenize` from lesson 01). Output: `{word: index}` dict. Stable insertion order means word index 0 is the first word seen in the first document. Convention varies; scikit-learn sorts alphabetically.
+Input: list of tokenized documents (any word-level tokenizer will do; the `code/main.py` in this lesson uses a simplified lowercase variant). Output: `{word: index}` dict. Stable insertion order means word index 0 is the first word seen in the first document. Convention varies; scikit-learn sorts alphabetically.
 
 ### Step 2: bag of words
 
