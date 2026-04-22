@@ -9,10 +9,20 @@ def softmax(scores):
 
 
 def dot(a, b):
+    if len(a) != len(b):
+        raise ValueError(f"dot: length mismatch {len(a)} vs {len(b)}")
     return sum(x * y for x, y in zip(a, b))
 
 
 def dot_attention(decoder_state, encoder_states):
+    if not encoder_states:
+        raise ValueError("dot_attention: encoder_states must not be empty")
+    d_s = len(decoder_state)
+    for i, h in enumerate(encoder_states):
+        if len(h) != d_s:
+            raise ValueError(
+                f"dot_attention: encoder_states[{i}] length {len(h)} != decoder_state length {d_s}"
+            )
     scores = [dot(decoder_state, h) for h in encoder_states]
     weights = softmax(scores)
     dim = len(encoder_states[0])
@@ -24,6 +34,9 @@ def dot_attention(decoder_state, encoder_states):
 
 
 def matvec(M, v):
+    for i, row in enumerate(M):
+        if len(row) != len(v):
+            raise ValueError(f"matvec: row {i} length {len(row)} != vector length {len(v)}")
     return [sum(M[i][j] * v[j] for j in range(len(v))) for i in range(len(M))]
 
 
@@ -57,7 +70,7 @@ def main():
 
     print("=== Luong dot attention ===")
     for name, s in [("close to 'cat'", [0.9, 0.1, 0.2]), ("close to 'mat'", [0.1, 0.9, 0.3]), ("neutral", [0.4, 0.4, 0.2])]:
-        context, weights = dot_attention(s, H)
+        _, weights = dot_attention(s, H)
         pretty = {p: round(w, 3) for p, w in zip(positions, weights)}
         print(f"  decoder state {name:20s} -> weights {pretty}")
 

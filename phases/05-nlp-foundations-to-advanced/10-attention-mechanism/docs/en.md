@@ -92,7 +92,7 @@ def dot_attention(decoder_state, encoder_states):
 
 
 def general_attention(decoder_state, encoder_states, W):
-    projected = W @ decoder_state
+    projected = W.T @ decoder_state
     scores = encoder_states @ projected
     weights = softmax(scores)
     return weights @ encoder_states, weights
