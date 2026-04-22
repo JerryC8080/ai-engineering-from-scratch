@@ -133,6 +133,16 @@ Save `outputs/skill-video-brief.md`. Skill takes a video brief (duration, aspect
 | Re-captioning | "Dense captions" | Using an LLM to re-label training clips with detailed prompts. |
 | Flicker | "Temporal artifact" | Frame-to-frame inconsistency; fixed with coupled denoising. |
 
+## Production note: video latents are a memory-bandwidth problem
+
+A 10-second 1080p clip at 24 fps is 240 frames × 1920 × 1080 × 3 ≈ 1.5 GB of raw pixels. After a 4× video VAE compression (`2 × spatial × 2 × temporal`) the latent is ~100 MB per request. Run this through a spatiotemporal DiT for 30 steps at batch 1 and you are moving ~3 GB/step through HBM — memory bandwidth, not FLOPs, is the bottleneck.
+
+Three production knobs, all straight from stas00's ml-engineering inference chapter:
+
+- **TP across the DiT.** Text-to-video models are routinely ≥10B params. TP=4 across 4 H100s is standard; PP=2 × TP=2 for 405B-class models. Latency per step drops roughly linearly with TP up to the all-reduce wall.
+- **Frame batching = continuous batching.** At generation time, video is conceptually a batch of frames linked by attention. Continuous batching (in-flight scheduling) applies: start rendering frame `t+1` while frame `t-1` is being returned, if the model architecture allows sliding-window generation.
+- **Clip-level prefill cache.** For image-to-video, the first-frame conditioning is analogous to an LLM's prompt prefill: compute it once, reuse across the temporal decoder passes. This is effectively a KV-cache for video.
+
 ## Further Reading
 
 - [Brooks et al. (2024). Video generation models as world simulators](https://openai.com/index/video-generation-models-as-world-simulators/) — Sora technical report.
@@ -142,3 +152,5 @@ Save `outputs/skill-video-brief.md`. Skill takes a video brief (duration, aspect
 - [Alibaba (2025). WAN 2.2](https://wanvideo.io/) — open SOTA mid-2025.
 - [Ho, Salimans, Gritsenko et al. (2022). Video Diffusion Models](https://arxiv.org/abs/2204.03458) — the seminal video diffusion paper.
 - [Blattmann et al. (2023). Align your Latents (Video LDM)](https://arxiv.org/abs/2304.08818) — Stable Video Diffusion's ancestor.
+- [Niels Transformers-Tutorials — Quick inference with VideoMAE](https://github.com/NielsRogge/Transformers-Tutorials/blob/master/VideoMAE/Quick_inference_with_VideoMAE.ipynb) — masked-video-autoencoder recognition pipeline. The tube-masking + temporal encoder pattern is the ancestor of the spatiotemporal-patch tokenizers used by Sora / CogVideoX / WAN — useful reference for understanding video-latent structure before jumping to the trillion-FLOP DiTs.
+- [stas00 ml-engineering — Pipeline parallelism](https://github.com/stas00/ml-engineering/blob/master/inference/README.md#pipeline-parallelism) — PP for inference (no backward-pass bubble). Essential for serving 30B+ video DiTs where TP alone hits the all-reduce wall.
