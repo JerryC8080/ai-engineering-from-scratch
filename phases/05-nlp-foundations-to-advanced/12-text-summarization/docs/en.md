@@ -110,6 +110,18 @@ print({k: round(v.fmeasure, 3) for k, v in scores.items()})
 
 Always use stemming. Without it, "running" and "run" count as different words and ROUGE undercounts.
 
+### Beyond ROUGE (2026 summarization eval)
+
+ROUGE has been the dominant summarization metric for twenty years and it is insufficient on its own in 2026. A large-scale meta-analysis of NLG papers showed:
+
+- **BERTScore** (contextual embedding similarity) gained ground through 2023 and is now reported alongside ROUGE in most summarization papers.
+- **BARTScore** treats evaluation as generation: score the summary by how likely a pre-trained BART assigns it given the source.
+- **MoverScore** (Earth Mover's Distance over contextual embeddings) reached the top spot in 2025 summarization benchmarks because it captures semantic overlap better than ROUGE.
+- **FactCC** and **QA-based faithfulness** were common 2021-2023, now often replaced by **G-Eval** (a GPT-4 prompt chain that scores coherence, consistency, fluency, relevance with chain-of-thought reasoning).
+- **G-Eval** and similar LLM-judge approaches match human judgment ~80% of the time when rubrics are well-designed.
+
+Production recommendation: report ROUGE-L for legacy comparison, BERTScore for semantic overlap, G-Eval for coherence and factuality. Calibrate against 50-100 human-labeled summaries.
+
 ### Step 4: the factuality problem
 
 Abstractive summaries hallucinate. Extractive summaries do not. This is the single biggest reason production systems still use extractive methods for anything compliance-adjacent.
