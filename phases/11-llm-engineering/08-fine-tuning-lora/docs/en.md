@@ -6,6 +6,7 @@
 **Languages:** Python
 **Prerequisites:** Phase 10, Lesson 06 (Instruction Tuning / SFT)
 **Time:** ~75 minutes
+**Related:** Phase 10 covers the SFT/DPO loops from scratch. This lesson plugs those into the 2026 PEFT toolkits (PEFT, TRL, Unsloth, Axolotl, LLaMA-Factory).
 
 ## Learning Objectives
 
@@ -158,9 +159,23 @@ Fine-tuning Llama 3 8B on 50,000 examples (3 epochs):
 | Full fine-tune | 2x A100 80GB | 8 hours | ~$32 |
 | LoRA r=16 | 1x A100 40GB | 4 hours | ~$8 |
 | QLoRA r=16 | 1x RTX 4090 24GB | 6 hours | ~$5 |
+| QLoRA r=16 (Unsloth) | 1x RTX 4090 24GB | 2.5 hours | ~$2 |
 | QLoRA r=16 | 1x T4 16GB | 12 hours | ~$4 |
 
-QLoRA on a single consumer GPU costs less than a lunch. This is why the open-source fine-tuning community exploded in 2023.
+QLoRA on a single consumer GPU costs less than a lunch. This is why the open-weight fine-tuning community exploded in 2023 and why every training framework below ships QLoRA by default in 2026.
+
+### The 2026 PEFT stack
+
+| Framework | What it is | Pick when |
+|-----------|-----------|-----------|
+| **Hugging Face PEFT** | The canonical LoRA/QLoRA/DoRA/IA3 library | You want raw control and your training loop is already on `transformers.Trainer` |
+| **TRL** | HF's reinforcement-from-feedback trainers (SFT, DPO, GRPO, PPO, ORPO) | You need DPO/GRPO after SFT; built on top of PEFT |
+| **Unsloth** | Triton-kernel rewrite of the forward/backward pass | You want 2-5x speedup + half the VRAM with no accuracy loss; Llama/Mistral/Qwen family |
+| **Axolotl** | YAML-config wrapper over PEFT + TRL + DeepSpeed + Unsloth | You want reproducible, version-controlled training runs |
+| **LLaMA-Factory** | GUI/CLI/API over PEFT + TRL | You want zero-code fine-tuning; 100+ model families supported |
+| **torchtune** | Native PyTorch recipes, no `transformers` dep | You want minimal deps and your org already standardizes on PyTorch |
+
+Rule of thumb: research use or one-off experiment → PEFT. Repeatable production pipeline → Axolotl with Unsloth kernels enabled. Throwaway prototyping → LLaMA-Factory.
 
 ### Merging Adapters
 
