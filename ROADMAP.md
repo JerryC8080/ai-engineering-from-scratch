@@ -213,22 +213,22 @@ Progress tracking for every phase and lesson.
 | 13 | Flow Matching & Rectified Flows | ⬚ | ~45 min |
 | 14 | Evaluation — FID, CLIP Score, Human Preference | ⬚ | ~45 min |
 
-## Phase 9: Reinforcement Learning — ⬚ (~13 hours)
+## Phase 9: Reinforcement Learning — ✅ (~13 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | MDPs, States, Actions & Rewards | ⬚ | ~45 min |
-| 02 | Dynamic Programming | ⬚ | ~75 min |
-| 03 | Monte Carlo Methods | ⬚ | ~75 min |
-| 04 | Temporal Difference — Q-Learning, SARSA | ⬚ | ~75 min |
-| 05 | Deep Q-Networks (DQN) | ⬚ | ~75 min |
-| 06 | Policy Gradient Methods — REINFORCE | ⬚ | ~75 min |
-| 07 | Actor-Critic — A2C, A3C | ⬚ | ~75 min |
-| 08 | Proximal Policy Optimization (PPO) | ⬚ | ~75 min |
-| 09 | Reward Modeling & RLHF | ⬚ | ~45 min |
-| 10 | Multi-Agent RL | ⬚ | ~45 min |
-| 11 | Sim-to-Real Transfer | ⬚ | ~45 min |
-| 12 | RL for Games | ⬚ | ~75 min |
+| 01 | MDPs, States, Actions & Rewards | ✅ | ~45 min |
+| 02 | Dynamic Programming | ✅ | ~75 min |
+| 03 | Monte Carlo Methods | ✅ | ~75 min |
+| 04 | Temporal Difference — Q-Learning, SARSA | ✅ | ~75 min |
+| 05 | Deep Q-Networks (DQN) | ✅ | ~75 min |
+| 06 | Policy Gradient Methods — REINFORCE | ✅ | ~75 min |
+| 07 | Actor-Critic — A2C, A3C | ✅ | ~75 min |
+| 08 | Proximal Policy Optimization (PPO) | ✅ | ~75 min |
+| 09 | Reward Modeling & RLHF | ✅ | ~45 min |
+| 10 | Multi-Agent RL | ✅ | ~45 min |
+| 11 | Sim-to-Real Transfer | ✅ | ~45 min |
+| 12 | RL for Games | ✅ | ~75 min |
 
 ## Phase 10: LLMs from Scratch — 🚧 (~18 hours)
 
