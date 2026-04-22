@@ -892,3 +892,6 @@ It also produces `outputs/skill-guardrail-patterns.md` -- a decision framework f
 - [NeMo Guardrails Documentation](https://docs.nvidia.com/nemo/guardrails/) -- NVIDIA's guide to implementing programmable conversational rails with Colang
 - [OpenAI Moderation Guide](https://platform.openai.com/docs/guides/moderation) -- reference for the free Moderation API, category definitions, and score thresholds
 - [Simon Willison's "Prompt Injection" Series](https://simonwillison.net/series/prompt-injection/) -- the most comprehensive ongoing collection of prompt injection research, real-world exploits, and defense analysis from the person who named the attack
+- [mlabonne LLM Engineer -- Securing LLMs](https://github.com/mlabonne/llm-course#8-securing-llms) -- the three-part framing this lesson uses (prompt hacking, backdoors, defensive measures) with pointers to garak for red-teaming and langfuse for production observation
+- [garak LLM vulnerability scanner](https://github.com/leondz/garak) -- mlabonne's go-to red-teaming tool: probes for jailbreaks, prompt injection, data leakage, toxicity, and hallucinated package names; pair it with the human-in-the-loop escalation pattern in this lesson
+- [Prompt Injection Primer for Engineers](https://github.com/jthack/PIPE) -- short practical guide (mlabonne-recommended) covering attack categories and first-line defenses
