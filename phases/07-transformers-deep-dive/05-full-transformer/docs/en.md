@@ -166,3 +166,7 @@ See `outputs/skill-transformer-block-reviewer.md`. The skill reviews a new trans
 - [Zhang, Sennrich (2019). Root Mean Square Layer Normalization](https://arxiv.org/abs/1910.07467) — RMSNorm.
 - [Shazeer (2020). GLU Variants Improve Transformer](https://arxiv.org/abs/2002.05202) — the SwiGLU paper.
 - [HuggingFace `modeling_llama.py`](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py) — canonical 2026 decoder-only block.
+- [Raschka, *LLMs-from-scratch* — Ch. 4 main chapter code](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/01_main-chapter-code) — the cleanest PyTorch walkthrough that wires the full GPT block (LN, MHA, FFN, residuals) end to end. This lesson's `encoder_block`/`decoder_block` match it line-for-line in spirit.
+- [Raschka, *LLMs-from-scratch* — `pkg/llms_from_scratch/llama3.py`](https://github.com/rasbt/LLMs-from-scratch/blob/main/pkg/llms_from_scratch/llama3.py) — production-shaped Llama 3 block with RMSNorm, SwiGLU, RoPE, GQA. Diff this against the Ch. 4 GPT block to see every 2017-to-2026 substitution in one file.
+- [NielsRogge, Transformers-Tutorials — `T5/T5_Fine_tuning.ipynb`](https://github.com/NielsRogge/Transformers-Tutorials/tree/master/T5) — encoder-decoder block in practice; shows cross-attention wiring on a real task.
+- [NielsRogge, Transformers-Tutorials — `BART`](https://github.com/NielsRogge/Transformers-Tutorials) (search for BART notebooks) — denoising encoder-decoder reference.
