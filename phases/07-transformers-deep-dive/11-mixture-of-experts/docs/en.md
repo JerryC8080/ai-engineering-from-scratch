@@ -164,3 +164,9 @@ See `outputs/skill-moe-configurator.md`. The skill picks E, k, and shared-expert
 - [Jiang et al. (2024). Mixtral of Experts](https://arxiv.org/abs/2401.04088) — Mixtral 8×7B.
 - [DeepSeek-AI (2024). DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437) — MLA + auxiliary-loss-free MoE + MTP.
 - [Wang et al. (2024). Auxiliary-Loss-Free Load Balancing Strategy for Mixture-of-Experts](https://arxiv.org/abs/2408.15664) — the bias-based balancing paper.
+- [Dai et al. (2024). DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models](https://arxiv.org/abs/2401.06066) — the fine-grained + shared-expert split this lesson's router uses.
+- [Kim et al. (2022). DeepSpeed-MoE: Advancing Mixture-of-Experts Inference and Training](https://arxiv.org/abs/2201.05596) — original shared-expert paper.
+- [Raschka, *LLMs-from-scratch* — Ch. 4 bonus `07_moe`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/07_moe) — the cleanest MoE-vs-dense swap in ~200 lines of PyTorch (`gpt_with_kv_moe.py`), plus a `memory_estimator_moe.py` that reproduces this lesson's dense-vs-MoE parameter table for any config. Read this first.
+- [Raschka, *LLMs-from-scratch* — Ch. 4 bonus `08_deltanet`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/08_deltanet) — optional: shows how MoE composes with attention variants (DeltaNet here).
+- [stas00, `ml-engineering/training/model-parallelism/README.md`](https://github.com/stas00/ml-engineering/blob/master/training/model-parallelism/README.md) — section on expert parallelism and the all-to-all communication cost discussed in "The catch: memory" above.
+- [mlabonne, LLM Course — "New Trends" section](https://github.com/mlabonne/llm-course) — production-side framing of MoE vs dense in 2026.
