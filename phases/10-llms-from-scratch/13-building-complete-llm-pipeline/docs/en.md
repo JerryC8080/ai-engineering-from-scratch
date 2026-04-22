@@ -253,6 +253,16 @@ This lesson produces `outputs/skill-llm-pipeline-reviewer.md`. Feed it a propose
 | Reproducible | "Same metrics on replay" | Different bit-level weights but equivalent downstream metrics — the realistic target for distributed LLM training |
 | Cost gate | "You cannot exceed X" | Pre-run cost estimate plus in-run tracker — the pipeline refuses to start if the estimate exceeds budget |
 
+## Reference Implementations
+
+This lesson stitches every prior lesson together. The reference implementations are correspondingly broad. Start with the end-to-end reproductions, then drop into the operations manual:
+
+- [Karpathy llm.c](https://github.com/karpathy/llm.c) -- the cleanest end-to-end GPT-2 reproduction in the open: data sharding (`dev/data/fineweb.py`), training in C/CUDA (`train_gpt2.cu`), PyTorch bit-exact reference (`train_gpt2.py`), and multi-node setup in `scripts/`. Read `README.md` + `doc/llm.c-from-scratch.md` as the reference for an all-in-one pipeline.
+- [Hugging Face Open-R1](https://github.com/huggingface/open-r1) -- the open reproduction of DeepSeek R1. Full SFT + GRPO + eval pipeline with config files, job launchers, and cost tracking. A real manifest in the wild.
+- [Rasbt LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch) -- Ch 2 (data) through Ch 7 (SFT + DPO) form a complete scratch pipeline. Run each chapter's notebook end-to-end on a laptop to validate the pipeline logic before scaling.
+- [stas00 ml-engineering (entire book)](https://github.com/stas00/ml-engineering) -- the operations manual for running this pipeline at 100+ GPU scale. `training/performance/` for MFU, `training/instabilities/` for loss spikes, `training/fault-tolerance/` for restart strategy, `training/checkpoints/` for versioning, `orchestration/` and `storage/` for infrastructure. If your pipeline runs more than a day on real hardware, you need this book open in a tab.
+- [nanotron](https://github.com/huggingface/nanotron) -- Hugging Face's production training framework. Real 3D parallelism, dataloader sharding, checkpoint format, and eval hooks. The full-scale version of your orchestrator.
+
 ## Further Reading
 
 - [Dubey et al., 2024 -- "The Llama 3 Herd of Models"](https://arxiv.org/abs/2407.21783) -- the most detailed public description of a frontier pipeline including data, training, alignment, eval
