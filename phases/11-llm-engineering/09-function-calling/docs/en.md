@@ -6,6 +6,7 @@
 **Languages:** Python
 **Prerequisites:** Phase 11 Lesson 03 (Structured Outputs)
 **Time:** ~75 minutes
+**Related:** Phase 11 · 14 (Model Context Protocol) — when a tool is shared across hosts, graduate from inline function-calling to an MCP server. This lesson covers the inline case; MCP covers the protocol case.
 
 ## Learning Objectives
 
@@ -92,12 +93,12 @@ Every major provider supports function calling, but the API surface differs.
 
 | Provider | API Parameter | Tool Call Format | Parallel Calls | Forced Calling |
 |----------|--------------|-----------------|---------------|----------------|
-| OpenAI (GPT-4o, o3) | `tools` | `tool_calls[].function` | Yes (multiple per turn) | `tool_choice="required"` |
-| Anthropic (Claude 3.5/3.7) | `tools` | `content[].type="tool_use"` | Yes (multiple blocks) | `tool_choice={"type":"any"}` |
-| Google (Gemini 2.0) | `function_declarations` | `functionCall` | Yes | `function_calling_config` |
-| Open Models (Llama 3, Hermes) | Varies | Hermes-style XML/JSON | Model-dependent | Prompt-based |
+| OpenAI (GPT-5, o4) | `tools` | `tool_calls[].function` | Yes (multiple per turn) | `tool_choice="required"` |
+| Anthropic (Claude 4.6/4.7) | `tools` | `content[].type="tool_use"` | Yes (multiple blocks) | `tool_choice={"type":"any"}` |
+| Google (Gemini 3) | `function_declarations` | `functionCall` | Yes | `function_calling_config` |
+| Open-weight (Llama 4, Qwen3, DeepSeek-V3) | Native `tools` on Llama 4; Hermes or ChatML on others | Mixed | Model-dependent | Prompt-based or `tool_choice` if supported |
 
-OpenAI pioneered the format. Anthropic and Google converged on similar schemas. Open-source models use various conventions -- the Hermes format (NousResearch) is the most common for fine-tuned open models.
+By 2026 the three closed providers have converged on near-identical JSON-Schema-based formats. Llama 4 ships with a native `tools` field that matches OpenAI's shape. Open-weight fine-tunes still vary — the Hermes format (NousResearch) is the most common for third-party fine-tunes. For shared tools across hosts, prefer MCP (Phase 11 · 14) over inline function-calling — the server is the same for all of them.
 
 ### Tool Choice: Auto, Required, Specific
 
