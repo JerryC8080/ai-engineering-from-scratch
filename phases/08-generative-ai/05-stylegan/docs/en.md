@@ -125,6 +125,15 @@ Save `outputs/skill-stylegan-inversion.md`. Skill takes a real photo and outputs
 | Alias-free | "StyleGAN3's trick" | Windowed sinc filters; eliminates texture sticking to the pixel grid. |
 | Inversion | "Find w for a real image" | Optimize or encode `x → w` so `G(w) ≈ x`. |
 
+## Production note: why StyleGAN still ships in 2026
+
+StyleGAN3 on a 4090 generates a 1024² FFHQ face in under 10 ms — `num_steps = 1`, no VAE decode, no cross-attention pass. In stas00's ml-engineering terms this is the floor latency for any image generator. A 50-step SDXL + VAE-decode pipeline at the same resolution is ~3 seconds. That is a **300× gap**, and for narrow-domain products (avatar services, ID document pipelines, stock face generation) it wins on TCO.
+
+Two operational consequences:
+
+- **No scheduler, no batcher.** Static batch at the target occupancy is optimal. Continuous batching (essential for LLMs and diffusion) provides zero benefit because every request takes the same FLOPs.
+- **Truncation `ψ` is the safety knob.** `ψ < 0.7` samples from a narrow cone of the mapping network's range. This is the only lever the serving layer has over sample variance. Lower `ψ` at peak load, raise it for premium users.
+
 ## Further Reading
 
 - [Karras et al. (2019). A Style-Based Generator Architecture for GANs](https://arxiv.org/abs/1812.04948) — StyleGAN.
@@ -133,3 +142,4 @@ Save `outputs/skill-stylegan-inversion.md`. Skill takes a real photo and outputs
 - [Tov et al. (2021). Designing an Encoder for StyleGAN Image Manipulation](https://arxiv.org/abs/2102.02766) — e4e inversion.
 - [Sauer et al. (2022). StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets](https://arxiv.org/abs/2202.00273) — StyleGAN-XL.
 - [Huang et al. (2024). R3GAN: The GAN is dead; long live the GAN!](https://arxiv.org/abs/2501.05441) — modern minimal GAN recipe.
+- [stas00 ml-engineering — Accelerator utilization and percentiles](https://github.com/stas00/ml-engineering/blob/master/inference/README.md#more-metric-notes) — how to actually measure `gpu util`, why p90/p95/p99 matter when half your users hit a long-tail prompt. StyleGAN servers have uniform compute so percentile spread is narrow; treat it as the baseline when profiling noisier diffusion servers.
