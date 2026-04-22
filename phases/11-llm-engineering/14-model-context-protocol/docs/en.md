@@ -202,5 +202,5 @@ Refuse to ship a server that writes to disk or calls external APIs without an ap
 - [Anthropic — Introducing MCP (Nov 2024)](https://www.anthropic.com/news/model-context-protocol) — launch post with design rationale.
 - [Python SDK](https://github.com/modelcontextprotocol/python-sdk) — official SDK used in this lesson.
 - [Security considerations for MCP](https://modelcontextprotocol.io/docs/concepts/security) — roots, destructive hints, tool poisoning.
-- [mlabonne LLM Engineer — Agents (agent protocols)](https://github.com/mlabonne/llm-course#5-agents) — mlabonne frames MCP as the industry standard for agent-to-tool interoperability and contrasts it with Agent2Agent (A2A); useful for placing MCP in the broader protocol landscape.
-- [mlabonne LLM Engineer — Retrieval Augmented Generation (orchestrators)](https://github.com/mlabonne/llm-course#3-retrieval-augmented-generation) — the "Orchestrators" bullet explicitly calls out MCP as "a new standard to pass data and context to models across providers"; read this alongside the spec for the RAG vs tool-calling angle.
+- [Google A2A specification](https://google.github.io/A2A/) — Agent2Agent protocol; the sibling standard for agent-to-agent communication that complements MCP's agent-to-tool scope.
+- [Anthropic — Building effective agents (Dec 2024)](https://www.anthropic.com/research/building-effective-agents) — where MCP sits in the broader pattern library for agent design (augmented LLM, workflows, autonomous agents).

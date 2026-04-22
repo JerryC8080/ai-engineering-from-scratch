@@ -543,5 +543,6 @@ It also produces `outputs/skill-structured-outputs.md` -- a decision framework f
 - [Anthropic Tool Use Guide](https://docs.anthropic.com/en/docs/tool-use) -- how Claude implements structured output via tool use with JSON Schema input_schema
 - [JSON Schema specification](https://json-schema.org/) -- the full spec for the schema language used by every major structured output system
 - [Outlines library](https://github.com/outlines-dev/outlines) -- open-source constrained generation using regex and JSON Schema compiled to finite state machines
-- [mlabonne LLM Engineer -- Structuring outputs](https://github.com/mlabonne/llm-course#1-running-llms) -- the roadmap bullet where Outlines, LMQL, and native JSON-mode APIs are listed side by side
-- [Stas ML Engineering -- Guided Text Generation](https://github.com/stas00/ml-engineering/tree/master/inference#guided-text-generation) -- production perspective on constrained decoding: why it speeds up inference (pruned vocab) as well as fixing format
+- [Dong et al., "XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models" (MLSys 2025)](https://arxiv.org/abs/2411.15100) -- the current state-of-the-art grammar engine; pushdown-automaton compilation that masks tokens at ~100 ns / token.
+- [Beurer-Kellner et al., "Prompting Is Programming: A Query Language for Large Language Models" (LMQL)](https://arxiv.org/abs/2212.06094) -- the LMQL paper framing constrained decoding as a query language with type and value constraints.
+- [Microsoft Guidance (framework docs)](https://github.com/guidance-ai/guidance) -- template-driven constrained generation; vendor-agnostic complement to Outlines and XGrammar.

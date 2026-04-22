@@ -427,5 +427,6 @@ This lesson produces:
 - Anthropic's RAG documentation (docs.anthropic.com) -- practical guidelines for chunk sizes, prompt construction, and evaluation
 - Pinecone Learning Center, "What is RAG?" -- clear visual explanations of the RAG pipeline with production considerations
 - Sentence-BERT: Reimers & Gurevych (2019) -- the paper behind the all-MiniLM embedding models, showing how to train bi-encoders for semantic similarity
-- [mlabonne LLM Engineer -- Retrieval Augmented Generation](https://github.com/mlabonne/llm-course#3-retrieval-augmented-generation) -- mlabonne's RAG chapter covering orchestrators (LangChain, LlamaIndex, MCP), retrievers (HyDE, CoRAG, hybrid), memory, and evaluation; the canonical companion reading for this lesson
-- [LlamaIndex High-Level Concepts](https://docs.llamaindex.ai/en/stable/getting_started/concepts.html) -- the main concepts to know when building RAG pipelines, the reference mlabonne points to first for the "Orchestrators" bullet
+- [Karpukhin et al., "Dense Passage Retrieval for Open-Domain Question Answering" (EMNLP 2020)](https://arxiv.org/abs/2004.04906) -- the DPR paper that proved dense bi-encoder retrieval beats BM25 on open-domain QA and set the pattern for modern RAG retrievers.
+- [LlamaIndex High-Level Concepts](https://docs.llamaindex.ai/en/stable/getting_started/concepts.html) -- the main concepts to know when building RAG pipelines: data loaders, node parsers, indices, retrievers, response synthesizers.
+- [LangChain RAG tutorial](https://python.langchain.com/docs/tutorials/rag/) -- the opposite-flavor orchestrator; chain-of-runnables view of the same retrieve-then-generate pattern.

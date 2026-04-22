@@ -1020,5 +1020,5 @@ The Python code (`code/prompt_engineering.py`) is a standalone testing harness. 
 - [Zamfirescu-Pereira et al., 2023 -- "Why Johnny Can't Prompt"](https://arxiv.org/abs/2304.13529) -- research on how non-experts struggle with prompt engineering and what makes prompts effective
 - [Shin et al., 2023 -- "Prompt Engineering a Prompt Engineer"](https://arxiv.org/abs/2311.05661) -- using LLMs to automatically optimize prompts, the foundation of meta-prompting
 - [LMSYS Chatbot Arena](https://chat.lmsys.org/) -- live blind comparison of LLMs where you can test the same prompt across models and vote on which response is better
-- [mlabonne LLM Engineer -- Running LLMs](https://github.com/mlabonne/llm-course#1-running-llms) -- curated reading list for LLM APIs, prompt engineering, and structured outputs that maps one-to-one to Phase 11 lessons 01-03
-- [DAIR.AI Prompt Engineering Guide](https://www.promptingguide.ai/) -- exhaustive catalogue of prompt techniques with examples (zero-shot, few-shot, CoT, ReAct, self-consistency); the reference mlabonne points to for the "Prompt engineering" sub-topic
+- [DAIR.AI Prompt Engineering Guide](https://www.promptingguide.ai/) -- exhaustive catalogue of prompt techniques with examples (zero-shot, few-shot, CoT, ReAct, self-consistency); the reference practitioners use for the broader "Prompt engineering" surface.
+- [Anthropic prompt library](https://docs.anthropic.com/en/prompt-library) -- curated, known-good prompts by use case; shows the structural patterns that ship in production.
