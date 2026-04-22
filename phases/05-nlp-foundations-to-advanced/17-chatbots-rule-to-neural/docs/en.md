@@ -17,7 +17,7 @@ Chatbot architectures have cycled through four paradigms, each introduced becaus
 
 ## The Concept
 
-![Chatbot evolution: rule-based → retrieval → neural → agent](./assets/chatbot.svg)
+![Chatbot evolution: rule-based → retrieval → neural → agent](../assets/chatbot.svg)
 
 **Rule-based (ELIZA, AIML, DialogFlow).** Hand-authored patterns match user input and produce responses. Intent classifiers route to predefined flows. Slot-filling state machines collect required info. Works brilliantly inside the narrow scope it was designed for. Fails immediately outside it. Still ships in safety-critical domains (banking authentication, airline booking) where hallucination is not tolerated.
 

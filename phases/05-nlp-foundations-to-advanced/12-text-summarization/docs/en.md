@@ -19,7 +19,7 @@ This lesson builds both, with the failure mode each one owns.
 
 ## The Concept
 
-![Extractive TextRank vs abstractive transformer](./assets/summarization.svg)
+![Extractive TextRank vs abstractive transformer](../assets/summarization.svg)
 
 **Extractive.** Treat the article as a graph where nodes are sentences and edges are similarities. Run PageRank (or something like it) over the graph to score sentences by how connected they are to everything else. Highest-scoring sentences are the summary. The canonical implementation is **TextRank** (Mihalcea and Tarau, 2004).
 

@@ -21,7 +21,7 @@ The trend in 2026 is hybrid: retrieve the best few passages, then prompt a gener
 
 ## The Concept
 
-![QA architectures: extractive, retrieval-augmented, generative](./assets/qa.svg)
+![QA architectures: extractive, retrieval-augmented, generative](../assets/qa.svg)
 
 **Extractive.** Encode question and passage together with a transformer (BERT family). Train two heads that predict start and end token indices of the answer. Loss is cross-entropy over valid positions. Output is a span from the passage. Never hallucinates (by construction), never handles questions the passage cannot answer (by construction).
 

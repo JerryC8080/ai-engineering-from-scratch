@@ -17,7 +17,7 @@ The interesting problem is what to do about unseen n-grams. A raw count-based mo
 
 ## The Concept
 
-![N-gram model: count, smooth, generate](./assets/ngram.svg)
+![N-gram model: count, smooth, generate](../assets/ngram.svg)
 
 **N-gram probability:** `P(w_i | w_{i-n+1}, ..., w_{i-1})`. Fix `n` (typically 3 for trigrams, 4 for 4-grams). Compute from counts:
 

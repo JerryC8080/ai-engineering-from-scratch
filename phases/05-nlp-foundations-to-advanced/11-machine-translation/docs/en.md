@@ -17,7 +17,7 @@ This lesson skips the history lesson and teaches the working pipeline of 2026: p
 
 ## The Concept
 
-![MT pipeline: tokenize → encode → decode with attention → detokenize](./assets/mt-pipeline.svg)
+![MT pipeline: tokenize → encode → decode with attention → detokenize](../assets/mt-pipeline.svg)
 
 Modern MT is a transformer encoder-decoder trained on parallel text. The encoder reads the source in its language's tokenization. The decoder generates the target, one subword at a time, using the encoder's output via cross-attention (lesson 10). Decoding uses beam search to avoid the greedy-decoding trap. The output is detokenized, detruecased, and scored against a reference.
 

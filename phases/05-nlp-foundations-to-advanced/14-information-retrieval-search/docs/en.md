@@ -17,7 +17,7 @@ This lesson builds each piece and names which failures each catches.
 
 ## The Concept
 
-![Hybrid retrieval: BM25 + dense + RRF + cross-encoder rerank](./assets/retrieval.svg)
+![Hybrid retrieval: BM25 + dense + RRF + cross-encoder rerank](../assets/retrieval.svg)
 
 Four layers. Pick the ones you need.
 

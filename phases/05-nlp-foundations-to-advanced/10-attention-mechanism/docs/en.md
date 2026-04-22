@@ -17,7 +17,7 @@ That is the whole idea. Transformers extended it. Self-attention applied it to a
 
 ## The Concept
 
-![Bahdanau attention: decoder queries all encoder states](./assets/attention.svg)
+![Bahdanau attention: decoder queries all encoder states](../assets/attention.svg)
 
 At each decoder step `t`:
 

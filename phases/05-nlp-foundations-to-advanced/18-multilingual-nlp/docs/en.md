@@ -17,7 +17,7 @@ This lesson names the tradeoffs, the canonical models, and the one decision that
 
 ## The Concept
 
-![Cross-lingual transfer via shared multilingual embedding space](./assets/multilingual.svg)
+![Cross-lingual transfer via shared multilingual embedding space](../assets/multilingual.svg)
 
 **Shared vocabulary.** Multilingual models use a SentencePiece or WordPiece tokenizer trained on text from all target languages. The vocabulary is shared: the same subword unit represents the same morpheme across related languages. `anti-` in English and Italian gets the same token.
 

@@ -21,7 +21,7 @@ This lesson builds intuition for both and names which one to pick for a given co
 
 ## The Concept
 
-![LDA mixture model vs BERTopic clustering](./assets/topic-modeling.svg)
+![LDA mixture model vs BERTopic clustering](../assets/topic-modeling.svg)
 
 **LDA generative story.** Each topic is a distribution over words. Each document is a mixture of topics. To generate a word in a document, sample a topic from the document's mixture, then sample a word from that topic's distribution. Inference reverses this: given observed words, infer the topic distribution per document and the word distribution per topic. Collapsed Gibbs sampling or variational Bayes does the math.
 
