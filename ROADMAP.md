@@ -124,7 +124,7 @@ Progress tracking for every phase and lesson.
 | 27 | Multi-Object Tracking & Video Memory | ✅ | ~60 min |
 | 28 | World Models & Video Diffusion | ✅ | ~75 min |
 
-## Phase 5: NLP — Foundations to Advanced — ✅ (~19 hours)
+## Phase 5: NLP — Foundations to Advanced — ✅ (~30 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -146,6 +146,17 @@ Progress tracking for every phase and lesson.
 | 16 | [Text Generation — Language Models Before Transformers](phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer) | ✅ | ~45 min |
 | 17 | [Chatbots — Rule-Based to Neural](phases/05-nlp-foundations-to-advanced/17-chatbots-rule-to-neural) | ✅ | ~75 min |
 | 18 | [Multilingual NLP](phases/05-nlp-foundations-to-advanced/18-multilingual-nlp) | ✅ | ~45 min |
+| 19 | [Subword Tokenization — BPE, WordPiece, Unigram, SentencePiece](phases/05-nlp-foundations-to-advanced/19-subword-tokenization) | ✅ | ~60 min |
+| 20 | [Structured Outputs & Constrained Decoding](phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding) | ✅ | ~60 min |
+| 21 | [NLI & Textual Entailment](phases/05-nlp-foundations-to-advanced/21-nli-textual-entailment) | ✅ | ~60 min |
+| 22 | [Embedding Models Deep Dive](phases/05-nlp-foundations-to-advanced/22-embedding-models-deep-dive) | ✅ | ~60 min |
+| 23 | [Chunking Strategies for RAG](phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag) | ✅ | ~60 min |
+| 24 | [Coreference Resolution](phases/05-nlp-foundations-to-advanced/24-coreference-resolution) | ✅ | ~60 min |
+| 25 | [Entity Linking & Disambiguation](phases/05-nlp-foundations-to-advanced/25-entity-linking) | ✅ | ~60 min |
+| 26 | [Relation Extraction & Knowledge Graph Construction](phases/05-nlp-foundations-to-advanced/26-relation-extraction-kg) | ✅ | ~60 min |
+| 27 | [LLM Evaluation — RAGAS, DeepEval, G-Eval](phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks) | ✅ | ~75 min |
+| 28 | [Long-Context Evaluation — NIAH, RULER, LongBench, MRCR](phases/05-nlp-foundations-to-advanced/28-long-context-evaluation) | ✅ | ~60 min |
+| 29 | [Dialogue State Tracking](phases/05-nlp-foundations-to-advanced/29-dialogue-state-tracking) | ✅ | ~75 min |
 
 ## Phase 6: Speech & Audio — ⬚ (~13 hours)
 
