@@ -415,20 +415,20 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | Generative Models: Taxonomy & History | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | — |
-| 02 | Autoencoders & VAE | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 03 | GANs: Generator vs Discriminator | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 04 | Conditional GANs & Pix2Pix | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 05 | StyleGAN | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 06 | Diffusion Models — DDPM from Scratch | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 07 | Latent Diffusion & Stable Diffusion | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 08 | ControlNet, LoRA & Conditioning | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 09 | Inpainting, Outpainting & Editing | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 10 | Video Generation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 11 | Audio Generation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 12 | 3D Generation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 13 | Flow Matching & Rectified Flows | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
-| 14 | Evaluation: FID, CLIP Score | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 01 | [Generative Models: Taxonomy & History](phases/08-generative-ai/01-generative-models-taxonomy-history/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 02 | [Autoencoders & VAE](phases/08-generative-ai/02-autoencoders-vae/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 03 | [GANs: Generator vs Discriminator](phases/08-generative-ai/03-gans-generator-discriminator/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 04 | [Conditional GANs & Pix2Pix](phases/08-generative-ai/04-conditional-gans-pix2pix/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 05 | [StyleGAN](phases/08-generative-ai/05-stylegan/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 06 | [Diffusion Models — DDPM from Scratch](phases/08-generative-ai/06-diffusion-ddpm-from-scratch/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 07 | [Latent Diffusion & Stable Diffusion](phases/08-generative-ai/07-latent-diffusion-stable-diffusion/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 08 | [ControlNet, LoRA & Conditioning](phases/08-generative-ai/08-controlnet-lora-conditioning/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 09 | [Inpainting, Outpainting & Editing](phases/08-generative-ai/09-inpainting-outpainting-editing/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 10 | [Video Generation](phases/08-generative-ai/10-video-generation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 11 | [Audio Generation](phases/08-generative-ai/11-audio-generation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 12 | [3D Generation](phases/08-generative-ai/12-3d-generation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 13 | [Flow Matching & Rectified Flows](phases/08-generative-ai/13-flow-matching-rectified-flows/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 14 | [Evaluation: FID, CLIP Score](phases/08-generative-ai/14-evaluation-fid-clip-score/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 
 </details>
 

@@ -194,24 +194,24 @@ Progress tracking for every phase and lesson.
 | 13 | Scaling Laws | ⬚ | ~45 min |
 | 14 | Build a Transformer from Scratch — The Capstone | ⬚ | ~120 min |
 
-## Phase 8: Generative AI — ⬚ (~14 hours)
+## Phase 8: Generative AI — ✅ (~14 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Generative Models — Taxonomy & History | ⬚ | ~45 min |
-| 02 | Autoencoders & VAE | ⬚ | ~75 min |
-| 03 | GANs — Generator vs Discriminator | ⬚ | ~75 min |
-| 04 | Conditional GANs & Pix2Pix | ⬚ | ~75 min |
-| 05 | StyleGAN | ⬚ | ~45 min |
-| 06 | Diffusion Models — DDPM from Scratch | ⬚ | ~75 min |
-| 07 | Latent Diffusion & Stable Diffusion | ⬚ | ~75 min |
-| 08 | ControlNet, LoRA & Image Conditioning | ⬚ | ~75 min |
-| 09 | Inpainting, Outpainting & Image Editing | ⬚ | ~75 min |
-| 10 | Video Generation | ⬚ | ~45 min |
-| 11 | Audio Generation | ⬚ | ~45 min |
-| 12 | 3D Generation | ⬚ | ~45 min |
-| 13 | Flow Matching & Rectified Flows | ⬚ | ~45 min |
-| 14 | Evaluation — FID, CLIP Score, Human Preference | ⬚ | ~45 min |
+| 01 | [Generative Models — Taxonomy & History](phases/08-generative-ai/01-generative-models-taxonomy-history/) | ✅ | ~45 min |
+| 02 | [Autoencoders & VAE](phases/08-generative-ai/02-autoencoders-vae/) | ✅ | ~75 min |
+| 03 | [GANs — Generator vs Discriminator](phases/08-generative-ai/03-gans-generator-discriminator/) | ✅ | ~75 min |
+| 04 | [Conditional GANs & Pix2Pix](phases/08-generative-ai/04-conditional-gans-pix2pix/) | ✅ | ~75 min |
+| 05 | [StyleGAN](phases/08-generative-ai/05-stylegan/) | ✅ | ~45 min |
+| 06 | [Diffusion Models — DDPM from Scratch](phases/08-generative-ai/06-diffusion-ddpm-from-scratch/) | ✅ | ~75 min |
+| 07 | [Latent Diffusion & Stable Diffusion](phases/08-generative-ai/07-latent-diffusion-stable-diffusion/) | ✅ | ~75 min |
+| 08 | [ControlNet, LoRA & Image Conditioning](phases/08-generative-ai/08-controlnet-lora-conditioning/) | ✅ | ~75 min |
+| 09 | [Inpainting, Outpainting & Image Editing](phases/08-generative-ai/09-inpainting-outpainting-editing/) | ✅ | ~75 min |
+| 10 | [Video Generation](phases/08-generative-ai/10-video-generation/) | ✅ | ~45 min |
+| 11 | [Audio Generation](phases/08-generative-ai/11-audio-generation/) | ✅ | ~45 min |
+| 12 | [3D Generation](phases/08-generative-ai/12-3d-generation/) | ✅ | ~45 min |
+| 13 | [Flow Matching & Rectified Flows](phases/08-generative-ai/13-flow-matching-rectified-flows/) | ✅ | ~45 min |
+| 14 | [Evaluation — FID, CLIP Score, Human Preference](phases/08-generative-ai/14-evaluation-fid-clip-score/) | ✅ | ~45 min |
 
 ## Phase 9: Reinforcement Learning — ⬚ (~13 hours)
 
