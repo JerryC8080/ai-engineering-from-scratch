@@ -57,6 +57,16 @@ Four language pairs supported initially; can be adapted to a new language with �
 
 Throughput on an L40S GPU: 64 concurrent sessions at 3× real-time.
 
+### How Moshi hits 64 concurrent sessions
+
+Moshi is decode-dominated: every 80 ms frame requires one forward pass through the 7B temporal transformer plus a depth-transformer pass for 8 codebooks. Throughput = `sessions × frame_rate`. On an L40S that works out to `64 × 12.5 = 800` forward passes per second, batched together.
+
+The tricks that make this feasible are the same tricks modern LLM inference servers use (see Stas ML Engineering, inference chapter):
+
+- **Continuous batching.** Don't wait for the slowest session to finish a turn — new Mimi frames from different sessions get packed into the next batch every 80 ms.
+- **Paged attention / KV caching.** The KV cache per session grows with dialogue length. Paging (vLLM-style) keeps memory from fragmenting across variable-length sessions.
+- **GQA.** Moshi uses grouped-query attention to shrink KV cache 4-8× vs vanilla MHA, which is what lets 64 sessions fit.
+
 ### Sesame CSM — the cousin
 
 Sesame CSM (2025) uses a similar idea — a Llama-3 backbone with a Mimi codec head. But CSM is single-directional (takes context + text, produces speech) rather than full-duplex. It's the best "voice presence" TTS on the market; not quite the same as Moshi's full-duplex capability.
@@ -178,3 +188,4 @@ Save as `outputs/skill-duplex-pipeline.md`. Pick pipeline vs full-duplex archite
 - [Kyutai — Moshi repo](https://github.com/kyutai-labs/moshi) — install + server.
 - [OpenAI — Realtime API](https://platform.openai.com/docs/guides/realtime) — closed commercial peer.
 - [Kyutai — Delayed Streams Modeling](https://github.com/kyutai-labs/delayed-streams-modeling) — the STT/TTS framework under the hood.
+- [Stas ML Engineering — KV caching & paged attention](https://github.com/stas00/ml-engineering/blob/master/inference/README.md#kv-caching) — the memory math behind serving 64 concurrent full-duplex sessions on one GPU.
