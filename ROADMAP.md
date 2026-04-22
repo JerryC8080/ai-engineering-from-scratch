@@ -129,14 +129,14 @@ Progress tracking for every phase and lesson.
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
 | 01 | [Text Processing — Tokenization, Stemming, Lemmatization](phases/05-nlp-foundations-to-advanced/01-text-processing) | ✅ | ~45 min |
-| 02 | Bag of Words, TF-IDF & Text Representation | ⬚ | ~75 min |
-| 03 | Word Embeddings — Word2Vec from Scratch | ⬚ | ~75 min |
-| 04 | GloVe, FastText & Subword Embeddings | ⬚ | ~45 min |
-| 05 | Sentiment Analysis | ⬚ | ~75 min |
-| 06 | Named Entity Recognition (NER) | ⬚ | ~75 min |
-| 07 | POS Tagging & Syntactic Parsing | ⬚ | ~45 min |
-| 08 | Text Classification — CNNs & RNNs for Text | ⬚ | ~75 min |
-| 09 | Sequence-to-Sequence Models | ⬚ | ~75 min |
+| 02 | [Bag of Words, TF-IDF & Text Representation](phases/05-nlp-foundations-to-advanced/02-bag-of-words-tfidf) | ✅ | ~75 min |
+| 03 | [Word Embeddings — Word2Vec from Scratch](phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec) | ✅ | ~75 min |
+| 04 | [GloVe, FastText & Subword Embeddings](phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword) | ✅ | ~45 min |
+| 05 | [Sentiment Analysis](phases/05-nlp-foundations-to-advanced/05-sentiment-analysis) | ✅ | ~75 min |
+| 06 | [Named Entity Recognition (NER)](phases/05-nlp-foundations-to-advanced/06-named-entity-recognition) | ✅ | ~75 min |
+| 07 | [POS Tagging & Syntactic Parsing](phases/05-nlp-foundations-to-advanced/07-pos-tagging-parsing) | ✅ | ~45 min |
+| 08 | [Text Classification — CNNs & RNNs for Text](phases/05-nlp-foundations-to-advanced/08-cnns-rnns-for-text) | ✅ | ~75 min |
+| 09 | [Sequence-to-Sequence Models](phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence) | ✅ | ~75 min |
 | 10 | Attention Mechanism — The Breakthrough | ⬚ | ~45 min |
 | 11 | Machine Translation | ⬚ | ~75 min |
 | 12 | Text Summarization | ⬚ | ~75 min |
