@@ -1,7 +1,3 @@
-import math
-import random
-
-
 LANGUAGE_FEATURES = {
     "english":  {"word_order": "SVO", "script": "Latin",   "family": "Germanic"},
     "german":   {"word_order": "SVO", "script": "Latin",   "family": "Germanic"},

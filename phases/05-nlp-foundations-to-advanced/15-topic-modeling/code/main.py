@@ -1,7 +1,5 @@
-import math
 import random
 import re
-from collections import Counter
 
 
 def tokenize(text):
