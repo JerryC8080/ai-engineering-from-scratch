@@ -124,6 +124,19 @@ Save `outputs/skill-img2img-chooser.md`. Skill takes a task description, data av
 | SPADE | "GauGAN" | Normalizes intermediate activations with the semantic map; segmentation-to-image. |
 | FiLM | "Feature-wise linear modulation" | Per-feature affine transform from the condition; cheap conditioning. |
 
+## Production note: Pix2Pix as a latency-bound baseline
+
+When you have paired data and a narrow task (sketch → render, semantic map → photo, day → night), Pix2Pix's one-shot inference beats diffusion by an order of magnitude on latency. The production comparison is usually:
+
+| Path | Steps | Typical latency at 512² on a single L4 |
+|------|-------|----------------------------------------|
+| Pix2Pix (U-Net forward) | 1 | ~30 ms |
+| SD-Inpaint or SD-Img2Img | 20 | ~1.2 s |
+| SDXL-Turbo Img2Img | 1-4 | ~0.15-0.35 s |
+| ControlNet + SDXL base | 20-30 | ~3-5 s |
+
+Pix2Pix wins on throughput in static batches (every request is the same FLOPs). Diffusion wins on quality and generalization. The modern play is often to ship a Pix2Pix-style distilled model for the narrow task and a diffusion fallback for tail inputs.
+
 ## Further Reading
 
 - [Mirza & Osindero (2014). Conditional Generative Adversarial Nets](https://arxiv.org/abs/1411.1784) — the cGAN paper.
@@ -132,3 +145,4 @@ Save `outputs/skill-img2img-chooser.md`. Skill takes a task description, data av
 - [Wang et al. (2018). High-Resolution Image Synthesis with Conditional GANs](https://arxiv.org/abs/1711.11585) — Pix2PixHD.
 - [Park et al. (2019). Semantic Image Synthesis with Spatially-Adaptive Normalization](https://arxiv.org/abs/1903.07291) — SPADE / GauGAN.
 - [Miyato & Koyama (2018). cGANs with Projection Discriminator](https://arxiv.org/abs/1802.05637) — the projection D.
+- [stas00 ml-engineering — Batching](https://github.com/stas00/ml-engineering/blob/master/inference/README.md#batching) — static vs continuous batching. Paired Pix2Pix-style generators are textbook static-batch servers (fixed FLOPs per request); diffusion needs continuous batching to keep the GPU saturated across variable step counts.
