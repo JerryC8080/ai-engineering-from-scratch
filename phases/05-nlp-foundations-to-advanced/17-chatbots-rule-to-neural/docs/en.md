@@ -63,6 +63,8 @@ ELIZA in 20 lines. The reflection trick ("I feel sad" → "Why do you feel sad")
 
 ### Step 2: retrieval-based (FAQ)
 
+This illustrative snippet requires `pip install sentence-transformers` (which pulls in torch). The runnable `code/main.py` for this lesson uses a stdlib Jaccard similarity instead, so the lesson runs without external dependencies.
+
 ```python
 from sentence_transformers import SentenceTransformer
 import numpy as np
@@ -93,15 +95,14 @@ Threshold-based refusal is the key design choice. If the best match is not close
 
 ### Step 3: neural generation (baseline)
 
-Use a fine-tuned BlenderBot or DialoGPT. Production-unusable on its own in 2026 (too prone to contradiction, off-topic drift, factual nonsense), but ships inside hybrid systems for natural phrasing.
+Use a small instruction-tuned encoder-decoder (FLAN-T5) or a fine-tuned conversational model. Production-unusable on its own in 2026 (contradiction, off-topic drift, factual nonsense), but ships inside hybrid systems for natural phrasing. DialoGPT-style decoder-only models need explicit turn separators and EOS handling to produce coherent replies; a FLAN-T5 text2text pipeline works out of the box for a teaching example.
 
 ```python
 from transformers import pipeline
 
-chatbot = pipeline("text-generation", model="microsoft/DialoGPT-medium")
+chatbot = pipeline("text2text-generation", model="google/flan-t5-small")
 
-conversation = "Hi there!"
-response = chatbot(conversation, max_new_tokens=40, pad_token_id=50256)
+response = chatbot("Respond politely to: Hi there!", max_new_tokens=40)
 print(response[0]["generated_text"])
 ```
 
@@ -167,7 +168,13 @@ Always use hybrid routing in production. No single architecture handles every re
 ## Failure modes that still ship
 
 - **Confident fabrication.** LLM agent claims it completed an action it did not. Mitigation: verify outcomes, log tool calls, never let the LLM claim to have done something without a successful tool return.
-- **Prompt injection.** User inserts text that overrides the system prompt. Ranked LLM01 in the OWASP Top 10 for LLM Applications 2025. Attack success rates hit 84% in agentic systems; production CVEs carry CVSS 9.0+. Direct injection (pasted into the chat) and indirect injection (hidden in documents, emails, or tool outputs the agent reads) both apply. Mitigation: treat user input as untrusted throughout the loop; sanitize before tool calls; isolate tool outputs from the main prompt; use the Plan-Verify-Execute (PVE) pattern where the agent plans first, then verifies each action against that plan before executing (this stops tool results from injecting new unplanned actions); require user confirmation for destructive actions; apply least-privilege to tool scopes. Note: no amount of prompt engineering fully eliminates this risk; external runtime defense layers (LLM Guard, allowlist validation, semantic anomaly detection) are required.
+- **Prompt injection.** User inserts text that overrides the system prompt. Ranked LLM01 in the OWASP Top 10 for LLM Applications 2025. Two flavors: direct injection (pasted into the chat) and indirect injection (hidden in documents, emails, or tool outputs the agent reads).
+
+  Attack rates vary by scenario. Measured success rates range ~0.5-8.5% across frontier models in general tool-use and coding benchmarks. Specific high-risk setups (adaptive attacks against AI coding agents, vulnerable orchestration) have reached ~84%. Production CVEs include EchoLeak (CVE-2025-32711, CVSS 9.3) — a zero-click data-exfiltration flaw in Microsoft 365 Copilot triggered by an attacker-controlled email.
+
+  Mitigations: treat user input as untrusted throughout the loop; sanitize before tool calls; isolate tool outputs from the main prompt; use the Plan-Verify-Execute (PVE) pattern where the agent plans first, then verifies each action against that plan before executing (this stops tool results from injecting new unplanned actions); require user confirmation for destructive actions; apply least-privilege to tool scopes.
+
+  No amount of prompt engineering fully eliminates this risk. External runtime defense layers (LLM Guard, allowlist validation, semantic anomaly detection) are required.
 - **Scope creep.** Agent goes off-task because a tool call returned tangentially related info. Mitigation: narrow tool contracts; keep the system prompt focused; add evaluations for off-task rate.
 - **Infinite loops.** Agent keeps calling the same tool. Mitigation: step budget, tool-call deduplication, LLM judge on "are we making progress."
 - **Context window exhaustion.** Long conversations push the earliest turns out of context. Mitigation: summarize older turns, retrieve relevant past turns by similarity, or use a long-context model.
