@@ -523,10 +523,21 @@ This lesson produces `outputs/prompt-gpt-architecture-analyzer.md` -- a prompt t
 | Layer normalization | "Normalizing activations" | Normalizing across the feature dimension to mean 0 and variance 1, with learnable scale and bias parameters |
 | Cross-entropy loss | "How wrong the predictions are" | -log(probability assigned to the correct next token), averaged over all positions -- the standard LLM training objective |
 
+## Reference Implementations
+
+Pre-training from scratch has three canonical educational implementations. Read each in this order after finishing the build:
+
+- [Karpathy nanoGPT `model.py`](https://github.com/karpathy/nanoGPT/blob/master/model.py) -- ~300 lines for the full GPT-2 architecture. Study `CausalSelfAttention` for the scaled dot-product + mask, `MLP` for the 4x expansion with GELU, and `configure_optimizers` for the weight-decay split (decay matrices but not biases or LayerNorm).
+- [Karpathy nanoGPT `train.py`](https://github.com/karpathy/nanoGPT/blob/master/train.py) -- the reference training loop: gradient accumulation, mixed precision via `torch.autocast`, cosine schedule with warmup, DDP hooks, and `torch.compile`. This is what your minimal trainer grows into.
+- [Rasbt LLMs-from-scratch Ch 4 `01_main-chapter-code`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/01_main-chapter-code) -- the GPT-2 124M architecture rebuilt module by module (`MultiHeadAttention`, `FeedForward`, `TransformerBlock`, `GPTModel`). Pair with the book's Chapter 4 for the conceptual walkthrough.
+- [Rasbt LLMs-from-scratch Ch 5 `01_main-chapter-code`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/01_main-chapter-code) -- the matching pre-training loop with loss curves, temperature/top-k sampling, and weight loading from OpenAI's released checkpoint. The sampling code is the blueprint for the generation you added in Step 5.
+- [Karpathy llm.c `train_gpt2.py`](https://github.com/karpathy/llm.c/blob/master/train_gpt2.py) -- reference PyTorch trainer that produces bit-exact outputs with the C/CUDA version. Useful to diff when your loss curve looks wrong: if this one trains cleanly on your data, your bug is in your model.
+- [Karpathy llm.c `train_gpt2.c`](https://github.com/karpathy/llm.c/blob/master/train_gpt2.c) -- the same loop in pure C. Read `gpt2_forward` once: attention, residual stream, and LayerNorm become concrete when they are 1000 lines of array math.
+- [Karpathy nn-zero-to-hero makemore part 2](https://github.com/karpathy/nn-zero-to-hero/blob/master/lectures/makemore/makemore_part2_mlp.ipynb) -- the MLP character-level predecessor to GPT. If your model won't overfit 10 sentences, step back to this notebook to confirm your forward and backward pass are correct.
+
 ## Further Reading
 
 - [Radford et al., 2019 -- "Language Models are Unsupervised Multitask Learners" (GPT-2)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) -- the GPT-2 paper that introduced the 124M to 1.5B parameter family
 - [Vaswani et al., 2017 -- "Attention Is All You Need"](https://arxiv.org/abs/1706.03762) -- the original transformer paper with scaled dot-product attention and multi-head attention
-- [Andrej Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT) -- the cleanest GPT-2 training implementation (~300 lines of PyTorch), the best educational reference for this architecture
 - [Llama 3 Technical Report](https://arxiv.org/abs/2407.21783) -- how Meta scaled the GPT architecture to 405B parameters with 16K GPUs
 - [Pope et al., 2022 -- "Efficiently Scaling Transformer Inference"](https://arxiv.org/abs/2211.05102) -- the paper that formalized prefill vs decode and KV cache analysis
