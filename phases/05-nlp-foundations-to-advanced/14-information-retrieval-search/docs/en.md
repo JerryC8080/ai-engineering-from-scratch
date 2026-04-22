@@ -161,6 +161,19 @@ The 2026 stack:
 
 Whatever you pick, budget for evaluation. Benchmark retrieval recall before benchmarking end-to-end RAG accuracy. A reader cannot fix what the retriever missed.
 
+### The hard-won lessons from 2026 production RAG
+
+- **80% of RAG failures trace to ingestion and chunking, not the model.** Teams spend weeks swapping LLMs and tuning prompts while the retrieval quietly returns the wrong context every third query. Fix chunking first.
+- **Chunking strategy matters more than chunk size.** Fixed-size splits break tables, code, and nested headers. Sentence-aware is the default; semantic or LLM-based chunking pays off for technical docs and product manuals.
+- **Parent-doc pattern.** Retrieve small "child" chunks for precision. When multiple children from the same parent section appear, swap in the parent block to preserve context. This consistently lifts answer quality without retraining.
+- **k_rerank=3 is usually optimal.** Every extra chunk past that adds token cost and generation latency without lifting answer quality. If k=8 is still better than k=3 for you, the reranker is underperforming.
+- **HyDE / query expansion.** Generate a hypothetical answer from the query, embed that, retrieve. Bridges the phrasing gap between short questions and long documents. Free precision lift with no training.
+- **Context budget under 8K tokens.** Consistent hits at that limit mean the reranker threshold is too loose.
+- **Version everything.** Prompts, chunking rules, embedding model, reranker. Any drift silently breaks answer quality. CI gates on faithfulness, context precision, and unanswered-question rate block regressions before users see them.
+- **Three-way retrieval (BM25 + dense + learned-sparse like SPLADE) outperforms two-way** on 2026 benchmarks, especially for queries mixing proper nouns with semantics. Ship it when infrastructure supports SPLADE indexes.
+
+Proper retrieval design reduces hallucinations by 70-90% according to 2026 industry measurements. Most RAG performance gains come from better retrieval, not model fine-tuning.
+
 ## Ship It
 
 Save as `outputs/skill-retrieval-picker.md`:
