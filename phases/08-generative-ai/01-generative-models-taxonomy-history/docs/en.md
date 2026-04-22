@@ -114,6 +114,16 @@ The skill takes a task description and outputs: (1) which family to use, (2) a r
 | Autoregressive | "Predict the next piece" | Factorize joint as product of conditionals. |
 | Latent | "Compressed code" | Low-dim representation from which a decoder can reconstruct the input. |
 
+## Production note: five families, five inference shapes
+
+Each family maps to a different inference-server cost curve. stas00's `ml-engineering/inference` chapter frames LLM inference as prefill + decode; the same decomposition applies here:
+
+- **Autoregressive (bucket 1 and 5).** Sequential decode dominates latency; KV-cache, continuous batching, and speculative decoding all apply directly.
+- **VAE / diffusion / flow-matching (buckets 2 and 4).** There is no decode in the LLM sense. Cost = `num_steps × step_cost`, and the `step_cost` is a transformer or U-Net forward at the full latent resolution. The production knobs are step count (DDIM / DPM-Solver / distillation), batch size, and precision (bf16 / fp8 / int4).
+- **GAN (bucket 3).** One forward pass. No schedule, no KV-cache. TTFT ≈ total latency. This is why StyleGAN still wins on narrow-domain UX.
+
+When you see "faster than diffusion" in a paper abstract, translate it to "fewer steps × same step cost" or "same steps × cheaper step cost". Everything else is marketing.
+
 ## Further Reading
 
 - [Goodfellow et al. (2014). Generative Adversarial Nets](https://arxiv.org/abs/1406.2661) — the GAN paper.
@@ -122,3 +132,5 @@ The skill takes a task description and outputs: (1) which family to use, (2) a r
 - [Song et al. (2021). Score-Based Generative Modeling through SDEs](https://arxiv.org/abs/2011.13456) — diffusion as an SDE.
 - [Lipman et al. (2023). Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747) — the flow matching paper.
 - [Esser et al. (2024). Scaling Rectified Flow Transformers for High-Resolution Image Synthesis](https://arxiv.org/abs/2403.03206) — Stable Diffusion 3.
+- [Niels Transformers-Tutorials — (Un)conditional image generation with ImageGPT](https://github.com/NielsRogge/Transformers-Tutorials/blob/master/ImageGPT/(Un)conditional_image_generation_with_ImageGPT.ipynb) — pixel-level autoregressive sampler (bucket 1 and 5). Shows the 32×32 color-cluster tokenization and the sequential decode that makes autoregressive image models slow.
+- [stas00 ml-engineering — Inference](https://github.com/stas00/ml-engineering/blob/master/inference/README.md) — prefill vs decode, TTFT, TPOT, continuous batching. Substrate vocabulary for everything in this phase.
