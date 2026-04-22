@@ -274,6 +274,21 @@ This lesson produces `outputs/skill-open-model-picker.md`. Given a deployment ta
 | Sliding-window attention | "Don't attend to everything" | Each token attends only to the last W tokens — caps attention cost at O(W) per token, used in Gemma 2 and early Mistral |
 | Active params | "What runs per token" | For MoE models, the parameter count that sees a forward pass per token (much smaller than total params) — governs per-token FLOPs |
 
+## Reference Implementations
+
+The single best way to understand a modern architecture is to read someone else's from-scratch rebuild. Rasbt's `ch05` variants do this for every major open model family:
+
+- [Rasbt LLMs-from-scratch Ch 5 `07_gpt_to_llama`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/07_gpt_to_llama) -- transforms the Ch 4 GPT-2 model into Llama 3 by swapping attention to GQA + RoPE, replacing LayerNorm with RMSNorm, and switching FFN to SwiGLU. The clearest diff-based view of how GPT-2 became Llama 3.
+- [Rasbt LLMs-from-scratch Ch 5 `11_qwen3`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/11_qwen3) -- Qwen 3 rebuilt from scratch, covering sliding-window attention and the model's sparse + dense variants.
+- [Rasbt LLMs-from-scratch Ch 5 `12_gemma3`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/12_gemma3) -- Gemma 3 from scratch with hybrid full + sliding attention and pre+post-norm.
+- [Rasbt LLMs-from-scratch Ch 5 `13_olmo3`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/13_olmo3) -- OLMo 3 rebuild, fully open-data lineage including training recipes.
+- [Rasbt LLMs-from-scratch Ch 5 `15_tiny-aya`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/15_tiny-aya) -- Tiny Aya, a small multilingual model to inspect in a laptop.
+- [Rasbt LLMs-from-scratch Ch 5 `16_qwen3.5`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/16_qwen3.5) and [`17_gemma4`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/17_gemma4) -- latest drops, kept in sync with model releases.
+- [Rasbt LLMs-from-scratch Ch 4 `04_gqa`, `05_mla`, `06_swa`, `07_moe`, `08_deltanet`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04) -- per-component rebuilds: GQA (Llama, Qwen), MLA (DeepSeek), SWA (Gemma, Mistral), MoE (Mixtral, DeepSeek), DeltaNet. Drop these modules into your own GPT-2 to see one architecture change at a time.
+- [mlabonne Model Family Tree notebook](https://colab.research.google.com/drive/1s2eQlolcI1VGgDhqWIANfkfKvcKrMyNr) -- visualizes the merged-model lineage of the modern open-weights ecosystem. Use it to see how Zephyr, Beagle, and OpenHermes descend from Mistral.
+- [mlabonne llm-course tools table](https://github.com/mlabonne/llm-course#notebooks) -- LazyMergekit, AutoQuant, AutoEval: one-click Colabs that let you reproduce the variants you just studied.
+- [Karpathy llm.c `train_llama3.py`](https://github.com/karpathy/llm.c/blob/master/train_llama3.py) -- minimal Llama 3 trainer: how the Rasbt walkthroughs become a real pre-training loop.
+
 ## Further Reading
 
 - [Dubey et al., 2024 -- "The Llama 3 Herd of Models"](https://arxiv.org/abs/2407.21783) -- the architectural and training reference for the dense Llama 3 family
