@@ -52,7 +52,7 @@ print(answer)
 {'score': 0.98, 'start': 57, 'end': 70, 'answer': 'June 29, 2007'}
 ```
 
-`deepset/roberta-base-squad2` is trained on SQuAD 2.0, which includes unanswerable questions. If the passage does not contain the answer, the model returns an empty answer with low score. Always check the score.
+`deepset/roberta-base-squad2` is trained on SQuAD 2.0, which includes unanswerable questions. By default, the `question-answering` pipeline returns the highest-scoring span even when the model's null score wins — it does *not* automatically return an empty answer. To get explicit "no answer" behavior, pass `handle_impossible_answer=True` to the pipeline call: the pipeline then returns an empty answer only when the null score exceeds every span score. Always check the `score` field either way.
 
 ### Step 2: a retrieval-augmented pipeline (sketch)
 
@@ -68,11 +68,11 @@ corpus = [
     "Android launched in 2008 as Google's mobile operating system.",
     "The first iPod was released in 2001.",
 ]
-corpus_embeddings = encoder.encode(corpus)
+corpus_embeddings = encoder.encode(corpus, normalize_embeddings=True)
 
 
 def retrieve(question, top_k=2):
-    q_emb = encoder.encode([question])
+    q_emb = encoder.encode([question], normalize_embeddings=True)
     sims = (corpus_embeddings @ q_emb.T).squeeze()
     order = np.argsort(-sims)[:top_k]
     return [corpus[i] for i in order]
