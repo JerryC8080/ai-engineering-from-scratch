@@ -770,6 +770,19 @@ This lesson produces:
 | Ops:byte ratio | "Arithmetic intensity" | The ratio of compute operations to memory bytes read -- determines whether a workload is compute-bound (high ratio) or memory-bound (low ratio) |
 | Time to first token | "TTFT" | Latency from receiving a request to producing the first output token -- dominated by prefill time for long prompts |
 
+## Reference Implementations
+
+Inference optimization is where operating at scale matters more than theory. Read these in this order:
+
+- [stas00 ml-engineering `inference/`](https://github.com/stas00/ml-engineering/tree/master/inference) -- Stas's collected notes on LLM inference: KV cache sizing, batching strategies, the actual memory math, and what breaks first in production. The systems-level reference for everything in this lesson.
+- [stas00 ml-engineering `compute/`](https://github.com/stas00/ml-engineering/tree/master/compute) -- GPU memory bandwidth and FLOPS by generation. Use this table to compute the roofline for your hardware.
+- [vLLM `attention/backends/`](https://github.com/vllm-project/vllm/tree/main/vllm/attention/backends) -- production PagedAttention kernel. Read `flash_attn.py` for the integration and `csrc/attention/attention_kernels.cu` for the CUDA. The reference for what paged KV cache looks like in a real serving engine.
+- [vLLM `core/scheduler.py`](https://github.com/vllm-project/vllm/blob/main/vllm/core/scheduler.py) -- continuous batching scheduler. `_schedule_running` + `_schedule_prefills` is the core loop: watch how running and waiting sequences get interleaved into one step.
+- [SGLang RadixAttention](https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/mem_cache/radix_cache.py) -- the prefix-cache trie that shares KV across requests with common prefixes. The implementation that realized the theoretical gain.
+- [llama.cpp KV cache implementation](https://github.com/ggerganov/llama.cpp/blob/master/src/llama-kv-cache.cpp) -- the CPU/Metal reference for unified KV cache management with batching. Pair with the quantized attention kernels in `ggml/src/`.
+- [FlashAttention reference](https://github.com/Dao-AILab/flash-attention) -- Tri Dao's IO-aware attention. The tiling + softmax recomputation that made long context practical. `flash_attn_interface.py` is the Python entry point.
+- [nanoGPT `sample.py`](https://github.com/karpathy/nanoGPT/blob/master/sample.py) -- the minimal decode loop. Start here, then compare against vLLM's scheduler to see what production adds.
+
 ## Further Reading
 
 - Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention" (2023) -- the vLLM paper that introduced paged KV cache management, now the industry standard for inference serving
