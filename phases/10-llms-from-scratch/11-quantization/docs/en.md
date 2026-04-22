@@ -858,6 +858,21 @@ This lesson produces `outputs/skill-quantization.md`, a decision framework for c
 | Scale factor | "The multiplier" | Converts between floating-point range and integer range: `float_val = int_val * scale` |
 | Perplexity delta | "How much worse" | Difference in perplexity between original and quantized model, < 0.5 is excellent, > 2.0 is a problem |
 
+## Reference Implementations
+
+Quantization is where the gap between paper and production is largest. mlabonne's notebooks are the single best onramp; stas00 explains the systems side:
+
+- [mlabonne "Introduction to Quantization" notebook](https://colab.research.google.com/drive/1DPr4mUQ92Cc-xf4GgAaB6dFcFnWIvqYi) -- absmax and zero-point from scratch + LLM.int8() walkthrough. Start here before any library.
+- [mlabonne "4-bit Quantization using GPTQ" notebook](https://colab.research.google.com/drive/1lSvVDaRgqQp_mWK_jC9gydz6_-y6Aq4A) -- quantize a real 7B model on a free Colab GPU using AutoGPTQ. The recipe you will actually reuse.
+- [mlabonne "Quantization with GGUF and llama.cpp" notebook](https://colab.research.google.com/drive/1pL8k7m04mgE5jo2NrjGi8atB0j_37aDD) -- convert an HF model to GGUF, pick a quant type (Q4_K_M, Q5_K_M, Q8_0), push to HF Hub. The end-to-end path for shipping a quantized model.
+- [mlabonne AutoQuant notebook](https://colab.research.google.com/drive/1b6nqC7UZVt8bx4MksX7s656GXPM-eWw4) -- one-click pipeline that outputs GGUF, GPTQ, AWQ, EXL2, and HQQ variants of the same base model. Read the source to see how each library is invoked.
+- [mlabonne llm-course "Quantization" section](https://github.com/mlabonne/llm-course#7-quantization) -- the decision tree between GGUF (CPU/Metal), GPTQ/AWQ (GPU inference), EXL2 (vLLM speed), and bitsandbytes (training). Use it to pick the right format.
+- [llama.cpp `quantize.cpp`](https://github.com/ggerganov/llama.cpp/blob/master/examples/quantize/quantize.cpp) -- the production GGUF quantizer. The k-quant block formats (`Q4_K_M` = 4-bit with super-block of 256 + 6-bit scales) live in `ggml-quants.c`. Worth reading to understand why K-quants beat naive 4-bit.
+- [AutoGPTQ](https://github.com/AutoGPTQ/AutoGPTQ) -- the production implementation of the GPTQ paper. Calibration dataset, layer-wise OBS-style rounding, checkpoint export.
+- [AutoAWQ](https://github.com/casper-hansen/AutoAWQ) -- the production implementation of the AWQ paper. Activation-aware scaling is the single trick. Diff the `quantize` function against GPTQ to see what one equation buys you.
+- [stas00 ml-engineering `training/dtype.md`](https://github.com/stas00/ml-engineering/blob/master/training/dtype.md) -- the precision zoo: FP32, TF32, FP16, BF16, FP8, INT8, INT4. Ranges, accumulators, when each breaks, hardware support. The reference before you touch a `--quantize` flag.
+- [stas00 ml-engineering `inference/`](https://github.com/stas00/ml-engineering/tree/master/inference) -- production inference notes, including the quantization-quality/throughput trade-offs observed on BLOOM-176B.
+
 ## Further Reading
 
 - [Frantar et al., 2022 -- "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"](https://arxiv.org/abs/2210.17323) -- the paper that made INT4 quantization practical for LLMs using Hessian-guided weight rounding
@@ -865,4 +880,3 @@ This lesson produces `outputs/skill-quantization.md`, a decision framework for c
 - [Dettmers et al., 2022 -- "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale"](https://arxiv.org/abs/2208.07339) -- mixed-precision INT8 that keeps outlier features in FP16, enabling INT8 inference without quality loss
 - [Xiao et al., 2023 -- "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models"](https://arxiv.org/abs/2211.10438) -- migrating quantization difficulty from activations to weights for W8A8 deployment
 - [Micikevicius et al., 2022 -- "FP8 Formats for Deep Learning"](https://arxiv.org/abs/2209.05433) -- the NVIDIA/ARM/Intel paper defining E4M3 and E5M2 formats now native on H100
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) -- the project that democratized LLM inference on consumer hardware using GGUF quantization and CPU/Metal optimization
