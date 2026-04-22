@@ -525,3 +525,6 @@ This lesson produces:
 - Cormack et al., "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods" (2009) -- the original RRF paper showing it beats more complex fusion methods
 - Gao et al., "Precise Zero-Shot Dense Retrieval without Relevance Labels" (2022) -- the HyDE paper demonstrating that hypothetical document embeddings improve retrieval without any training data
 - Nogueira & Cho, "Passage Re-ranking with BERT" (2019) -- showed cross-encoder reranking on top of BM25 significantly improves retrieval quality
+- [mlabonne LLM Engineer -- Advanced RAG](https://github.com/mlabonne/llm-course#4-advanced-rag) -- query construction (Text-to-SQL, Cypher), tool use, post-processing (reranking, RAG-fusion, classification), and DSPy-style programmatic optimization; the roadmap this lesson maps directly onto
+- [LangChain Query Construction blog](https://blog.langchain.dev/query-construction/) -- mlabonne's first reference under Advanced RAG: how to translate natural-language queries into structured database queries
+- [DSPy in 8 Steps](https://dspy-docs.vercel.app/docs/building-blocks/solving_your_task) -- the tutorial mlabonne points to for "Program LLMs"; treats prompt construction and weight selection as an optimization problem over retrieval pipelines
