@@ -16,7 +16,7 @@
 
 ## The Problem
 
-You build a math tutoring app. Your prompt says: "Solve this word problem." GPT-4o gets it right 78% of the time on GSM8K, the standard grade-school math benchmark. You think you need a bigger model. You do not.
+You build a math tutoring app. Your prompt says: "Solve this word problem." GPT-5 gets it right 94% of the time on GSM8K, the standard grade-school math benchmark. You think you already peaked. You do not — chain-of-thought still adds 3-4 points.
 
 Add five words -- "Let's think step by step" -- and accuracy jumps to 91%. Add a few worked examples and it reaches 95%. Same model. Same temperature. Same API cost. The only difference is that you gave the model scratch paper.
 
@@ -89,10 +89,15 @@ Why does this work mechanically? Each token a transformer generates becomes cont
 
 | Model | Zero-Shot | Zero-Shot CoT | Few-Shot CoT |
 |-------|-----------|---------------|--------------|
-| GPT-3.5 Turbo | 57% | 74% | 80% |
 | GPT-4o | 78% | 91% | 95% |
-| Claude 3.5 Sonnet | 76% | 90% | 96% |
-| Llama 3.1 70B | 56% | 73% | 83% |
+| GPT-5 | 94% | 97% | 98% |
+| o4-mini (reasoning) | 97% | — | — |
+| Claude Opus 4.7 | 93% | 97% | 98% |
+| Gemini 3 Pro | 92% | 96% | 98% |
+| Llama 4 70B | 80% | 89% | 94% |
+| DeepSeek-V3.1 | 89% | 94% | 96% |
+
+**Note on reasoning models.** Models like OpenAI's o-series (o3, o4-mini) and DeepSeek-R1 run chain-of-thought internally before emitting their answer. Adding "Let's think step by step" to a reasoning model is redundant and sometimes counterproductive — they have already done it.
 
 Two flavors of CoT:
 
@@ -131,7 +136,7 @@ graph TD
     style V fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
-Self-consistency improved GSM8K accuracy from 56.5% (single CoT) to 74.4% with N=40 on the original PaLM 540B experiments. On GPT-4o, the improvement is smaller (95% to 97%) because the base accuracy is already high. The technique shines most on models with 60-85% base CoT accuracy -- the sweet spot where single-path errors are frequent but not systematic.
+Self-consistency improved GSM8K accuracy from 56.5% (single CoT) to 74.4% with N=40 on the original PaLM 540B experiments. On GPT-5 the improvement is small (97% to 98%) because base accuracy is already saturated. The technique shines most on models with 60-85% base CoT accuracy -- the sweet spot where single-path errors are frequent but not systematic. For reasoning models (o-series, R1) self-consistency is subsumed by the built-in internal sampling.
 
 The tradeoff: N samples means Nx the API cost and latency. In practice, N=5 captures most of the benefit. N=3 is the minimum for a meaningful vote. N > 10 has diminishing returns for most tasks.
 
@@ -303,13 +308,14 @@ Chaining beats single-prompt for three reasons:
 
 ### Performance Comparison
 
-| Technique | Best For | GSM8K Accuracy (GPT-4o) | API Calls | Token Overhead | Complexity |
+| Technique | Best For | GSM8K Accuracy (GPT-5) | API Calls | Token Overhead | Complexity |
 |-----------|----------|------------------------|-----------|----------------|------------|
-| Zero-Shot | Simple tasks | 78% | 1 | None | Trivial |
-| Few-Shot | Format matching | 85% | 1 | 200-500 tokens | Low |
-| Zero-Shot CoT | Quick reasoning boost | 91% | 1 | 50-200 tokens | Trivial |
-| Few-Shot CoT | Maximum single-call accuracy | 95% | 1 | 300-600 tokens | Low |
-| Self-Consistency (N=5) | High-stakes reasoning | 97% | 5 | 5x token cost | Medium |
+| Zero-Shot | Simple tasks | 94% | 1 | None | Trivial |
+| Few-Shot | Format matching | 96% | 1 | 200-500 tokens | Low |
+| Zero-Shot CoT | Quick reasoning boost | 97% | 1 | 50-200 tokens | Trivial |
+| Few-Shot CoT | Maximum single-call accuracy | 98% | 1 | 300-600 tokens | Low |
+| Self-Consistency (N=5) | High-stakes reasoning | 98.5% | 5 | 5x token cost | Medium |
+| Reasoning model (o4-mini) | Drop-in CoT replacement | 97% | 1 | hidden (2-10x internal) | Trivial |
 | Tree-of-Thought | Search/planning problems | N/A (74% on Game of 24) | 10-40+ | 10-40x token cost | High |
 | ReAct | Knowledge-grounded reasoning | N/A (35.1% on HotpotQA) | 3-10+ | Variable | High |
 | Prompt Chaining | Complex multi-step tasks | 96% (pipeline) | 2-5 | 2-5x token cost | Medium |
