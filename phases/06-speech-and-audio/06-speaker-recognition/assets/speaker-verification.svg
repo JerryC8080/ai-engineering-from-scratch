@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+    <style>
+      .box { fill: #faf6ef; stroke: #1a1a1a; stroke-width: 1.5; }
+      .hot { fill: #fff1d6; stroke: #c0392b; stroke-width: 1.5; }
+      .label { font-size: 13px; font-weight: 700; fill: #1a1a1a; }
+      .content { font-size: 11px; fill: #333; font-family: 'Menlo', monospace; }
+      .caption { font-size: 11px; fill: #555; font-style: italic; }
+      .title { font-size: 15px; font-weight: 700; fill: #1a1a1a; }
+      .line { stroke: #1a1a1a; stroke-width: 1.3; fill: none; }
+      .red { stroke: #c0392b; stroke-width: 1.8; fill: none; }
+    </style>
+  </defs>
+
+  <text x="440" y="26" text-anchor="middle" class="title">speaker verification: embedding + cosine + calibrated threshold</text>
+
+  <rect x="30" y="50" width="160" height="100" class="box"/>
+  <text x="110" y="74" text-anchor="middle" class="label">1. utterance A</text>
+  <text x="110" y="94" text-anchor="middle" class="content">log-mel (80, T)</text>
+  <text x="110" y="112" text-anchor="middle" class="caption">≥ 1 s of voiced speech</text>
+
+  <line x1="192" y1="100" x2="213" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="215" y="50" width="210" height="100" class="box"/>
+  <text x="320" y="74" text-anchor="middle" class="label">2. ECAPA-TDNN</text>
+  <text x="320" y="94" text-anchor="middle" class="content">TDNN + attention pool</text>
+  <text x="320" y="112" text-anchor="middle" class="content">→ 192-dim vector</text>
+  <text x="320" y="134" text-anchor="middle" class="caption">14M params, AAM-softmax</text>
+
+  <line x1="427" y1="100" x2="448" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="450" y="50" width="210" height="100" class="hot"/>
+  <text x="555" y="74" text-anchor="middle" class="label">3. cosine(embA, embB)</text>
+  <text x="555" y="94" text-anchor="middle" class="content">score ∈ [-1, +1]</text>
+  <text x="555" y="112" text-anchor="middle" class="content">decision: score &gt; τ</text>
+  <text x="555" y="134" text-anchor="middle" class="caption">τ calibrated per channel</text>
+
+  <line x1="662" y1="100" x2="683" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="685" y="50" width="170" height="100" class="box"/>
+  <text x="770" y="74" text-anchor="middle" class="label">4. yes / no</text>
+  <text x="770" y="94" text-anchor="middle" class="content">accept / reject</text>
+  <text x="770" y="112" text-anchor="middle" class="content">or rank a roster</text>
+  <text x="770" y="134" text-anchor="middle" class="caption">enroll 3-5 clips</text>
+
+  <rect x="30" y="180" width="380" height="240" class="box"/>
+  <text x="220" y="202" text-anchor="middle" class="label">EER: where FAR = FRR</text>
+  <line x1="70" y1="380" x2="400" y2="380" stroke="#1a1a1a" stroke-width="1"/>
+  <line x1="70" y1="380" x2="70" y2="230" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="70" y="225" text-anchor="middle" class="caption">rate</text>
+  <text x="400" y="398" text-anchor="end" class="caption">threshold τ</text>
+  <path class="line" d="M80,250 Q150,270 220,320 T390,380"/>
+  <path class="red" d="M80,380 Q150,365 220,325 T390,245"/>
+  <circle cx="230" cy="324" r="4" fill="#c0392b"/>
+  <text x="240" y="322" class="caption">EER</text>
+  <text x="85" y="265" class="caption">FRR (false reject)</text>
+  <text x="300" y="270" class="caption" fill="#c0392b">FAR (false accept)</text>
+
+  <rect x="425" y="180" width="430" height="240" class="box"/>
+  <text x="640" y="202" text-anchor="middle" class="label">2026 EER numbers</text>
+  <text x="445" y="232" class="content">x-vector (2018)             3.2%    VoxCeleb1-O</text>
+  <text x="445" y="252" class="content">ECAPA-TDNN (2020)           0.87%   VoxCeleb1-O</text>
+  <text x="445" y="272" class="content">WavLM-base + TDNN (2022)    0.84%   VoxCeleb1-O</text>
+  <text x="445" y="292" class="content">3D-Speaker CAM++ (2024)     0.50%   VoxCeleb1-O</text>
+  <text x="445" y="312" class="content">pyannoteAI Precision-2      &lt;0.40%  claimed 2026</text>
+  <text x="445" y="342" class="caption">biometrics target: EER &lt; 0.1% — add anti-spoofing + liveness.</text>
+  <text x="445" y="362" class="caption">channel mismatch doubles EER — calibrate per deploy channel.</text>
+  <text x="445" y="382" class="caption">for diarization: cluster ECAPA embeddings, pyannote 3.1 pipeline.</text>
+  <text x="445" y="402" class="caption">always enroll 3-5 clips per user to stabilize the centroid.</text>
+</svg>
