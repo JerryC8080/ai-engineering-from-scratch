@@ -42,6 +42,14 @@ def simple_bleu(hypothesis, reference, max_n=4):
     return 100 * bp * math.exp(log_mean)
 
 
+def simple_bleu_note():
+    return (
+        "simple_bleu above has no smoothing: one zero-precision n-gram drops "
+        "the score to 0.0. This punishes short hypotheses; production uses "
+        "epsilon / NIST / add-k smoothing via sacrebleu."
+    )
+
+
 def chrf(hypothesis, reference, n=6, beta=2):
     def char_ngrams(text, k):
         return [text[i:i + k] for i in range(len(text) - k + 1)]
@@ -81,6 +89,7 @@ def main():
         c = chrf(hyp, ref)
         print(f"{hyp:40s}  {ref:25s}  {b:6.1f}  {c:6.1f}")
     print()
+    print(simple_bleu_note())
     print("BLEU under 1 point is noise. chrF catches morphological partials BLEU misses.")
     print("For real work, use sacrebleu (pip install sacrebleu) instead of this teaching version.")
 

@@ -51,7 +51,7 @@ out = model.generate(
 print(tok.batch_decode(out, skip_special_tokens=True)[0])
 ```
 
-```
+```text
 Les chats courent.
 ```
 
