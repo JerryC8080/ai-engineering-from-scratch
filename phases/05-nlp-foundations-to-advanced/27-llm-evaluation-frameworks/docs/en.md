@@ -55,28 +55,36 @@ Why it fails silently:
 ### Step 1: faithfulness with NLI (RAGAS-style)
 
 ```python
+from typing import Callable
 from transformers import pipeline
+
 nli = pipeline("text-classification",
                model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
                top_k=None)
 
+# `llm` is any callable: prompt str -> generated str.
+# Example: llm = lambda p: client.messages.create(model="claude-haiku-4-5", ...).content[0].text
+LLM = Callable[[str], str]
 
-def atomic_claims(answer, llm):
+
+def atomic_claims(answer: str, llm: LLM) -> list[str]:
     prompt = f"""Break this answer into simple factual claims (one per line):
 {answer}
 """
     return llm(prompt).splitlines()
 
 
-def faithfulness(answer, context, llm):
+def faithfulness(answer: str, context: str, llm: LLM) -> float:
     claims = atomic_claims(answer, llm)
+    if not claims:
+        return 0.0
     supported = 0
     for claim in claims:
         result = nli({"text": context, "text_pair": claim})[0]
-        entail = next(s for s in result if s["label"] == "entailment")
-        if entail["score"] > 0.5:
+        entail = next((s for s in result if s["label"] == "entailment"), None)
+        if entail and entail["score"] > 0.5:
             supported += 1
-    return supported / len(claims) if claims else 0.0
+    return supported / len(claims)
 ```
 
 Decompose the answer into atomic claims. NLI-check each claim against the retrieved context. Faithfulness = fraction supported.
@@ -84,11 +92,19 @@ Decompose the answer into atomic claims. NLI-check each claim against the retrie
 ### Step 2: answer relevance
 
 ```python
-def answer_relevance(question, answer, encoder, llm, n=3):
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# encoder: any model implementing .encode(texts, normalize_embeddings=True) -> ndarray
+# e.g., encoder = SentenceTransformer("BAAI/bge-small-en-v1.5")
+
+def answer_relevance(question: str, answer: str, encoder, llm: LLM, n: int = 3) -> float:
     prompt = f"Write {n} questions this answer could be the answer to:\n{answer}"
-    generated = llm(prompt).splitlines()[:n]
-    q_emb = encoder.encode([question], normalize_embeddings=True)[0]
-    g_embs = encoder.encode(generated, normalize_embeddings=True)
+    generated = [line for line in llm(prompt).splitlines() if line.strip()][:n]
+    if not generated:
+        return 0.0
+    q_emb = np.asarray(encoder.encode([question], normalize_embeddings=True)[0])
+    g_embs = np.asarray(encoder.encode(generated, normalize_embeddings=True))
     sims = [float(q_emb @ g_emb) for g_emb in g_embs]
     return sum(sims) / len(sims)
 ```
@@ -135,8 +151,10 @@ def test_rag_system():
     faith = FaithfulnessMetric(threshold=0.85)
     rel = ContextualRelevancyMetric(threshold=0.7)
     for case in cases:
-        assert faith.measure(case) >= 0.85, f"faithfulness regression on {case.id}"
-        assert rel.measure(case) >= 0.7, f"relevancy regression on {case.id}"
+        faith.measure(case)
+        assert faith.score >= 0.85, f"faithfulness regression on {case.id}"
+        rel.measure(case)
+        assert rel.score >= 0.7, f"relevancy regression on {case.id}"
 ```
 
 Ship as a pytest file. Run on every PR. Block merges on regressions.
