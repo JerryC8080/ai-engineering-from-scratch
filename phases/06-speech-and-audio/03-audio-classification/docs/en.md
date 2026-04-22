@@ -118,20 +118,32 @@ class AudioCNN(nn.Module):
 ### Step 5: the 2026 default — fine-tune BEATs
 
 ```python
-from transformers import ASTFeatureExtractor, ASTForAudioClassification
+import torch
+import torch.nn.functional as F
+from transformers import AutoFeatureExtractor, ASTForAudioClassification
 
-ext = ASTFeatureExtractor.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593")
+model_id = "MIT/ast-finetuned-audioset-10-10-0.4593"
+ext = AutoFeatureExtractor.from_pretrained(model_id)
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model = ASTForAudioClassification.from_pretrained(
-    "MIT/ast-finetuned-audioset-10-10-0.4593",
-    num_labels=50,
-    ignore_mismatched_sizes=True,
-)
+    model_id,
+    attn_implementation="sdpa",  # PyTorch scaled-dot-product attention; faster inference
+).to(device)
 
-inputs = ext(audio, sampling_rate=16000, return_tensors="pt")
-logits = model(**inputs).logits
+inputs = ext(audio, sampling_rate=16000, return_tensors="pt").to(device)
+with torch.no_grad():
+    logits = model(**inputs).logits
+
+# Report top-5 with probabilities — raw argmax hides confidence cliffs.
+probs = F.softmax(logits, dim=-1)
+top5_probs, top5_idx = torch.topk(probs, 5)
+for p, i in zip(top5_probs[0], top5_idx[0]):
+    print(f"{model.config.id2label[i.item()]}: {p.item():.2%}")
 ```
 
-For BEATs, use `microsoft/BEATs-base` via the `beats` library; the transformers API is the same shape.
+For fine-tuning, reload with `num_labels=50, ignore_mismatched_sizes=True` to replace the classification head. For BEATs, use `microsoft/BEATs-base` via the `beats` library; the transformers API is the same shape.
+
+The AST feature extractor outputs shape `(1, 1024, 128)` — 1024 time frames × 128 mel bins — and handles normalization with AudioSet mean/std. If you compute mels yourself, you must apply the same normalization or the model will produce garbage.
 
 ## Use It
 
@@ -177,3 +189,4 @@ Save as `outputs/skill-classifier-designer.md`. Pick architecture, augmentations
 - [Park et al. (2019). SpecAugment](https://arxiv.org/abs/1904.08779) — the dominant audio augmentation.
 - [Piczak (2015). ESC-50 dataset](https://github.com/karolpiczak/ESC-50) — 50-class benchmark that lives on.
 - [Gemmeke et al. (2017). AudioSet](https://research.google.com/audioset/) — 632-class YouTube taxonomy; still the gold standard.
+- [Niels Transformers-Tutorials — AST inference notebook](https://github.com/NielsRogge/Transformers-Tutorials/blob/master/AST/Inference_with_the_Audio_Spectogram_Transformer_to_classify_audio.ipynb) — `AutoFeatureExtractor` + `attn_implementation="sdpa"` walkthrough on real AudioSet audio.
