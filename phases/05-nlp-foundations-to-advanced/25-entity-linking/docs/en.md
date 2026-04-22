@@ -70,7 +70,8 @@ def disambiguate(mention, context, alias_index, entity_desc):
     best, best_score = None, -1
     for entity_id in candidates:
         desc_words = set(tokenize(entity_desc[entity_id]))
-        score = len(context_words & desc_words) / len(context_words | desc_words)
+        union = len(context_words | desc_words)
+        score = len(context_words & desc_words) / union if union else 0.0
         if score > best_score:
             best, best_score = entity_id, score
     return best, best_score
