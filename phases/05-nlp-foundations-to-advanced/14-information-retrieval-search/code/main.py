@@ -9,11 +9,13 @@ def tokenize(text):
 
 class BM25:
     def __init__(self, corpus, k1=1.5, b=0.75):
+        if not corpus:
+            raise ValueError("BM25 corpus must not be empty")
         self.corpus = [tokenize(d) for d in corpus]
         self.k1 = k1
         self.b = b
         self.n_docs = len(self.corpus)
-        self.avg_dl = sum(len(d) for d in self.corpus) / max(self.n_docs, 1)
+        self.avg_dl = sum(len(d) for d in self.corpus) / self.n_docs
         self.df = Counter()
         for doc in self.corpus:
             for term in set(doc):

@@ -34,11 +34,14 @@ Three-way retrieval (BM25 + dense + learned-sparse like SPLADE) outperforms two-
 
 ```python
 import math
+import re
 from collections import Counter
+
+TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
 def tokenize(text):
-    return [t for t in text.lower().split() if t.isalnum() or any(c.isalnum() for c in t)]
+    return TOKEN_RE.findall(text.lower())
 
 
 class BM25:
@@ -97,7 +100,7 @@ def build_dense_index(corpus, model_id="sentence-transformers/all-MiniLM-L6-v2")
 
 def dense_search(encoder, embeddings, query, top_k=10):
     q_emb = encoder.encode([query], normalize_embeddings=True)
-    sims = (embeddings @ q_emb.T).squeeze()
+    sims = (embeddings @ q_emb.T).flatten()
     order = np.argsort(-sims)[:top_k]
     return [(float(sims[i]), int(i)) for i in order]
 ```
