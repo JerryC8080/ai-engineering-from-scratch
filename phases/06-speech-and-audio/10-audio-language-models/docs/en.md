@@ -154,6 +154,7 @@ Report per-category (speech / sound / music / multi-audio) separately. Aggregate
 - **Long-audio degradation.** Past 10 minutes, most models' speaker attribution breaks. Diarize first (Lesson 6), then summarize.
 - **Hallucinations on silence.** Same Whisper-style issue inherited by LALMs that use Whisper encoder. VAD-gate.
 - **Benchmark cherry-picking.** Vendor blog posts highlight best-case categories. Run MMAU-Pro multi-audio subset yourself.
+- **Treating automated benchmarks as the final word.** mlabonne's LLM evaluation framing applies here unchanged: **automated benchmarks** (MMAU, LongAudioBench) are cheap but contamination-prone; **human evaluation** catches subjective quality (timbre, emotion); **model-based evaluation** (UTMOS, CLAP) correlates well but inherits judge-model bias. Release notes should combine at least two.
 
 ## Ship It
 
@@ -184,3 +185,4 @@ Save as `outputs/skill-alm-picker.md`. Pick LALM + benchmark subset + output-mod
 - [NVIDIA (2026). Audio Flamingo Next](https://arxiv.org/abs/2604.10905) — LongAudioBench SOTA.
 - [Tang et al. (2023). SALMONN](https://arxiv.org/abs/2310.13289) — dual-encoder pioneer.
 - [MMAU-Pro leaderboard](https://mmaubenchmark.github.io/) — live 2026 rankings.
+- [mlabonne llm-course — Evaluation + New Trends](https://github.com/mlabonne/llm-course#6-evaluation) — the automated-vs-human-vs-model-judge split and how multimodal-extension benchmarks are built.
