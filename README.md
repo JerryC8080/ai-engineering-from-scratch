@@ -477,7 +477,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </details>
 
 <details id="phase-11">
-<summary><b>🟥 Phase 11 — LLM Engineering</b> &nbsp;<code>13 lessons</code>&nbsp; <em>Put LLMs to work in production.</em></summary>
+<summary><b>🟥 Phase 11 — LLM Engineering</b> &nbsp;<code>15 lessons</code>&nbsp; <em>Put LLMs to work in production.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -495,6 +495,8 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 | 11 | [Caching, Rate Limiting & Cost](phases/11-llm-engineering/11-caching-cost/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 | 12 | [Guardrails & Safety](phases/11-llm-engineering/12-guardrails/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 | 13 | [Building a Production LLM App](phases/11-llm-engineering/13-production-app/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 14 | [Model Context Protocol (MCP)](phases/11-llm-engineering/14-model-context-protocol/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 15 | [Prompt Caching & Context Caching](phases/11-llm-engineering/15-prompt-caching/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 
 </details>
 

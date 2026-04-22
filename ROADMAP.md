@@ -2,7 +2,7 @@
 
 Progress tracking for every phase and lesson.
 
-**Total estimated time: ~290 hours (at your own pace)**
+**Total estimated time: ~292 hours (at your own pace)**
 
 **Legend:** ✅ Complete | 🚧 In Progress | ⬚ Planned
 
@@ -249,23 +249,25 @@ Progress tracking for every phase and lesson.
 | 13 | Building a Complete LLM Pipeline | ⬚ | ~120 min |
 | 14 | Open Models — Architecture Walkthroughs | ⬚ | ~45 min |
 
-## Phase 11: LLM Engineering — ✅ (~15 hours)
+## Phase 11: LLM Engineering — ✅ (~17 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Prompt Engineering — Techniques & Patterns | ✅ | ~45 min |
-| 02 | Few-Shot, Chain-of-Thought, Tree-of-Thought | ✅ | ~45 min |
-| 03 | Structured Outputs | ✅ | ~75 min |
-| 04 | Embeddings & Vector Representations | ✅ | ~75 min |
-| 05 | Context Engineering | ✅ | ~75 min |
-| 06 | RAG — Retrieval-Augmented Generation | ✅ | ~75 min |
-| 07 | Advanced RAG | ✅ | ~75 min |
-| 08 | Fine-Tuning with LoRA & QLoRA | ✅ | ~75 min |
-| 09 | Function Calling & Tool Use | ✅ | ~75 min |
-| 10 | Evaluation & Testing LLM Applications | ✅ | ~45 min |
-| 11 | Caching, Rate Limiting & Cost Optimization | ✅ | ~45 min |
-| 12 | Guardrails, Safety & Content Filtering | ✅ | ~45 min |
-| 13 | Building a Production LLM Application | ✅ | ~120 min |
+| 01 | [Prompt Engineering — Techniques & Patterns](phases/11-llm-engineering/01-prompt-engineering) | ✅ | ~45 min |
+| 02 | [Few-Shot, Chain-of-Thought, Tree-of-Thought](phases/11-llm-engineering/02-few-shot-cot) | ✅ | ~45 min |
+| 03 | [Structured Outputs](phases/11-llm-engineering/03-structured-outputs) | ✅ | ~75 min |
+| 04 | [Embeddings & Vector Representations](phases/11-llm-engineering/04-embeddings) | ✅ | ~75 min |
+| 05 | [Context Engineering](phases/11-llm-engineering/05-context-engineering) | ✅ | ~75 min |
+| 06 | [RAG — Retrieval-Augmented Generation](phases/11-llm-engineering/06-rag) | ✅ | ~75 min |
+| 07 | [Advanced RAG](phases/11-llm-engineering/07-advanced-rag) | ✅ | ~75 min |
+| 08 | [Fine-Tuning with LoRA & QLoRA](phases/11-llm-engineering/08-fine-tuning-lora) | ✅ | ~75 min |
+| 09 | [Function Calling & Tool Use](phases/11-llm-engineering/09-function-calling) | ✅ | ~75 min |
+| 10 | [Evaluation & Testing LLM Applications](phases/11-llm-engineering/10-evaluation) | ✅ | ~45 min |
+| 11 | [Caching, Rate Limiting & Cost Optimization](phases/11-llm-engineering/11-caching-cost) | ✅ | ~45 min |
+| 12 | [Guardrails, Safety & Content Filtering](phases/11-llm-engineering/12-guardrails) | ✅ | ~45 min |
+| 13 | [Building a Production LLM Application](phases/11-llm-engineering/13-production-app) | ✅ | ~120 min |
+| 14 | [Model Context Protocol (MCP)](phases/11-llm-engineering/14-model-context-protocol) | ✅ | ~75 min |
+| 15 | [Prompt Caching & Context Caching](phases/11-llm-engineering/15-prompt-caching) | ✅ | ~60 min |
 
 ## Phase 12: Multimodal AI — ⬚ (~11 hours)
 
