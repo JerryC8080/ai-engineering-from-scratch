@@ -16,7 +16,7 @@ Goodfellow's idea: train a classifier `D(x)` to distinguish real images from fak
 This is adversarial training. The math is a minimax game:
 
 ```
-min_G max_D E_real[log D(x)] + E_fake[log(1 - D(G(z)))]
+min_G max_D  E_real[log D(x)] + E_fake[log(1 - D(G(z)))]
 ```
 
 In 2026 GANs are no longer the SOTA generator (diffusion and flow matching ate that crown). But StyleGAN 2/3 remain the sharpest face models ever shipped, GAN discriminators are used as *perceptual losses* in diffusion training, and adversarial training powers the fast 1-step distillations (SDXL-Turbo, SD3-Turbo, LCM) that let you ship real-time diffusion.
@@ -63,22 +63,22 @@ The vanilla Goodfellow loss `log(1 - D(G(z)))` goes to 0 when D classifies G's f
 
 ```python
 def g_loss(d_fake):
- # maximize log D(G(z)) <=> minimize -log D(G(z))
- return -sum(math.log(max(p, 1e-8)) for p in d_fake) / len(d_fake)
+    # maximize log D(G(z))  <=>  minimize -log D(G(z))
+    return -sum(math.log(max(p, 1e-8)) for p in d_fake) / len(d_fake)
 ```
 
 ### Step 2: one discriminator step per generator step
 
 ```python
 for step in range(steps):
- # train D
- real_batch = sample_real(batch_size)
- fake_batch = [G(z) for z in sample_noise(batch_size)]
- update_D(real_batch, fake_batch)
+    # train D
+    real_batch = sample_real(batch_size)
+    fake_batch = [G(z) for z in sample_noise(batch_size)]
+    update_D(real_batch, fake_batch)
 
- # train G
- fake_batch = [G(z) for z in sample_noise(batch_size)] # fresh fakes
- update_G(fake_batch)
+    # train G
+    fake_batch = [G(z) for z in sample_noise(batch_size)]  # fresh fakes
+    update_G(fake_batch)
 ```
 
 Fresh fakes for G, otherwise gradients are stale.
@@ -87,11 +87,11 @@ Fresh fakes for G, otherwise gradients are stale.
 
 ```python
 if step % 200 == 0:
- samples = [G(z) for z in sample_noise(500)]
- mode_a = sum(1 for s in samples if s < 0)
- mode_b = 500 - mode_a
- if min(mode_a, mode_b) < 50:
- print(" [!] mode collapse: one mode is starved")
+    samples = [G(z) for z in sample_noise(500)]
+    mode_a = sum(1 for s in samples if s < 0)
+    mode_b = 500 - mode_a
+    if min(mode_a, mode_b) < 50:
+        print("  [!] mode collapse: one mode is starved")
 ```
 
 The canonical symptom: one of the two real modes stops being generated. The discriminator stops correcting it because it's never seen as a fake.
@@ -144,7 +144,7 @@ Save `outputs/skill-gan-debugger.md`. Skill takes a failing GAN run (loss curves
 
 ## Production note: one-shot inference is GAN's lasting advantage
 
-GANs no longer win on sample quality for open-domain generation, but they still win on inference cost. In the production-inference framing a GAN has:
+GANs no longer win on sample quality for open-domain generation, but they still win on inference cost. In stas00's `ml-engineering/inference` vocabulary a GAN has:
 
 - **No prefill, no decode stages.** A single `G(z)` forward pass. TTFT ≈ total latency.
 - **No KV-cache pressure.** The only state is the weights. Batch size is bounded by activation memory, not cache.

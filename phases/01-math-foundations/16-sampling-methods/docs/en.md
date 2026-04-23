@@ -47,11 +47,11 @@ Every sampling method starts here. A uniform random number generator produces va
 ```
 U ~ Uniform(0, 1)
 
-P(a <= U <= b) = b - a for 0 <= a <= b <= 1
+P(a <= U <= b) = b - a    for 0 <= a <= b <= 1
 
 Properties:
- E[U] = 0.5
- Var(U) = 1/12
+  E[U] = 0.5
+  Var(U) = 1/12
 ```
 
 To sample uniformly from a discrete set of n items, generate U and return floor(n * U). To sample from a continuous range [a, b], compute a + (b - a) * U.
@@ -66,36 +66,36 @@ The cumulative distribution function (CDF) maps values to probabilities:
 F(x) = P(X <= x)
 
 Properties:
- F is non-decreasing
- F(-inf) = 0
- F(+inf) = 1
- F maps the real line to [0, 1]
+  F is non-decreasing
+  F(-inf) = 0
+  F(+inf) = 1
+  F maps the real line to [0, 1]
 ```
 
 The inverse CDF maps probabilities back to values. If U ~ Uniform(0, 1), then X = F_inverse(U) follows the target distribution.
 
 ```
 Algorithm:
- 1. Generate u ~ Uniform(0, 1)
- 2. Return F_inverse(u)
+  1. Generate u ~ Uniform(0, 1)
+  2. Return F_inverse(u)
 
 Why it works:
- P(X <= x) = P(F_inverse(U) <= x) = P(U <= F(x)) = F(x)
+  P(X <= x) = P(F_inverse(U) <= x) = P(U <= F(x)) = F(x)
 ```
 
 **Exponential distribution example:**
 
 ```
-PDF: f(x) = lambda * exp(-lambda * x), x >= 0
+PDF: f(x) = lambda * exp(-lambda * x),   x >= 0
 CDF: F(x) = 1 - exp(-lambda * x)
 
 Solve F(x) = u for x:
- u = 1 - exp(-lambda * x)
- exp(-lambda * x) = 1 - u
- x = -ln(1 - u) / lambda
+  u = 1 - exp(-lambda * x)
+  exp(-lambda * x) = 1 - u
+  x = -ln(1 - u) / lambda
 
 Since (1 - U) and U have the same distribution:
- x = -ln(u) / lambda
+  x = -ln(u) / lambda
 ```
 
 This works perfectly when you can write down F_inverse in closed form. For the normal distribution, there is no closed-form inverse CDF, so we use other methods (Box-Muller, or numerical approximation).
@@ -107,15 +107,15 @@ This works perfectly when you can write down F_inverse in closed form. For the n
 When you cannot invert the CDF but can evaluate the target PDF up to a constant, rejection sampling works.
 
 ```
-Target distribution: p(x) (can evaluate, possibly unnormalized)
-Proposal distribution: q(x) (can sample from)
+Target distribution: p(x)  (can evaluate, possibly unnormalized)
+Proposal distribution: q(x)  (can sample from)
 Bound: M such that p(x) <= M * q(x) for all x
 
 Algorithm:
- 1. Sample x ~ q(x)
- 2. Sample u ~ Uniform(0, 1)
- 3. If u < p(x) / (M * q(x)), accept x
- 4. Otherwise, reject and go to step 1
+  1. Sample x ~ q(x)
+  2. Sample u ~ Uniform(0, 1)
+  3. If u < p(x) / (M * q(x)), accept x
+  4. Otherwise, reject and go to step 1
 
 Acceptance rate = 1/M
 ```
@@ -134,13 +134,13 @@ Sometimes you do not need samples from the target distribution p(x). You need to
 Goal: estimate E_p[f(x)] = integral of f(x) * p(x) dx
 
 Rewrite:
- E_p[f(x)] = integral of f(x) * (p(x)/q(x)) * q(x) dx
- = E_q[f(x) * w(x)]
+  E_p[f(x)] = integral of f(x) * (p(x)/q(x)) * q(x) dx
+            = E_q[f(x) * w(x)]
 
-where w(x) = p(x) / q(x) are the importance weights.
+where w(x) = p(x) / q(x)  are the importance weights.
 
 Estimator:
- E_p[f(x)] ~ (1/N) * sum(f(x_i) * w(x_i)) where x_i ~ q(x)
+  E_p[f(x)] ~ (1/N) * sum(f(x_i) * w(x_i))    where x_i ~ q(x)
 ```
 
 This is critical in reinforcement learning. In PPO (Proximal Policy Optimization), you collect trajectories under an old policy pi_old but want to optimize a new policy pi_new. The importance weight is pi_new(a|s) / pi_old(a|s). PPO clips these weights to prevent the new policy from diverging too far from the old one.
@@ -159,10 +159,10 @@ Monte Carlo estimation approximates integrals by averaging random samples. The l
 Goal: estimate I = integral of g(x) dx over domain D
 
 Method:
- 1. Sample x_1,..., x_N uniformly from D
- 2. I ~ (Volume of D / N) * sum(g(x_i))
+  1. Sample x_1, ..., x_N uniformly from D
+  2. I ~ (Volume of D / N) * sum(g(x_i))
 
-Error: O(1 / sqrt(N)) regardless of dimension
+Error: O(1 / sqrt(N))   regardless of dimension
 ```
 
 The error rate is dimension-independent. This is why Monte Carlo methods dominate in high dimensions where grid-based integration is impossible.
@@ -178,7 +178,7 @@ pi ~ 4 * (count inside) / (total count)
 **Estimating expectations:**
 
 ```
-E[f(X)] ~ (1/N) * sum(f(x_i)) where x_i ~ p(x)
+E[f(X)] ~ (1/N) * sum(f(x_i))    where x_i ~ p(x)
 
 The sample mean converges to the true expectation.
 Variance of the estimator = Var(f(X)) / N
@@ -189,20 +189,20 @@ Variance of the estimator = Var(f(X)) / N
 MCMC constructs a Markov chain whose stationary distribution is the target distribution p(x). After enough steps, samples from the chain are (approximately) samples from p(x).
 
 ```
-Target: p(x) (known up to a normalizing constant)
-Proposal: q(x'|x) (how to propose the next state given the current state)
+Target: p(x)  (known up to a normalizing constant)
+Proposal: q(x'|x)  (how to propose the next state given the current state)
 
 Metropolis-Hastings algorithm:
- 1. Start at some x_0
- 2. For t = 1, 2,..., T:
- a. Propose x' ~ q(x'|x_t)
- b. Compute acceptance ratio:
- alpha = [p(x') * q(x_t|x')] / [p(x_t) * q(x'|x_t)]
- c. Accept with probability min(1, alpha):
- - If u < alpha (u ~ Uniform(0,1)): x_{t+1} = x'
- - Otherwise: x_{t+1} = x_t
- 3. Discard first B samples (burn-in)
- 4. Return remaining samples
+  1. Start at some x_0
+  2. For t = 1, 2, ..., T:
+     a. Propose x' ~ q(x'|x_t)
+     b. Compute acceptance ratio:
+        alpha = [p(x') * q(x_t|x')] / [p(x_t) * q(x'|x_t)]
+     c. Accept with probability min(1, alpha):
+        - If u < alpha (u ~ Uniform(0,1)): x_{t+1} = x'
+        - Otherwise: x_{t+1} = x_t
+  3. Discard first B samples (burn-in)
+  4. Return remaining samples
 ```
 
 For symmetric proposals (q(x'|x) = q(x|x')), the ratio simplifies to p(x')/p(x). This is the original Metropolis algorithm.
@@ -220,13 +220,14 @@ For symmetric proposals (q(x'|x) = q(x|x')), the ratio simplifies to p(x')/p(x).
 Gibbs sampling is a special case of MCMC for multivariate distributions. Instead of proposing a move in all dimensions at once, it updates one variable at a time from its conditional distribution.
 
 ```
-Target: p(x_1, x_2,..., x_d)
+Target: p(x_1, x_2, ..., x_d)
 
 Algorithm:
- For each iteration t:
- Sample x_1^{t+1} ~ p(x_1 | x_2^t, x_3^t,..., x_d^t)
- Sample x_2^{t+1} ~ p(x_2 | x_1^{t+1}, x_3^t,..., x_d^t)...
- Sample x_d^{t+1} ~ p(x_d | x_1^{t+1}, x_2^{t+1},..., x_{d-1}^{t+1})
+  For each iteration t:
+    Sample x_1^{t+1} ~ p(x_1 | x_2^t, x_3^t, ..., x_d^t)
+    Sample x_2^{t+1} ~ p(x_2 | x_1^{t+1}, x_3^t, ..., x_d^t)
+    ...
+    Sample x_d^{t+1} ~ p(x_d | x_1^{t+1}, x_2^{t+1}, ..., x_{d-1}^{t+1})
 ```
 
 Gibbs sampling requires that you can sample from each conditional distribution p(x_i | x_{-i}). This is straightforward for many models:
@@ -240,13 +241,13 @@ The acceptance rate is always 1 (every proposal is accepted) because sampling fr
 
 ### Temperature Sampling (Used in LLMs)
 
-Language models output logits z_1,..., z_V for each token in the vocabulary. Softmax converts these to probabilities. Temperature rescales the logits before softmax:
+Language models output logits z_1, ..., z_V for each token in the vocabulary. Softmax converts these to probabilities. Temperature rescales the logits before softmax:
 
 ```
 p_i = exp(z_i / T) / sum(exp(z_j / T))
 
 T = 1.0: standard softmax (original distribution)
-T -> 0: argmax (deterministic, always picks highest logit)
+T -> 0:  argmax (deterministic, always picks highest logit)
 T -> inf: uniform (all tokens equally likely)
 T < 1.0: sharpens the distribution (more confident, less diverse)
 T > 1.0: flattens the distribution (less confident, more diverse)
@@ -269,14 +270,14 @@ Top-k sampling restricts the candidate set to the k tokens with the highest prob
 
 ```
 Algorithm:
- 1. Compute softmax probabilities for all V tokens
- 2. Sort tokens by probability (descending)
- 3. Keep only the top k tokens
- 4. Renormalize: p_i' = p_i / sum(p_j for j in top-k)
- 5. Sample from the renormalized distribution
+  1. Compute softmax probabilities for all V tokens
+  2. Sort tokens by probability (descending)
+  3. Keep only the top k tokens
+  4. Renormalize: p_i' = p_i / sum(p_j for j in top-k)
+  5. Sample from the renormalized distribution
 
-k = 1: greedy decoding
-k = V: no filtering (standard sampling)
+k = 1:  greedy decoding
+k = V:  no filtering (standard sampling)
 k = 40: typical setting, removes long tail of unlikely tokens
 ```
 
@@ -288,15 +289,15 @@ Top-p sampling dynamically adjusts the candidate set size. Instead of keeping a 
 
 ```
 Algorithm:
- 1. Compute softmax probabilities for all V tokens
- 2. Sort tokens by probability (descending)
- 3. Find smallest k such that sum of top-k probabilities >= p
- 4. Keep only those k tokens
- 5. Renormalize and sample
+  1. Compute softmax probabilities for all V tokens
+  2. Sort tokens by probability (descending)
+  3. Find smallest k such that sum of top-k probabilities >= p
+  4. Keep only those k tokens
+  5. Renormalize and sample
 
-p = 0.9: keeps tokens covering 90% of probability mass
-p = 1.0: no filtering
-p = 0.1: very restrictive, nearly greedy
+p = 0.9:  keeps tokens covering 90% of probability mass
+p = 1.0:  no filtering
+p = 0.1:  very restrictive, nearly greedy
 ```
 
 When the model is confident, nucleus sampling keeps few tokens (maybe 2-3). When the model is uncertain, it keeps many (maybe 200). This adaptive behavior is why nucleus sampling generally produces better text than top-k.
@@ -314,24 +315,24 @@ Variational autoencoders (VAEs) learn by encoding inputs into a distribution in 
 
 ```
 Standard sampling (not differentiable):
- z ~ N(mu, sigma^2)
+  z ~ N(mu, sigma^2)
 
- The randomness blocks gradient flow.
- d/d_mu [sample from N(mu, sigma^2)] = ???
+  The randomness blocks gradient flow.
+  d/d_mu [sample from N(mu, sigma^2)] = ???
 ```
 
 The reparameterization trick separates the randomness from the parameters:
 
 ```
 Reparameterized sampling:
- epsilon ~ N(0, 1) (fixed random noise, no parameters)
- z = mu + sigma * epsilon (deterministic function of parameters)
+  epsilon ~ N(0, 1)          (fixed random noise, no parameters)
+  z = mu + sigma * epsilon   (deterministic function of parameters)
 
- Now z is a deterministic, differentiable function of mu and sigma.
- d(z)/d(mu) = 1
- d(z)/d(sigma) = epsilon
+  Now z is a deterministic, differentiable function of mu and sigma.
+  d(z)/d(mu) = 1
+  d(z)/d(sigma) = epsilon
 
- Gradients flow through mu and sigma.
+  Gradients flow through mu and sigma.
 ```
 
 This works because N(mu, sigma^2) has the same distribution as mu + sigma * N(0, 1). The key insight: move the randomness to a parameter-free source (epsilon), then express the sample as a differentiable transformation of the parameters.
@@ -352,10 +353,10 @@ The reparameterization trick works for continuous distributions (Gaussian). For 
 **The Gumbel-Max trick (non-differentiable):**
 
 ```
-To sample from a categorical distribution with log-probabilities log(p_1),..., log(p_k):
- 1. Sample g_i ~ Gumbel(0, 1) for each category
- (g = -log(-log(u)), where u ~ Uniform(0, 1))
- 2. Return argmax(log(p_i) + g_i)
+To sample from a categorical distribution with log-probabilities log(p_1), ..., log(p_k):
+  1. Sample g_i ~ Gumbel(0, 1) for each category
+     (g = -log(-log(u)), where u ~ Uniform(0, 1))
+  2. Return argmax(log(p_i) + g_i)
 
 This produces exact categorical samples.
 ```
@@ -364,12 +365,12 @@ This produces exact categorical samples.
 
 ```
 Replace the hard argmax with a soft softmax:
- y_i = exp((log(p_i) + g_i) / tau) / sum(exp((log(p_j) + g_j) / tau))
+  y_i = exp((log(p_i) + g_i) / tau) / sum(exp((log(p_j) + g_j) / tau))
 
 tau (temperature) controls the approximation:
- tau -> 0: approaches a one-hot vector (hard categorical)
- tau -> inf: approaches uniform (1/k, 1/k,..., 1/k)
- tau = 1.0: soft approximation
+  tau -> 0:  approaches a one-hot vector (hard categorical)
+  tau -> inf: approaches uniform (1/k, 1/k, ..., 1/k)
+  tau = 1.0: soft approximation
 ```
 
 Gumbel-Softmax produces a continuous relaxation of a discrete sample. The output is a probability vector (soft one-hot) instead of a hard one-hot. Gradients flow through the softmax. During the forward pass in training, you can use the "straight-through" estimator: use the hard argmax for the forward pass but the soft Gumbel-Softmax gradients for the backward pass.
@@ -386,13 +387,13 @@ Standard Monte Carlo sampling can leave gaps in the sample space by chance. Stra
 
 ```
 Standard Monte Carlo:
- Sample N points uniformly from [0, 1]
- Some regions may have clusters, others gaps
+  Sample N points uniformly from [0, 1]
+  Some regions may have clusters, others gaps
 
 Stratified sampling:
- Divide [0, 1] into N equal strata: [0, 1/N), [1/N, 2/N),..., [(N-1)/N, 1)
- Sample one point uniformly within each stratum
- x_i = (i + u_i) / N where u_i ~ Uniform(0, 1), i = 0,..., N-1
+  Divide [0, 1] into N equal strata: [0, 1/N), [1/N, 2/N), ..., [(N-1)/N, 1)
+  Sample one point uniformly within each stratum
+  x_i = (i + u_i) / N   where u_i ~ Uniform(0, 1),  i = 0, ..., N-1
 ```
 
 Stratified sampling always has lower or equal variance compared to standard Monte Carlo:
@@ -416,16 +417,16 @@ Diffusion models generate images through a sampling process. The forward process
 
 ```
 Forward process (known):
- x_t = sqrt(alpha_t) * x_{t-1} + sqrt(1 - alpha_t) * epsilon
- where epsilon ~ N(0, I)
+  x_t = sqrt(alpha_t) * x_{t-1} + sqrt(1 - alpha_t) * epsilon
+  where epsilon ~ N(0, I)
 
- After T steps: x_T ~ N(0, I) (pure noise)
+  After T steps: x_T ~ N(0, I)  (pure noise)
 
 Reverse process (learned):
- x_{t-1} = (1/sqrt(alpha_t)) * (x_t - (1 - alpha_t)/sqrt(1 - alpha_bar_t) * epsilon_theta(x_t, t)) + sigma_t * z
- where z ~ N(0, I)
+  x_{t-1} = (1/sqrt(alpha_t)) * (x_t - (1 - alpha_t)/sqrt(1 - alpha_bar_t) * epsilon_theta(x_t, t)) + sigma_t * z
+  where z ~ N(0, I)
 
- Each denoising step is a sampling step.
+  Each denoising step is a sampling step.
 ```
 
 The connection to the methods in this lesson:
@@ -445,11 +446,11 @@ import math
 import random
 
 def sample_uniform(a, b):
- return a + (b - a) * random.random()
+    return a + (b - a) * random.random()
 
 def sample_exponential_inverse_cdf(lam):
- u = random.random()
- return -math.log(u) / lam
+    u = random.random()
+    return -math.log(u) / lam
 ```
 
 Generate 10,000 exponential samples and verify the mean is 1/lambda.
@@ -458,11 +459,11 @@ Generate 10,000 exponential samples and verify the mean is 1/lambda.
 
 ```python
 def rejection_sample(target_pdf, proposal_sample, proposal_pdf, M):
- while True:
- x = proposal_sample()
- u = random.random()
- if u < target_pdf(x) / (M * proposal_pdf(x)):
- return x
+    while True:
+        x = proposal_sample()
+        u = random.random()
+        if u < target_pdf(x) / (M * proposal_pdf(x)):
+            return x
 ```
 
 Use rejection sampling to draw from a truncated normal distribution. Verify the shape by histogramming the samples.
@@ -471,12 +472,12 @@ Use rejection sampling to draw from a truncated normal distribution. Verify the 
 
 ```python
 def importance_sampling_estimate(f, target_pdf, proposal_pdf, proposal_sample, n):
- total = 0
- for _ in range(n):
- x = proposal_sample()
- w = target_pdf(x) / proposal_pdf(x)
- total += f(x) * w
- return total / n
+    total = 0
+    for _ in range(n):
+        x = proposal_sample()
+        w = target_pdf(x) / proposal_pdf(x)
+        total += f(x) * w
+    return total / n
 ```
 
 Estimate E[X^2] under a normal distribution using a uniform proposal. Compare to the known answer (mu^2 + sigma^2).
@@ -485,30 +486,30 @@ Estimate E[X^2] under a normal distribution using a uniform proposal. Compare to
 
 ```python
 def monte_carlo_pi(n):
- inside = 0
- for _ in range(n):
- x = random.uniform(-1, 1)
- y = random.uniform(-1, 1)
- if x*x + y*y <= 1:
- inside += 1
- return 4 * inside / n
+    inside = 0
+    for _ in range(n):
+        x = random.uniform(-1, 1)
+        y = random.uniform(-1, 1)
+        if x*x + y*y <= 1:
+            inside += 1
+    return 4 * inside / n
 ```
 
 ### Step 5: Metropolis-Hastings MCMC
 
 ```python
 def metropolis_hastings(target_log_pdf, proposal_sample, proposal_log_pdf, x0, n_samples, burn_in):
- samples = []
- x = x0
- for i in range(n_samples + burn_in):
- x_new = proposal_sample(x)
- log_alpha = (target_log_pdf(x_new) + proposal_log_pdf(x, x_new)
- - target_log_pdf(x) - proposal_log_pdf(x_new, x))
- if math.log(random.random()) < log_alpha:
- x = x_new
- if i >= burn_in:
- samples.append(x)
- return samples
+    samples = []
+    x = x0
+    for i in range(n_samples + burn_in):
+        x_new = proposal_sample(x)
+        log_alpha = (target_log_pdf(x_new) + proposal_log_pdf(x, x_new)
+                     - target_log_pdf(x) - proposal_log_pdf(x_new, x))
+        if math.log(random.random()) < log_alpha:
+            x = x_new
+        if i >= burn_in:
+            samples.append(x)
+    return samples
 ```
 
 Sample from a bimodal distribution (mixture of two Gaussians). Visualize the chain's trajectory.
@@ -517,29 +518,29 @@ Sample from a bimodal distribution (mixture of two Gaussians). Visualize the cha
 
 ```python
 def gibbs_sampling_2d(conditional_x_given_y, conditional_y_given_x, x0, y0, n_samples, burn_in):
- x, y = x0, y0
- samples = []
- for i in range(n_samples + burn_in):
- x = conditional_x_given_y(y)
- y = conditional_y_given_x(x)
- if i >= burn_in:
- samples.append((x, y))
- return samples
+    x, y = x0, y0
+    samples = []
+    for i in range(n_samples + burn_in):
+        x = conditional_x_given_y(y)
+        y = conditional_y_given_x(x)
+        if i >= burn_in:
+            samples.append((x, y))
+    return samples
 ```
 
 ### Step 7: Temperature sampling
 
 ```python
 def softmax(logits):
- max_l = max(logits)
- exps = [math.exp(z - max_l) for z in logits]
- total = sum(exps)
- return [e / total for e in exps]
+    max_l = max(logits)
+    exps = [math.exp(z - max_l) for z in logits]
+    total = sum(exps)
+    return [e / total for e in exps]
 
 def temperature_sample(logits, temperature):
- scaled = [z / temperature for z in logits]
- probs = softmax(scaled)
- return sample_from_probs(probs)
+    scaled = [z / temperature for z in logits]
+    probs = softmax(scaled)
+    return sample_from_probs(probs)
 ```
 
 Show how temperature changes the output distribution for a set of token logits.
@@ -548,41 +549,41 @@ Show how temperature changes the output distribution for a set of token logits.
 
 ```python
 def top_k_sample(logits, k):
- indexed = sorted(enumerate(logits), key=lambda x: -x[1])
- top = indexed[:k]
- top_logits = [l for _, l in top]
- probs = softmax(top_logits)
- idx = sample_from_probs(probs)
- return top[idx][0]
+    indexed = sorted(enumerate(logits), key=lambda x: -x[1])
+    top = indexed[:k]
+    top_logits = [l for _, l in top]
+    probs = softmax(top_logits)
+    idx = sample_from_probs(probs)
+    return top[idx][0]
 
 def top_p_sample(logits, p):
- probs = softmax(logits)
- indexed = sorted(enumerate(probs), key=lambda x: -x[1])
- cumsum = 0
- selected = []
- for token_idx, prob in indexed:
- cumsum += prob
- selected.append((token_idx, prob))
- if cumsum >= p:
- break
- sel_probs = [pr for _, pr in selected]
- total = sum(sel_probs)
- sel_probs = [pr / total for pr in sel_probs]
- idx = sample_from_probs(sel_probs)
- return selected[idx][0]
+    probs = softmax(logits)
+    indexed = sorted(enumerate(probs), key=lambda x: -x[1])
+    cumsum = 0
+    selected = []
+    for token_idx, prob in indexed:
+        cumsum += prob
+        selected.append((token_idx, prob))
+        if cumsum >= p:
+            break
+    sel_probs = [pr for _, pr in selected]
+    total = sum(sel_probs)
+    sel_probs = [pr / total for pr in sel_probs]
+    idx = sample_from_probs(sel_probs)
+    return selected[idx][0]
 ```
 
 ### Step 9: Reparameterization trick
 
 ```python
 def reparam_sample(mu, sigma):
- epsilon = random.gauss(0, 1)
- return mu + sigma * epsilon
+    epsilon = random.gauss(0, 1)
+    return mu + sigma * epsilon
 
 def reparam_gradient(mu, sigma, epsilon):
- dz_dmu = 1.0
- dz_dsigma = epsilon
- return dz_dmu, dz_dsigma
+    dz_dmu = 1.0
+    dz_dsigma = epsilon
+    return dz_dmu, dz_dsigma
 ```
 
 Demonstrate that gradients flow through the reparameterized sample but not through direct sampling.
@@ -591,12 +592,12 @@ Demonstrate that gradients flow through the reparameterized sample but not throu
 
 ```python
 def gumbel_sample():
- u = random.random()
- return -math.log(-math.log(u))
+    u = random.random()
+    return -math.log(-math.log(u))
 
 def gumbel_softmax(logits, temperature):
- gumbels = [math.log(p) + gumbel_sample() for p in logits]
- return softmax([g / temperature for g in gumbels])
+    gumbels = [math.log(p) + gumbel_sample() for p in logits]
+    return softmax([g / temperature for g in gumbels])
 ```
 
 Show how decreasing temperature makes the output approach a one-hot vector.

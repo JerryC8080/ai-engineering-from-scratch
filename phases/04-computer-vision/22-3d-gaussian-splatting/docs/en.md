@@ -29,11 +29,11 @@ The mental model is simple, the math has enough moving parts that most introduct
 One 3D Gaussian is a parametric blob in space with these attributes:
 
 ```
-position mu (3,) centre in world coordinates
-rotation q (4,) unit quaternion encoding orientation
-scale s (3,) log-scales per axis (exponentiated at render time)
-opacity alpha (1,) post-sigmoid opacity [0, 1]
-SH coefficients c_lm (3 * (L+1)^2,) view-dependent colour
+position         mu         (3,)    centre in world coordinates
+rotation         q          (4,)    unit quaternion encoding orientation
+scale            s          (3,)    log-scales per axis (exponentiated at render time)
+opacity          alpha      (1,)    post-sigmoid opacity [0, 1]
+SH coefficients  c_lm       (3 * (L+1)^2,)   view-dependent colour
 ```
 
 Rotation + scale build a 3x3 covariance: `Sigma = R S S^T R^T`. That is the shape of the Gaussian in 3D. Spherical harmonics let the colour change with viewing direction — specular highlights, subtle sheen, view-dependent glow — without storing per-view textures. With SH degree 3 you get 16 coefficients per colour channel, 48 floats per Gaussian for colour alone.
@@ -44,15 +44,15 @@ A scene typically has 1-5 million Gaussians. Each stores roughly 60 floats (3 + 
 
 ```mermaid
 flowchart LR
- SCENE["Millions of 3D Gaussians<br/>(position, rotation, scale,<br/>opacity, SH colour)"] --> PROJ["Project to 2D<br/>(camera extrinsics + intrinsics)"]
- PROJ --> TILES["Assign to tiles<br/>(16x16 screen-space)"]
- TILES --> SORT["Depth-sort<br/>per tile"]
- SORT --> ALPHA["Alpha-composite<br/>front-to-back"]
- ALPHA --> PIX["Pixel colour"]
+    SCENE["Millions of 3D Gaussians<br/>(position, rotation, scale,<br/>opacity, SH colour)"] --> PROJ["Project to 2D<br/>(camera extrinsics + intrinsics)"]
+    PROJ --> TILES["Assign to tiles<br/>(16x16 screen-space)"]
+    TILES --> SORT["Depth-sort<br/>per tile"]
+    SORT --> ALPHA["Alpha-composite<br/>front-to-back"]
+    ALPHA --> PIX["Pixel colour"]
 
- style SCENE fill:#dbeafe,stroke:#2563eb
- style ALPHA fill:#fef3c7,stroke:#d97706
- style PIX fill:#dcfce7,stroke:#16a34a
+    style SCENE fill:#dbeafe,stroke:#2563eb
+    style ALPHA fill:#fef3c7,stroke:#d97706
+    style PIX fill:#dcfce7,stroke:#16a34a
 ```
 
 Five steps, all GPU-friendly. No MLP query per pixel. A single RTX 3080 Ti renders 6 million splats at 147 fps.
@@ -63,7 +63,7 @@ The 3D Gaussian at world position `mu` with 3D covariance `Sigma` projects to a 
 
 ```
 mu' = project(mu)
-Sigma' = J W Sigma W^T J^T (2 x 2)
+Sigma' = J W Sigma W^T J^T          (2 x 2)
 
 W = viewing transform (rotation + translation of camera)
 J = Jacobian of the perspective projection at mu'
@@ -78,9 +78,9 @@ For one pixel, the Gaussians that cover it are sorted back-to-front (or equivale
 ```
 C_pixel = sum_i alpha_i * T_i * c_i
 
-T_i = prod_{j < i} (1 - alpha_j) transmittance up to i
-alpha_i = opacity_i * exp(-0.5 * d^T Sigma'^-1 d) local contribution
-c_i = eval_SH(SH_i, view_direction) view-dependent colour
+T_i = prod_{j < i} (1 - alpha_j)       transmittance up to i
+alpha_i = opacity_i * exp(-0.5 * d^T Sigma'^-1 d)   local contribution
+c_i = eval_SH(SH_i, view_direction)    view-dependent colour
 ```
 
 This is **the same equation as NeRF's volumetric render**, just over an explicit sparse set of Gaussians instead of dense samples along a ray. That identity is why rendered quality matches NeRF — both are integrating the same radiance-field equation.
@@ -106,12 +106,12 @@ View-dependent colour is a function `c(direction)` on the unit sphere. Spherical
 ### The 2026 production stack
 
 ```
-1. Capture smartphone / DJI drone / handheld scanner
-2. SfM / MVS COLMAP or GLOMAP derives camera poses + sparse points
-3. Train 3DGS nerfstudio / gsplat / inria official / PostShot (~10-30 min on RTX 4090)
-4. Edit SuperSplat / SplatForge (clean floaters, segment)
-5. Export.ply -> glTF KHR_gaussian_splatting or.usd (OpenUSD 26.03)
-6. View Cesium / Unreal / Babylon.js / Three.js / Vision Pro
+1. Capture         smartphone / DJI drone / handheld scanner
+2. SfM / MVS       COLMAP or GLOMAP derives camera poses + sparse points
+3. Train 3DGS      nerfstudio / gsplat / inria official / PostShot (~10-30 min on RTX 4090)
+4. Edit            SuperSplat / SplatForge (clean floaters, segment)
+5. Export          .ply -> glTF KHR_gaussian_splatting or .usd (OpenUSD 26.03)
+6. View            Cesium / Unreal / Babylon.js / Three.js / Vision Pro
 ```
 
 ### 4D and generative variants
@@ -133,20 +133,20 @@ import torch.nn.functional as F
 
 
 def eval_2d_gaussian(means, covs, points):
- """
- means: (G, 2) centres
- covs: (G, 2, 2) covariance matrices
- points: (H, W, 2) pixel coordinates
- returns: (G, H, W) density at every pixel for every Gaussian
- """
- G = means.size(0)
- H, W, _ = points.shape
- flat = points.view(-1, 2)
- inv = torch.linalg.inv(covs)
- diff = flat[None, :, :] - means[:, None, :]
- d = torch.einsum("gpi,gij,gpj->gp", diff, inv, diff)
- density = torch.exp(-0.5 * d)
- return density.view(G, H, W)
+    """
+    means:  (G, 2)      centres
+    covs:   (G, 2, 2)   covariance matrices
+    points: (H, W, 2)   pixel coordinates
+    returns: (G, H, W)  density at every pixel for every Gaussian
+    """
+    G = means.size(0)
+    H, W, _ = points.shape
+    flat = points.view(-1, 2)
+    inv = torch.linalg.inv(covs)
+    diff = flat[None, :, :] - means[:, None, :]
+    d = torch.einsum("gpi,gij,gpj->gp", diff, inv, diff)
+    density = torch.exp(-0.5 * d)
+    return density.view(G, H, W)
 ```
 
 `einsum` does the quadratic form `diff^T Sigma^-1 diff` for every (Gaussian, pixel) pair.
@@ -157,38 +157,38 @@ Alpha-compositing front-to-back. Depth in 2D is meaningless, so we use a learned
 
 ```python
 def rasterise_2d(means, covs, colours, opacities, depths, image_size):
- """
- means: (G, 2)
- covs: (G, 2, 2)
- colours: (G, 3)
- opacities: (G,) in [0, 1]
- depths: (G,) per-Gaussian scalar used for ordering
- image_size: (H, W)
- returns: (H, W, 3) rendered image
- """
- H, W = image_size
- yy, xx = torch.meshgrid(
- torch.arange(H, dtype=torch.float32, device=means.device),
- torch.arange(W, dtype=torch.float32, device=means.device),
- indexing="ij",
- )
- points = torch.stack([xx, yy], dim=-1)
+    """
+    means:     (G, 2)
+    covs:      (G, 2, 2)
+    colours:   (G, 3)
+    opacities: (G,)     in [0, 1]
+    depths:    (G,)     per-Gaussian scalar used for ordering
+    image_size: (H, W)
+    returns:   (H, W, 3) rendered image
+    """
+    H, W = image_size
+    yy, xx = torch.meshgrid(
+        torch.arange(H, dtype=torch.float32, device=means.device),
+        torch.arange(W, dtype=torch.float32, device=means.device),
+        indexing="ij",
+    )
+    points = torch.stack([xx, yy], dim=-1)
 
- densities = eval_2d_gaussian(means, covs, points)
- alphas = opacities[:, None, None] * densities
- alphas = alphas.clamp(0.0, 0.99)
+    densities = eval_2d_gaussian(means, covs, points)
+    alphas = opacities[:, None, None] * densities
+    alphas = alphas.clamp(0.0, 0.99)
 
- order = torch.argsort(depths)
- alphas = alphas[order]
- colours_sorted = colours[order]
+    order = torch.argsort(depths)
+    alphas = alphas[order]
+    colours_sorted = colours[order]
 
- T = torch.ones(H, W, device=means.device)
- out = torch.zeros(H, W, 3, device=means.device)
- for i in range(means.size(0)):
- a = alphas[i]
- out += (T * a)[..., None] * colours_sorted[i][None, None, :]
- T = T * (1.0 - a)
- return out
+    T = torch.ones(H, W, device=means.device)
+    out = torch.zeros(H, W, 3, device=means.device)
+    for i in range(means.size(0)):
+        a = alphas[i]
+        out += (T * a)[..., None] * colours_sorted[i][None, None, :]
+        T = T * (1.0 - a)
+    return out
 ```
 
 Not fast — a real implementation uses tile-based CUDA kernels — but exactly the right math and fully differentiable.
@@ -197,32 +197,32 @@ Not fast — a real implementation uses tile-based CUDA kernels — but exactly 
 
 ```python
 class Splats2D(nn.Module):
- def __init__(self, num_splats=128, image_size=64, seed=0):
- super().__init__()
- g = torch.Generator().manual_seed(seed)
- H, W = image_size, image_size
- self.means = nn.Parameter(torch.rand(num_splats, 2, generator=g) * torch.tensor([W, H]))
- self.log_scale = nn.Parameter(torch.ones(num_splats, 2) * math.log(2.0))
- self.rot = nn.Parameter(torch.zeros(num_splats)) # single angle in 2D
- self.colour_logits = nn.Parameter(torch.randn(num_splats, 3, generator=g) * 0.5)
- self.opacity_logit = nn.Parameter(torch.zeros(num_splats))
- self.depth = nn.Parameter(torch.rand(num_splats, generator=g))
+    def __init__(self, num_splats=128, image_size=64, seed=0):
+        super().__init__()
+        g = torch.Generator().manual_seed(seed)
+        H, W = image_size, image_size
+        self.means = nn.Parameter(torch.rand(num_splats, 2, generator=g) * torch.tensor([W, H]))
+        self.log_scale = nn.Parameter(torch.ones(num_splats, 2) * math.log(2.0))
+        self.rot = nn.Parameter(torch.zeros(num_splats))  # single angle in 2D
+        self.colour_logits = nn.Parameter(torch.randn(num_splats, 3, generator=g) * 0.5)
+        self.opacity_logit = nn.Parameter(torch.zeros(num_splats))
+        self.depth = nn.Parameter(torch.rand(num_splats, generator=g))
 
- def covs(self):
- s = torch.exp(self.log_scale)
- c, si = torch.cos(self.rot), torch.sin(self.rot)
- R = torch.stack([
- torch.stack([c, -si], dim=-1),
- torch.stack([si, c], dim=-1),
- ], dim=-2)
- S = torch.diag_embed(s ** 2)
- return R @ S @ R.transpose(-1, -2)
+    def covs(self):
+        s = torch.exp(self.log_scale)
+        c, si = torch.cos(self.rot), torch.sin(self.rot)
+        R = torch.stack([
+            torch.stack([c, -si], dim=-1),
+            torch.stack([si, c], dim=-1),
+        ], dim=-2)
+        S = torch.diag_embed(s ** 2)
+        return R @ S @ R.transpose(-1, -2)
 
- def forward(self, image_size):
- covs = self.covs()
- colours = torch.sigmoid(self.colour_logits)
- opacities = torch.sigmoid(self.opacity_logit)
- return rasterise_2d(self.means, covs, colours, opacities, self.depth, image_size)
+    def forward(self, image_size):
+        covs = self.covs()
+        colours = torch.sigmoid(self.colour_logits)
+        opacities = torch.sigmoid(self.opacity_logit)
+        return rasterise_2d(self.means, covs, colours, opacities, self.depth, image_size)
 ```
 
 `log_scale`, `opacity_logit`, and `colour_logits` are all unconstrained parameters mapped through the right activation at render time. This is the standard pattern for every 3DGS implementation.
@@ -234,15 +234,15 @@ import math
 import numpy as np
 
 def make_target(size=64):
- yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
- img = np.zeros((size, size, 3), dtype=np.float32)
- # Red circle
- mask = (xx - 20) ** 2 + (yy - 20) ** 2 < 10 ** 2
- img[mask] = [1.0, 0.2, 0.2]
- # Blue square
- mask = (np.abs(xx - 45) < 8) & (np.abs(yy - 40) < 8)
- img[mask] = [0.2, 0.3, 1.0]
- return torch.from_numpy(img)
+    yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
+    img = np.zeros((size, size, 3), dtype=np.float32)
+    # Red circle
+    mask = (xx - 20) ** 2 + (yy - 20) ** 2 < 10 ** 2
+    img[mask] = [1.0, 0.2, 0.2]
+    # Blue square
+    mask = (np.abs(xx - 45) < 8) & (np.abs(yy - 40) < 8)
+    img[mask] = [0.2, 0.3, 1.0]
+    return torch.from_numpy(img)
 
 
 target = make_target(64)
@@ -250,11 +250,11 @@ model = Splats2D(num_splats=64, image_size=64)
 opt = torch.optim.Adam(model.parameters(), lr=0.05)
 
 for step in range(200):
- pred = model((64, 64))
- loss = F.mse_loss(pred, target)
- opt.zero_grad(); loss.backward(); opt.step()
- if step % 40 == 0:
- print(f"step {step:3d} mse {loss.item():.4f}")
+    pred = model((64, 64))
+    loss = F.mse_loss(pred, target)
+    opt.zero_grad(); loss.backward(); opt.step()
+    if step % 40 == 0:
+        print(f"step {step:3d}  mse {loss.item():.4f}")
 ```
 
 Over 200 steps the 64 Gaussians settle into the two shapes. That is the entire idea — gradient-descent on explicit geometric primitives.
@@ -277,33 +277,33 @@ The SH basis up to degree 3 has 16 terms per channel. Evaluation:
 
 ```python
 def eval_sh_degree_3(sh_coeffs, dirs):
- """
- sh_coeffs: (..., 16, 3) last dim is RGB channels
- dirs: (..., 3) unit vectors
- returns: (..., 3)
- """
- C0 = 0.282094791773878
- C1 = 0.488602511902920
- C2 = [1.092548430592079, 1.092548430592079,
- 0.315391565252520, 1.092548430592079,
- 0.546274215296039]
- x, y, z = dirs[..., 0], dirs[..., 1], dirs[..., 2]
- x2, y2, z2 = x * x, y * y, z * z
- xy, yz, xz = x * y, y * z, x * z
+    """
+    sh_coeffs: (..., 16, 3)   last dim is RGB channels
+    dirs:      (..., 3)       unit vectors
+    returns:   (..., 3)
+    """
+    C0 = 0.282094791773878
+    C1 = 0.488602511902920
+    C2 = [1.092548430592079, 1.092548430592079,
+          0.315391565252520, 1.092548430592079,
+          0.546274215296039]
+    x, y, z = dirs[..., 0], dirs[..., 1], dirs[..., 2]
+    x2, y2, z2 = x * x, y * y, z * z
+    xy, yz, xz = x * y, y * z, x * z
 
- result = C0 * sh_coeffs[..., 0, :]
- result = result - C1 * y[..., None] * sh_coeffs[..., 1, :]
- result = result + C1 * z[..., None] * sh_coeffs[..., 2, :]
- result = result - C1 * x[..., None] * sh_coeffs[..., 3, :]
+    result = C0 * sh_coeffs[..., 0, :]
+    result = result - C1 * y[..., None] * sh_coeffs[..., 1, :]
+    result = result + C1 * z[..., None] * sh_coeffs[..., 2, :]
+    result = result - C1 * x[..., None] * sh_coeffs[..., 3, :]
 
- result = result + C2[0] * xy[..., None] * sh_coeffs[..., 4, :]
- result = result + C2[1] * yz[..., None] * sh_coeffs[..., 5, :]
- result = result + C2[2] * (2.0 * z2 - x2 - y2)[..., None] * sh_coeffs[..., 6, :]
- result = result + C2[3] * xz[..., None] * sh_coeffs[..., 7, :]
- result = result + C2[4] * (x2 - y2)[..., None] * sh_coeffs[..., 8, :]
+    result = result + C2[0] * xy[..., None] * sh_coeffs[..., 4, :]
+    result = result + C2[1] * yz[..., None] * sh_coeffs[..., 5, :]
+    result = result + C2[2] * (2.0 * z2 - x2 - y2)[..., None] * sh_coeffs[..., 6, :]
+    result = result + C2[3] * xz[..., None] * sh_coeffs[..., 7, :]
+    result = result + C2[4] * (x2 - y2)[..., None] * sh_coeffs[..., 8, :]
 
- # degree 3 terms omitted here for brevity; full 16-coefficient version in the code file
- return result
+    # degree 3 terms omitted here for brevity; full 16-coefficient version in the code file
+    return result
 ```
 
 Learned `sh_coeffs` store the "colour in every direction" for that Gaussian. At render time you evaluate against the current view direction and get a 3-vector RGB.

@@ -68,7 +68,7 @@ Run `code/main.py`. It draws 2000 samples from a two-mode Gaussian mixture, then
 
 ```
 explicit density (histogram): p(x in [-0.5, 0.5]) ≈ 0.38
-approximate density (KDE): p(x in [-0.5, 0.5]) ≈ 0.41
+approximate density (KDE):     p(x in [-0.5, 0.5]) ≈ 0.41
 implicit (nearest-sample gen): 20 new samples printed, no p(x)
 ```
 
@@ -116,7 +116,7 @@ The skill takes a task description and outputs: (1) which family to use, (2) a r
 
 ## Production note: five families, five inference shapes
 
-Each family maps to a different inference-server cost curve. the production-inference framing frames LLM inference as prefill + decode; the same decomposition applies here:
+Each family maps to a different inference-server cost curve. stas00's `ml-engineering/inference` chapter frames LLM inference as prefill + decode; the same decomposition applies here:
 
 - **Autoregressive (bucket 1 and 5).** Sequential decode dominates latency; KV-cache, continuous batching, and speculative decoding all apply directly.
 - **VAE / diffusion / flow-matching (buckets 2 and 4).** There is no decode in the LLM sense. Cost = `num_steps × step_cost`, and the `step_cost` is a transformer or U-Net forward at the full latent resolution. The production knobs are step count (DDIM / DPM-Solver / distillation), batch size, and precision (bf16 / fp8 / int4).

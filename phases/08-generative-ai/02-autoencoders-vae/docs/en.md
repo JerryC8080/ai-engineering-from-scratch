@@ -31,7 +31,7 @@ In 2026 VAEs rarely ship standalone — they have been outclassed by diffusion f
 
 ```
 loss = reconstruction + β · KL[q(z|x) || N(0, I)]
- = ||x - x̂||² + β · Σ_i ( σ_i² + μ_i² - log σ_i² - 1 ) / 2
+     = ||x - x̂||²  + β · Σ_i ( σ_i² + μ_i² - log σ_i² - 1 ) / 2
 ```
 
 Reconstruction pushes `x̂` toward `x`. KL pushes `q(z|x)` toward the prior. They trade off. Small β (<1) = sharper samples, code space less Gaussian. Large β (>1) = cleaner code space, blurrier samples. β-VAE (Higgins 2017) made this knob famous and kicked off disentanglement research.
@@ -46,10 +46,10 @@ Reconstruction pushes `x̂` toward `x`. KL pushes `q(z|x)` toward the prior. The
 
 ```python
 def encode(x, enc):
- h = tanh(add(matmul(enc["W1"], x), enc["b1"]))
- mu = add(matmul(enc["W_mu"], h), enc["b_mu"])
- log_sigma2 = add(matmul(enc["W_sig"], h), enc["b_sig"])
- return mu, log_sigma2
+    h = tanh(add(matmul(enc["W1"], x), enc["b1"]))
+    mu = add(matmul(enc["W_mu"], h), enc["b_mu"])
+    log_sigma2 = add(matmul(enc["W_sig"], h), enc["b_sig"])
+    return mu, log_sigma2
 ```
 
 `log σ²` instead of `σ` so the network output is unconstrained (softplus of σ is a trap — gradients die at σ ≈ 0).
@@ -58,22 +58,22 @@ def encode(x, enc):
 
 ```python
 def reparameterize(mu, log_sigma2, rng):
- eps = [rng.gauss(0, 1) for _ in mu]
- sigma = [math.exp(0.5 * lv) for lv in log_sigma2]
- return [m + s * e for m, s, e in zip(mu, sigma, eps)]
+    eps = [rng.gauss(0, 1) for _ in mu]
+    sigma = [math.exp(0.5 * lv) for lv in log_sigma2]
+    return [m + s * e for m, s, e in zip(mu, sigma, eps)]
 
 def decode(z, dec):
- h = tanh(add(matmul(dec["W1"], z), dec["b1"]))
- return add(matmul(dec["W_out"], h), dec["b_out"])
+    h = tanh(add(matmul(dec["W1"], z), dec["b1"]))
+    return add(matmul(dec["W_out"], h), dec["b_out"])
 ```
 
 ### Step 3: the ELBO
 
 ```python
 def elbo(x, x_hat, mu, log_sigma2, beta=1.0):
- recon = sum((a - b) ** 2 for a, b in zip(x, x_hat))
- kl = 0.5 * sum(math.exp(lv) + m * m - lv - 1 for m, lv in zip(mu, log_sigma2))
- return recon + beta * kl, recon, kl
+    recon = sum((a - b) ** 2 for a, b in zip(x, x_hat))
+    kl = 0.5 * sum(math.exp(lv) + m * m - lv - 1 for m, lv in zip(mu, log_sigma2))
+    return recon + beta * kl, recon, kl
 ```
 
 Exact closed-form KL because both distributions are Gaussian. Do not integrate numerically. People still ship code with monte-carlo KL estimates in 2026 — it is 3x slower for no reason.
@@ -82,8 +82,8 @@ Exact closed-form KL because both distributions are Gaussian. Do not integrate n
 
 ```python
 def sample(dec, z_dim, rng):
- z = [rng.gauss(0, 1) for _ in range(z_dim)]
- return decode(z, dec)
+    z = [rng.gauss(0, 1) for _ in range(z_dim)]
+    return decode(z, dec)
 ```
 
 That is the generative model. Five lines.

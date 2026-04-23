@@ -26,7 +26,7 @@ ControlNet + LoRA + text = the 2026 practitioner's toolkit. Most production imag
 Take a pretrained SD. *Clone* the encoder half of the U-Net. Freeze the original. Train the clone to accept an extra conditioning input (edges, depth, pose). Connect the clone back to the decoder half of the original with *zero-convolution* skip connections (1×1 convs initialized to zero — start as a no-op, learn a delta).
 
 ```
-SD U-Net decoder:... ← orig_enc_features + zero_conv(controlnet_enc(condition))
+SD U-Net decoder:   ... ← orig_enc_features + zero_conv(controlnet_enc(condition))
 ```
 
 Zero-conv init means ControlNet starts as identity — no harm even before training. Train on 1M (prompt, condition, image) triples with the standard diffusion loss.
@@ -42,7 +42,7 @@ features += weight_a * control_a(depth) + weight_b * control_b(pose)
 For any linear layer `W ∈ R^{d×d}` in the model, freeze `W` and add a low-rank delta:
 
 ```
-W' = W + ΔW, ΔW = B @ A, A ∈ R^{r×d}, B ∈ R^{d×r}
+W' = W + ΔW,  ΔW = B @ A,  A ∈ R^{r×d},  B ∈ R^{d×r}
 ```
 
 with `r << d`. Rank 4-16 is standard for attention, rank 64-128 for heavy fine-tunes. Number of new parameters: `2 · d · r` instead of `d²`. For SDXL attention with `d=640`, `r=16`: 20k params per adapter instead of 410k — a 20x reduction. Across the whole model: a LoRA is usually 20-200MB vs the base 5GB.
@@ -78,15 +78,15 @@ ControlNet ≈ spatial. LoRA ≈ semantic. Use both.
 
 ```python
 def lora(W, A, B, x, alpha=1.0):
- # W is frozen; A, B are the trainable low-rank factors.
- return [W[i][j] * x[j] for i, j in...] + alpha * (B @ (A @ x))
+    # W is frozen; A, B are the trainable low-rank factors.
+    return [W[i][j] * x[j] for i, j in ...] + alpha * (B @ (A @ x))
 ```
 
 ### Step 2: zero-init side network
 
 ```python
 side_out = control_net(x, condition)
-gated = gate * side_out # gate initialized to 0
+gated = gate * side_out  # gate initialized to 0
 h = base(x) + gated
 ```
 
@@ -138,7 +138,7 @@ Save `outputs/skill-sd-toolkit-composer.md`. Skill takes a task (input assets: p
 
 ## Production note: LoRA swaps, ControlNet lanes, multi-tenant serving
 
-A real text-to-image SaaS serves hundreds of LoRAs and a dozen ControlNets over the same base checkpoint. The serving problem looks a lot like LLM multi-tenancy (production practice shows the LLM case under continuous batching and LoRAX / S-LoRA):
+A real text-to-image SaaS serves hundreds of LoRAs and a dozen ControlNets over the same base checkpoint. The serving problem looks a lot like LLM multi-tenancy (stas00 covers the LLM case under continuous batching and LoRAX / S-LoRA):
 
 - **Hot-swap LoRAs, do not merge.** Merging `W' = W + α·B·A` into the base gives ~3-5% faster per-step inference but freezes `α` and the base. Keep LoRAs hot in VRAM as rank-r deltas; diffusers exposes `pipe.load_lora_weights()` + `pipe.set_adapters([...], adapter_weights=[...])` for per-request activation. Swap cost is the `2 · d · r · num_layers` weights — MB-scale, sub-second.
 - **ControlNet as a second attention lane.** The cloned encoder runs in parallel with the base. Two ControlNets at weight 1.0 each = two extra forward passes per step, not one merged pass. Batch-size headroom drops quadratically. Budget for ~1.5× step cost per active ControlNet.

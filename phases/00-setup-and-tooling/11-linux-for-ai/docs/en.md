@@ -26,13 +26,13 @@ Linux organizes everything under a single root `/`. There is no `C:\` or `/Volum
 
 ```mermaid
 graph TD
- root["/"] --> home["home/your-username/<br/>Your files — clone repos, run training"]
- root --> tmp["tmp/<br/>Temporary files, cleared on reboot"]
- root --> usr["usr/<br/>System programs and libraries"]
- root --> etc["etc/<br/>Config files"]
- root --> varlog["var/log/<br/>Logs — check when something breaks"]
- root --> mnt["mnt/ or /media/<br/>External drives and volumes"]
- root --> proc["proc/ and /sys/<br/>Virtual files — kernel and hardware info"]
+    root["/"] --> home["home/your-username/<br/>Your files — clone repos, run training"]
+    root --> tmp["tmp/<br/>Temporary files, cleared on reboot"]
+    root --> usr["usr/<br/>System programs and libraries"]
+    root --> etc["etc/<br/>Config files"]
+    root --> varlog["var/log/<br/>Logs — check when something breaks"]
+    root --> mnt["mnt/ or /media/<br/>External drives and volumes"]
+    root --> proc["proc/ and /sys/<br/>Virtual files — kernel and hardware info"]
 ```
 
 Your home directory is `~` or `/home/your-username`. Almost everything you do happens here.
@@ -44,28 +44,28 @@ These are the 15 commands that cover 95% of what you'll do on a remote GPU box.
 ### Moving Around
 
 ```bash
-pwd # Where am I?
-ls # What's here?
-ls -la # What's here, including hidden files with details?
-cd /path/to/dir # Go there
-cd ~ # Go home
-cd.. # Go up one level
+pwd                         # Where am I?
+ls                          # What's here?
+ls -la                      # What's here, including hidden files with details?
+cd /path/to/dir             # Go there
+cd ~                        # Go home
+cd ..                       # Go up one level
 ```
 
 ### Files and Directories
 
 ```bash
-mkdir my-project # Create a directory
-mkdir -p a/b/c # Create nested directories in one shot
+mkdir my-project            # Create a directory
+mkdir -p a/b/c              # Create nested directories in one shot
 
-cp file.txt backup.txt # Copy a file
-cp -r src/ src-backup/ # Copy a directory (recursive)
+cp file.txt backup.txt      # Copy a file
+cp -r src/ src-backup/      # Copy a directory (recursive)
 
-mv old.txt new.txt # Rename a file
-mv file.txt /tmp/ # Move a file
+mv old.txt new.txt          # Rename a file
+mv file.txt /tmp/           # Move a file
 
-rm file.txt # Delete a file (no trash, it's gone)
-rm -rf my-dir/ # Delete a directory and everything inside
+rm file.txt                 # Delete a file (no trash, it's gone)
+rm -rf my-dir/              # Delete a directory and everything inside
 ```
 
 `rm -rf` is permanent. There is no undo. Double-check the path before hitting enter.
@@ -73,22 +73,22 @@ rm -rf my-dir/ # Delete a directory and everything inside
 ### Reading Files
 
 ```bash
-cat file.txt # Print entire file
-head -20 file.txt # First 20 lines
-tail -20 file.txt # Last 20 lines
-tail -f log.txt # Follow a log file in real time (Ctrl+C to stop)
-less file.txt # Scroll through a file (q to quit)
+cat file.txt                # Print entire file
+head -20 file.txt           # First 20 lines
+tail -20 file.txt           # Last 20 lines
+tail -f log.txt             # Follow a log file in real time (Ctrl+C to stop)
+less file.txt               # Scroll through a file (q to quit)
 ```
 
 ### Searching
 
 ```bash
-grep "error" training.log # Find lines containing "error"
-grep -r "learning_rate". # Search all files in current directory
-grep -i "cuda" config.yaml # Case-insensitive search
+grep "error" training.log           # Find lines containing "error"
+grep -r "learning_rate" .           # Search all files in current directory
+grep -i "cuda" config.yaml          # Case-insensitive search
 
-find. -name "*.py" # Find all Python files under current dir
-find. -name "*.ckpt" -size +1G # Find checkpoint files larger than 1GB
+find . -name "*.py"                 # Find all Python files under current dir
+find . -name "*.ckpt" -size +1G     # Find checkpoint files larger than 1GB
 ```
 
 ## Permissions
@@ -98,19 +98,19 @@ Every file in Linux has an owner and permission bits. You'll run into this when 
 ```bash
 ls -l train.py
 # -rwxr-xr-- 1 user group 2048 Mar 19 10:00 train.py
-# ^^^ owner permissions: read, write, execute
-# ^^^ group permissions: read, execute
-# ^^ everyone else: read only
+#  ^^^             owner permissions: read, write, execute
+#     ^^^          group permissions: read, execute
+#        ^^        everyone else: read only
 ```
 
 Common fixes:
 
 ```bash
-chmod +x train.sh # Make a script executable
-chmod 755 deploy.sh # Owner: full, others: read+execute
-chmod 644 config.yaml # Owner: read+write, others: read only
+chmod +x train.sh           # Make a script executable
+chmod 755 deploy.sh         # Owner: full, others: read+execute
+chmod 644 config.yaml       # Owner: read+write, others: read only
 
-chown user:group file.txt # Change who owns a file (needs sudo)
+chown user:group file.txt   # Change who owns a file (needs sudo)
 ```
 
 When something says "Permission denied," it's almost always a permissions issue. `chmod +x` or `sudo` will fix most cases.
@@ -120,27 +120,27 @@ When something says "Permission denied," it's almost always a permissions issue.
 Ubuntu uses `apt`. This is how you install system-level software.
 
 ```bash
-sudo apt update # Refresh the package list (always do this first)
-sudo apt install -y htop # Install a package (-y skips confirmation)
-sudo apt install -y build-essential # C compiler, make, etc. Needed by many Python packages
-sudo apt install -y tmux # Terminal multiplexer (keep sessions alive after disconnect)
+sudo apt update             # Refresh the package list (always do this first)
+sudo apt install -y htop    # Install a package (-y skips confirmation)
+sudo apt install -y build-essential  # C compiler, make, etc. Needed by many Python packages
+sudo apt install -y tmux    # Terminal multiplexer (keep sessions alive after disconnect)
 
-apt list --installed # What's installed?
-sudo apt remove htop # Uninstall
+apt list --installed        # What's installed?
+sudo apt remove htop        # Uninstall
 ```
 
 Common packages you'll install on a fresh GPU box:
 
 ```bash
 sudo apt update && sudo apt install -y \
- build-essential \
- git \
- curl \
- wget \
- tmux \
- htop \
- unzip \
- python3-venv
+    build-essential \
+    git \
+    curl \
+    wget \
+    tmux \
+    htop \
+    unzip \
+    python3-venv
 ```
 
 ## Users and sudo
@@ -148,9 +148,9 @@ sudo apt update && sudo apt install -y \
 You're usually logged in as a regular user. Some operations need root (admin) access.
 
 ```bash
-whoami # What user am I?
-sudo command # Run a single command as root
-sudo su # Become root (exit to go back, use sparingly)
+whoami                      # What user am I?
+sudo command                # Run a single command as root
+sudo su                     # Become root (exit to go back, use sparingly)
 ```
 
 On cloud GPU instances, you're typically the only user and already have sudo access. Don't run everything as root. Use sudo only when needed.
@@ -160,21 +160,21 @@ On cloud GPU instances, you're typically the only user and already have sudo acc
 When your training hangs, or you need to check what's running:
 
 ```bash
-htop # Interactive process viewer (q to quit)
-ps aux | grep python # Find running Python processes
-kill 12345 # Gracefully stop process with PID 12345
-kill -9 12345 # Force kill (use when graceful doesn't work)
-nvidia-smi # GPU processes and memory usage
+htop                        # Interactive process viewer (q to quit)
+ps aux | grep python        # Find running Python processes
+kill 12345                  # Gracefully stop process with PID 12345
+kill -9 12345               # Force kill (use when graceful doesn't work)
+nvidia-smi                  # GPU processes and memory usage
 ```
 
 systemd manages services (background daemons). You'll use it if you run inference servers:
 
 ```bash
-sudo systemctl start nginx # Start a service
-sudo systemctl stop nginx # Stop it
-sudo systemctl restart nginx # Restart it
-sudo systemctl status nginx # Check if it's running
-sudo systemctl enable nginx # Start automatically on boot
+sudo systemctl start nginx          # Start a service
+sudo systemctl stop nginx           # Stop it
+sudo systemctl restart nginx        # Restart it
+sudo systemctl status nginx         # Check if it's running
+sudo systemctl enable nginx         # Start automatically on boot
 ```
 
 ## Disk Space
@@ -182,12 +182,12 @@ sudo systemctl enable nginx # Start automatically on boot
 GPU boxes often have limited disk space. Models and datasets fill it fast.
 
 ```bash
-df -h # Disk usage for all mounted drives
-df -h /home # Disk usage for /home specifically
+df -h                       # Disk usage for all mounted drives
+df -h /home                 # Disk usage for /home specifically
 
-du -sh * # Size of each item in current directory
-du -sh ~/.cache # Size of your cache (pip, huggingface models land here)
-du -sh /data/checkpoints/ # Check how big your checkpoints are
+du -sh *                    # Size of each item in current directory
+du -sh ~/.cache             # Size of your cache (pip, huggingface models land here)
+du -sh /data/checkpoints/   # Check how big your checkpoints are
 
 # Find the biggest space hogs
 du -h --max-depth=1 / 2>/dev/null | sort -hr | head -20
@@ -212,18 +212,18 @@ You'll download models, transfer files, and hit APIs from the command line.
 
 ```bash
 # Download files
-wget https://example.com/model.bin # Download a file
-curl -O https://example.com/data.tar.gz # Same thing with curl
-curl -s https://api.example.com/health | python3 -m json.tool # Hit an API, pretty-print JSON
+wget https://example.com/model.bin                   # Download a file
+curl -O https://example.com/data.tar.gz              # Same thing with curl
+curl -s https://api.example.com/health | python3 -m json.tool  # Hit an API, pretty-print JSON
 
 # Transfer files between machines
-scp model.bin user@remote:/data/ # Copy file to remote machine
-scp user@remote:/data/results.csv. # Copy file from remote to local
-scp -r user@remote:/data/checkpoints/./local-dir/ # Copy directory
+scp model.bin user@remote:/data/                     # Copy file to remote machine
+scp user@remote:/data/results.csv .                  # Copy file from remote to local
+scp -r user@remote:/data/checkpoints/ ./local-dir/   # Copy directory
 
 # Sync directories (faster than scp for large transfers, resumes on failure)
-rsync -avz --progress./data/ user@remote:/data/
-rsync -avz --progress user@remote:/results/./results/
+rsync -avz --progress ./data/ user@remote:/data/
+rsync -avz --progress user@remote:/results/ ./results/
 ```
 
 Use `rsync` over `scp` for anything large. It only transfers changed bytes and handles interrupted connections.
@@ -233,17 +233,17 @@ Use `rsync` over `scp` for anything large. It only transfers changed bytes and h
 When you SSH into a remote box, closing your laptop kills your training run. tmux prevents this.
 
 ```bash
-tmux new -s train # Start a new session named "train"
-#... start your training, then:
-# Ctrl+B, then D # Detach (training keeps running)
+tmux new -s train           # Start a new session named "train"
+# ... start your training, then:
+# Ctrl+B, then D            # Detach (training keeps running)
 
-tmux ls # List sessions
-tmux attach -t train # Reattach to session
+tmux ls                     # List sessions
+tmux attach -t train        # Reattach to session
 
 # Inside tmux:
-# Ctrl+B, then % # Split pane vertically
-# Ctrl+B, then " # Split pane horizontally
-# Ctrl+B, then arrow keys # Switch between panes
+# Ctrl+B, then %            # Split pane vertically
+# Ctrl+B, then "            # Split pane horizontally
+# Ctrl+B, then arrow keys   # Switch between panes
 ```
 
 Always run long training jobs inside tmux. Always.
@@ -282,16 +282,16 @@ Things that will trip you up if you're coming from macOS:
 ## Quick Reference Card
 
 ```
-Navigation: pwd, ls, cd, find
-Files: cp, mv, rm, mkdir, cat, head, tail, less
-Search: grep, find
-Permissions: chmod, chown, sudo
-Packages: apt update, apt install
-Processes: htop, ps, kill, nvidia-smi
-Services: systemctl start/stop/restart/status
-Disk: df -h, du -sh
-Network: curl, wget, scp, rsync
-Sessions: tmux new/attach/detach
+Navigation:     pwd, ls, cd, find
+Files:          cp, mv, rm, mkdir, cat, head, tail, less
+Search:         grep, find
+Permissions:    chmod, chown, sudo
+Packages:       apt update, apt install
+Processes:      htop, ps, kill, nvidia-smi
+Services:       systemctl start/stop/restart/status
+Disk:           df -h, du -sh
+Network:        curl, wget, scp, rsync
+Sessions:       tmux new/attach/detach
 ```
 
 ## Exercises

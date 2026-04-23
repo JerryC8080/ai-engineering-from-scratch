@@ -24,7 +24,7 @@ Rectified flow (Liu 2022) goes further: iteratively straighten the paths with a 
 Define:
 
 ```
-x_t = t · x_1 + (1 - t) · x_0, t ∈ [0, 1]
+x_t = t · x_1 + (1 - t) · x_0,   t ∈ [0, 1]
 ```
 
 where `x_0 ~ data` and `x_1 ~ N(0, I)`. The time derivative along this straight line is constant:
@@ -84,25 +84,25 @@ What flow matching added: the *clarity* of the target (a plain velocity), a clea
 
 ```python
 def train_step(x0, net, rng, lr):
- x1 = rng.gauss(0, 1)
- t = rng.random()
- x_t = t * x1 + (1 - t) * x0
- target = x1 - x0
- pred = net_forward(x_t, t)
- loss = (pred - target) ** 2
- # backprop + update
+    x1 = rng.gauss(0, 1)
+    t = rng.random()
+    x_t = t * x1 + (1 - t) * x0
+    target = x1 - x0
+    pred = net_forward(x_t, t)
+    loss = (pred - target) ** 2
+    # backprop + update
 ```
 
 ### Step 2: multi-step inference
 
 ```python
 def sample(net, num_steps):
- x = rng.gauss(0, 1)
- for i in range(num_steps):
- t = 1.0 - i / num_steps
- dt = 1.0 / num_steps
- x -= dt * net_forward(x, t)
- return x
+    x = rng.gauss(0, 1)
+    for i in range(num_steps):
+        t = 1.0 - i / num_steps
+        dt = 1.0 / num_steps
+        x -= dt * net_forward(x, t)
+    return x
 ```
 
 ### Step 3: compare step counts

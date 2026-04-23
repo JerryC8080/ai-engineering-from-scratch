@@ -63,9 +63,9 @@ Keep a standard unconditional diffusion model. At each reverse step, resample �
 
 ```python
 def sample_data(rng):
- cluster = rng.choice([0, 1])
- center = [-1.0] * 5 if cluster == 0 else [1.0] * 5
- return [c + rng.gauss(0, 0.2) for c in center], cluster
+    cluster = rng.choice([0, 1])
+    center = [-1.0] * 5 if cluster == 0 else [1.0] * 5
+    return [c + rng.gauss(0, 0.2) for c in center], cluster
 ```
 
 ### Step 2: train denoiser over all 5 dims
@@ -76,12 +76,12 @@ Standard DDPM. Net outputs 5-D noise prediction for 5-D noisy input.
 
 ```python
 def inpaint_step(x_t, mask, clean_image, alpha_bars, t, rng):
- # replace unmasked dims with a freshly noised version of the clean source
- a_bar = alpha_bars[t]
- for i in range(len(x_t)):
- if not mask[i]:
- x_t[i] = math.sqrt(a_bar) * clean_image[i] + math.sqrt(1 - a_bar) * rng.gauss(0, 1)
- #...then run the normal reverse step on x_t
+    # replace unmasked dims with a freshly noised version of the clean source
+    a_bar = alpha_bars[t]
+    for i in range(len(x_t)):
+        if not mask[i]:
+            x_t[i] = math.sqrt(a_bar) * clean_image[i] + math.sqrt(1 - a_bar) * rng.gauss(0, 1)
+    # ...then run the normal reverse step on x_t
 ```
 
 This is the naive approach and it works on toy 1-D data. Real image inpainting uses the 9-channel input because texture coherence matters more.
@@ -138,7 +138,7 @@ Save `outputs/skill-editing-pipeline.md`. Skill takes an original image + edit d
 
 ## Production note: edit pipelines are latency-sensitive
 
-Users editing an image expect sub-5-second round trips. A 30-step SDXL-Inpaint at 1024² is 3-4 s on an L4, plus SAM mask generation (~200 ms) and VAE encode/decode (~500 ms combined). In the production-inference framing, this is TTFT-bound rather than throughput-bound — batch 1, low concurrency, minimize every stage:
+Users editing an image expect sub-5-second round trips. A 30-step SDXL-Inpaint at 1024² is 3-4 s on an L4, plus SAM mask generation (~200 ms) and VAE encode/decode (~500 ms combined). In stas00's ml-engineering framing, this is TTFT-bound rather than throughput-bound — batch 1, low concurrency, minimize every stage:
 
 - **SAM-H is the slow one.** SAM-H at 1024² is ~200 ms; SAM-ViT-B is ~40 ms with minor quality loss. SAM 2 (video) adds temporal overhead; do not use it for single-image edits.
 - **Skip the encode when possible.** `pipe.image_processor.preprocess(img)` encodes to latents. If you have the latents from the previous generation (typical in iterative-edit UIs), pass them directly via `latents=...` to skip one VAE encode.

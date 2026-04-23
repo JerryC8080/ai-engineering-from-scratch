@@ -54,8 +54,8 @@ One task, three production uses. This is why every RAG evaluation framework ship
 from transformers import pipeline
 
 nli = pipeline("text-classification",
- model="facebook/bart-large-mnli",
- top_k=None) # return all labels; replaces deprecated return_all_scores=True
+               model="facebook/bart-large-mnli",
+               top_k=None)  # return all labels; replaces deprecated return_all_scores=True
 
 premise = "The cat is sleeping on the couch."
 hypothesis = "There is a cat in the room."
@@ -63,8 +63,8 @@ hypothesis = "There is a cat in the room."
 result = nli({"text": premise, "text_pair": hypothesis})[0]
 print(result)
 # [{'label': 'entailment', 'score': 0.97},
-# {'label': 'neutral', 'score': 0.02},
-# {'label': 'contradiction', 'score': 0.01}]
+#  {'label': 'neutral', 'score': 0.02},
+#  {'label': 'contradiction', 'score': 0.01}]
 ```
 
 For production NLI, `facebook/bart-large-mnli` and `microsoft/deberta-v3-large-mnli` are the open defaults. DeBERTa-v3 tops leaderboards.
@@ -80,7 +80,7 @@ labels = ["finance", "sports", "politics", "technology"]
 result = zs(text, candidate_labels=labels)
 print(result)
 # {'labels': ['finance', 'politics', 'technology', 'sports'],
-# 'scores': [0.92, 0.05, 0.02, 0.01]}
+#  'scores': [0.92, 0.05, 0.02, 0.01]}
 ```
 
 The template is "This example is about {label}." by default. Customize with `hypothesis_template`. No training data required. No fine-tuning. Works out of the box.
@@ -89,9 +89,9 @@ The template is "This example is about {label}." by default. Customize with `hyp
 
 ```python
 def is_faithful(answer, context, threshold=0.5):
- result = nli({"text": context, "text_pair": answer})[0]
- entail = next(s for s in result if s["label"] == "entailment")
- return entail["score"] > threshold
+    result = nli({"text": context, "text_pair": answer})[0]
+    entail = next(s for s in result if s["label"] == "entailment")
+    return entail["score"] > threshold
 ```
 
 This is the core of RAGAS faithfulness. Split the generated answer into atomic claims. Check each claim against the retrieved context. Report the fraction that entail.

@@ -52,8 +52,8 @@ A graph G = (V, E) consists of vertices (nodes) V and edges E. Each edge connect
 The adjacency matrix A is the core representation. For a graph with n nodes:
 
 ```
-A[i][j] = 1 if there is an edge from node i to node j
-A[i][j] = 0 otherwise
+A[i][j] = 1    if there is an edge from node i to node j
+A[i][j] = 0    otherwise
 ```
 
 For undirected graphs, A is symmetric: A[i][j] = A[j][i]. For weighted graphs, A[i][j] = weight of edge (i, j).
@@ -65,8 +65,8 @@ Nodes: 0, 1, 2
 Edges: (0,1), (1,2), (0,2)
 
 A = [[0, 1, 1],
- [1, 0, 1],
- [1, 1, 0]]
+     [1, 0, 1],
+     [1, 1, 0]]
 ```
 
 The adjacency matrix is the input to every GNN. Matrix operations on A correspond to operations on the graph.
@@ -79,7 +79,7 @@ The degree matrix D is diagonal:
 
 ```
 D[i][i] = degree of node i
-D[i][j] = 0 for i != j
+D[i][j] = 0    for i != j
 ```
 
 For the triangle example: D = diag(2, 2, 2) because every node connects to two others.
@@ -94,14 +94,14 @@ The two fundamental graph traversal algorithms. You need both.
 
 ```
 BFS from node 0:
- Visit 0
- Queue: [1, 2] (neighbors of 0)
- Visit 1
- Queue: [2, 3] (add neighbors of 1)
- Visit 2
- Queue: [3] (neighbors of 2 already visited)
- Visit 3
- Queue: [] (done)
+  Visit 0
+  Queue: [1, 2]        (neighbors of 0)
+  Visit 1
+  Queue: [2, 3]        (add neighbors of 1)
+  Visit 2
+  Queue: [3]           (neighbors of 2 already visited)
+  Visit 3
+  Queue: []            (done)
 ```
 
 BFS finds shortest paths in unweighted graphs. The distance from the start to any node equals the BFS level at which that node is first discovered. This is why BFS is used for hop-count distances in social networks.
@@ -110,14 +110,14 @@ BFS finds shortest paths in unweighted graphs. The distance from the start to an
 
 ```
 DFS from node 0:
- Visit 0
- Stack: [1, 2] (neighbors of 0)
- Visit 2 (pop from stack)
- Stack: [1, 3] (add neighbors of 2)
- Visit 3 (pop from stack)
- Stack: [1]
- Visit 1 (pop from stack)
- Stack: [] (done)
+  Visit 0
+  Stack: [1, 2]        (neighbors of 0)
+  Visit 2               (pop from stack)
+  Stack: [1, 3]         (add neighbors of 2)
+  Visit 3               (pop from stack)
+  Stack: [1]
+  Visit 1               (pop from stack)
+  Stack: []             (done)
 ```
 
 DFS is useful for:
@@ -137,9 +137,9 @@ L = D - A. The most important matrix in spectral graph theory.
 For the triangle:
 
 ```
-D = [[2, 0, 0], A = [[0, 1, 1], L = [[2, -1, -1],
- [0, 2, 0], [1, 0, 1], [-1, 2, -1],
- [0, 0, 2]] [1, 1, 0]] [-1, -1, 2]]
+D = [[2, 0, 0],    A = [[0, 1, 1],    L = [[2, -1, -1],
+     [0, 2, 0],         [1, 0, 1],         [-1, 2, -1],
+     [0, 0, 2]]         [1, 1, 0]]         [-1, -1,  2]]
 ```
 
 The Laplacian has remarkable properties:
@@ -154,19 +154,19 @@ The Laplacian has remarkable properties:
 
 ```mermaid
 graph TD
- subgraph "Graph to Matrices"
- G["Graph G"] --> A["Adjacency Matrix A"]
- G --> D["Degree Matrix D"]
- A --> L["Laplacian L = D - A"]
- D --> L
- end
- subgraph "Spectral Analysis"
- L --> E["Eigenvalues of L"]
- L --> V["Eigenvectors of L"]
- E --> C["Connected components (zeros)"]
- E --> F["Connectivity (Fiedler value)"]
- V --> S["Spectral clustering"]
- end
+    subgraph "Graph to Matrices"
+        G["Graph G"] --> A["Adjacency Matrix A"]
+        G --> D["Degree Matrix D"]
+        A --> L["Laplacian L = D - A"]
+        D --> L
+    end
+    subgraph "Spectral Analysis"
+        L --> E["Eigenvalues of L"]
+        L --> V["Eigenvectors of L"]
+        E --> C["Connected components (zeros)"]
+        E --> F["Connectivity (Fiedler value)"]
+        V --> S["Spectral clustering"]
+    end
 ```
 
 ### Spectral Properties
@@ -209,23 +209,23 @@ One round of message passing lets each node "see" its immediate neighbors. Two r
 
 ```mermaid
 graph LR
- subgraph "Round 0"
- A0["Node A: [1,0]"]
- B0["Node B: [0,1]"]
- C0["Node C: [1,1]"]
- end
- subgraph "Round 1 (aggregate neighbors)"
- A1["Node A: avg(B,C) = [0.5, 1.0]"]
- B1["Node B: avg(A,C) = [1.0, 0.5]"]
- C1["Node C: avg(A,B) = [0.5, 0.5]"]
- end
- A0 --> A1
- B0 --> A1
- C0 --> A1
- A0 --> B1
- C0 --> B1
- A0 --> C1
- B0 --> C1
+    subgraph "Round 0"
+        A0["Node A: [1,0]"]
+        B0["Node B: [0,1]"]
+        C0["Node C: [1,1]"]
+    end
+    subgraph "Round 1 (aggregate neighbors)"
+        A1["Node A: avg(B,C) = [0.5, 1.0]"]
+        B1["Node B: avg(A,C) = [1.0, 0.5]"]
+        C1["Node C: avg(A,B) = [0.5, 0.5]"]
+    end
+    A0 --> A1
+    B0 --> A1
+    C0 --> A1
+    A0 --> B1
+    C0 --> B1
+    A0 --> C1
+    B0 --> C1
 ```
 
 ### Concepts and ML Applications
@@ -247,39 +247,39 @@ graph LR
 
 ```python
 class Graph:
- def __init__(self, n_nodes, directed=False):
- self.n = n_nodes
- self.directed = directed
- self.adj = {i: {} for i in range(n_nodes)}
+    def __init__(self, n_nodes, directed=False):
+        self.n = n_nodes
+        self.directed = directed
+        self.adj = {i: {} for i in range(n_nodes)}
 
- def add_edge(self, u, v, weight=1.0):
- self.adj[u][v] = weight
- if not self.directed:
- self.adj[v][u] = weight
+    def add_edge(self, u, v, weight=1.0):
+        self.adj[u][v] = weight
+        if not self.directed:
+            self.adj[v][u] = weight
 
- def neighbors(self, node):
- return list(self.adj[node].keys())
+    def neighbors(self, node):
+        return list(self.adj[node].keys())
 
- def degree(self, node):
- return len(self.adj[node])
+    def degree(self, node):
+        return len(self.adj[node])
 
- def adjacency_matrix(self):
- import numpy as np
- A = np.zeros((self.n, self.n))
- for u in range(self.n):
- for v, w in self.adj[u].items():
- A[u][v] = w
- return A
+    def adjacency_matrix(self):
+        import numpy as np
+        A = np.zeros((self.n, self.n))
+        for u in range(self.n):
+            for v, w in self.adj[u].items():
+                A[u][v] = w
+        return A
 
- def degree_matrix(self):
- import numpy as np
- D = np.zeros((self.n, self.n))
- for i in range(self.n):
- D[i][i] = self.degree(i)
- return D
+    def degree_matrix(self):
+        import numpy as np
+        D = np.zeros((self.n, self.n))
+        for i in range(self.n):
+            D[i][i] = self.degree(i)
+        return D
 
- def laplacian(self):
- return self.degree_matrix() - self.adjacency_matrix()
+    def laplacian(self):
+        return self.degree_matrix() - self.adjacency_matrix()
 ```
 
 The adjacency list (`self.adj`) stores neighbors efficiently. The adjacency matrix conversion uses numpy because all the spectral operations need it.
@@ -290,36 +290,36 @@ The adjacency list (`self.adj`) stores neighbors efficiently. The adjacency matr
 from collections import deque
 
 def bfs(graph, start):
- visited = set()
- order = []
- distances = {}
- queue = deque([(start, 0)])
- visited.add(start)
- while queue:
- node, dist = queue.popleft()
- order.append(node)
- distances[node] = dist
- for neighbor in graph.neighbors(node):
- if neighbor not in visited:
- visited.add(neighbor)
- queue.append((neighbor, dist + 1))
- return order, distances
+    visited = set()
+    order = []
+    distances = {}
+    queue = deque([(start, 0)])
+    visited.add(start)
+    while queue:
+        node, dist = queue.popleft()
+        order.append(node)
+        distances[node] = dist
+        for neighbor in graph.neighbors(node):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, dist + 1))
+    return order, distances
 
 
 def dfs(graph, start):
- visited = set()
- order = []
- stack = [start]
- while stack:
- node = stack.pop()
- if node in visited:
- continue
- visited.add(node)
- order.append(node)
- for neighbor in reversed(graph.neighbors(node)):
- if neighbor not in visited:
- stack.append(neighbor)
- return order
+    visited = set()
+    order = []
+    stack = [start]
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        order.append(node)
+        for neighbor in reversed(graph.neighbors(node)):
+            if neighbor not in visited:
+                stack.append(neighbor)
+    return order
 ```
 
 BFS uses a deque (double-ended queue) for O(1) popleft. DFS uses a list as a stack. Both visit every node exactly once -- O(V + E) time.
@@ -328,21 +328,21 @@ BFS uses a deque (double-ended queue) for O(1) popleft. DFS uses a list as a sta
 
 ```python
 def connected_components(graph):
- visited = set()
- components = []
- for node in range(graph.n):
- if node not in visited:
- order, _ = bfs(graph, node)
- visited.update(order)
- components.append(order)
- return components
+    visited = set()
+    components = []
+    for node in range(graph.n):
+        if node not in visited:
+            order, _ = bfs(graph, node)
+            visited.update(order)
+            components.append(order)
+    return components
 
 
 def laplacian_eigenvalues(graph):
- import numpy as np
- L = graph.laplacian()
- eigenvalues = np.linalg.eigvalsh(L)
- return eigenvalues
+    import numpy as np
+    L = graph.laplacian()
+    eigenvalues = np.linalg.eigvalsh(L)
+    return eigenvalues
 ```
 
 `eigvalsh` is for symmetric matrices -- the Laplacian is always symmetric for undirected graphs. It returns eigenvalues in ascending order. Count the zeros to find the number of connected components.
@@ -351,18 +351,18 @@ def laplacian_eigenvalues(graph):
 
 ```python
 def spectral_clustering(graph, k=2):
- import numpy as np
- L = graph.laplacian()
- eigenvalues, eigenvectors = np.linalg.eigh(L)
- features = eigenvectors[:, 1:k+1]
+    import numpy as np
+    L = graph.laplacian()
+    eigenvalues, eigenvectors = np.linalg.eigh(L)
+    features = eigenvectors[:, 1:k+1]
 
- labels = np.zeros(graph.n, dtype=int)
- for i in range(graph.n):
- if features[i, 0] >= 0:
- labels[i] = 0
- else:
- labels[i] = 1
- return labels
+    labels = np.zeros(graph.n, dtype=int)
+    for i in range(graph.n):
+        if features[i, 0] >= 0:
+            labels[i] = 0
+        else:
+            labels[i] = 1
+    return labels
 ```
 
 For k=2, the sign of the Fiedler vector splits the graph into two clusters. For k>2, you would run k-means on the first k eigenvectors (excluding the trivial all-ones eigenvector).
@@ -371,14 +371,14 @@ For k=2, the sign of the Fiedler vector splits the graph into two clusters. For 
 
 ```python
 def message_passing(graph, features, weight_matrix):
- import numpy as np
- A = graph.adjacency_matrix()
- row_sums = A.sum(axis=1, keepdims=True)
- row_sums[row_sums == 0] = 1
- A_norm = A / row_sums
- aggregated = A_norm @ features
- output = aggregated @ weight_matrix
- return output
+    import numpy as np
+    A = graph.adjacency_matrix()
+    row_sums = A.sum(axis=1, keepdims=True)
+    row_sums[row_sums == 0] = 1
+    A_norm = A / row_sums
+    aggregated = A_norm @ features
+    output = aggregated @ weight_matrix
+    return output
 ```
 
 This is one round of GNN message passing. Each node's new features are the weighted average of its neighbors' features, transformed by the weight matrix. Stack multiple rounds to propagate information further.
@@ -416,11 +416,11 @@ networkx handles graphs of any size with optimized C backends. Use it in product
 import numpy as np
 
 A = np.array([
- [0, 1, 1, 0, 0],
- [1, 0, 1, 0, 0],
- [1, 1, 0, 1, 0],
- [0, 0, 1, 0, 1],
- [0, 0, 0, 1, 0]
+    [0, 1, 1, 0, 0],
+    [1, 0, 1, 0, 0],
+    [1, 1, 0, 1, 0],
+    [0, 0, 1, 0, 1],
+    [0, 0, 0, 1, 0]
 ])
 
 D = np.diag(A.sum(axis=1))

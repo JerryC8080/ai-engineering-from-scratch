@@ -27,11 +27,11 @@ Encodec (Meta, 2022), SoundStream (Google, 2021), Descript Audio Codec (DAC, 202
 
 ```
 waveform (16000 samples/sec)
- └─ encoder conv ─┐
- ├─ RVQ layer 1 → indices at 75 Hz
- ├─ RVQ layer 2 → indices at 75 Hz
- ├─...
- └─ RVQ layer 8
+    └─ encoder conv ─┐
+                     ├─ RVQ layer 1 → indices at 75 Hz
+                     ├─ RVQ layer 2 → indices at 75 Hz
+                     ├─ ...
+                     └─ RVQ layer 8
 ```
 
 ### Two generative paradigms on top
@@ -64,10 +64,10 @@ The 2024-2026 trend: flow matching is winning for music (faster inference, clean
 
 ```python
 def make_tokens(style, length, vocab_size, rng):
- if style == 0: # "speech-like": alternating
- return [i % vocab_size for i in range(length)]
- # "music-like": ramp
- return [(i * 3) % vocab_size for i in range(length)]
+    if style == 0:  # "speech-like": alternating
+        return [i % vocab_size for i in range(length)]
+    # "music-like": ramp
+    return [(i * 3) % vocab_size for i in range(length)]
 ```
 
 ### Step 2: train a tiny token predictor
@@ -125,7 +125,7 @@ Save `outputs/skill-audio-brief.md`. Skill takes an audio brief (task, duration,
 
 ## Production note: audio is a streaming problem
 
-Audio is the one output modality users expect to arrive *as it is generated*, not all-at-once. In the production-inference framing this means TPOT matters (Time Per Output Token) because the user's listening speed is the target throughput — not their reading speed. For 16kHz audio tokenized at ~75 tokens/second (Encodec), the server must generate ≥75 tokens/sec per user to keep playback smooth.
+Audio is the one output modality users expect to arrive *as it is generated*, not all-at-once. In stas00's ml-engineering terms this means TPOT matters (Time Per Output Token) because the user's listening speed is the target throughput — not their reading speed. For 16kHz audio tokenized at ~75 tokens/second (Encodec), the server must generate ≥75 tokens/sec per user to keep playback smooth.
 
 Two architectural consequences:
 

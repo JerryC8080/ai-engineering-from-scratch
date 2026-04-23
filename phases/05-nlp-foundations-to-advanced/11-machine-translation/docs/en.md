@@ -42,11 +42,11 @@ src = "The cats are running."
 inputs = tok(src, return_tensors="pt")
 
 out = model.generate(
- **inputs,
- forced_bos_token_id=tok.convert_tokens_to_ids("fra_Latn"),
- num_beams=5,
- length_penalty=1.0,
- max_new_tokens=64,
+    **inputs,
+    forced_bos_token_id=tok.convert_tokens_to_ids("fra_Latn"),
+    num_beams=5,
+    length_penalty=1.0,
+    max_new_tokens=64,
 )
 print(tok.batch_decode(out, skip_special_tokens=True)[0])
 ```
@@ -71,7 +71,7 @@ references = [["Les chats courent."]]
 
 bleu = sacrebleu.corpus_bleu(hypotheses, references)
 chrf = sacrebleu.corpus_chrf(hypotheses, references)
-print(f"BLEU: {bleu.score:.1f} chrF: {chrf.score:.1f}")
+print(f"BLEU: {bleu.score:.1f}  chrF: {chrf.score:.1f}")
 ```
 
 Always use `sacrebleu`. It normalizes tokenization so scores are comparable across papers. Rolling your own BLEU computation is how misleading benchmarks happen.
@@ -107,20 +107,20 @@ from transformers import Trainer, TrainingArguments
 from datasets import Dataset
 
 pairs = [
- {"src": "The defendant pleaded guilty.", "tgt": "L'accusé a plaidé coupable."},
+    {"src": "The defendant pleaded guilty.", "tgt": "L'accusé a plaidé coupable."},
 ]
 
 ds = Dataset.from_list(pairs)
 
 
 def preprocess(ex):
- return tok(
- ex["src"],
- text_target=ex["tgt"],
- truncation=True,
- max_length=128,
- padding="max_length",
- )
+    return tok(
+        ex["src"],
+        text_target=ex["tgt"],
+        truncation=True,
+        max_length=128,
+        padding="max_length",
+    )
 
 
 ds = ds.map(preprocess, remove_columns=["src", "tgt"])

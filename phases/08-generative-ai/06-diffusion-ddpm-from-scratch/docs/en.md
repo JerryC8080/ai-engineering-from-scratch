@@ -20,7 +20,7 @@ Sohl-Dickstein et al. (2015) had a theoretical answer: define a Markov chain `q(
 **Forward process `q`.** Add Gaussian noise in `T` small steps. The closed form — the reason the math is tractable — is that the cumulative step is also Gaussian:
 
 ```
-q(x_t | x_0) = N( sqrt(α̅_t) · x_0, (1 - α̅_t) · I )
+q(x_t | x_0) = N( sqrt(α̅_t) · x_0,  (1 - α̅_t) · I )
 ```
 
 where `α̅_t = ∏_{s=1..t} (1 - β_s)` for a schedule of `β_t`. Pick `β_t` from 1e-4 to 0.02 linearly over T=1000 steps and `x_T` is approximately `N(0, I)`.
@@ -28,7 +28,7 @@ where `α̅_t = ∏_{s=1..t} (1 - β_s)` for a schedule of `β_t`. Pick `β_t` f
 **Reverse process `p_θ`.** Learn a neural net `ε_θ(x_t, t)` that predicts the noise that was added. Given `x_t`, denoise by:
 
 ```
-x_{t-1} = (1 / sqrt(α_t)) · ( x_t - (β_t / sqrt(1 - α̅_t)) · ε_θ(x_t, t) ) + σ_t · z
+x_{t-1} = (1 / sqrt(α_t)) · ( x_t - (β_t / sqrt(1 - α̅_t)) · ε_θ(x_t, t) )  +  σ_t · z
 ```
 
 where `σ_t` is either `sqrt(β_t)` or a learned variance. The expression is ugly but it is just algebra — solving for `x_{t-1}` given the posterior `q(x_{t-1} | x_t, x_0)` and substituting `x_0` with its noise-predicted estimate.
@@ -36,7 +36,7 @@ where `σ_t` is either `sqrt(β_t)` or a learned variance. The expression is ugl
 **Training loss.**
 
 ```
-L_simple = E_{x_0, t, ε} [ || ε - ε_θ( sqrt(α̅_t) · x_0 + sqrt(1 - α̅_t) · ε, t ) ||² ]
+L_simple = E_{x_0, t, ε} [ || ε - ε_θ( sqrt(α̅_t) · x_0 + sqrt(1 - α̅_t) · ε,  t ) ||² ]
 ```
 
 Sample `x_0` from data, pick a random `t`, sample `ε ~ N(0, I)`, compute the noisy `x_t` in one shot via the closed form, and regress on the noise. One loss, no minimax, no KL, no reparameterization tricks.
@@ -65,43 +65,43 @@ alphas = [1 - b for b in betas]
 alpha_bars = []
 cum = 1.0
 for a in alphas:
- cum *= a
- alpha_bars.append(cum)
+    cum *= a
+    alpha_bars.append(cum)
 ```
 
 ### Step 2: sample `x_t` in one shot
 
 ```python
 def forward_sample(x0, t, alpha_bars, rng):
- a_bar = alpha_bars[t]
- eps = rng.gauss(0, 1)
- x_t = math.sqrt(a_bar) * x0 + math.sqrt(1 - a_bar) * eps
- return x_t, eps
+    a_bar = alpha_bars[t]
+    eps = rng.gauss(0, 1)
+    x_t = math.sqrt(a_bar) * x0 + math.sqrt(1 - a_bar) * eps
+    return x_t, eps
 ```
 
 ### Step 3: one training step
 
 ```python
 def train_step(x0, model, alpha_bars, rng):
- t = rng.randrange(T)
- x_t, eps = forward_sample(x0, t, alpha_bars, rng)
- eps_hat = model_forward(model, x_t, t)
- loss = (eps - eps_hat) ** 2
- return loss, gradient_step(model,...)
+    t = rng.randrange(T)
+    x_t, eps = forward_sample(x0, t, alpha_bars, rng)
+    eps_hat = model_forward(model, x_t, t)
+    loss = (eps - eps_hat) ** 2
+    return loss, gradient_step(model, ...)
 ```
 
 ### Step 4: reverse sampling
 
 ```python
 def sample(model, alpha_bars, T, rng):
- x = rng.gauss(0, 1)
- for t in range(T - 1, -1, -1):
- eps_hat = model_forward(model, x, t)
- beta_t = 1 - alphas[t]
- x = (x - beta_t / math.sqrt(1 - alpha_bars[t]) * eps_hat) / math.sqrt(alphas[t])
- if t > 0:
- x += math.sqrt(beta_t) * rng.gauss(0, 1)
- return x
+    x = rng.gauss(0, 1)
+    for t in range(T - 1, -1, -1):
+        eps_hat = model_forward(model, x, t)
+        beta_t = 1 - alphas[t]
+        x = (x - beta_t / math.sqrt(1 - alpha_bars[t]) * eps_hat) / math.sqrt(alphas[t])
+        if t > 0:
+            x += math.sqrt(beta_t) * rng.gauss(0, 1)
+    return x
 ```
 
 For a 1-D problem with 40 timesteps and a 24-unit MLP, this learns the two-mode mixture in ~200 epochs.
@@ -110,7 +110,7 @@ For a 1-D problem with 40 timesteps and a 24-unit MLP, this learns the two-mode 
 
 The net needs to know which timestep it is denoising. Two standard options:
 
-- **Sinusoidal embedding.** Like Transformer positional encoding. `embed(t) = [sin(t/ω_0), cos(t/ω_0), sin(t/ω_1),...]`. Pass through an MLP, broadcast into the net.
+- **Sinusoidal embedding.** Like Transformer positional encoding. `embed(t) = [sin(t/ω_0), cos(t/ω_0), sin(t/ω_1), ...]`. Pass through an MLP, broadcast into the net.
 - **Film / group-norm conditioning.** Project embedding to per-channel scale/bias (FiLM) at each block.
 
 Our toy code uses sinusoidal → concat. Production U-Nets use FiLM.
@@ -162,13 +162,13 @@ Save `outputs/skill-diffusion-trainer.md`. Skill takes a dataset + compute budge
 
 ## Production note: diffusion inference is a step-count problem
 
-The DDPM paper runs T=1000 reverse steps. Nobody ships that in production. Every real inference stack picks one of three strategies — and each maps cleanly to the production-inference framing of "where is the latency coming from":
+The DDPM paper runs T=1000 reverse steps. Nobody ships that in production. Every real inference stack picks one of three strategies — and each maps cleanly to stas00's ml-engineering framing of "where is the latency coming from":
 
 1. **Faster sampler, same model.** DDIM (20-50 steps), DPM-Solver++ (10-20), UniPC (8-16). Drop-in replacement of the reverse loop; the trained `ε_θ` weights are untouched. Cuts latency 20-50×.
 2. **Distillation.** Train a student to match the teacher in fewer steps: Progressive Distillation (2 → 1), Consistency Models (arbitrary → 1-4), LCM, SDXL-Turbo, SD3-Turbo. Cuts latency another 5-10×, requires retraining.
 3. **Caching and compilation.** `torch.compile(unet, mode="reduce-overhead")`, TensorRT-LLM's diffusion backends, `xformers`/SDPA attention, bf16 weights. Cuts per-step latency ~2×. Stacks with (1) and (2).
 
-For a production diffusion server the budget conversation is the same as production practice shows for LLMs: latency is `num_steps × step_cost + VAE_decode`, throughput is `batch_size × (num_steps × step_cost)^-1`. TTFT is small (one step); TPOT-equivalent is the full response time because image generation is "all-at-once" from the user's perspective.
+For a production diffusion server the budget conversation is the same as stas00 describes for LLMs: latency is `num_steps × step_cost + VAE_decode`, throughput is `batch_size × (num_steps × step_cost)^-1`. TTFT is small (one step); TPOT-equivalent is the full response time because image generation is "all-at-once" from the user's perspective.
 
 ## Further Reading
 

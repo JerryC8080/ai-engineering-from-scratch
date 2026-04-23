@@ -32,22 +32,22 @@ Every feature selection method falls into one of three categories:
 
 ```mermaid
 flowchart TD
- A[Feature Selection Methods] --> B[Filter Methods]
- A --> C[Wrapper Methods]
- A --> D[Embedded Methods]
+    A[Feature Selection Methods] --> B[Filter Methods]
+    A --> C[Wrapper Methods]
+    A --> D[Embedded Methods]
 
- B --> B1["Variance Threshold"]
- B --> B2["Mutual Information"]
- B --> B3["Chi-squared Test"]
- B --> B4["Correlation Filtering"]
+    B --> B1["Variance Threshold"]
+    B --> B2["Mutual Information"]
+    B --> B3["Chi-squared Test"]
+    B --> B4["Correlation Filtering"]
 
- C --> C1["Recursive Feature Elimination"]
- C --> C2["Forward Selection"]
- C --> C3["Backward Elimination"]
+    C --> C1["Recursive Feature Elimination"]
+    C --> C2["Forward Selection"]
+    C --> C3["Backward Elimination"]
 
- D --> D1["L1 / Lasso Regularization"]
- D --> D2["Tree-based Importance"]
- D --> D3["Elastic Net"]
+    D --> D1["L1 / Lasso Regularization"]
+    D --> D2["Tree-based Importance"]
+    D --> D3["Elastic Net"]
 ```
 
 **Filter methods** score each feature independently using a statistical measure. They do not use a model. Fast, but they miss feature interactions.
@@ -88,11 +88,11 @@ For continuous features, discretize into bins first (histogram-based estimation)
 
 ```mermaid
 flowchart LR
- A[Feature X] --> B[Discretize into Bins]
- B --> C["Compute Joint Distribution p(x,y)"]
- C --> D["Compute MI = sum p(x,y) * log(p(x,y) / p(x)p(y))"]
- D --> E["Rank Features by MI Score"]
- E --> F[Select Top K]
+    A[Feature X] --> B[Discretize into Bins]
+    B --> C["Compute Joint Distribution p(x,y)"]
+    C --> D["Compute MI = sum p(x,y) * log(p(x,y) / p(x)p(y))"]
+    D --> E["Rank Features by MI Score"]
+    E --> F[Select Top K]
 ```
 
 ### Recursive Feature Elimination (RFE)
@@ -106,12 +106,12 @@ RFE is a wrapper method. It uses a model's own feature importance to iteratively
 
 ```mermaid
 flowchart TD
- A["Start: All N Features"] --> B["Train Model"]
- B --> C["Rank Feature Importances"]
- C --> D["Remove Least Important"]
- D --> E{"Features == Target Count?"}
- E -->|No| B
- E -->|Yes| F["Return Selected Features"]
+    A["Start: All N Features"] --> B["Train Model"]
+    B --> C["Rank Feature Importances"]
+    C --> D["Remove Least Important"]
+    D --> E{"Features == Target Count?"}
+    E -->|No| B
+    E -->|Yes| F["Return Selected Features"]
 ```
 
 RFE considers feature interactions because the model sees all remaining features together. Removing one feature changes the importance of others. This makes it more thorough than filter methods.
@@ -144,8 +144,8 @@ For a random forest with T trees:
 
 ```
 importance(feature_j) = (1/T) * sum over all trees of
- sum over all nodes splitting on feature_j of
- (n_samples * impurity_decrease)
+    sum over all nodes splitting on feature_j of
+        (n_samples * impurity_decrease)
 ```
 
 This gives a normalized importance score for each feature. It handles nonlinear relationships and feature interactions automatically.
@@ -180,26 +180,26 @@ Permutation importance avoids the cardinality bias of tree-based importance. But
 
 ```mermaid
 flowchart TD
- A[Start: Feature Selection] --> B{How many features?}
- B -->|"< 50"| C["Start with variance threshold + mutual information"]
- B -->|"50-500"| D["Variance threshold, then L1 or tree importance"]
- B -->|"> 500"| E["Variance threshold, then mutual info filter, then RFE on survivors"]
+    A[Start: Feature Selection] --> B{How many features?}
+    B -->|"< 50"| C["Start with variance threshold + mutual information"]
+    B -->|"50-500"| D["Variance threshold, then L1 or tree importance"]
+    B -->|"> 500"| E["Variance threshold, then mutual info filter, then RFE on survivors"]
 
- C --> F{Using linear model?}
- D --> F
- E --> F
+    C --> F{Using linear model?}
+    D --> F
+    E --> F
 
- F -->|Yes| G["L1 regularization for final selection"]
- F -->|No - trees| H["Tree importance + permutation importance"]
- F -->|No - other| I["RFE with your model"]
+    F -->|Yes| G["L1 regularization for final selection"]
+    F -->|No - trees| H["Tree importance + permutation importance"]
+    F -->|No - other| I["RFE with your model"]
 
- G --> J[Validate: compare selected vs all features]
- H --> J
- I --> J
+    G --> J[Validate: compare selected vs all features]
+    H --> J
+    I --> J
 
- J --> K{Performance improved?}
- K -->|Yes| L["Ship with selected features"]
- K -->|No| M["Try different method or keep all features"]
+    J --> K{Performance improved?}
+    K -->|Yes| L["Ship with selected features"]
+    K -->|No| M["Try different method or keep all features"]
 ```
 
 ## Build It
@@ -211,36 +211,36 @@ import numpy as np
 
 
 def make_feature_selection_data(n_samples=500, seed=42):
- rng = np.random.RandomState(seed)
+    rng = np.random.RandomState(seed)
 
- x1 = rng.randn(n_samples)
- x2 = rng.randn(n_samples)
- x3 = rng.randn(n_samples)
- x4 = x1 + 0.1 * rng.randn(n_samples)
- x5 = x2 + 0.1 * rng.randn(n_samples)
+    x1 = rng.randn(n_samples)
+    x2 = rng.randn(n_samples)
+    x3 = rng.randn(n_samples)
+    x4 = x1 + 0.1 * rng.randn(n_samples)
+    x5 = x2 + 0.1 * rng.randn(n_samples)
 
- informative = np.column_stack([x1, x2, x3, x4, x5])
+    informative = np.column_stack([x1, x2, x3, x4, x5])
 
- correlated = np.column_stack([
- x1 * 0.9 + 0.1 * rng.randn(n_samples),
- x2 * 0.8 + 0.2 * rng.randn(n_samples),
- x3 * 0.7 + 0.3 * rng.randn(n_samples),
- x1 * 0.5 + x2 * 0.5 + 0.1 * rng.randn(n_samples),
- x2 * 0.6 + x3 * 0.4 + 0.1 * rng.randn(n_samples),
- ])
+    correlated = np.column_stack([
+        x1 * 0.9 + 0.1 * rng.randn(n_samples),
+        x2 * 0.8 + 0.2 * rng.randn(n_samples),
+        x3 * 0.7 + 0.3 * rng.randn(n_samples),
+        x1 * 0.5 + x2 * 0.5 + 0.1 * rng.randn(n_samples),
+        x2 * 0.6 + x3 * 0.4 + 0.1 * rng.randn(n_samples),
+    ])
 
- noise = rng.randn(n_samples, 10) * 0.5
+    noise = rng.randn(n_samples, 10) * 0.5
 
- X = np.hstack([informative, correlated, noise])
- y = (2 * x1 - 1.5 * x2 + x3 + 0.5 * rng.randn(n_samples) > 0).astype(int)
+    X = np.hstack([informative, correlated, noise])
+    y = (2 * x1 - 1.5 * x2 + x3 + 0.5 * rng.randn(n_samples) > 0).astype(int)
 
- feature_names = (
- [f"info_{i}" for i in range(5)]
- + [f"corr_{i}" for i in range(5)]
- + [f"noise_{i}" for i in range(10)]
- )
+    feature_names = (
+        [f"info_{i}" for i in range(5)]
+        + [f"corr_{i}" for i in range(5)]
+        + [f"noise_{i}" for i in range(10)]
+    )
 
- return X, y, feature_names
+    return X, y, feature_names
 ```
 
 We know the ground truth: features 0-4 are informative (plus 3 and 4 are correlated copies of 0 and 1), features 5-9 are correlated with informative features, features 10-19 are pure noise. A good selection method should rank 0-4 highest and 10-19 lowest.
@@ -249,210 +249,210 @@ We know the ground truth: features 0-4 are informative (plus 3 and 4 are correla
 
 ```python
 def variance_threshold(X, threshold=0.01):
- variances = np.var(X, axis=0)
- mask = variances > threshold
- return mask, variances
+    variances = np.var(X, axis=0)
+    mask = variances > threshold
+    return mask, variances
 ```
 
 ### Step 3: Mutual information (discrete)
 
 ```python
 def discretize(x, n_bins=10):
- min_val, max_val = x.min(), x.max()
- if max_val == min_val:
- return np.zeros_like(x, dtype=int)
- bin_edges = np.linspace(min_val, max_val, n_bins + 1)
- binned = np.digitize(x, bin_edges[1:-1])
- return binned
+    min_val, max_val = x.min(), x.max()
+    if max_val == min_val:
+        return np.zeros_like(x, dtype=int)
+    bin_edges = np.linspace(min_val, max_val, n_bins + 1)
+    binned = np.digitize(x, bin_edges[1:-1])
+    return binned
 
 
 def mutual_information(X, y, n_bins=10):
- n_samples, n_features = X.shape
- mi_scores = np.zeros(n_features)
+    n_samples, n_features = X.shape
+    mi_scores = np.zeros(n_features)
 
- y_vals, y_counts = np.unique(y, return_counts=True)
- p_y = y_counts / n_samples
+    y_vals, y_counts = np.unique(y, return_counts=True)
+    p_y = y_counts / n_samples
 
- for f in range(n_features):
- x_binned = discretize(X[:, f], n_bins)
- x_vals, x_counts = np.unique(x_binned, return_counts=True)
- p_x = dict(zip(x_vals, x_counts / n_samples))
+    for f in range(n_features):
+        x_binned = discretize(X[:, f], n_bins)
+        x_vals, x_counts = np.unique(x_binned, return_counts=True)
+        p_x = dict(zip(x_vals, x_counts / n_samples))
 
- mi = 0.0
- for xv in x_vals:
- for yi, yv in enumerate(y_vals):
- joint_mask = (x_binned == xv) & (y == yv)
- p_xy = np.sum(joint_mask) / n_samples
- if p_xy > 0:
- mi += p_xy * np.log(p_xy / (p_x[xv] * p_y[yi]))
- mi_scores[f] = mi
+        mi = 0.0
+        for xv in x_vals:
+            for yi, yv in enumerate(y_vals):
+                joint_mask = (x_binned == xv) & (y == yv)
+                p_xy = np.sum(joint_mask) / n_samples
+                if p_xy > 0:
+                    mi += p_xy * np.log(p_xy / (p_x[xv] * p_y[yi]))
+        mi_scores[f] = mi
 
- return mi_scores
+    return mi_scores
 ```
 
 ### Step 4: Recursive Feature Elimination
 
 ```python
 def simple_logistic_importance(X, y, lr=0.1, epochs=100):
- n_samples, n_features = X.shape
- w = np.zeros(n_features)
- b = 0.0
+    n_samples, n_features = X.shape
+    w = np.zeros(n_features)
+    b = 0.0
 
- for _ in range(epochs):
- z = X @ w + b
- pred = 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
- error = pred - y
- w -= lr * (X.T @ error) / n_samples
- b -= lr * np.mean(error)
+    for _ in range(epochs):
+        z = X @ w + b
+        pred = 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
+        error = pred - y
+        w -= lr * (X.T @ error) / n_samples
+        b -= lr * np.mean(error)
 
- return w, b
+    return w, b
 
 
 def rfe(X, y, n_features_to_select=5, lr=0.1, epochs=100):
- n_total = X.shape[1]
- remaining = list(range(n_total))
- rankings = np.ones(n_total, dtype=int)
- rank = n_total
+    n_total = X.shape[1]
+    remaining = list(range(n_total))
+    rankings = np.ones(n_total, dtype=int)
+    rank = n_total
 
- while len(remaining) > n_features_to_select:
- X_subset = X[:, remaining]
- w, _ = simple_logistic_importance(X_subset, y, lr, epochs)
- importances = np.abs(w)
+    while len(remaining) > n_features_to_select:
+        X_subset = X[:, remaining]
+        w, _ = simple_logistic_importance(X_subset, y, lr, epochs)
+        importances = np.abs(w)
 
- least_idx = np.argmin(importances)
- original_idx = remaining[least_idx]
- rankings[original_idx] = rank
- rank -= 1
- remaining.pop(least_idx)
+        least_idx = np.argmin(importances)
+        original_idx = remaining[least_idx]
+        rankings[original_idx] = rank
+        rank -= 1
+        remaining.pop(least_idx)
 
- for idx in remaining:
- rankings[idx] = 1
+    for idx in remaining:
+        rankings[idx] = 1
 
- selected_mask = rankings == 1
- return selected_mask, rankings
+    selected_mask = rankings == 1
+    return selected_mask, rankings
 ```
 
 ### Step 5: L1 feature selection
 
 ```python
 def soft_threshold(w, alpha):
- return np.sign(w) * np.maximum(np.abs(w) - alpha, 0)
+    return np.sign(w) * np.maximum(np.abs(w) - alpha, 0)
 
 
 def l1_feature_selection(X, y, alpha=0.1, lr=0.01, epochs=500):
- n_samples, n_features = X.shape
- w = np.zeros(n_features)
- b = 0.0
+    n_samples, n_features = X.shape
+    w = np.zeros(n_features)
+    b = 0.0
 
- for _ in range(epochs):
- z = X @ w + b
- pred = 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
- error = pred - y
+    for _ in range(epochs):
+        z = X @ w + b
+        pred = 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
+        error = pred - y
 
- gradient_w = (X.T @ error) / n_samples
- gradient_b = np.mean(error)
+        gradient_w = (X.T @ error) / n_samples
+        gradient_b = np.mean(error)
 
- w -= lr * gradient_w
- w = soft_threshold(w, lr * alpha)
- b -= lr * gradient_b
+        w -= lr * gradient_w
+        w = soft_threshold(w, lr * alpha)
+        b -= lr * gradient_b
 
- selected_mask = np.abs(w) > 1e-6
- return selected_mask, w
+    selected_mask = np.abs(w) > 1e-6
+    return selected_mask, w
 ```
 
 ### Step 6: Tree-based importance (simple decision tree)
 
 ```python
 def gini_impurity(y):
- if len(y) == 0:
- return 0.0
- classes, counts = np.unique(y, return_counts=True)
- probs = counts / len(y)
- return 1.0 - np.sum(probs ** 2)
+    if len(y) == 0:
+        return 0.0
+    classes, counts = np.unique(y, return_counts=True)
+    probs = counts / len(y)
+    return 1.0 - np.sum(probs ** 2)
 
 
 def best_split(X, y, feature_idx):
- values = np.unique(X[:, feature_idx])
- if len(values) <= 1:
- return None, -1.0
+    values = np.unique(X[:, feature_idx])
+    if len(values) <= 1:
+        return None, -1.0
 
- best_threshold = None
- best_gain = -1.0
- parent_gini = gini_impurity(y)
- n = len(y)
+    best_threshold = None
+    best_gain = -1.0
+    parent_gini = gini_impurity(y)
+    n = len(y)
 
- for i in range(len(values) - 1):
- threshold = (values[i] + values[i + 1]) / 2.0
- left_mask = X[:, feature_idx] <= threshold
- right_mask = ~left_mask
+    for i in range(len(values) - 1):
+        threshold = (values[i] + values[i + 1]) / 2.0
+        left_mask = X[:, feature_idx] <= threshold
+        right_mask = ~left_mask
 
- n_left = np.sum(left_mask)
- n_right = np.sum(right_mask)
+        n_left = np.sum(left_mask)
+        n_right = np.sum(right_mask)
 
- if n_left == 0 or n_right == 0:
- continue
+        if n_left == 0 or n_right == 0:
+            continue
 
- gain = parent_gini - (n_left / n) * gini_impurity(y[left_mask]) - (n_right / n) * gini_impurity(y[right_mask])
+        gain = parent_gini - (n_left / n) * gini_impurity(y[left_mask]) - (n_right / n) * gini_impurity(y[right_mask])
 
- if gain > best_gain:
- best_gain = gain
- best_threshold = threshold
+        if gain > best_gain:
+            best_gain = gain
+            best_threshold = threshold
 
- return best_threshold, best_gain
+    return best_threshold, best_gain
 
 
 def tree_importance(X, y, n_trees=50, max_depth=5, seed=42):
- rng = np.random.RandomState(seed)
- n_samples, n_features = X.shape
- importances = np.zeros(n_features)
+    rng = np.random.RandomState(seed)
+    n_samples, n_features = X.shape
+    importances = np.zeros(n_features)
 
- for _ in range(n_trees):
- sample_idx = rng.choice(n_samples, size=n_samples, replace=True)
- feature_subset = rng.choice(n_features, size=max(1, int(np.sqrt(n_features))), replace=False)
+    for _ in range(n_trees):
+        sample_idx = rng.choice(n_samples, size=n_samples, replace=True)
+        feature_subset = rng.choice(n_features, size=max(1, int(np.sqrt(n_features))), replace=False)
 
- X_boot = X[sample_idx]
- y_boot = y[sample_idx]
+        X_boot = X[sample_idx]
+        y_boot = y[sample_idx]
 
- tree_imp = _build_tree_importance(X_boot, y_boot, feature_subset, max_depth)
- importances += tree_imp
+        tree_imp = _build_tree_importance(X_boot, y_boot, feature_subset, max_depth)
+        importances += tree_imp
 
- total = importances.sum()
- if total > 0:
- importances /= total
+    total = importances.sum()
+    if total > 0:
+        importances /= total
 
- return importances
+    return importances
 
 
 def _build_tree_importance(X, y, feature_subset, max_depth, depth=0):
- n_features = X.shape[1]
- importances = np.zeros(n_features)
+    n_features = X.shape[1]
+    importances = np.zeros(n_features)
 
- if depth >= max_depth or len(np.unique(y)) <= 1 or len(y) < 4:
- return importances
+    if depth >= max_depth or len(np.unique(y)) <= 1 or len(y) < 4:
+        return importances
 
- best_feature = None
- best_threshold = None
- best_gain = -1.0
+    best_feature = None
+    best_threshold = None
+    best_gain = -1.0
 
- for f in feature_subset:
- threshold, gain = best_split(X, y, f)
- if gain > best_gain:
- best_gain = gain
- best_feature = f
- best_threshold = threshold
+    for f in feature_subset:
+        threshold, gain = best_split(X, y, f)
+        if gain > best_gain:
+            best_gain = gain
+            best_feature = f
+            best_threshold = threshold
 
- if best_feature is None or best_gain <= 0:
- return importances
+    if best_feature is None or best_gain <= 0:
+        return importances
 
- importances[best_feature] += best_gain * len(y)
+    importances[best_feature] += best_gain * len(y)
 
- left_mask = X[:, best_feature] <= best_threshold
- right_mask = ~left_mask
+    left_mask = X[:, best_feature] <= best_threshold
+    right_mask = ~left_mask
 
- importances += _build_tree_importance(X[left_mask], y[left_mask], feature_subset, max_depth, depth + 1)
- importances += _build_tree_importance(X[right_mask], y[right_mask], feature_subset, max_depth, depth + 1)
+    importances += _build_tree_importance(X[left_mask], y[left_mask], feature_subset, max_depth, depth + 1)
+    importances += _build_tree_importance(X[right_mask], y[right_mask], feature_subset, max_depth, depth + 1)
 
- return importances
+    return importances
 ```
 
 ### Step 7: Run all methods and compare
@@ -465,10 +465,10 @@ With scikit-learn, feature selection is built into the pipeline:
 
 ```python
 from sklearn.feature_selection import (
- VarianceThreshold,
- mutual_info_classif,
- RFE,
- SelectFromModel,
+    VarianceThreshold,
+    mutual_info_classif,
+    RFE,
+    SelectFromModel,
 )
 from sklearn.linear_model import Lasso, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier

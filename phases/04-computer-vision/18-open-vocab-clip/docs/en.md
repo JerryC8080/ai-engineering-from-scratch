@@ -28,14 +28,14 @@ That capability — zero-shot transfer — is why every modern vision system sta
 
 ```mermaid
 flowchart LR
- IMG["Image"] --> IENC["Image encoder<br/>(ViT-L/14)"] --> IEMB["Image embedding<br/>(1024,)"]
- TXT["Caption"] --> TENC["Text encoder<br/>(transformer)"] --> TEMB["Text embedding<br/>(1024,)"]
- IEMB --> SIM["Cosine similarity"]
- TEMB --> SIM
+    IMG["Image"] --> IENC["Image encoder<br/>(ViT-L/14)"] --> IEMB["Image embedding<br/>(1024,)"]
+    TXT["Caption"] --> TENC["Text encoder<br/>(transformer)"] --> TEMB["Text embedding<br/>(1024,)"]
+    IEMB --> SIM["Cosine similarity"]
+    TEMB --> SIM
 
- style IENC fill:#dbeafe,stroke:#2563eb
- style TENC fill:#fef3c7,stroke:#d97706
- style SIM fill:#dcfce7,stroke:#16a34a
+    style IENC fill:#dbeafe,stroke:#2563eb
+    style TENC fill:#fef3c7,stroke:#d97706
+    style SIM fill:#dcfce7,stroke:#16a34a
 ```
 
 Both encoders end with a linear projection to the same embedding dimension (512 for CLIP-B/32, 1024 for CLIP-L/14). L2-normalise and compute cosine similarity.
@@ -47,8 +47,8 @@ Given a batch of N (image, caption) pairs, build an NxN similarity matrix. Train
 ```
 sim_matrix = image_embeddings @ text_embeddings.T / tau
 
-loss_i2t = cross_entropy(sim_matrix, targets=arange(N))
-loss_t2i = cross_entropy(sim_matrix.T, targets=arange(N))
+loss_i2t = cross_entropy(sim_matrix,       targets=arange(N))
+loss_t2i = cross_entropy(sim_matrix.T,     targets=arange(N))
 loss = (loss_i2t + loss_t2i) / 2
 ```
 
@@ -75,7 +75,7 @@ Given a trained CLIP:
 4. Similarity = `I @ T.T` shape (1, C).
 5. Argmax -> predicted class.
 
-Prompt engineering matters. OpenAI published 80 prompt templates for ImageNet ("a photo of a {}", "a blurry photo of a {}", "a sketch of a {}",...). Average the embeddings of all templates per class for an extra 1-3% top-1 accuracy.
+Prompt engineering matters. OpenAI published 80 prompt templates for ImageNet ("a photo of a {}", "a blurry photo of a {}", "a sketch of a {}", ...). Average the embeddings of all templates per class for an extra 1-3% top-1 accuracy.
 
 ### Where CLIP-style models are used in 2026
 
@@ -101,16 +101,16 @@ import torch.nn.functional as F
 
 
 class TwoTower(nn.Module):
- def __init__(self, img_in=128, txt_in=64, emb=64):
- super().__init__()
- self.image_proj = nn.Sequential(nn.Linear(img_in, 128), nn.ReLU(), nn.Linear(128, emb))
- self.text_proj = nn.Sequential(nn.Linear(txt_in, 128), nn.ReLU(), nn.Linear(128, emb))
- self.logit_scale = nn.Parameter(torch.ones([]) * 2.6592) # ln(1/0.07)
+    def __init__(self, img_in=128, txt_in=64, emb=64):
+        super().__init__()
+        self.image_proj = nn.Sequential(nn.Linear(img_in, 128), nn.ReLU(), nn.Linear(128, emb))
+        self.text_proj = nn.Sequential(nn.Linear(txt_in, 128), nn.ReLU(), nn.Linear(128, emb))
+        self.logit_scale = nn.Parameter(torch.ones([]) * 2.6592)  # ln(1/0.07)
 
- def forward(self, img_feats, txt_feats):
- i = F.normalize(self.image_proj(img_feats), dim=-1)
- t = F.normalize(self.text_proj(txt_feats), dim=-1)
- return i, t, self.logit_scale.exp()
+    def forward(self, img_feats, txt_feats):
+        i = F.normalize(self.image_proj(img_feats), dim=-1)
+        t = F.normalize(self.text_proj(txt_feats), dim=-1)
+        return i, t, self.logit_scale.exp()
 ```
 
 Two projections, shared-dim output, learned temperature. Same shape as the real CLIP API.
@@ -119,12 +119,12 @@ Two projections, shared-dim output, learned temperature. Same shape as the real 
 
 ```python
 def clip_loss(image_emb, text_emb, logit_scale):
- N = image_emb.size(0)
- sim = logit_scale * image_emb @ text_emb.T
- targets = torch.arange(N, device=sim.device)
- l_i = F.cross_entropy(sim, targets)
- l_t = F.cross_entropy(sim.T, targets)
- return (l_i + l_t) / 2
+    N = image_emb.size(0)
+    sim = logit_scale * image_emb @ text_emb.T
+    targets = torch.arange(N, device=sim.device)
+    l_i = F.cross_entropy(sim, targets)
+    l_t = F.cross_entropy(sim.T, targets)
+    return (l_i + l_t) / 2
 ```
 
 Symmetric. Higher logit_scale = sharper softmax = more confident but risk of instability.
@@ -134,15 +134,15 @@ Symmetric. Higher logit_scale = sharper softmax = more confident but risk of ins
 ```python
 @torch.no_grad()
 def zero_shot_classify(model, image_feats, class_text_feats, class_names):
- """
- image_feats: (N, img_in)
- class_text_feats: (C, txt_in) one averaged embedding per class
- """
- i = F.normalize(model.image_proj(image_feats), dim=-1)
- t = F.normalize(model.text_proj(class_text_feats), dim=-1)
- sim = i @ t.T
- pred = sim.argmax(dim=-1)
- return [class_names[p] for p in pred.tolist()]
+    """
+    image_feats:      (N, img_in)
+    class_text_feats: (C, txt_in)   one averaged embedding per class
+    """
+    i = F.normalize(model.image_proj(image_feats), dim=-1)
+    t = F.normalize(model.text_proj(class_text_feats), dim=-1)
+    sim = i @ t.T
+    pred = sim.argmax(dim=-1)
+    return [class_names[p] for p in pred.tolist()]
 ```
 
 One line per step. This is the exact zero-shot procedure used with a production CLIP checkpoint.
@@ -157,7 +157,7 @@ img = torch.randn(8, 128)
 txt = torch.randn(8, 64)
 i, t, scale = model(img, txt)
 loss = clip_loss(i, t, scale)
-print(f"batch size: {i.size(0)} loss: {loss.item():.3f}")
+print(f"batch size: {i.size(0)}   loss: {loss.item():.3f}")
 ```
 
 Loss should be close to `log(N) = log(8) = 2.08` for a randomly initialised model — the symmetric cross-entropy target when no structure is learned yet.
@@ -178,11 +178,11 @@ image = preprocess(Image.open("dog.jpg")).unsqueeze(0)
 text = tokenizer(["a photo of a dog", "a photo of a cat", "a photo of a car"])
 
 with torch.no_grad():
- image_features = model.encode_image(image)
- text_features = model.encode_text(text)
- image_features = image_features / image_features.norm(dim=-1, keepdim=True)
- text_features = text_features / text_features.norm(dim=-1, keepdim=True)
- probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+    image_features = model.encode_image(image)
+    text_features = model.encode_text(text)
+    image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+    text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+    probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
 
 print(probs)
 ```

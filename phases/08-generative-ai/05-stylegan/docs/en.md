@@ -55,20 +55,20 @@ In 2026 StyleGAN3 remains the default for (a) narrow-domain photorealism at high
 
 ```python
 def mapping(z, M):
- h = z
- for i in range(num_layers):
- h = leaky_relu(add(matmul(M[f"W{i}"], h), M[f"b{i}"]))
- return h
+    h = z
+    for i in range(num_layers):
+        h = leaky_relu(add(matmul(M[f"W{i}"], h), M[f"b{i}"]))
+    return h
 ```
 
 ### Step 2: adaptive instance normalization
 
 ```python
 def adain(x, w_scale, w_bias):
- mu = mean(x)
- sd = std(x)
- x_norm = [(xi - mu) / (sd + 1e-8) for xi in x]
- return [w_scale * xi + w_bias for xi in x_norm]
+    mu = mean(x)
+    sd = std(x)
+    x_norm = [(xi - mu) / (sd + 1e-8) for xi in x]
+    return [w_scale * xi + w_bias for xi in x_norm]
 ```
 
 Per-feature-map scale and bias come from `w` via linear projection.
@@ -77,7 +77,7 @@ Per-feature-map scale and bias come from `w` via linear projection.
 
 ```python
 def add_noise(x, sigma, rng):
- return [xi + sigma * rng.gauss(0, 1) for xi in x]
+    return [xi + sigma * rng.gauss(0, 1) for xi in x]
 ```
 
 Sigma per-channel is learnable.
@@ -127,7 +127,7 @@ Save `outputs/skill-stylegan-inversion.md`. Skill takes a real photo and outputs
 
 ## Production note: why StyleGAN still ships in 2026
 
-StyleGAN3 on a 4090 generates a 1024² FFHQ face in under 10 ms — `num_steps = 1`, no VAE decode, no cross-attention pass. In the production-inference framing this is the floor latency for any image generator. A 50-step SDXL + VAE-decode pipeline at the same resolution is ~3 seconds. That is a **300× gap**, and for narrow-domain products (avatar services, ID document pipelines, stock face generation) it wins on TCO.
+StyleGAN3 on a 4090 generates a 1024² FFHQ face in under 10 ms — `num_steps = 1`, no VAE decode, no cross-attention pass. In stas00's ml-engineering terms this is the floor latency for any image generator. A 50-step SDXL + VAE-decode pipeline at the same resolution is ~3 seconds. That is a **300× gap**, and for narrow-domain products (avatar services, ID document pipelines, stock face generation) it wins on TCO.
 
 Two operational consequences:
 

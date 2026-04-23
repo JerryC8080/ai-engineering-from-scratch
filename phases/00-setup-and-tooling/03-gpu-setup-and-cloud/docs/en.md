@@ -26,19 +26,19 @@ You have three options: local GPU, cloud GPU, or Google Colab (free).
 Your options:
 
 1. Local NVIDIA GPU
- Cost: $0 (you already have it)
- Setup: Install CUDA + cuDNN
- Best for: Regular use, large datasets
+   Cost: $0 (you already have it)
+   Setup: Install CUDA + cuDNN
+   Best for: Regular use, large datasets
 
 2. Google Colab (free tier)
- Cost: $0
- Setup: None
- Best for: Quick experiments, no GPU at home
+   Cost: $0
+   Setup: None
+   Best for: Quick experiments, no GPU at home
 
 3. Cloud GPU (Lambda, RunPod, Vast.ai)
- Cost: $0.20-2.00/hr
- Setup: SSH + install
- Best for: Serious training, large models
+   Cost: $0.20-2.00/hr
+   Setup: SSH + install
+   Best for: Serious training, large models
 ```
 
 ## Build It
@@ -59,8 +59,8 @@ import torch
 print(f"CUDA available: {torch.cuda.is_available()}")
 print(f"CUDA version: {torch.version.cuda}")
 if torch.cuda.is_available():
- print(f"GPU: {torch.cuda.get_device_name(0)}")
- print(f"Memory: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB")
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"Memory: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB")
 ```
 
 ### Option 2: Google Colab
@@ -108,16 +108,16 @@ cpu_time = time.time() - start
 print(f"CPU: {cpu_time:.3f}s")
 
 if torch.cuda.is_available():
- a_gpu = a_cpu.to("cuda")
- b_gpu = b_cpu.to("cuda")
+    a_gpu = a_cpu.to("cuda")
+    b_gpu = b_cpu.to("cuda")
 
- torch.cuda.synchronize()
- start = time.time()
- c_gpu = a_gpu @ b_gpu
- torch.cuda.synchronize()
- gpu_time = time.time() - start
- print(f"GPU: {gpu_time:.3f}s")
- print(f"Speedup: {cpu_time / gpu_time:.0f}x")
+    torch.cuda.synchronize()
+    start = time.time()
+    c_gpu = a_gpu @ b_gpu
+    torch.cuda.synchronize()
+    gpu_time = time.time() - start
+    print(f"GPU: {gpu_time:.3f}s")
+    print(f"Speedup: {cpu_time / gpu_time:.0f}x")
 ```
 
 ## Exercises

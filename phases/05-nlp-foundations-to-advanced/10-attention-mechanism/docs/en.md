@@ -22,8 +22,8 @@ That is the whole idea. Transformers extended it. Self-attention applied it to a
 At each decoder step `t`:
 
 1. Use the previous decoder hidden state `s_{t-1}` as a **query**.
-2. Score it against every encoder hidden state `h_1,..., h_T`. One scalar per encoder position.
-3. Softmax the scores to get attention weights `α_{t,1},..., α_{t,T}` that sum to 1.
+2. Score it against every encoder hidden state `h_1, ..., h_T`. One scalar per encoder position.
+3. Softmax the scores to get attention weights `α_{t,1}, ..., α_{t,T}` that sum to 1.
 4. Context vector `c_t = Σ α_{t,i} * h_i`. Weighted average of encoder states.
 5. Decoder takes `c_t` plus the previous output token, produces the next token.
 
@@ -65,19 +65,19 @@ import numpy as np
 
 
 def additive_attention(decoder_state, encoder_states, W_a, U_a, v_a):
- projected_dec = W_a @ decoder_state
- projected_enc = encoder_states @ U_a.T
- combined = np.tanh(projected_enc + projected_dec)
- scores = combined @ v_a
- weights = softmax(scores)
- context = weights @ encoder_states
- return context, weights
+    projected_dec = W_a @ decoder_state
+    projected_enc = encoder_states @ U_a.T
+    combined = np.tanh(projected_enc + projected_dec)
+    scores = combined @ v_a
+    weights = softmax(scores)
+    context = weights @ encoder_states
+    return context, weights
 
 
 def softmax(x):
- x = x - np.max(x)
- e = np.exp(x)
- return e / e.sum()
+    x = x - np.max(x)
+    e = np.exp(x)
+    return e / e.sum()
 ```
 
 Check your shapes against the table above. `encoder_states` has shape `(T_enc, d_h)`. `projected_enc` has shape `(T_enc, d_attn)`. `projected_dec` has shape `(d_attn,)` and broadcasts. `combined` has shape `(T_enc, d_attn)`. `scores` has shape `(T_enc,)`. `weights` has shape `(T_enc,)`. `context` has shape `(d_h,)`. Ship it.
@@ -86,16 +86,16 @@ Check your shapes against the table above. `encoder_states` has shape `(T_enc, d
 
 ```python
 def dot_attention(decoder_state, encoder_states):
- scores = encoder_states @ decoder_state
- weights = softmax(scores)
- return weights @ encoder_states, weights
+    scores = encoder_states @ decoder_state
+    weights = softmax(scores)
+    return weights @ encoder_states, weights
 
 
 def general_attention(decoder_state, encoder_states, W):
- projected = W.T @ decoder_state
- scores = encoder_states @ projected
- weights = softmax(scores)
- return weights @ encoder_states, weights
+    projected = W.T @ decoder_state
+    scores = encoder_states @ projected
+    weights = softmax(scores)
+    return weights @ encoder_states, weights
 ```
 
 Three lines each. This is why Luong's paper landed. Same accuracy on most tasks, a lot less code.
@@ -106,9 +106,9 @@ Given three encoder states (roughly "cat", "sat", "mat") and a decoder state tha
 
 ```python
 H = np.array([
- [1.0, 0.0, 0.2],
- [0.5, 0.5, 0.1],
- [0.1, 0.9, 0.3],
+    [1.0, 0.0, 0.2],
+    [0.5, 0.5, 0.1],
+    [0.1, 0.9, 0.3],
 ])
 
 s_close_to_cat = np.array([0.9, 0.1, 0.2])

@@ -38,17 +38,17 @@ Most methods detect point anomalies. Contextual anomalies need time or location 
 
 ```mermaid
 flowchart TD
- A[Anomaly Types] --> B[Point Anomaly]
- A --> C[Contextual Anomaly]
- A --> D[Collective Anomaly]
+    A[Anomaly Types] --> B[Point Anomaly]
+    A --> C[Contextual Anomaly]
+    A --> D[Collective Anomaly]
 
- B --> B1["Single unusual value<br/>Temperature: 500F"]
- C --> C1["Unusual in context<br/>90F in January"]
- D --> D1["Unusual sequence<br/>50 failed logins"]
+    B --> B1["Single unusual value<br/>Temperature: 500F"]
+    C --> C1["Unusual in context<br/>90F in January"]
+    D --> D1["Unusual sequence<br/>50 failed logins"]
 
- style B fill:#fdd,stroke:#333
- style C fill:#ffd,stroke:#333
- style D fill:#fdf,stroke:#333
+    style B fill:#fdd,stroke:#333
+    style C fill:#ffd,stroke:#333
+    style D fill:#fdf,stroke:#333
 ```
 
 ### The Unsupervised Framing
@@ -126,16 +126,16 @@ The key insight: anomalies are few and different. In a random partitioning of th
 
 ```mermaid
 flowchart TD
- A[All Data Points] --> B{Random Feature + Random Split}
- B --> C[Left Partition]
- B --> D[Right Partition]
- C --> E{Random Feature + Random Split}
- E --> F[Normal Point - deep in tree]
- E --> G[More splits needed...]
- D --> H["Anomaly - isolated quickly (short path)"]
+    A[All Data Points] --> B{Random Feature + Random Split}
+    B --> C[Left Partition]
+    B --> D[Right Partition]
+    C --> E{Random Feature + Random Split}
+    E --> F[Normal Point - deep in tree]
+    E --> G[More splits needed...]
+    D --> H["Anomaly - isolated quickly (short path)"]
 
- style H fill:#fdd,stroke:#333
- style F fill:#dfd,stroke:#333
+    style H fill:#fdd,stroke:#333
+    style F fill:#dfd,stroke:#333
 ```
 
 **How it works:**
@@ -203,14 +203,14 @@ Evaluating anomaly detectors is harder than evaluating classifiers:
 
 ```mermaid
 flowchart LR
- A[Raw Data] --> B[Train on Normal Data Only]
- B --> C[Score All Test Data]
- C --> D[Rank by Anomaly Score]
- D --> E[Evaluate Top-K Flagged Items]
- E --> F[Precision at K / AUPRC]
+    A[Raw Data] --> B[Train on Normal Data Only]
+    B --> C[Score All Test Data]
+    C --> D[Rank by Anomaly Score]
+    D --> E[Evaluate Top-K Flagged Items]
+    E --> F[Precision at K / AUPRC]
 
- style A fill:#f9f,stroke:#333
- style F fill:#9f9,stroke:#333
+    style A fill:#f9f,stroke:#333
+    style F fill:#9f9,stroke:#333
 ```
 
 ### Anomaly Detection Pipeline
@@ -235,11 +235,11 @@ The code in `code/anomaly_detection.py` implements Z-score, IQR, and Isolation F
 
 ```python
 def zscore_detect(X, threshold=3.0):
- mean = X.mean(axis=0)
- std = X.std(axis=0)
- std[std == 0] = 1.0
- z = np.abs((X - mean) / std)
- return z.max(axis=1) > threshold
+    mean = X.mean(axis=0)
+    std = X.std(axis=0)
+    std[std == 0] = 1.0
+    z = np.abs((X - mean) / std)
+    return z.max(axis=1) > threshold
 ```
 
 Simple and vectorized. Flags a point if any feature exceeds the threshold.
@@ -248,14 +248,14 @@ Simple and vectorized. Flags a point if any feature exceeds the threshold.
 
 ```python
 def iqr_detect(X, factor=1.5):
- q1 = np.percentile(X, 25, axis=0)
- q3 = np.percentile(X, 75, axis=0)
- iqr = q3 - q1
- iqr[iqr == 0] = 1.0
- lower = q1 - factor * iqr
- upper = q3 + factor * iqr
- outside = (X < lower) | (X > upper)
- return outside.any(axis=1)
+    q1 = np.percentile(X, 25, axis=0)
+    q3 = np.percentile(X, 75, axis=0)
+    iqr = q3 - q1
+    iqr[iqr == 0] = 1.0
+    lower = q1 - factor * iqr
+    upper = q3 + factor * iqr
+    outside = (X < lower) | (X > upper)
+    return outside.any(axis=1)
 ```
 
 ### Isolation Forest from Scratch
@@ -264,28 +264,28 @@ The from-scratch implementation builds isolation trees that randomly partition t
 
 ```python
 class IsolationTree:
- def __init__(self, max_depth):
- self.max_depth = max_depth
+    def __init__(self, max_depth):
+        self.max_depth = max_depth
 
- def fit(self, X, depth=0):
- n, p = X.shape
- if depth >= self.max_depth or n <= 1:
- self.is_leaf = True
- self.size = n
- return self
- self.is_leaf = False
- self.feature = np.random.randint(p)
- x_min = X[:, self.feature].min()
- x_max = X[:, self.feature].max()
- if x_min == x_max:
- self.is_leaf = True
- self.size = n
- return self
- self.threshold = np.random.uniform(x_min, x_max)
- left_mask = X[:, self.feature] < self.threshold
- self.left = IsolationTree(self.max_depth).fit(X[left_mask], depth + 1)
- self.right = IsolationTree(self.max_depth).fit(X[~left_mask], depth + 1)
- return self
+    def fit(self, X, depth=0):
+        n, p = X.shape
+        if depth >= self.max_depth or n <= 1:
+            self.is_leaf = True
+            self.size = n
+            return self
+        self.is_leaf = False
+        self.feature = np.random.randint(p)
+        x_min = X[:, self.feature].min()
+        x_max = X[:, self.feature].max()
+        if x_min == x_max:
+            self.is_leaf = True
+            self.size = n
+            return self
+        self.threshold = np.random.uniform(x_min, x_max)
+        left_mask = X[:, self.feature] < self.threshold
+        self.left = IsolationTree(self.max_depth).fit(X[left_mask], depth + 1)
+        self.right = IsolationTree(self.max_depth).fit(X[~left_mask], depth + 1)
+        return self
 ```
 
 The path length to isolate a point determines its anomaly score. Shorter paths mean more anomalous.
@@ -294,23 +294,23 @@ The `IsolationForest` class wraps multiple trees:
 
 ```python
 class IsolationForest:
- def __init__(self, n_estimators=100, max_samples=256, seed=42):
- self.n_estimators = n_estimators
- self.max_samples = max_samples
+    def __init__(self, n_estimators=100, max_samples=256, seed=42):
+        self.n_estimators = n_estimators
+        self.max_samples = max_samples
 
- def fit(self, X):
- sample_size = min(self.max_samples, X.shape[0])
- max_depth = int(np.ceil(np.log2(sample_size)))
- for _ in range(self.n_estimators):
- idx = rng.choice(X.shape[0], size=sample_size, replace=False)
- tree = IsolationTree(max_depth=max_depth)
- tree.fit(X[idx])
- self.trees.append(tree)
+    def fit(self, X):
+        sample_size = min(self.max_samples, X.shape[0])
+        max_depth = int(np.ceil(np.log2(sample_size)))
+        for _ in range(self.n_estimators):
+            idx = rng.choice(X.shape[0], size=sample_size, replace=False)
+            tree = IsolationTree(max_depth=max_depth)
+            tree.fit(X[idx])
+            self.trees.append(tree)
 
- def anomaly_score(self, X):
- avg_path = average path length across all trees
- scores = 2.0 ** (-avg_path / c(max_samples))
- return scores
+    def anomaly_score(self, X):
+        avg_path = average path length across all trees
+        scores = 2.0 ** (-avg_path / c(max_samples))
+        return scores
 ```
 
 The normalization factor `c(n)` is the expected path length of an unsuccessful search in a binary search tree with n elements. It equals `2 * H(n-1) - 2*(n-1)/n` where `H` is the harmonic number. This normalization ensures scores are comparable across datasets of different sizes.

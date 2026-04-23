@@ -24,15 +24,15 @@ Git is the tool. GitHub is where the code lives. This lesson covers what you nee
 
 ```mermaid
 sequenceDiagram
- participant WD as Working Directory
- participant SA as Staging Area
- participant LR as Local Repo
- participant R as Remote (GitHub)
- WD->>SA: git add
- SA->>LR: git commit
- LR->>R: git push
- R->>LR: git fetch
- LR->>WD: git pull
+    participant WD as Working Directory
+    participant SA as Staging Area
+    participant LR as Local Repo
+    participant R as Remote (GitHub)
+    WD->>SA: git add
+    SA->>LR: git commit
+    LR->>R: git push
+    R->>LR: git fetch
+    LR->>WD: git pull
 ```
 
 Three things to remember:
@@ -63,7 +63,7 @@ git push origin main
 ```bash
 git checkout -b experiment/new-optimizer
 
-#... make changes, commit...
+# ... make changes, commit ...
 
 git checkout main
 git merge experiment/new-optimizer

@@ -33,15 +33,15 @@ Before you model anything, you need to know what your data looks like. Descripti
 **Measures of central tendency** answer "where is the middle?"
 
 ```
-Mean: sum of all values / count
- mu = (1/n) * sum(x_i)
+Mean:   sum of all values / count
+        mu = (1/n) * sum(x_i)
 
 Median: middle value when sorted
- Robust to outliers. If you have [1, 2, 3, 4, 1000], the mean is 202
- but the median is 3.
+        Robust to outliers. If you have [1, 2, 3, 4, 1000], the mean is 202
+        but the median is 3.
 
-Mode: most frequent value
- Useful for categorical data. For continuous data, rarely informative.
+Mode:   most frequent value
+        Useful for categorical data. For continuous data, rarely informative.
 ```
 
 The mean is the balance point. The median is the halfway mark. When they diverge, your distribution is skewed. Income distributions have mean >> median (right skew from billionaires). Loss distributions during training often have mean << median (left skew from easy samples).
@@ -49,28 +49,28 @@ The mean is the balance point. The median is the halfway mark. When they diverge
 **Measures of spread** answer "how dispersed is the data?"
 
 ```
-Variance: average squared deviation from the mean
- sigma^2 = (1/n) * sum((x_i - mu)^2)
+Variance:   average squared deviation from the mean
+            sigma^2 = (1/n) * sum((x_i - mu)^2)
 
-Standard deviation: square root of variance
- sigma = sqrt(sigma^2)
- Same units as the data, so more interpretable.
+Standard deviation:  square root of variance
+                     sigma = sqrt(sigma^2)
+                     Same units as the data, so more interpretable.
 
-Range: max - min
- Sensitive to outliers. Almost never useful alone.
+Range:      max - min
+            Sensitive to outliers. Almost never useful alone.
 
-IQR: Q3 - Q1 (interquartile range)
- The range of the middle 50% of the data.
- Robust to outliers. Used for box plots and outlier detection.
+IQR:        Q3 - Q1 (interquartile range)
+            The range of the middle 50% of the data.
+            Robust to outliers. Used for box plots and outlier detection.
 ```
 
 **Percentiles** divide sorted data into 100 equal parts. The 25th percentile (Q1) means 25% of values fall below this point. The 50th percentile is the median. The 75th percentile is Q3.
 
 ```
 For latency monitoring:
- P50 = median latency (typical user experience)
- P95 = 95th percentile (bad but not worst case)
- P99 = 99th percentile (tail latency, often 10x the median)
+  P50 = median latency        (typical user experience)
+  P95 = 95th percentile       (bad but not worst case)
+  P99 = 99th percentile       (tail latency, often 10x the median)
 ```
 
 In ML, you care about percentiles for inference latency, prediction confidence distributions, and understanding error distributions. A model with low average error but terrible P99 error might be useless for safety-critical applications.
@@ -79,7 +79,7 @@ In ML, you care about percentiles for inference latency, prediction confidence d
 
 ```
 Population variance: sigma^2 = (1/N) * sum((x_i - mu)^2)
-Sample variance: s^2 = (1/(n-1)) * sum((x_i - x_bar)^2)
+Sample variance:     s^2     = (1/(n-1)) * sum((x_i - x_bar)^2)
 ```
 
 In practice: if n is large (thousands of samples), the difference is negligible. If n is small (dozens of samples), it matters.
@@ -93,9 +93,9 @@ Correlation measures the strength and direction of a linear relationship between
 ```
 r = sum((x_i - x_bar)(y_i - y_bar)) / (n * s_x * s_y)
 
-r = +1: perfect positive linear relationship
-r = -1: perfect negative linear relationship
-r = 0: no linear relationship (but there might be a nonlinear one!)
+r = +1:  perfect positive linear relationship
+r = -1:  perfect negative linear relationship
+r =  0:  no linear relationship (but there might be a nonlinear one!)
 
 Range: [-1, 1]
 ```
@@ -105,7 +105,7 @@ Pearson assumes the relationship is linear and both variables are roughly normal
 **Spearman rank correlation** measures monotonic association:
 
 ```
-1. Replace each value with its rank (1, 2, 3,...)
+1. Replace each value with its rank (1, 2, 3, ...)
 2. Compute Pearson correlation on the ranks
 
 Spearman catches any monotonic relationship, not just linear.
@@ -115,14 +115,14 @@ If y = x^3, Pearson gives r < 1 but Spearman gives rho = 1.
 **When to use each:**
 
 ```
-Pearson: Both variables are continuous and roughly normal.
- You care about the linear relationship specifically.
- No extreme outliers.
+Pearson:    Both variables are continuous and roughly normal.
+            You care about the linear relationship specifically.
+            No extreme outliers.
 
-Spearman: Ordinal data (rankings, ratings).
- Data is not normally distributed.
- You suspect a monotonic but not linear relationship.
- Outliers are present.
+Spearman:   Ordinal data (rankings, ratings).
+            Data is not normally distributed.
+            You suspect a monotonic but not linear relationship.
+            Outliers are present.
 ```
 
 **The golden rule:** correlation does not imply causation. Ice cream sales and drowning deaths are correlated because both increase in summer. Your model's accuracy and the number of parameters are correlated, but adding parameters does not automatically improve accuracy (see: overfitting).
@@ -134,23 +134,23 @@ The covariance between two variables measures how they vary together:
 ```
 Cov(X, Y) = (1/n) * sum((x_i - x_bar)(y_i - y_bar))
 
-Cov(X, Y) > 0: X and Y tend to increase together
-Cov(X, Y) < 0: when X increases, Y tends to decrease
-Cov(X, Y) = 0: no linear co-movement
+Cov(X, Y) > 0:  X and Y tend to increase together
+Cov(X, Y) < 0:  when X increases, Y tends to decrease
+Cov(X, Y) = 0:  no linear co-movement
 ```
 
 For d features, the covariance matrix C is a d x d matrix where C[i][j] = Cov(feature_i, feature_j). The diagonal entries C[i][i] are the variances of each feature.
 
 ```
-C = | Var(x1) Cov(x1,x2) Cov(x1,x3) |
- | Cov(x2,x1) Var(x2) Cov(x2,x3) |
- | Cov(x3,x1) Cov(x3,x2) Var(x3) |
+C = | Var(x1)      Cov(x1,x2)  Cov(x1,x3) |
+    | Cov(x2,x1)  Var(x2)      Cov(x2,x3) |
+    | Cov(x3,x1)  Cov(x3,x2)  Var(x3)     |
 
 Properties:
- - Symmetric: C[i][j] = C[j][i]
- - Positive semi-definite: all eigenvalues >= 0
- - Diagonal = variances
- - Off-diagonal = covariances
+  - Symmetric: C[i][j] = C[j][i]
+  - Positive semi-definite: all eigenvalues >= 0
+  - Diagonal = variances
+  - Off-diagonal = covariances
 ```
 
 **Connection to PCA.** PCA eigendecomposes the covariance matrix. The eigenvectors are the principal components (directions of maximum variance). The eigenvalues tell you how much variance each component captures. This is exactly what Lesson 10 covered, but now you see why the covariance matrix is the right thing to decompose: it encodes all pairwise linear relationships in your data.
@@ -164,12 +164,12 @@ Hypothesis testing is a framework for making decisions under uncertainty. You st
 **The setup:**
 
 ```
-Null hypothesis (H0): the default assumption, usually "no effect"
+Null hypothesis (H0):        the default assumption, usually "no effect"
 Alternative hypothesis (H1): what you are trying to show
 
 Example:
- H0: Model A and Model B have the same accuracy
- H1: Model B has higher accuracy than Model A
+  H0: Model A and Model B have the same accuracy
+  H1: Model B has higher accuracy than Model A
 ```
 
 **The p-value** is the probability of seeing data as extreme as what you observed, assuming H0 is true. It is NOT the probability that H0 is true. This is the single most common misunderstanding in statistics.
@@ -178,17 +178,17 @@ Example:
 p-value = P(data this extreme | H0 is true)
 
 If p-value < alpha (typically 0.05):
- Reject H0. The result is "statistically significant."
+    Reject H0. The result is "statistically significant."
 If p-value >= alpha:
- Fail to reject H0. You do not have enough evidence.
- This does NOT mean H0 is true.
+    Fail to reject H0. You do not have enough evidence.
+    This does NOT mean H0 is true.
 ```
 
 **Confidence intervals** give a range of plausible values for a parameter:
 
 ```
 95% confidence interval for the mean:
- x_bar +/- z * (s / sqrt(n))
+    x_bar +/- z * (s / sqrt(n))
 
 where z = 1.96 for 95% confidence
 
@@ -239,9 +239,9 @@ chi^2 = sum((observed - expected)^2 / expected)
 Example: does a language model's output distribution match the
 training distribution across categories?
 
-Category Observed Expected
-Positive 120 100
-Negative 80 100
+Category    Observed   Expected
+Positive       120        100
+Negative        80        100
 chi^2 = (120-100)^2/100 + (80-100)^2/100 = 4 + 4 = 8
 
 With 1 degree of freedom, chi^2 = 8 gives p < 0.005.
@@ -253,17 +253,17 @@ The difference is significant.
 A/B testing in ML is not the same as web A/B testing. Model comparison has specific challenges:
 
 ```
-1. Same test set: Both models must be evaluated on identical data.
- Different test sets make comparison meaningless.
+1. Same test set:    Both models must be evaluated on identical data.
+                     Different test sets make comparison meaningless.
 
 2. Multiple metrics: Accuracy alone is not enough. You need precision,
- recall, F1, latency, and fairness metrics.
+                     recall, F1, latency, and fairness metrics.
 
-3. Variance: Use cross-validation or bootstrap to estimate
- the variance of each metric, not just point estimates.
+3. Variance:         Use cross-validation or bootstrap to estimate
+                     the variance of each metric, not just point estimates.
 
-4. Data leakage: If the test set was used during model selection,
- your comparison is biased. Hold out a final test set.
+4. Data leakage:     If the test set was used during model selection,
+                     your comparison is biased. Hold out a final test set.
 ```
 
 **The procedure:**
@@ -271,7 +271,7 @@ A/B testing in ML is not the same as web A/B testing. Model comparison has speci
 ```
 1. Define your metric and significance level (alpha = 0.05)
 2. Run both models on the same k-fold cross-validation splits
-3. Collect paired scores: [(a1, b1), (a2, b2),..., (ak, bk)]
+3. Collect paired scores: [(a1, b1), (a2, b2), ..., (ak, bk)]
 4. Compute differences: d_i = b_i - a_i
 5. Run a paired t-test on the differences
 6. Check: is the mean difference significantly different from 0?
@@ -285,10 +285,10 @@ A result can be statistically significant but practically meaningless. With enou
 
 ```
 Example:
- Model A accuracy: 0.9234
- Model B accuracy: 0.9237
- n = 1,000,000 test samples
- p-value = 0.001
+  Model A accuracy: 0.9234
+  Model B accuracy: 0.9237
+  n = 1,000,000 test samples
+  p-value = 0.001
 
 Statistically significant? Yes.
 Practically significant? A 0.03% improvement is not worth the
@@ -300,9 +300,9 @@ engineering cost of deploying a new model.
 ```
 Cohen's d = (mean_1 - mean_2) / pooled_std
 
-d = 0.2: small effect
-d = 0.5: medium effect
-d = 0.8: large effect
+d = 0.2:  small effect
+d = 0.5:  medium effect
+d = 0.8:  large effect
 ```
 
 Always report both the p-value and the effect size. The p-value tells you if the difference is real. The effect size tells you if it matters.
@@ -340,11 +340,11 @@ Bootstrapping estimates the sampling distribution of a statistic by resampling y
 ```
 1. You have n data points
 2. Draw n samples WITH replacement (some points appear multiple times,
- some not at all)
+   some not at all)
 3. Compute your statistic on this bootstrap sample
 4. Repeat B times (typically B = 1000 to 10000)
 5. The distribution of bootstrap statistics approximates the
- sampling distribution
+   sampling distribution
 ```
 
 **Bootstrap confidence interval (percentile method):**
@@ -358,11 +358,11 @@ Sort the B bootstrap statistics
 
 ```
 - Test set accuracy is a point estimate. Bootstrap gives you
- confidence intervals.
+  confidence intervals.
 - You cannot assume metric distributions are normal (especially
- for AUC, F1, precision at k).
+  for AUC, F1, precision at k).
 - Bootstrap works for ANY statistic: median, ratio of two means,
- difference in AUC between two models.
+  difference in AUC between two models.
 - No closed-form formula needed.
 ```
 
@@ -371,11 +371,11 @@ Sort the B bootstrap statistics
 ```
 1. You have predictions from Model A and Model B on the same test set
 2. For each bootstrap iteration:
- a. Resample test indices with replacement
- b. Compute metric_A and metric_B on the resampled set
- c. Store diff = metric_B - metric_A
+   a. Resample test indices with replacement
+   b. Compute metric_A and metric_B on the resampled set
+   c. Store diff = metric_B - metric_A
 3. 95% CI for the difference:
- [2.5th percentile of diffs, 97.5th percentile of diffs]
+   [2.5th percentile of diffs, 97.5th percentile of diffs]
 4. If the CI does not contain 0, the difference is significant
 ```
 
@@ -386,18 +386,18 @@ This is more robust than the paired t-test because it makes no distributional as
 **Parametric tests** assume a specific distribution (usually normal):
 
 ```
-t-test: assumes normally distributed data (or large n by CLT)
-ANOVA: assumes normality and equal variances
-Pearson r: assumes bivariate normality
+t-test:         assumes normally distributed data (or large n by CLT)
+ANOVA:          assumes normality and equal variances
+Pearson r:      assumes bivariate normality
 ```
 
 **Non-parametric tests** make no distributional assumptions:
 
 ```
-Mann-Whitney U: compares two groups (replaces independent t-test)
+Mann-Whitney U:     compares two groups (replaces independent t-test)
 Wilcoxon signed-rank: compares paired data (replaces paired t-test)
-Spearman rho: correlation on ranks (replaces Pearson)
-Kruskal-Wallis: compares multiple groups (replaces ANOVA)
+Spearman rho:       correlation on ranks (replaces Pearson)
+Kruskal-Wallis:     compares multiple groups (replaces ANOVA)
 ```
 
 **When to use non-parametric:**
@@ -424,9 +424,9 @@ In ML experiments, you typically have small n (5 or 10 cross-validation folds), 
 The CLT says the distribution of sample means approaches a normal distribution as n grows, regardless of the underlying population distribution.
 
 ```
-If X_1, X_2,..., X_n are iid with mean mu and variance sigma^2:
+If X_1, X_2, ..., X_n are iid with mean mu and variance sigma^2:
 
- X_bar ~ Normal(mu, sigma^2 / n) as n -> infinity
+    X_bar ~ Normal(mu, sigma^2 / n)    as n -> infinity
 
 Works for n >= 30 in most cases.
 For highly skewed distributions, you might need n >= 100.
@@ -437,11 +437,11 @@ For highly skewed distributions, you might need n >= 100.
 ```
 1. Justifies confidence intervals and t-tests on aggregated metrics
 2. Explains why averaging over cross-validation folds gives stable
- estimates even when individual folds vary wildly
+   estimates even when individual folds vary wildly
 3. Mini-batch gradient descent works because the average gradient
- over a batch approximates the true gradient (CLT in action)
+   over a batch approximates the true gradient (CLT in action)
 4. Ensemble methods: averaging predictions from many models gives
- more stable output than any single model
+   more stable output than any single model
 ```
 
 **What CLT does NOT do:**
@@ -449,7 +449,7 @@ For highly skewed distributions, you might need n >= 100.
 ```
 - Does NOT make your data normal. It makes the MEAN of samples normal.
 - Does NOT work for heavy-tailed distributions with infinite variance
- (Cauchy distribution).
+  (Cauchy distribution).
 - Does NOT apply to dependent data (time series without correction).
 ```
 

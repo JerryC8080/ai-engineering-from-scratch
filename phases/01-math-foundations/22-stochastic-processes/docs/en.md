@@ -43,16 +43,17 @@ After n steps, your position is the sum of n random +/-1 values. The expected po
 This is counterintuitive. The walk is fair -- no drift in either direction. But over time, it wanders further and further from where it started. The standard deviation after n steps is sqrt(n).
 
 ```
-Step 0: Position = 0
-Step 1: Position = +1 or -1
-Step 2: Position = +2, 0, or -2...
+Step 0:  Position = 0
+Step 1:  Position = +1 or -1
+Step 2:  Position = +2, 0, or -2
+...
 Step 100: Expected distance from origin ~ 10 (sqrt(100))
 Step 10000: Expected distance from origin ~ 100 (sqrt(10000))
 ```
 
 **In 2D**, the walk moves up, down, left, or right with equal probability. The same sqrt(n) scaling applies to the distance from the origin. The path traces a fractal-like pattern.
 
-**Why sqrt(n)?** Each step is +1 or -1 with equal probability. After n steps, the position S_n = X_1 + X_2 +... + X_n where each X_i is +/-1. The variance of each step is 1, and the steps are independent, so Var(S_n) = n. Standard deviation = sqrt(n). By the central limit theorem, S_n / sqrt(n) converges to a standard normal distribution.
+**Why sqrt(n)?** Each step is +1 or -1 with equal probability. After n steps, the position S_n = X_1 + X_2 + ... + X_n where each X_i is +/-1. The variance of each step is 1, and the steps are independent, so Var(S_n) = n. Standard deviation = sqrt(n). By the central limit theorem, S_n / sqrt(n) converges to a standard normal distribution.
 
 This sqrt(n) scaling shows up everywhere in ML. SGD noise scales as 1/sqrt(batch_size). Embedding dimensions scale as sqrt(d). The square root is the signature of independent random additions.
 
@@ -67,7 +68,7 @@ Brownian motion is the mathematical foundation of diffusion. It models the rando
 A Markov chain is a system that transitions between states according to fixed probabilities. The key property: the next state depends only on the current state, not on the history.
 
 ```
-P(X_{t+1} = j | X_t = i, X_{t-1} =...) = P(X_{t+1} = j | X_t = i)
+P(X_{t+1} = j | X_t = i, X_{t-1} = ...) = P(X_{t+1} = j | X_t = i)
 ```
 
 This is the Markov property. It means you can describe the entire dynamics with a transition matrix P:
@@ -83,9 +84,9 @@ Each row of P sums to 1 (you must go somewhere).
 ```
 States: Sunny (0), Rainy (1), Cloudy (2)
 
-P = [[0.7, 0.1, 0.2], (if sunny: 70% sunny, 10% rainy, 20% cloudy)
- [0.3, 0.4, 0.3], (if rainy: 30% sunny, 40% rainy, 30% cloudy)
- [0.4, 0.2, 0.4]] (if cloudy: 40% sunny, 20% rainy, 40% cloudy)
+P = [[0.7, 0.1, 0.2],    (if sunny: 70% sunny, 10% rainy, 20% cloudy)
+     [0.3, 0.4, 0.3],    (if rainy: 30% sunny, 40% rainy, 30% cloudy)
+     [0.4, 0.2, 0.4]]    (if cloudy: 40% sunny, 20% rainy, 40% cloudy)
 ```
 
 Start in any state. After many transitions, the distribution of states converges to the stationary distribution pi, where pi * P = pi. This is the left eigenvector of P with eigenvalue 1.
@@ -94,15 +95,15 @@ For the weather chain, the stationary distribution might be [0.53, 0.18, 0.29] -
 
 ```mermaid
 graph LR
- S["Sunny"] -->|0.7| S
- S -->|0.1| R["Rainy"]
- S -->|0.2| C["Cloudy"]
- R -->|0.3| S
- R -->|0.4| R
- R -->|0.3| C
- C -->|0.4| S
- C -->|0.2| R
- C -->|0.4| C
+    S["Sunny"] -->|0.7| S
+    S -->|0.1| R["Rainy"]
+    S -->|0.2| C["Cloudy"]
+    R -->|0.3| S
+    R -->|0.4| R
+    R -->|0.3| C
+    C -->|0.4| S
+    C -->|0.2| R
+    C -->|0.4| C
 ```
 
 **Computing the stationary distribution.** There are two approaches:
@@ -149,7 +150,7 @@ Brownian motion is continuous but nowhere differentiable -- it jiggles at every 
 In discrete simulation, you approximate Brownian motion by:
 
 ```
-B(t + dt) = B(t) + sqrt(dt) * z, where z ~ N(0, 1)
+B(t + dt) = B(t) + sqrt(dt) * z,    where z ~ N(0, 1)
 ```
 
 The sqrt(dt) scaling is important. It comes from the central limit theorem applied to random walks.
@@ -180,16 +181,16 @@ The reverse process -- going from noise back to data -- is also a Markov chain, 
 
 ```mermaid
 graph LR
- subgraph "Forward Process (add noise)"
- X0["x_0 (data)"] -->|"+ noise"| X1["x_1"]
- X1 -->|"+ noise"| X2["x_2"]
- X2 -->|"..."| XT["x_T (pure noise)"]
- end
- subgraph "Reverse Process (denoise)"
- XT2["x_T (noise)"] -->|"neural net"| XR2["x_{T-1}"]
- XR2 -->|"neural net"| XR1["x_{T-2}"]
- XR1 -->|"..."| XR0["x_0 (generated data)"]
- end
+    subgraph "Forward Process (add noise)"
+        X0["x_0 (data)"] -->|"+ noise"| X1["x_1"]
+        X1 -->|"+ noise"| X2["x_2"]
+        X2 -->|"..."| XT["x_T (pure noise)"]
+    end
+    subgraph "Reverse Process (denoise)"
+        XT2["x_T (noise)"] -->|"neural net"| XR2["x_{T-1}"]
+        XR2 -->|"neural net"| XR1["x_{T-2}"]
+        XR1 -->|"..."| XR0["x_0 (generated data)"]
+    end
 ```
 
 ### MCMC: Markov Chain Monte Carlo
@@ -235,24 +236,24 @@ The chain is guaranteed to converge to p(x) under mild conditions. But convergen
 import numpy as np
 
 def random_walk_1d(n_steps, seed=None):
- rng = np.random.RandomState(seed)
- steps = rng.choice([-1, 1], size=n_steps)
- positions = np.concatenate([[0], np.cumsum(steps)])
- return positions
+    rng = np.random.RandomState(seed)
+    steps = rng.choice([-1, 1], size=n_steps)
+    positions = np.concatenate([[0], np.cumsum(steps)])
+    return positions
 
 
 def random_walk_2d(n_steps, seed=None):
- rng = np.random.RandomState(seed)
- directions = rng.choice(4, size=n_steps)
- dx = np.zeros(n_steps)
- dy = np.zeros(n_steps)
- dx[directions == 0] = 1 # right
- dx[directions == 1] = -1 # left
- dy[directions == 2] = 1 # up
- dy[directions == 3] = -1 # down
- x = np.concatenate([[0], np.cumsum(dx)])
- y = np.concatenate([[0], np.cumsum(dy)])
- return x, y
+    rng = np.random.RandomState(seed)
+    directions = rng.choice(4, size=n_steps)
+    dx = np.zeros(n_steps)
+    dy = np.zeros(n_steps)
+    dx[directions == 0] = 1   # right
+    dx[directions == 1] = -1  # left
+    dy[directions == 2] = 1   # up
+    dy[directions == 3] = -1  # down
+    x = np.concatenate([[0], np.cumsum(dx)])
+    y = np.concatenate([[0], np.cumsum(dy)])
+    return x, y
 ```
 
 The 1D walk stores cumulative sums. Each step is +1 or -1. After n steps, the position is the sum. The variance grows linearly with n, so the standard deviation grows as sqrt(n).
@@ -261,32 +262,32 @@ The 1D walk stores cumulative sums. Each step is +1 or -1. After n steps, the po
 
 ```python
 class MarkovChain:
- def __init__(self, transition_matrix, state_names=None):
- self.P = np.array(transition_matrix, dtype=float)
- self.n_states = len(self.P)
- self.state_names = state_names or [str(i) for i in range(self.n_states)]
+    def __init__(self, transition_matrix, state_names=None):
+        self.P = np.array(transition_matrix, dtype=float)
+        self.n_states = len(self.P)
+        self.state_names = state_names or [str(i) for i in range(self.n_states)]
 
- def step(self, current_state, rng=None):
- if rng is None:
- rng = np.random.RandomState()
- probs = self.P[current_state]
- return rng.choice(self.n_states, p=probs)
+    def step(self, current_state, rng=None):
+        if rng is None:
+            rng = np.random.RandomState()
+        probs = self.P[current_state]
+        return rng.choice(self.n_states, p=probs)
 
- def simulate(self, start_state, n_steps, seed=None):
- rng = np.random.RandomState(seed)
- states = [start_state]
- current = start_state
- for _ in range(n_steps):
- current = self.step(current, rng)
- states.append(current)
- return states
+    def simulate(self, start_state, n_steps, seed=None):
+        rng = np.random.RandomState(seed)
+        states = [start_state]
+        current = start_state
+        for _ in range(n_steps):
+            current = self.step(current, rng)
+            states.append(current)
+        return states
 
- def stationary_distribution(self):
- eigenvalues, eigenvectors = np.linalg.eig(self.P.T)
- idx = np.argmin(np.abs(eigenvalues - 1.0))
- stationary = np.real(eigenvectors[:, idx])
- stationary = stationary / stationary.sum()
- return np.abs(stationary)
+    def stationary_distribution(self):
+        eigenvalues, eigenvectors = np.linalg.eig(self.P.T)
+        idx = np.argmin(np.abs(eigenvalues - 1.0))
+        stationary = np.real(eigenvectors[:, idx])
+        stationary = stationary / stationary.sum()
+        return np.abs(stationary)
 ```
 
 The stationary distribution is the left eigenvector of P with eigenvalue 1. We find it by computing eigenvectors of P^T (transposing turns left eigenvectors into right eigenvectors).
@@ -295,14 +296,14 @@ The stationary distribution is the left eigenvector of P with eigenvalue 1. We f
 
 ```python
 def langevin_dynamics(grad_U, x0, dt, temperature, n_steps, seed=None):
- rng = np.random.RandomState(seed)
- x = np.array(x0, dtype=float)
- trajectory = [x.copy()]
- for _ in range(n_steps):
- noise = rng.randn(*x.shape)
- x = x - dt * grad_U(x) + np.sqrt(2 * temperature * dt) * noise
- trajectory.append(x.copy())
- return np.array(trajectory)
+    rng = np.random.RandomState(seed)
+    x = np.array(x0, dtype=float)
+    trajectory = [x.copy()]
+    for _ in range(n_steps):
+        noise = rng.randn(*x.shape)
+        x = x - dt * grad_U(x) + np.sqrt(2 * temperature * dt) * noise
+        trajectory.append(x.copy())
+    return np.array(trajectory)
 ```
 
 The gradient pushes x toward low energy. The noise prevents it from getting stuck. At equilibrium, the distribution of samples is proportional to exp(-U(x)/temperature).
@@ -311,19 +312,19 @@ The gradient pushes x toward low energy. The noise prevents it from getting stuc
 
 ```python
 def metropolis_hastings(target_log_prob, proposal_std, x0, n_samples, seed=None):
- rng = np.random.RandomState(seed)
- x = np.array(x0, dtype=float)
- samples = [x.copy()]
- accepted = 0
- for _ in range(n_samples - 1):
- x_proposed = x + rng.randn(*x.shape) * proposal_std
- log_ratio = target_log_prob(x_proposed) - target_log_prob(x)
- if np.log(rng.rand()) < log_ratio:
- x = x_proposed
- accepted += 1
- samples.append(x.copy())
- acceptance_rate = accepted / (n_samples - 1)
- return np.array(samples), acceptance_rate
+    rng = np.random.RandomState(seed)
+    x = np.array(x0, dtype=float)
+    samples = [x.copy()]
+    accepted = 0
+    for _ in range(n_samples - 1):
+        x_proposed = x + rng.randn(*x.shape) * proposal_std
+        log_ratio = target_log_prob(x_proposed) - target_log_prob(x)
+        if np.log(rng.rand()) < log_ratio:
+            x = x_proposed
+            accepted += 1
+        samples.append(x.copy())
+    acceptance_rate = accepted / (n_samples - 1)
+    return np.array(samples), acceptance_rate
 ```
 
 The algorithm proposes a new point, checks if it has higher probability (or accepts with probability proportional to the ratio), and repeats. The acceptance rate should be around 23-50% for good mixing.
@@ -348,12 +349,12 @@ print(f"Actual distance: {abs(walk[-1])}")
 import numpy as np
 
 P = np.array([[0.7, 0.1, 0.2],
- [0.3, 0.4, 0.3],
- [0.4, 0.2, 0.4]])
+              [0.3, 0.4, 0.3],
+              [0.4, 0.2, 0.4]])
 
 distribution = np.array([1.0, 0.0, 0.0])
 for _ in range(100):
- distribution = distribution @ P
+    distribution = distribution @ P
 
 print(f"Stationary distribution: {np.round(distribution, 4)}")
 ```

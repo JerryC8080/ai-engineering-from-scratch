@@ -54,10 +54,10 @@ Production KGs usually mix: open IE for discovery, then canonicalize relations o
 
 ```python
 PATTERNS = [
- (r"(?P<s>[A-Z]\w+) (?:is|was) (?:a|an|the) (?P<o>[A-Z]?\w+)", "isA"),
- (r"(?P<s>[A-Z]\w+) (?:is|was) born in (?P<o>\w+)", "bornIn"),
- (r"(?P<s>[A-Z]\w+) works? (?:at|for) (?P<o>[A-Z]\w+)", "worksAt"),
- (r"(?P<s>[A-Z]\w+) founded (?P<o>[A-Z]\w+)", "founded"),
+    (r"(?P<s>[A-Z]\w+) (?:is|was) (?:a|an|the) (?P<o>[A-Z]?\w+)", "isA"),
+    (r"(?P<s>[A-Z]\w+) (?:is|was) born in (?P<o>\w+)", "bornIn"),
+    (r"(?P<s>[A-Z]\w+) works? (?:at|for) (?P<o>[A-Z]\w+)", "worksAt"),
+    (r"(?P<s>[A-Z]\w+) founded (?P<o>[A-Z]\w+)", "founded"),
 ]
 ```
 
@@ -89,8 +89,8 @@ Text: {text}
 
 Output JSON:
 [{{"subject": {{"text": "...", "span": [start, end]}},
- "relation": "...",
- "object": {{"text": "...", "span": [start, end]}}}},...]
+   "relation": "...",
+   "object": {{"text": "...", "span": [start, end]}}}}, ...]
 
 Only include triples fully supported by the text. No inference beyond what is stated.
 """
@@ -102,18 +102,18 @@ Verify every returned span against the source. Reject anything where `text[start
 
 ```python
 RELATION_MAP = {
- "is the CEO of": "P169", # "chief executive officer"
- "was born in": "P19", # "place of birth"
- "founded": "P112", # "founded by" (inverted subject/object)
- "works at": "P108", # "employer"
+    "is the CEO of": "P169",       # "chief executive officer"
+    "was born in":   "P19",         # "place of birth"
+    "founded":        "P112",       # "founded by" (inverted subject/object)
+    "works at":       "P108",       # "employer"
 }
 
 
 def canonicalize(relation):
- rel_low = relation.lower().strip()
- if rel_low in RELATION_MAP:
- return RELATION_MAP[rel_low]
- return None # drop unmapped open relations or route to manual review
+    rel_low = relation.lower().strip()
+    if rel_low in RELATION_MAP:
+        return RELATION_MAP[rel_low]
+    return None   # drop unmapped open relations or route to manual review
 ```
 
 Canonicalization is often 60-80% of the engineering work. Budget for it.
@@ -124,14 +124,14 @@ Canonicalization is often 60-80% of the engineering work. Budget for it.
 triples = extract(text)
 graph = {}
 for s, r, o in triples:
- graph.setdefault(s, []).append((r, o))
+    graph.setdefault(s, []).append((r, o))
 
 
 def neighbors(node, relation=None):
- return [(r, o) for r, o in graph.get(node, []) if relation is None or r == relation]
+    return [(r, o) for r, o in graph.get(node, []) if relation is None or r == relation]
 
 
-print(neighbors("Tim Cook", relation="P108")) # -> [(P108, Apple)]
+print(neighbors("Tim Cook", relation="P108"))    # -> [(P108, Apple)]
 ```
 
 This is the atom of every RAG-over-KG system. Scale it with RDF triple stores (Blazegraph, Virtuoso), property graphs (Neo4j), or vector-augmented graph stores.

@@ -30,11 +30,11 @@ A pipeline is an ordered sequence of data transformations followed by a model. E
 
 ```mermaid
 flowchart LR
- A[Raw Data] --> B[Impute Missing Values]
- B --> C[Scale Numeric Features]
- C --> D[Encode Categoricals]
- D --> E[Train Model]
- E --> F[Prediction]
+    A[Raw Data] --> B[Impute Missing Values]
+    B --> C[Scale Numeric Features]
+    C --> D[Encode Categoricals]
+    D --> E[Train Model]
+    E --> F[Prediction]
 ```
 
 The pipeline guarantees:
@@ -82,8 +82,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
 pipe = Pipeline([
- ("scaler", StandardScaler()),
- ("model", LogisticRegression()),
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression()),
 ])
 
 pipe.fit(X_train, y_train)
@@ -110,23 +110,23 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 numeric_pipe = Pipeline([
- ("impute", SimpleImputer(strategy="median")),
- ("scale", StandardScaler()),
+    ("impute", SimpleImputer(strategy="median")),
+    ("scale", StandardScaler()),
 ])
 
 categorical_pipe = Pipeline([
- ("impute", SimpleImputer(strategy="most_frequent")),
- ("encode", OneHotEncoder(handle_unknown="ignore")),
+    ("impute", SimpleImputer(strategy="most_frequent")),
+    ("encode", OneHotEncoder(handle_unknown="ignore")),
 ])
 
 preprocessor = ColumnTransformer([
- ("num", numeric_pipe, ["age", "income", "score"]),
- ("cat", categorical_pipe, ["city", "gender", "plan"]),
+    ("num", numeric_pipe, ["age", "income", "score"]),
+    ("cat", categorical_pipe, ["city", "gender", "plan"]),
 ])
 
 full_pipeline = Pipeline([
- ("preprocess", preprocessor),
- ("model", GradientBoostingClassifier()),
+    ("preprocess", preprocessor),
+    ("model", GradientBoostingClassifier()),
 ])
 ```
 
@@ -142,15 +142,15 @@ A pipeline makes training reproducible, but you also need to track what happened
 import mlflow
 
 with mlflow.start_run():
- mlflow.log_param("max_depth", 5)
- mlflow.log_param("n_estimators", 100)
- mlflow.log_param("learning_rate", 0.1)
+    mlflow.log_param("max_depth", 5)
+    mlflow.log_param("n_estimators", 100)
+    mlflow.log_param("learning_rate", 0.1)
 
- pipe.fit(X_train, y_train)
- accuracy = pipe.score(X_test, y_test)
+    pipe.fit(X_train, y_train)
+    accuracy = pipe.score(X_test, y_test)
 
- mlflow.log_metric("accuracy", accuracy)
- mlflow.sklearn.log_model(pipe, "model")
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.sklearn.log_model(pipe, "model")
 ```
 
 Every run is recorded with parameters, metrics, artifacts, and the full model. You can compare runs, reproduce any experiment, and deploy any model version.
@@ -209,31 +209,31 @@ import numpy as np
 import random
 
 def set_seed(seed=42):
- random.seed(seed)
- np.random.seed(seed)
- try:
- import torch
- torch.manual_seed(seed)
- torch.cuda.manual_seed_all(seed)
- torch.backends.cudnn.deterministic = True
- except ImportError:
- pass
+    random.seed(seed)
+    np.random.seed(seed)
+    try:
+        import torch
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+    except ImportError:
+        pass
 ```
 
 ### From Notebook to Production Pipeline
 
 ```mermaid
 flowchart TD
- A[Jupyter Notebook] --> B[Extract functions]
- B --> C[Build Pipeline object]
- C --> D[Add config file for hyperparameters]
- D --> E[Add experiment tracking]
- E --> F[Add data validation]
- F --> G[Add tests]
- G --> H[Package for deployment]
+    A[Jupyter Notebook] --> B[Extract functions]
+    B --> C[Build Pipeline object]
+    C --> D[Add config file for hyperparameters]
+    D --> E[Add experiment tracking]
+    E --> F[Add data validation]
+    F --> G[Add tests]
+    G --> H[Package for deployment]
 
- style A fill:#fdd,stroke:#333
- style H fill:#dfd,stroke:#333
+    style A fill:#fdd,stroke:#333
+    style H fill:#dfd,stroke:#333
 ```
 
 The typical progression:
@@ -266,44 +266,44 @@ The code in `code/pipeline.py` builds a complete ML pipeline from scratch:
 
 ```python
 class CustomTransformer:
- def __init__(self):
- self.means = None
- self.stds = None
+    def __init__(self):
+        self.means = None
+        self.stds = None
 
- def fit(self, X):
- self.means = np.mean(X, axis=0)
- self.stds = np.std(X, axis=0)
- self.stds[self.stds == 0] = 1.0
- return self
+    def fit(self, X):
+        self.means = np.mean(X, axis=0)
+        self.stds = np.std(X, axis=0)
+        self.stds[self.stds == 0] = 1.0
+        return self
 
- def transform(self, X):
- return (X - self.means) / self.stds
+    def transform(self, X):
+        return (X - self.means) / self.stds
 
- def fit_transform(self, X):
- return self.fit(X).transform(X)
+    def fit_transform(self, X):
+        return self.fit(X).transform(X)
 ```
 
 ### Step 2: Pipeline from Scratch
 
 ```python
 class PipelineFromScratch:
- def __init__(self, steps):
- self.steps = steps
+    def __init__(self, steps):
+        self.steps = steps
 
- def fit(self, X, y=None):
- X_current = X.copy()
- for name, step in self.steps[:-1]:
- X_current = step.fit_transform(X_current)
- name, model = self.steps[-1]
- model.fit(X_current, y)
- return self
+    def fit(self, X, y=None):
+        X_current = X.copy()
+        for name, step in self.steps[:-1]:
+            X_current = step.fit_transform(X_current)
+        name, model = self.steps[-1]
+        model.fit(X_current, y)
+        return self
 
- def predict(self, X):
- X_current = X.copy()
- for name, step in self.steps[:-1]:
- X_current = step.transform(X_current)
- name, model = self.steps[-1]
- return model.predict(X_current)
+    def predict(self, X):
+        X_current = X.copy()
+        for name, step in self.steps[:-1]:
+            X_current = step.transform(X_current)
+        name, model = self.steps[-1]
+        return model.predict(X_current)
 ```
 
 ### Step 3: Cross-Validation with Pipeline

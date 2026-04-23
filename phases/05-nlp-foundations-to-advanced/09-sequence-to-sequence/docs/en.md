@@ -41,15 +41,15 @@ import torch.nn as nn
 
 
 class Encoder(nn.Module):
- def __init__(self, src_vocab_size, embed_dim, hidden_dim):
- super().__init__()
- self.embed = nn.Embedding(src_vocab_size, embed_dim, padding_idx=0)
- self.gru = nn.GRU(embed_dim, hidden_dim, batch_first=True)
+    def __init__(self, src_vocab_size, embed_dim, hidden_dim):
+        super().__init__()
+        self.embed = nn.Embedding(src_vocab_size, embed_dim, padding_idx=0)
+        self.gru = nn.GRU(embed_dim, hidden_dim, batch_first=True)
 
- def forward(self, src):
- e = self.embed(src)
- outputs, hidden = self.gru(e)
- return outputs, hidden
+    def forward(self, src):
+        e = self.embed(src)
+        outputs, hidden = self.gru(e)
+        return outputs, hidden
 ```
 
 `outputs` has shape `[batch, seq_len, hidden_dim]` — one hidden state per input position. `hidden` has shape `[1, batch, hidden_dim]` — the final step. Lesson 08 said "pool over outputs for classification." Here we keep the last hidden state as the context vector, and ignore the per-step outputs.
@@ -58,17 +58,17 @@ class Encoder(nn.Module):
 
 ```python
 class Decoder(nn.Module):
- def __init__(self, tgt_vocab_size, embed_dim, hidden_dim):
- super().__init__()
- self.embed = nn.Embedding(tgt_vocab_size, embed_dim, padding_idx=0)
- self.gru = nn.GRU(embed_dim, hidden_dim, batch_first=True)
- self.fc = nn.Linear(hidden_dim, tgt_vocab_size)
+    def __init__(self, tgt_vocab_size, embed_dim, hidden_dim):
+        super().__init__()
+        self.embed = nn.Embedding(tgt_vocab_size, embed_dim, padding_idx=0)
+        self.gru = nn.GRU(embed_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, tgt_vocab_size)
 
- def forward(self, token, hidden):
- e = self.embed(token)
- out, hidden = self.gru(e, hidden)
- logits = self.fc(out)
- return logits, hidden
+    def forward(self, token, hidden):
+        e = self.embed(token)
+        out, hidden = self.gru(e, hidden)
+        logits = self.fc(out)
+        return logits, hidden
 ```
 
 Decoder is called one step at a time. Input: a batch of single tokens and the current hidden state. Output: vocabulary logits for the next token and the updated hidden state.
@@ -77,26 +77,26 @@ Decoder is called one step at a time. Input: a batch of single tokens and the cu
 
 ```python
 def train_batch(encoder, decoder, src, tgt, bos_id, optimizer, teacher_forcing_ratio=0.9):
- optimizer.zero_grad()
- _, hidden = encoder(src)
- batch_size, tgt_len = tgt.shape
- input_token = torch.full((batch_size, 1), bos_id, dtype=torch.long)
- loss = 0.0
- loss_fn = nn.CrossEntropyLoss(ignore_index=0)
+    optimizer.zero_grad()
+    _, hidden = encoder(src)
+    batch_size, tgt_len = tgt.shape
+    input_token = torch.full((batch_size, 1), bos_id, dtype=torch.long)
+    loss = 0.0
+    loss_fn = nn.CrossEntropyLoss(ignore_index=0)
 
- for t in range(tgt_len):
- logits, hidden = decoder(input_token, hidden)
- step_loss = loss_fn(logits.squeeze(1), tgt[:, t])
- loss += step_loss
- use_teacher = torch.rand(1).item() < teacher_forcing_ratio
- if use_teacher:
- input_token = tgt[:, t].unsqueeze(1)
- else:
- input_token = logits.argmax(dim=-1)
+    for t in range(tgt_len):
+        logits, hidden = decoder(input_token, hidden)
+        step_loss = loss_fn(logits.squeeze(1), tgt[:, t])
+        loss += step_loss
+        use_teacher = torch.rand(1).item() < teacher_forcing_ratio
+        if use_teacher:
+            input_token = tgt[:, t].unsqueeze(1)
+        else:
+            input_token = logits.argmax(dim=-1)
 
- loss.backward()
- optimizer.step()
- return loss.item() / tgt_len
+    loss.backward()
+    optimizer.step()
+    return loss.item() / tgt_len
 ```
 
 Two knobs worth naming. `ignore_index=0` skips loss on padding tokens. `teacher_forcing_ratio` is the probability of using the true token vs. the model's prediction at each step. Start at 1.0 (full teacher forcing) and anneal down to ~0.5 over training to close the exposure-bias gap.
@@ -106,18 +106,18 @@ Two knobs worth naming. `ignore_index=0` skips loss on padding tokens. `teacher_
 ```python
 @torch.no_grad()
 def greedy_decode(encoder, decoder, src, bos_id, eos_id, max_len=50):
- _, hidden = encoder(src)
- batch_size = src.shape[0]
- input_token = torch.full((batch_size, 1), bos_id, dtype=torch.long)
- output_ids = []
- for _ in range(max_len):
- logits, hidden = decoder(input_token, hidden)
- next_token = logits.argmax(dim=-1)
- output_ids.append(next_token)
- input_token = next_token
- if (next_token == eos_id).all():
- break
- return torch.cat(output_ids, dim=1)
+    _, hidden = encoder(src)
+    batch_size = src.shape[0]
+    input_token = torch.full((batch_size, 1), bos_id, dtype=torch.long)
+    output_ids = []
+    for _ in range(max_len):
+        logits, hidden = decoder(input_token, hidden)
+        next_token = logits.argmax(dim=-1)
+        output_ids.append(next_token)
+        input_token = next_token
+        if (next_token == eos_id).all():
+            break
+    return torch.cat(output_ids, dim=1)
 ```
 
 Greedy decoding picks the highest-probability token at every step. It can wander off: once you commit to a token, you cannot unsay it. **Beam search** keeps the top-`k` partial sequences alive and picks the highest-scoring complete one at the end. Beam width 3-5 is standard.
@@ -127,10 +127,10 @@ Greedy decoding picks the highest-probability token at every step. It can wander
 Train the model on a toy copy task: source `[a, b, c, d, e]`, target `[a, b, c, d, e]`. Increase sequence length. Observe accuracy.
 
 ```
-seq_len=5 copy accuracy: 98%
-seq_len=10 copy accuracy: 91%
-seq_len=20 copy accuracy: 62%
-seq_len=40 copy accuracy: 23%
+seq_len=5   copy accuracy: 98%
+seq_len=10  copy accuracy: 91%
+seq_len=20  copy accuracy: 62%
+seq_len=40  copy accuracy: 23%
 ```
 
 A single GRU hidden state cannot losslessly memorize a 40-token input. The information is there at every encoder step, but the decoder only sees the last state. Attention fixes this directly.

@@ -28,12 +28,12 @@ This matters for ML because frequency-domain thinking appears everywhere. Convol
 
 ### The DFT definition
 
-Given N samples x[0], x[1],..., x[N-1], the Discrete Fourier Transform produces N frequency coefficients X[0], X[1],..., X[N-1]:
+Given N samples x[0], x[1], ..., x[N-1], the Discrete Fourier Transform produces N frequency coefficients X[0], X[1], ..., X[N-1]:
 
 ```
 X[k] = sum_{n=0}^{N-1} x[n] * e^(-2*pi*i*k*n/N)
 
-for k = 0, 1,..., N-1
+for k = 0, 1, ..., N-1
 ```
 
 Each X[k] is a complex number. Its magnitude |X[k]| tells you the amplitude of frequency k. Its phase angle(X[k]) tells you the phase offset of that frequency.
@@ -61,7 +61,7 @@ The inverse DFT reconstructs the original signal from its frequency coefficients
 ```
 x[n] = (1/N) * sum_{k=0}^{N-1} X[k] * e^(2*pi*i*k*n/N)
 
-for n = 0, 1,..., N-1
+for n = 0, 1, ..., N-1
 ```
 
 The only differences from the forward DFT: the sign in the exponent is positive (not negative), and there is a 1/N normalization factor.
@@ -81,29 +81,29 @@ The Cooley-Tukey algorithm (the most common FFT) works by divide and conquer:
 3. Combine the two half-size DFTs using "twiddle factors" e^(-2*pi*i*k/N).
 
 ```
-X[k] = E[k] + e^(-2*pi*i*k/N) * O[k] for k = 0,..., N/2 - 1
-X[k + N/2] = E[k] - e^(-2*pi*i*k/N) * O[k] for k = 0,..., N/2 - 1
+X[k] = E[k] + e^(-2*pi*i*k/N) * O[k]          for k = 0, ..., N/2 - 1
+X[k + N/2] = E[k] - e^(-2*pi*i*k/N) * O[k]    for k = 0, ..., N/2 - 1
 
 where E = DFT of even-indexed samples
- O = DFT of odd-indexed samples
+      O = DFT of odd-indexed samples
 ```
 
 The symmetry means each level of recursion does O(N) work, and there are log2(N) levels. Total: O(N log N).
 
 ```mermaid
 graph TD
- subgraph "8-point FFT (Cooley-Tukey)"
- X["x[0..7]<br/>8 samples"] -->|"split even/odd"| E["Even: x[0,2,4,6]"]
- X -->|"split even/odd"| O["Odd: x[1,3,5,7]"]
- E -->|"4-pt FFT"| EK["E[0..3]"]
- O -->|"4-pt FFT"| OK["O[0..3]"]
- EK -->|"combine with twiddle factors"| XK["X[0..7]"]
- OK -->|"combine with twiddle factors"| XK
- end
- subgraph "Complexity"
- C1["DFT: O(N^2) = 64 multiplications"]
- C2["FFT: O(N log N) = 24 multiplications"]
- end
+    subgraph "8-point FFT (Cooley-Tukey)"
+        X["x[0..7]<br/>8 samples"] -->|"split even/odd"| E["Even: x[0,2,4,6]"]
+        X -->|"split even/odd"| O["Odd: x[1,3,5,7]"]
+        E -->|"4-pt FFT"| EK["E[0..3]"]
+        O -->|"4-pt FFT"| OK["O[0..3]"]
+        EK -->|"combine with twiddle factors"| XK["X[0..7]"]
+        OK -->|"combine with twiddle factors"| XK
+    end
+    subgraph "Complexity"
+        C1["DFT: O(N^2) = 64 multiplications"]
+        C2["FFT: O(N log N) = 24 multiplications"]
+    end
 ```
 
 The FFT requires the signal length to be a power of 2. In practice, signals are zero-padded to the next power of 2.
@@ -115,8 +115,8 @@ The **power spectrum** is |X[k]|^2 -- the squared magnitude of each frequency co
 The **phase spectrum** is angle(X[k]) -- the phase offset of each frequency. For most analysis tasks, you care about the power spectrum and ignore the phase.
 
 ```
-Power at frequency k: P[k] = |X[k]|^2 = X[k].real^2 + X[k].imag^2
-Phase at frequency k: phi[k] = atan2(X[k].imag, X[k].real)
+Power at frequency k:  P[k] = |X[k]|^2 = X[k].real^2 + X[k].imag^2
+Phase at frequency k:  phi[k] = atan2(X[k].imag, X[k].real)
 ```
 
 ### Frequency resolution
@@ -124,9 +124,9 @@ Phase at frequency k: phi[k] = atan2(X[k].imag, X[k].real)
 The frequency resolution of the DFT depends on the number of samples N and the sampling rate fs.
 
 ```
-Frequency of bin k: f_k = k * fs / N
-Frequency resolution: delta_f = fs / N
-Maximum frequency: f_max = fs / 2 (Nyquist)
+Frequency of bin k:      f_k = k * fs / N
+Frequency resolution:    delta_f = fs / N
+Maximum frequency:       f_max = fs / 2  (Nyquist)
 ```
 
 To resolve two frequencies that are close together, you need more samples. To capture high frequencies, you need a higher sampling rate.
@@ -138,9 +138,9 @@ This is one of the most important results in signal processing and directly rele
 **Convolution in the time domain equals pointwise multiplication in the frequency domain.**
 
 ```
-x * h = IFFT(FFT(x). FFT(h))
+x * h = IFFT(FFT(x) . FFT(h))
 
-where * is convolution and. is element-wise multiplication
+where * is convolution and . is element-wise multiplication
 ```
 
 Why this matters:
@@ -154,18 +154,18 @@ Note: the DFT computes circular convolution (the signal wraps around). For linea
 
 ```mermaid
 graph LR
- subgraph "Time Domain"
- TA["Signal x[n]"] -->|"convolve (slow: O(NM))"| TC["Output y[n]"]
- TB["Filter h[n]"] -->|"convolve"| TC
- end
- subgraph "Frequency Domain"
- FA["FFT(x)"] -->|"multiply (fast: O(N))"| FC["FFT(x) * FFT(h)"]
- FB["FFT(h)"] -->|"multiply"| FC
- FC -->|"IFFT"| FD["y[n]"]
- end
- TA -.->|"FFT"| FA
- TB -.->|"FFT"| FB
- FD -.->|"same result"| TC
+    subgraph "Time Domain"
+        TA["Signal x[n]"] -->|"convolve (slow: O(NM))"| TC["Output y[n]"]
+        TB["Filter h[n]"] -->|"convolve"| TC
+    end
+    subgraph "Frequency Domain"
+        FA["FFT(x)"] -->|"multiply (fast: O(N))"| FC["FFT(x) * FFT(h)"]
+        FB["FFT(h)"] -->|"multiply"| FC
+        FC -->|"IFFT"| FD["y[n]"]
+    end
+    TA -.->|"FFT"| FA
+    TB -.->|"FFT"| FB
+    FD -.->|"same result"| TC
 ```
 
 ### Windowing
@@ -184,7 +184,7 @@ Common windows:
 | Blackman | Triple cosine | Wide | Very low (-58 dB) | When side lobe suppression is critical |
 
 ```
-Hann window: w[n] = 0.5 * (1 - cos(2*pi*n / (N-1)))
+Hann window:    w[n] = 0.5 * (1 - cos(2*pi*n / (N-1)))
 Hamming window: w[n] = 0.54 - 0.46 * cos(2*pi*n / (N-1))
 ```
 
@@ -209,7 +209,7 @@ Parseval's theorem says the total energy is the same in both domains. Energy is 
 The original Transformer uses sinusoidal positional encodings:
 
 ```
-PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
 PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
 ```
 
@@ -244,10 +244,10 @@ STFT procedure:
 1. Choose a window size (e.g., 1024 samples)
 2. Choose a hop size (e.g., 256 samples -- 75% overlap)
 3. For each window position:
- a. Extract the windowed segment
- b. Apply a Hann/Hamming window
- c. Compute FFT
- d. Store the magnitude spectrum as one column of the spectrogram
+   a. Extract the windowed segment
+   b. Apply a Hann/Hamming window
+   c. Compute FFT
+   d. Store the magnitude spectrum as one column of the spectrogram
 ```
 
 Spectrograms are the standard input representation for audio ML models. Speech recognition models (Whisper, DeepSpeech) operate on mel-spectrograms -- spectrograms with frequencies mapped to the mel scale, which better matches human pitch perception.
@@ -258,13 +258,13 @@ If a signal contains frequencies above fs/2 (the Nyquist frequency), sampling at
 
 ```
 Example:
- True signal: 90 Hz sine wave
- Sampling rate: 100 Hz
- Apparent frequency: 100 - 90 = 10 Hz
+  True signal: 90 Hz sine wave
+  Sampling rate: 100 Hz
+  Apparent frequency: 100 - 90 = 10 Hz
 
- The samples from the 90 Hz signal at 100 Hz sampling rate
- are identical to the samples from a 10 Hz signal.
- No amount of math can recover the original 90 Hz.
+  The samples from the 90 Hz signal at 100 Hz sampling rate
+  are identical to the samples from a 10 Hz signal.
+  No amount of math can recover the original 90 Hz.
 ```
 
 This is why analog-to-digital converters include anti-aliasing filters that remove frequencies above Nyquist before sampling. In ML, aliasing appears when downsampling feature maps without proper low-pass filtering -- some architectures address this with anti-aliased pooling layers.
@@ -284,20 +284,21 @@ The O(N^2) DFT follows directly from the definition.
 ```python
 import math
 
-class Complex:...
+class Complex:
+    ...
 
 def dft(x):
- N = len(x)
- result = []
- for k in range(N):
- total = Complex(0, 0)
- for n in range(N):
- angle = -2 * math.pi * k * n / N
- w = Complex(math.cos(angle), math.sin(angle))
- xn = x[n] if isinstance(x[n], Complex) else Complex(x[n])
- total = total + xn * w
- result.append(total)
- return result
+    N = len(x)
+    result = []
+    for k in range(N):
+        total = Complex(0, 0)
+        for n in range(N):
+            angle = -2 * math.pi * k * n / N
+            w = Complex(math.cos(angle), math.sin(angle))
+            xn = x[n] if isinstance(x[n], Complex) else Complex(x[n])
+            total = total + xn * w
+        result.append(total)
+    return result
 ```
 
 ### Step 2: Inverse DFT
@@ -306,16 +307,16 @@ Same structure, positive exponent, divide by N.
 
 ```python
 def idft(X):
- N = len(X)
- result = []
- for n in range(N):
- total = Complex(0, 0)
- for k in range(N):
- angle = 2 * math.pi * k * n / N
- w = Complex(math.cos(angle), math.sin(angle))
- total = total + X[k] * w
- result.append(Complex(total.real / N, total.imag / N))
- return result
+    N = len(X)
+    result = []
+    for n in range(N):
+        total = Complex(0, 0)
+        for k in range(N):
+            angle = 2 * math.pi * k * n / N
+            w = Complex(math.cos(angle), math.sin(angle))
+            total = total + X[k] * w
+        result.append(Complex(total.real / N, total.imag / N))
+    return result
 ```
 
 ### Step 3: FFT (Cooley-Tukey)
@@ -324,47 +325,47 @@ The recursive FFT requires power-of-2 length. Split into even and odd, recurse, 
 
 ```python
 def fft(x):
- N = len(x)
- if N <= 1:
- return [x[0] if isinstance(x[0], Complex) else Complex(x[0])]
- if N % 2 != 0:
- return dft(x)
+    N = len(x)
+    if N <= 1:
+        return [x[0] if isinstance(x[0], Complex) else Complex(x[0])]
+    if N % 2 != 0:
+        return dft(x)
 
- even = fft([x[i] for i in range(0, N, 2)])
- odd = fft([x[i] for i in range(1, N, 2)])
+    even = fft([x[i] for i in range(0, N, 2)])
+    odd = fft([x[i] for i in range(1, N, 2)])
 
- result = [Complex(0)] * N
- for k in range(N // 2):
- angle = -2 * math.pi * k / N
- twiddle = Complex(math.cos(angle), math.sin(angle))
- t = twiddle * odd[k]
- result[k] = even[k] + t
- result[k + N // 2] = even[k] - t
- return result
+    result = [Complex(0)] * N
+    for k in range(N // 2):
+        angle = -2 * math.pi * k / N
+        twiddle = Complex(math.cos(angle), math.sin(angle))
+        t = twiddle * odd[k]
+        result[k] = even[k] + t
+        result[k + N // 2] = even[k] - t
+    return result
 ```
 
 ### Step 4: Spectral analysis helpers
 
 ```python
 def power_spectrum(X):
- return [xk.real ** 2 + xk.imag ** 2 for xk in X]
+    return [xk.real ** 2 + xk.imag ** 2 for xk in X]
 
 def convolve_fft(x, h):
- N = len(x) + len(h) - 1
- padded_N = 1
- while padded_N < N:
- padded_N *= 2
+    N = len(x) + len(h) - 1
+    padded_N = 1
+    while padded_N < N:
+        padded_N *= 2
 
- x_padded = x + [0.0] * (padded_N - len(x))
- h_padded = h + [0.0] * (padded_N - len(h))
+    x_padded = x + [0.0] * (padded_N - len(x))
+    h_padded = h + [0.0] * (padded_N - len(h))
 
- X = fft(x_padded)
- H = fft(h_padded)
+    X = fft(x_padded)
+    H = fft(h_padded)
 
- Y = [xk * hk for xk, hk in zip(X, H)]
+    Y = [xk * hk for xk, hk in zip(X, H)]
 
- y = idft(Y)
- return [y[n].real for n in range(N)]
+    y = idft(Y)
+    return [y[n].real for n in range(N)]
 ```
 
 ## Use It

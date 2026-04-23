@@ -67,22 +67,22 @@ Neural Radiance Field (Mildenhall et al., 2020). A tiny MLP takes `(x, y, z, vie
 
 ```python
 def gaussian_at(x, y, gaussian):
- px, py = gaussian["pos"]
- sigma = gaussian["sigma"]
- d2 = (x - px) ** 2 + (y - py) ** 2
- return math.exp(-d2 / (2 * sigma * sigma))
+    px, py = gaussian["pos"]
+    sigma = gaussian["sigma"]
+    d2 = (x - px) ** 2 + (y - py) ** 2
+    return math.exp(-d2 / (2 * sigma * sigma))
 ```
 
 ### Step 2: render by summing splats
 
 ```python
 def render(image_size, gaussians):
- img = [[0.0] * image_size for _ in range(image_size)]
- for g in gaussians:
- for y in range(image_size):
- for x in range(image_size):
- img[y][x] += g["color"] * gaussian_at(x, y, g)
- return img
+    img = [[0.0] * image_size for _ in range(image_size)]
+    for g in gaussians:
+        for y in range(image_size):
+            for x in range(image_size):
+                img[y][x] += g["color"] * gaussian_at(x, y, g)
+    return img
 ```
 
 Real 3D Gaussian splatting sorts Gaussians by depth and alpha-composites in order. Our 2D toy just sums.
@@ -91,10 +91,10 @@ Real 3D Gaussian splatting sorts Gaussians by depth and alpha-composites in orde
 
 ```python
 for step in range(steps):
- pred = render(size, gaussians)
- loss = mse(pred, target)
- gradients = compute_grads(pred, target, gaussians)
- update(gaussians, gradients, lr)
+    pred = render(size, gaussians)
+    loss = mse(pred, target)
+    gradients = compute_grads(pred, target, gaussians)
+    update(gaussians, gradients, lr)
 ```
 
 ## Pitfalls

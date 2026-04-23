@@ -34,9 +34,9 @@ A complex number has two parts: a real part and an imaginary part.
 z = a + bi
 
 where:
- a is the real part
- b is the imaginary part
- i is the imaginary unit, defined by i^2 = -1
+  a is the real part
+  b is the imaginary part
+  i is the imaginary unit, defined by i^2 = -1
 ```
 
 That is it. You extend the number line into a plane. The real numbers sit on one axis. The imaginary numbers sit on the other. Every complex number is a point in this plane.
@@ -55,12 +55,12 @@ Example: (3 + 2i) + (1 + 4i) = 4 + 6i
 
 ```
 (a + bi)(c + di) = ac + adi + bci + bdi^2
- = ac + adi + bci - bd
- = (ac - bd) + (ad + bc)i
+                 = ac + adi + bci - bd
+                 = (ac - bd) + (ad + bc)i
 
 Example: (3 + 2i)(1 + 4i) = 3 + 12i + 2i + 8i^2
- = 3 + 14i - 8
- = -5 + 14i
+                            = 3 + 14i - 8
+                            = -5 + 14i
 ```
 
 **Conjugate.** Flip the sign of the imaginary part.
@@ -88,9 +88,9 @@ This eliminates the imaginary part from the denominator, giving you a clean comp
 The complex plane maps every complex number to a 2D point. The horizontal axis is the real axis, the vertical axis is the imaginary axis.
 
 ```
-z = 3 + 2i corresponds to the point (3, 2)
+z = 3 + 2i  corresponds to the point (3, 2)
 z = -1 + 0i corresponds to the point (-1, 0) on the real axis
-z = 0 + 4i corresponds to the point (0, 4) on the imaginary axis
+z = 0 + 4i  corresponds to the point (0, 4) on the imaginary axis
 ```
 
 A complex number is simultaneously a point and a vector from the origin. This dual interpretation is what makes complex numbers useful for geometry.
@@ -103,8 +103,8 @@ Any point in the plane can be described by its distance from the origin and its 
 z = r * (cos(theta) + i*sin(theta))
 
 where:
- r = |z| = sqrt(a^2 + b^2) (magnitude, or modulus)
- theta = atan2(b, a) (phase, or argument)
+  r = |z| = sqrt(a^2 + b^2)     (magnitude, or modulus)
+  theta = atan2(b, a)             (phase, or argument)
 ```
 
 Rectangular form (a + bi) is good for addition. Polar form (r, theta) is good for multiplication.
@@ -150,25 +150,25 @@ Multiplying the complex number (x + yi) by e^(i*theta) rotates the point (x, y) 
 
 ```
 Rotation via complex multiplication:
- (x + yi) * (cos(theta) + i*sin(theta))
- = (x*cos(theta) - y*sin(theta)) + (x*sin(theta) + y*cos(theta))i
+  (x + yi) * (cos(theta) + i*sin(theta))
+  = (x*cos(theta) - y*sin(theta)) + (x*sin(theta) + y*cos(theta))i
 
 Rotation via matrix multiplication:
- [cos(theta) -sin(theta)] [x] [x*cos(theta) - y*sin(theta)]
- [sin(theta) cos(theta)] [y] = [x*sin(theta) + y*cos(theta)]
+  [cos(theta)  -sin(theta)] [x]   [x*cos(theta) - y*sin(theta)]
+  [sin(theta)   cos(theta)] [y] = [x*sin(theta) + y*cos(theta)]
 ```
 
 They produce identical results. Complex multiplication IS 2D rotation. The rotation matrix is just complex multiplication written in matrix notation.
 
 ```mermaid
 graph TD
- subgraph "Complex Multiplication = 2D Rotation"
- A["z = x + yi<br/>Point (x, y)"] -->|"multiply by e^(i*theta)"| B["z' = z * e^(i*theta)<br/>Point rotated by theta"]
- end
- subgraph "Equivalent Matrix Form"
- C["vector [x, y]"] -->|"multiply by rotation matrix"| D["[x cos theta - y sin theta,<br/> x sin theta + y cos theta]"]
- end
- B -.->|"same result"| D
+    subgraph "Complex Multiplication = 2D Rotation"
+        A["z = x + yi<br/>Point (x, y)"] -->|"multiply by e^(i*theta)"| B["z' = z * e^(i*theta)<br/>Point rotated by theta"]
+    end
+    subgraph "Equivalent Matrix Form"
+        C["vector [x, y]"] -->|"multiply by rotation matrix"| D["[x cos theta - y sin theta,<br/> x sin theta + y cos theta]"]
+    end
+    B -.->|"same result"| D
 ```
 
 ### Phasors and rotating signals
@@ -180,8 +180,8 @@ The real part of this rotating point is cos(omega*t). The imaginary part is sin(
 ```
 e^(i*omega*t) = cos(omega*t) + i*sin(omega*t)
 
-Real part: cos(omega*t) -- a cosine wave
-Imaginary part: sin(omega*t) -- a sine wave
+Real part:      cos(omega*t)    -- a cosine wave
+Imaginary part: sin(omega*t)    -- a sine wave
 ```
 
 This is the phasor representation. Instead of tracking a wiggly sine wave, you track a smoothly rotating arrow. Phase shifts become angle offsets. Amplitude changes become magnitude changes. Addition of signals becomes vector addition.
@@ -191,7 +191,7 @@ This is the phasor representation. Instead of tracking a wiggly sine wave, you t
 The N-th roots of unity are N points equally spaced on the unit circle:
 
 ```
-w_k = e^(2*pi*i*k/N) for k = 0, 1, 2,..., N-1
+w_k = e^(2*pi*i*k/N)    for k = 0, 1, 2, ..., N-1
 ```
 
 For N = 4, the roots are: 1, i, -1, -i (the four compass points).
@@ -201,7 +201,7 @@ Roots of unity are the foundation of the Discrete Fourier Transform. The DFT dec
 
 ### Connection to the DFT
 
-The Discrete Fourier Transform of a signal x[0], x[1],..., x[N-1] is:
+The Discrete Fourier Transform of a signal x[0], x[1], ..., x[N-1] is:
 
 ```
 X[k] = sum_{n=0}^{N-1} x[n] * e^(-2*pi*i*k*n/N)
@@ -250,21 +250,21 @@ The sin and cos pairs are the real and imaginary parts of complex exponentials a
 
 ```mermaid
 graph LR
- subgraph "Unit Circle"
- direction TB
- U1["e^(i*0) = 1"] -.-> U2["e^(i*pi/2) = i"]
- U2 -.-> U3["e^(i*pi) = -1"]
- U3 -.-> U4["e^(i*3pi/2) = -i"]
- U4 -.-> U1
- end
- subgraph "Applications"
- A1["Euler's formula:<br/>e^(i*theta) = cos + i*sin"]
- A2["DFT uses roots of unity:<br/>e^(2*pi*i*k/N)"]
- A3["RoPE uses rotation:<br/>q * e^(i*m*theta)"]
- end
- U1 --> A1
- U1 --> A2
- U1 --> A3
+    subgraph "Unit Circle"
+        direction TB
+        U1["e^(i*0) = 1"] -.-> U2["e^(i*pi/2) = i"]
+        U2 -.-> U3["e^(i*pi) = -1"]
+        U3 -.-> U4["e^(i*3pi/2) = -i"]
+        U4 -.-> U1
+    end
+    subgraph "Applications"
+        A1["Euler's formula:<br/>e^(i*theta) = cos + i*sin"]
+        A2["DFT uses roots of unity:<br/>e^(2*pi*i*k/N)"]
+        A3["RoPE uses rotation:<br/>q * e^(i*m*theta)"]
+    end
+    U1 --> A1
+    U1 --> A2
+    U1 --> A3
 ```
 
 ## Build It
@@ -277,45 +277,45 @@ Build a Complex number class that supports arithmetic, magnitude, phase, and con
 import math
 
 class Complex:
- def __init__(self, real, imag=0.0):
- self.real = real
- self.imag = imag
+    def __init__(self, real, imag=0.0):
+        self.real = real
+        self.imag = imag
 
- def __add__(self, other):
- return Complex(self.real + other.real, self.imag + other.imag)
+    def __add__(self, other):
+        return Complex(self.real + other.real, self.imag + other.imag)
 
- def __mul__(self, other):
- r = self.real * other.real - self.imag * other.imag
- i = self.real * other.imag + self.imag * other.real
- return Complex(r, i)
+    def __mul__(self, other):
+        r = self.real * other.real - self.imag * other.imag
+        i = self.real * other.imag + self.imag * other.real
+        return Complex(r, i)
 
- def __truediv__(self, other):
- denom = other.real ** 2 + other.imag ** 2
- r = (self.real * other.real + self.imag * other.imag) / denom
- i = (self.imag * other.real - self.real * other.imag) / denom
- return Complex(r, i)
+    def __truediv__(self, other):
+        denom = other.real ** 2 + other.imag ** 2
+        r = (self.real * other.real + self.imag * other.imag) / denom
+        i = (self.imag * other.real - self.real * other.imag) / denom
+        return Complex(r, i)
 
- def magnitude(self):
- return math.sqrt(self.real ** 2 + self.imag ** 2)
+    def magnitude(self):
+        return math.sqrt(self.real ** 2 + self.imag ** 2)
 
- def phase(self):
- return math.atan2(self.imag, self.real)
+    def phase(self):
+        return math.atan2(self.imag, self.real)
 
- def conjugate(self):
- return Complex(self.real, -self.imag)
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
 ```
 
 ### Step 2: Polar conversion and Euler's formula
 
 ```python
 def to_polar(z):
- return z.magnitude(), z.phase()
+    return z.magnitude(), z.phase()
 
 def from_polar(r, theta):
- return Complex(r * math.cos(theta), r * math.sin(theta))
+    return Complex(r * math.cos(theta), r * math.sin(theta))
 
 def euler(theta):
- return Complex(math.cos(theta), math.sin(theta))
+    return Complex(math.cos(theta), math.sin(theta))
 ```
 
 Verify: `euler(theta).magnitude()` should always be 1.0. `euler(0)` should give (1, 0). `euler(pi)` should give (-1, 0).
@@ -335,15 +335,15 @@ The magnitude stays the same. Only the angle changes.
 
 ```python
 def dft(signal):
- N = len(signal)
- result = []
- for k in range(N):
- total = Complex(0, 0)
- for n in range(N):
- angle = -2 * math.pi * k * n / N
- total = total + Complex(signal[n], 0) * euler(angle)
- result.append(total)
- return result
+    N = len(signal)
+    result = []
+    for k in range(N):
+        total = Complex(0, 0)
+        for n in range(N):
+            angle = -2 * math.pi * k * n / N
+            total = total + Complex(signal[n], 0) * euler(angle)
+        result.append(total)
+    return result
 ```
 
 This is the O(N^2) DFT. Each output X[k] is the sum of the signal samples multiplied by roots of unity.
@@ -354,15 +354,15 @@ The inverse DFT reconstructs the original signal from its spectrum. The only cha
 
 ```python
 def idft(spectrum):
- N = len(spectrum)
- result = []
- for n in range(N):
- total = Complex(0, 0)
- for k in range(N):
- angle = 2 * math.pi * k * n / N
- total = total + spectrum[k] * euler(angle)
- result.append(Complex(total.real / N, total.imag / N))
- return result
+    N = len(spectrum)
+    result = []
+    for n in range(N):
+        total = Complex(0, 0)
+        for k in range(N):
+            angle = 2 * math.pi * k * n / N
+            total = total + spectrum[k] * euler(angle)
+        result.append(Complex(total.real / N, total.imag / N))
+    return result
 ```
 
 This gives you perfect reconstruction. Apply DFT, then IDFT, and you get back the original signal to machine precision. No information is lost.
@@ -371,7 +371,7 @@ This gives you perfect reconstruction. Apply DFT, then IDFT, and you get back th
 
 ```python
 def roots_of_unity(N):
- return [euler(2 * math.pi * k / N) for k in range(N)]
+    return [euler(2 * math.pi * k / N) for k in range(N)]
 ```
 
 Verify two properties:

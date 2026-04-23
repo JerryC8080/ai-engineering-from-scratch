@@ -50,8 +50,8 @@ The trend: replace U-Net with DiT (transformer over latent patches), scale the t
 ### Step 1: encoder/decoder
 
 ```python
-def encode(x): return x * 0.5 # toy "compression" to smaller scale
-def decode(z): return z * 2.0
+def encode(x):    return x * 0.5          # toy "compression" to smaller scale
+def decode(z):    return z * 2.0
 ```
 
 A real VAE has trained weights. For pedagogy, this linear map is enough to show that diffusion operates on `z` without caring about the original data space.
@@ -126,13 +126,13 @@ Save `outputs/skill-sd-prompter.md`. Skill takes a text prompt + target style an
 
 ## Production note: running Flux-12B on an 8GB consumer GPU
 
-the reference notebook is the canonical "I have a consumer GPU, can I ship this?" recipe. The trick is the same three-knob recipe production practice shows for LLM inference applied to a diffusion DiT:
+Niels' Flux notebook is the canonical "I have a consumer GPU, can I ship this?" recipe. The trick is the same three-knob recipe stas00 lists for LLM inference applied to a diffusion DiT:
 
 1. **Staggered loading.** Flux has three networks that never need to coexist in VRAM: T5-XXL text encoder (~10 GB in fp32), CLIP-L (small), the 12B MMDiT, and the VAE. Encode the prompt first, *delete* the encoders, load the DiT, denoise, *delete* the DiT, load the VAE, decode. Consumer 8GB GPUs only fit one stage at a time.
 2. **4-bit quantization via bitsandbytes.** `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)` on both the T5 encoder and the DiT. Cuts memory 8×, quality drop is imperceptible for text-to-image per Aritra's benchmarks (linked in the notebook).
 3. **CPU offload.** `pipe.enable_model_cpu_offload()` auto-swaps modules between CPU and GPU as each forward pass advances. Adds 10-20% latency but makes the pipeline run at all.
 
-The memory accounting is: `10 GB T5 / 8 = 1.25 GB` quantized, `12 B params × 0.5 bytes = ~6 GB` quantized DiT, plus activations. In the production terms this is the extreme-end of TP=1 inference — no model parallelism, maximum quantization. For production you'd run TP=2 or TP=4 on H100s; for a single dev laptop, this is the recipe.
+The memory accounting is: `10 GB T5 / 8 = 1.25 GB` quantized, `12 B params × 0.5 bytes = ~6 GB` quantized DiT, plus activations. In stas00's terms this is the extreme-end of TP=1 inference — no model parallelism, maximum quantization. For production you'd run TP=2 or TP=4 on H100s; for a single dev laptop, this is the recipe.
 
 ## Further Reading
 

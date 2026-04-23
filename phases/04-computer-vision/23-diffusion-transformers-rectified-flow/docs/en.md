@@ -28,24 +28,24 @@ The shift matters because it is the reason diffusion-based image generation beca
 
 ```mermaid
 flowchart LR
- subgraph UNET["DDPM U-Net (2020)"]
- U1["Conv encoder"] --> U2["Conv bottleneck"] --> U3["Conv decoder"]
- end
- subgraph DIT["DiT (2023)"]
- D1["Patch embed"] --> D2["Transformer blocks"] --> D3["Unpatchify"]
- end
- subgraph MMDIT["MMDiT (SD3, 2024)"]
- M1["Text stream"] --> M3["Joint attention<br/>(separate weights per modality)"]
- M2["Image stream"] --> M3
- end
- subgraph FLUX["FLUX (2024)"]
- F1["Double-stream blocks<br/>(text + image separate)"] --> F2["Single-stream blocks<br/>(concat + shared weights)"]
- end
+    subgraph UNET["DDPM U-Net (2020)"]
+        U1["Conv encoder"] --> U2["Conv bottleneck"] --> U3["Conv decoder"]
+    end
+    subgraph DIT["DiT (2023)"]
+        D1["Patch embed"] --> D2["Transformer blocks"] --> D3["Unpatchify"]
+    end
+    subgraph MMDIT["MMDiT (SD3, 2024)"]
+        M1["Text stream"] --> M3["Joint attention<br/>(separate weights per modality)"]
+        M2["Image stream"] --> M3
+    end
+    subgraph FLUX["FLUX (2024)"]
+        F1["Double-stream blocks<br/>(text + image separate)"] --> F2["Single-stream blocks<br/>(concat + shared weights)"]
+    end
 
- style UNET fill:#e5e7eb,stroke:#6b7280
- style DIT fill:#dbeafe,stroke:#2563eb
- style MMDIT fill:#fef3c7,stroke:#d97706
- style FLUX fill:#dcfce7,stroke:#16a34a
+    style UNET fill:#e5e7eb,stroke:#6b7280
+    style DIT fill:#dbeafe,stroke:#2563eb
+    style MMDIT fill:#fef3c7,stroke:#d97706
+    style FLUX fill:#dcfce7,stroke:#16a34a
 ```
 
 - **DiT** (Peebles & Xie, 2023) — replace the U-Net with a ViT-like transformer on latent patches. Conditioning via adaptive layer norm (AdaLN).
@@ -60,7 +60,7 @@ DDPM defines the forward process as a noisy SDE where `x_t` is increasingly corr
 Rectified flow defines a **straight-line** interpolation between clean data and pure noise:
 
 ```
-x_t = (1 - t) * x_0 + t * epsilon, t in [0, 1]
+x_t = (1 - t) * x_0 + t * epsilon,     t in [0, 1]
 ```
 
 Train a network to predict the velocity `v_theta(x_t, t) = epsilon - x_0` — the forward direction along the straight-line path from clean data to noise (`dx_t/dt`). During sampling, you integrate this velocity backward to step from noise toward data. The resulting ODE is much closer to a straight line, so far fewer integration steps are needed to sample.
@@ -128,43 +128,43 @@ import torch.nn as nn
 
 
 class AdaLNZero(nn.Module):
- """
- Adaptive LayerNorm with a gate. Predicts (scale, shift, gate) from the conditioning.
- Init such that the whole block starts as identity ("zero init").
- """
+    """
+    Adaptive LayerNorm with a gate. Predicts (scale, shift, gate) from the conditioning.
+    Init such that the whole block starts as identity ("zero init").
+    """
 
- def __init__(self, dim, cond_dim):
- super().__init__()
- self.norm = nn.LayerNorm(dim, elementwise_affine=False)
- self.mlp = nn.Linear(cond_dim, dim * 3)
- nn.init.zeros_(self.mlp.weight)
- nn.init.zeros_(self.mlp.bias)
+    def __init__(self, dim, cond_dim):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim, elementwise_affine=False)
+        self.mlp = nn.Linear(cond_dim, dim * 3)
+        nn.init.zeros_(self.mlp.weight)
+        nn.init.zeros_(self.mlp.bias)
 
- def forward(self, x, cond):
- scale, shift, gate = self.mlp(cond).chunk(3, dim=-1)
- h = self.norm(x) * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)
- return h, gate.unsqueeze(1)
+    def forward(self, x, cond):
+        scale, shift, gate = self.mlp(cond).chunk(3, dim=-1)
+        h = self.norm(x) * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)
+        return h, gate.unsqueeze(1)
 
 
 class DiTBlock(nn.Module):
- def __init__(self, dim=192, heads=3, mlp_ratio=4, cond_dim=192):
- super().__init__()
- self.adaln1 = AdaLNZero(dim, cond_dim)
- self.attn = nn.MultiheadAttention(dim, heads, batch_first=True)
- self.adaln2 = AdaLNZero(dim, cond_dim)
- self.mlp = nn.Sequential(
- nn.Linear(dim, dim * mlp_ratio),
- nn.GELU(),
- nn.Linear(dim * mlp_ratio, dim),
- )
+    def __init__(self, dim=192, heads=3, mlp_ratio=4, cond_dim=192):
+        super().__init__()
+        self.adaln1 = AdaLNZero(dim, cond_dim)
+        self.attn = nn.MultiheadAttention(dim, heads, batch_first=True)
+        self.adaln2 = AdaLNZero(dim, cond_dim)
+        self.mlp = nn.Sequential(
+            nn.Linear(dim, dim * mlp_ratio),
+            nn.GELU(),
+            nn.Linear(dim * mlp_ratio, dim),
+        )
 
- def forward(self, x, cond):
- h, gate1 = self.adaln1(x, cond)
- a, _ = self.attn(h, h, h, need_weights=False)
- x = x + gate1 * a
- h, gate2 = self.adaln2(x, cond)
- x = x + gate2 * self.mlp(h)
- return x
+    def forward(self, x, cond):
+        h, gate1 = self.adaln1(x, cond)
+        a, _ = self.attn(h, h, h, need_weights=False)
+        x = x + gate1 * a
+        h, gate2 = self.adaln2(x, cond)
+        x = x + gate2 * self.mlp(h)
+        return x
 ```
 
 `AdaLNZero` starts as an identity mapping because its MLP weights are initialised to zero. Training nudges the block away from identity; this stabilises deep transformer diffusion models dramatically.
@@ -173,45 +173,45 @@ class DiTBlock(nn.Module):
 
 ```python
 def timestep_embedding(t, dim):
- import math
- half = dim // 2
- freqs = torch.exp(-math.log(10000) * torch.arange(half, device=t.device) / half)
- args = t[:, None].float() * freqs[None]
- return torch.cat([args.sin(), args.cos()], dim=-1)
+    import math
+    half = dim // 2
+    freqs = torch.exp(-math.log(10000) * torch.arange(half, device=t.device) / half)
+    args = t[:, None].float() * freqs[None]
+    return torch.cat([args.sin(), args.cos()], dim=-1)
 
 
 class TinyDiT(nn.Module):
- def __init__(self, image_size=16, patch_size=2, in_channels=3, dim=96, depth=4, heads=3):
- super().__init__()
- self.patch_size = patch_size
- self.num_patches = (image_size // patch_size) ** 2
- self.patch = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
- self.pos = nn.Parameter(torch.zeros(1, self.num_patches, dim))
- self.time_mlp = nn.Sequential(
- nn.Linear(dim, dim * 2),
- nn.SiLU(),
- nn.Linear(dim * 2, dim),
- )
- self.blocks = nn.ModuleList([DiTBlock(dim, heads, cond_dim=dim) for _ in range(depth)])
- self.norm_out = nn.LayerNorm(dim, elementwise_affine=False)
- self.head = nn.Linear(dim, patch_size * patch_size * in_channels)
+    def __init__(self, image_size=16, patch_size=2, in_channels=3, dim=96, depth=4, heads=3):
+        super().__init__()
+        self.patch_size = patch_size
+        self.num_patches = (image_size // patch_size) ** 2
+        self.patch = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
+        self.pos = nn.Parameter(torch.zeros(1, self.num_patches, dim))
+        self.time_mlp = nn.Sequential(
+            nn.Linear(dim, dim * 2),
+            nn.SiLU(),
+            nn.Linear(dim * 2, dim),
+        )
+        self.blocks = nn.ModuleList([DiTBlock(dim, heads, cond_dim=dim) for _ in range(depth)])
+        self.norm_out = nn.LayerNorm(dim, elementwise_affine=False)
+        self.head = nn.Linear(dim, patch_size * patch_size * in_channels)
 
- def forward(self, x, t):
- n = x.size(0)
- x = self.patch(x)
- x = x.flatten(2).transpose(1, 2) + self.pos
- t_emb = self.time_mlp(timestep_embedding(t, self.pos.size(-1)))
- for blk in self.blocks:
- x = blk(x, t_emb)
- x = self.norm_out(x)
- x = self.head(x)
- return self._unpatchify(x, n)
+    def forward(self, x, t):
+        n = x.size(0)
+        x = self.patch(x)
+        x = x.flatten(2).transpose(1, 2) + self.pos
+        t_emb = self.time_mlp(timestep_embedding(t, self.pos.size(-1)))
+        for blk in self.blocks:
+            x = blk(x, t_emb)
+        x = self.norm_out(x)
+        x = self.head(x)
+        return self._unpatchify(x, n)
 
- def _unpatchify(self, x, n):
- p = self.patch_size
- h = w = int(self.num_patches ** 0.5)
- x = x.view(n, h, w, p, p, -1).permute(0, 5, 1, 3, 2, 4).reshape(n, -1, h * p, w * p)
- return x
+    def _unpatchify(self, x, n):
+        p = self.patch_size
+        h = w = int(self.num_patches ** 0.5)
+        x = x.view(n, h, w, p, p, -1).permute(0, 5, 1, 3, 2, 4).reshape(n, -1, h * p, w * p)
+        return x
 ```
 
 ### Step 3: Rectified flow training
@@ -220,21 +220,21 @@ class TinyDiT(nn.Module):
 import torch.nn.functional as F
 
 def rectified_flow_train_step(model, x0, optimizer, device):
- model.train()
- x0 = x0.to(device)
- n = x0.size(0)
- t = torch.rand(n, device=device)
- epsilon = torch.randn_like(x0)
- x_t = (1 - t[:, None, None, None]) * x0 + t[:, None, None, None] * epsilon
+    model.train()
+    x0 = x0.to(device)
+    n = x0.size(0)
+    t = torch.rand(n, device=device)
+    epsilon = torch.randn_like(x0)
+    x_t = (1 - t[:, None, None, None]) * x0 + t[:, None, None, None] * epsilon
 
- target_velocity = epsilon - x0
- pred_velocity = model(x_t, t)
+    target_velocity = epsilon - x0
+    pred_velocity = model(x_t, t)
 
- loss = F.mse_loss(pred_velocity, target_velocity)
- optimizer.zero_grad()
- loss.backward()
- optimizer.step()
- return loss.item()
+    loss = F.mse_loss(pred_velocity, target_velocity)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    return loss.item()
 ```
 
 Compare with DDPM's noise-prediction loss (Lesson 10): same structure, different target. Instead of predicting the noise `epsilon`, we predict the **velocity** `epsilon - x_0`, which points from data to noise along the straight-line interpolation.
@@ -246,15 +246,15 @@ Rectified flow is an ODE. Euler's method is the simplest and, for a well-trained
 ```python
 @torch.no_grad()
 def rectified_flow_sample(model, shape, steps=20, device="cpu"):
- model.eval()
- x = torch.randn(shape, device=device)
- dt = 1.0 / steps
- t = torch.ones(shape[0], device=device)
- for _ in range(steps):
- v = model(x, t)
- x = x - dt * v
- t = t - dt
- return x
+    model.eval()
+    x = torch.randn(shape, device=device)
+    dt = 1.0 / steps
+    t = torch.ones(shape[0], device=device)
+    for _ in range(steps):
+        v = model(x, t)
+        x = x - dt * v
+        t = t - dt
+    return x
 ```
 
 20 steps. On a trained model this produces samples comparable to 1000-step DDPM.
@@ -265,17 +265,17 @@ def rectified_flow_sample(model, shape, steps=20, device="cpu"):
 import numpy as np
 
 def synthetic_blobs(num=200, size=16, seed=0):
- rng = np.random.default_rng(seed)
- out = np.zeros((num, 3, size, size), dtype=np.float32)
- yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
- for i in range(num):
- cx, cy = rng.uniform(4, size - 4, size=2)
- r = rng.uniform(2, 4)
- mask = (xx - cx) ** 2 + (yy - cy) ** 2 < r ** 2
- colour = rng.uniform(-1, 1, size=3)
- for c in range(3):
- out[i, c][mask] = colour[c]
- return torch.from_numpy(out)
+    rng = np.random.default_rng(seed)
+    out = np.zeros((num, 3, size, size), dtype=np.float32)
+    yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
+    for i in range(num):
+        cx, cy = rng.uniform(4, size - 4, size=2)
+        r = rng.uniform(2, 4)
+        mask = (xx - cx) ** 2 + (yy - cy) ** 2 < r ** 2
+        colour = rng.uniform(-1, 1, size=3)
+        for c in range(3):
+            out[i, c][mask] = colour[c]
+    return torch.from_numpy(out)
 ```
 
 Train a `TinyDiT` on this with rectified flow. After 500 steps, sampled outputs should look like faint blobs of colour.
@@ -289,15 +289,15 @@ from diffusers import FluxPipeline, StableDiffusion3Pipeline
 import torch
 
 pipe = FluxPipeline.from_pretrained(
- "black-forest-labs/FLUX.1-schnell",
- torch_dtype=torch.bfloat16,
+    "black-forest-labs/FLUX.1-schnell",
+    torch_dtype=torch.bfloat16,
 ).to("cuda")
 
 out = pipe(
- prompt="a golden retriever surfing a tsunami, hyperrealistic, studio lighting",
- guidance_scale=0.0, # schnell was trained without CFG
- num_inference_steps=4,
- max_sequence_length=256,
+    prompt="a golden retriever surfing a tsunami, hyperrealistic, studio lighting",
+    guidance_scale=0.0,           # schnell was trained without CFG
+    num_inference_steps=4,
+    max_sequence_length=256,
 ).images[0]
 out.save("surf.png")
 ```
@@ -308,8 +308,8 @@ For SD3:
 
 ```python
 pipe = StableDiffusion3Pipeline.from_pretrained(
- "stabilityai/stable-diffusion-3.5-large",
- torch_dtype=torch.bfloat16,
+    "stabilityai/stable-diffusion-3.5-large",
+    torch_dtype=torch.bfloat16,
 ).to("cuda")
 out = pipe(prompt, guidance_scale=3.5, num_inference_steps=28).images[0]
 ```

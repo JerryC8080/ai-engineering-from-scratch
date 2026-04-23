@@ -54,30 +54,30 @@ See `code/main.py`. The skeleton:
 
 ```python
 def build_haystack(filler_text, needle, depth_ratio, total_tokens):
- if not (0.0 <= depth_ratio <= 1.0):
- raise ValueError(f"depth_ratio must be in [0, 1], got {depth_ratio}")
- if total_tokens <= 0:
- raise ValueError(f"total_tokens must be positive, got {total_tokens}")
+    if not (0.0 <= depth_ratio <= 1.0):
+        raise ValueError(f"depth_ratio must be in [0, 1], got {depth_ratio}")
+    if total_tokens <= 0:
+        raise ValueError(f"total_tokens must be positive, got {total_tokens}")
 
- filler_tokens = tokenize(filler_text)
- needle_tokens = tokenize(needle)
- if not filler_tokens:
- raise ValueError("filler_text produced no tokens")
+    filler_tokens = tokenize(filler_text)
+    needle_tokens = tokenize(needle)
+    if not filler_tokens:
+        raise ValueError("filler_text produced no tokens")
 
- # Repeat filler until long enough to fill the haystack body.
- body_len = max(total_tokens - len(needle_tokens), 0)
- while len(filler_tokens) < body_len:
- filler_tokens = filler_tokens + filler_tokens
- filler_tokens = filler_tokens[:body_len]
+    # Repeat filler until long enough to fill the haystack body.
+    body_len = max(total_tokens - len(needle_tokens), 0)
+    while len(filler_tokens) < body_len:
+        filler_tokens = filler_tokens + filler_tokens
+    filler_tokens = filler_tokens[:body_len]
 
- insert_at = min(int(body_len * depth_ratio), body_len)
- haystack = filler_tokens[:insert_at] + needle_tokens + filler_tokens[insert_at:]
- return " ".join(haystack)
+    insert_at = min(int(body_len * depth_ratio), body_len)
+    haystack = filler_tokens[:insert_at] + needle_tokens + filler_tokens[insert_at:]
+    return " ".join(haystack)
 
 
 def score_niah(model, haystack, question, expected):
- answer = model.complete(f"Context: {haystack}\nQ: {question}\nA:", max_tokens=50)
- return 1 if expected.lower() in answer.lower() else 0
+    answer = model.complete(f"Context: {haystack}\nQ: {question}\nA:", max_tokens=50)
+    return 1 if expected.lower() in answer.lower() else 0
 ```
 
 Sweep `depth_ratio` ∈ {0, 0.25, 0.5, 0.75, 1.0} × `total_tokens` ∈ {1k, 4k, 16k, 64k}. Plot the heatmap. That is the NIAH card for your target model.
@@ -86,13 +86,13 @@ Sweep `depth_ratio` ∈ {0, 0.25, 0.5, 0.75, 1.0} × `total_tokens` ∈ {1k, 4k,
 
 ```python
 def build_multi_needle(filler, needles, total_tokens):
- depths = [0.1, 0.4, 0.7]
- chunks = [filler[:int(total_tokens * 0.1)]]
- for depth, needle in zip(depths, needles):
- chunks.append(needle)
- next_chunk = filler[int(total_tokens * depth): int(total_tokens * (depth + 0.3))]
- chunks.append(next_chunk)
- return " ".join(chunks)
+    depths = [0.1, 0.4, 0.7]
+    chunks = [filler[:int(total_tokens * 0.1)]]
+    for depth, needle in zip(depths, needles):
+        chunks.append(needle)
+        next_chunk = filler[int(total_tokens * depth): int(total_tokens * (depth + 0.3))]
+        chunks.append(next_chunk)
+    return " ".join(chunks)
 ```
 
 Questions like "What are the three magic words?" require retrieving all three. Single-needle success does not predict multi-needle success.
@@ -100,7 +100,7 @@ Questions like "What are the three magic words?" require retrieving all three. S
 ### Step 3: multi-hop variable tracing (RULER-style)
 
 ```python
-haystack = """X1 = 42.... (filler)... X2 = X1 + 10.... (filler)... X3 = X2 * 2."""
+haystack = """X1 = 42. ... (filler) ... X2 = X1 + 10. ... (filler) ... X3 = X2 * 2."""
 question = "What is X3?"
 ```
 
@@ -113,13 +113,13 @@ from datasets import load_dataset
 longbench = load_dataset("THUDM/LongBench-v2")
 
 def eval_model_on_longbench(model, subset="single-doc-qa"):
- tasks = [x for x in longbench["test"] if x["task"] == subset]
- correct = 0
- for x in tasks:
- answer = model.complete(x["context"] + "\n\nQ: " + x["question"], max_tokens=20)
- if normalize(answer) == normalize(x["answer"]):
- correct += 1
- return correct / len(tasks)
+    tasks = [x for x in longbench["test"] if x["task"] == subset]
+    correct = 0
+    for x in tasks:
+        answer = model.complete(x["context"] + "\n\nQ: " + x["question"], max_tokens=20)
+        if normalize(answer) == normalize(x["answer"]):
+            correct += 1
+    return correct / len(tasks)
 ```
 
 Report per-category accuracy. Aggregate scores hide big task-level differences.

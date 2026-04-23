@@ -27,7 +27,7 @@ This lesson builds bag of words, then TF-IDF, from scratch. Then shows scikit-le
 
 ```
 TF-IDF(w, d) = TF(w, d) * IDF(w)
- = count(w in d) / |d| * log(N / df(w))
+             = count(w in d) / |d| * log(N / df(w))
 ```
 
 Where `TF` is term frequency in the document, `df` is document frequency (how many docs contain the word), `N` is total documents. The `log` keeps the weight bounded for ubiquitous words.
@@ -40,12 +40,12 @@ Key property: both produce sparse vectors with interpretable axes. You can look 
 
 ```python
 def build_vocab(docs):
- vocab = {}
- for doc in docs:
- for token in doc:
- if token not in vocab:
- vocab[token] = len(vocab)
- return vocab
+    vocab = {}
+    for doc in docs:
+        for token in doc:
+            if token not in vocab:
+                vocab[token] = len(vocab)
+    return vocab
 ```
 
 Input: list of tokenized documents (any word-level tokenizer will do; the `code/main.py` in this lesson uses a simplified lowercase variant). Output: `{word: index}` dict. Stable insertion order means word index 0 is the first word seen in the first document. Convention varies; scikit-learn sorts alphabetically.
@@ -54,12 +54,12 @@ Input: list of tokenized documents (any word-level tokenizer will do; the `code/
 
 ```python
 def bag_of_words(docs, vocab):
- matrix = [[0] * len(vocab) for _ in docs]
- for i, doc in enumerate(docs):
- for token in doc:
- if token in vocab:
- matrix[i][vocab[token]] += 1
- return matrix
+    matrix = [[0] * len(vocab) for _ in docs]
+    for i, doc in enumerate(docs):
+        for token in doc:
+            if token in vocab:
+                matrix[i][vocab[token]] += 1
+    return matrix
 ```
 
 ```python
@@ -78,20 +78,20 @@ import math
 
 
 def term_frequency(doc_bow, doc_length):
- return [c / doc_length if doc_length else 0 for c in doc_bow]
+    return [c / doc_length if doc_length else 0 for c in doc_bow]
 
 
 def document_frequency(bow_matrix):
- df = [0] * len(bow_matrix[0])
- for row in bow_matrix:
- for j, count in enumerate(row):
- if count > 0:
- df[j] += 1
- return df
+    df = [0] * len(bow_matrix[0])
+    for row in bow_matrix:
+        for j, count in enumerate(row):
+            if count > 0:
+                df[j] += 1
+    return df
 
 
 def inverse_document_frequency(df, n_docs):
- return [math.log((n_docs + 1) / (d + 1)) + 1 for d in df]
+    return [math.log((n_docs + 1) / (d + 1)) + 1 for d in df]
 ```
 
 Two smoothing tricks worth naming. The `(n+1)/(d+1)` avoids `log(x/0)`. The trailing `+1` ensures a word in every document still has IDF 1 (not 0), matching scikit-learn's default. Other implementations use raw `log(N/df)`. Both work; the smoothed version is friendlier.
@@ -100,19 +100,23 @@ Two smoothing tricks worth naming. The `(n+1)/(d+1)` avoids `log(x/0)`. The trai
 
 ```python
 def tfidf(bow_matrix):
- n_docs = len(bow_matrix)
- df = document_frequency(bow_matrix)
- idf = inverse_document_frequency(df, n_docs)
- out = []
- for row in bow_matrix:
- length = sum(row)
- tf = term_frequency(row, length)
- out.append([tf_j * idf_j for tf_j, idf_j in zip(tf, idf)])
- return out
+    n_docs = len(bow_matrix)
+    df = document_frequency(bow_matrix)
+    idf = inverse_document_frequency(df, n_docs)
+    out = []
+    for row in bow_matrix:
+        length = sum(row)
+        tf = term_frequency(row, length)
+        out.append([tf_j * idf_j for tf_j, idf_j in zip(tf, idf)])
+    return out
 ```
 
 ```python
->>> docs = [... ["the", "cat", "sat"],... ["the", "dog", "sat"],... ["the", "cat", "ran"],... ]
+>>> docs = [
+...     ["the", "cat", "sat"],
+...     ["the", "dog", "sat"],
+...     ["the", "cat", "ran"],
+... ]
 >>> vocab = build_vocab(docs)
 >>> bow = bag_of_words(docs, vocab)
 >>> tfidf(bow)
@@ -124,11 +128,11 @@ Three documents, five vocab words (`the`, `cat`, `sat`, `dog`, `ran`). `the` app
 
 ```python
 def l2_normalize(matrix):
- out = []
- for row in matrix:
- norm = math.sqrt(sum(x * x for x in row))
- out.append([x / norm if norm else 0 for x in row])
- return out
+    out = []
+    for row in matrix:
+        norm = math.sqrt(sum(x * x for x in row))
+        out.append([x / norm if norm else 0 for x in row])
+    return out
 ```
 
 Without normalization, a longer document gets a larger vector and dominates similarity scores. L2 normalization puts every document on the unit hypersphere. Cosine similarity between rows is now just a dot product.
@@ -188,19 +192,19 @@ The 2026 pragmatic default for medium-data classification: use TF-IDF weights as
 
 ```python
 def tfidf_weighted_embedding(doc, tfidf_scores, embedding_table, dim):
- vec = [0.0] * dim
- total_weight = 0.0
- for token in doc:
- if token not in embedding_table or token not in tfidf_scores:
- continue
- weight = tfidf_scores[token]
- emb = embedding_table[token]
- for i in range(dim):
- vec[i] += weight * emb[i]
- total_weight += weight
- if total_weight == 0:
- return vec
- return [v / total_weight for v in vec]
+    vec = [0.0] * dim
+    total_weight = 0.0
+    for token in doc:
+        if token not in embedding_table or token not in tfidf_scores:
+            continue
+        weight = tfidf_scores[token]
+        emb = embedding_table[token]
+        for i in range(dim):
+            vec[i] += weight * emb[i]
+        total_weight += weight
+    if total_weight == 0:
+        return vec
+    return [v / total_weight for v in vec]
 ```
 
 You get semantic capacity from embeddings, and rare-word emphasis from TF-IDF. Classifier trains on the pooled vector. This outperforms either on its own for sentiment, topic, and intent classification below about 50k labeled examples.

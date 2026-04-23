@@ -26,9 +26,9 @@ An AI engineering environment has four layers:
 
 ```mermaid
 graph TD
- A["4. AI/ML Libraries\nPyTorch, JAX, transformers, etc."] --> B["3. Language Runtimes\nPython 3.11+, Node 20+, Rust, Julia"]
- B --> C["2. Package Managers\nuv, pnpm, cargo, juliaup"]
- C --> D["1. System Foundation\nOS, shell, git, editor, GPU drivers"]
+    A["4. AI/ML Libraries\nPyTorch, JAX, transformers, etc."] --> B["3. Language Runtimes\nPython 3.11+, Node 20+, Rust, Julia"]
+    B --> C["2. Package Managers\nuv, pnpm, cargo, juliaup"]
+    C --> D["1. System Foundation\nOS, shell, git, editor, GPU drivers"]
 ```
 
 We install bottom-up. Each layer depends on the one below it.
@@ -61,7 +61,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv python install 3.12
 
 uv venv
-source.venv/bin/activate # or.venv\Scripts\activate on Windows
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 
 uv pip install numpy matplotlib jupyter
 ```
@@ -127,7 +127,7 @@ uv pip install torch torchvision torchaudio --index-url https://download.pytorch
 import torch
 print(f"CUDA available: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
- print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
 ```
 
 No GPU? No problem. Most lessons work on CPU. For training-heavy lessons, use Google Colab or cloud GPUs.

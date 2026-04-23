@@ -41,46 +41,46 @@ TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
 def tokenize(text):
- return TOKEN_RE.findall(text.lower())
+    return TOKEN_RE.findall(text.lower())
 
 
 class BM25:
- def __init__(self, corpus, k1=1.5, b=0.75):
- if not corpus:
- raise ValueError("corpus must not be empty")
- self.corpus = [tokenize(d) for d in corpus]
- self.k1 = k1
- self.b = b
- self.n_docs = len(self.corpus)
- self.avg_dl = sum(len(d) for d in self.corpus) / self.n_docs
- self.df = Counter()
- for doc in self.corpus:
- for term in set(doc):
- self.df[term] += 1
+    def __init__(self, corpus, k1=1.5, b=0.75):
+        if not corpus:
+            raise ValueError("corpus must not be empty")
+        self.corpus = [tokenize(d) for d in corpus]
+        self.k1 = k1
+        self.b = b
+        self.n_docs = len(self.corpus)
+        self.avg_dl = sum(len(d) for d in self.corpus) / self.n_docs
+        self.df = Counter()
+        for doc in self.corpus:
+            for term in set(doc):
+                self.df[term] += 1
 
- def idf(self, term):
- n = self.df.get(term, 0)
- return math.log(1 + (self.n_docs - n + 0.5) / (n + 0.5))
+    def idf(self, term):
+        n = self.df.get(term, 0)
+        return math.log(1 + (self.n_docs - n + 0.5) / (n + 0.5))
 
- def score(self, query, doc_idx):
- q_tokens = tokenize(query)
- doc = self.corpus[doc_idx]
- dl = len(doc)
- freq = Counter(doc)
- score = 0.0
- for term in q_tokens:
- f = freq.get(term, 0)
- if f == 0:
- continue
- numerator = f * (self.k1 + 1)
- denominator = f + self.k1 * (1 - self.b + self.b * dl / self.avg_dl)
- score += self.idf(term) * numerator / denominator
- return score
+    def score(self, query, doc_idx):
+        q_tokens = tokenize(query)
+        doc = self.corpus[doc_idx]
+        dl = len(doc)
+        freq = Counter(doc)
+        score = 0.0
+        for term in q_tokens:
+            f = freq.get(term, 0)
+            if f == 0:
+                continue
+            numerator = f * (self.k1 + 1)
+            denominator = f + self.k1 * (1 - self.b + self.b * dl / self.avg_dl)
+            score += self.idf(term) * numerator / denominator
+        return score
 
- def rank(self, query, top_k=10):
- scored = [(self.score(query, i), i) for i in range(self.n_docs)]
- scored.sort(reverse=True)
- return scored[:top_k]
+    def rank(self, query, top_k=10):
+        scored = [(self.score(query, i), i) for i in range(self.n_docs)]
+        scored.sort(reverse=True)
+        return scored[:top_k]
 ```
 
 Two parameters worth knowing. `k1=1.5` controls term-frequency saturation; higher means more weight on term repetition. `b=0.75` controls length normalization; 0 ignores document length, 1 fully normalizes. The defaults are Robertson's recommendations from the original paper and rarely need tuning.
@@ -93,16 +93,16 @@ import numpy as np
 
 
 def build_dense_index(corpus, model_id="sentence-transformers/all-MiniLM-L6-v2"):
- encoder = SentenceTransformer(model_id)
- embeddings = encoder.encode(corpus, normalize_embeddings=True)
- return encoder, embeddings
+    encoder = SentenceTransformer(model_id)
+    embeddings = encoder.encode(corpus, normalize_embeddings=True)
+    return encoder, embeddings
 
 
 def dense_search(encoder, embeddings, query, top_k=10):
- q_emb = encoder.encode([query], normalize_embeddings=True)
- sims = (embeddings @ q_emb.T).flatten()
- order = np.argsort(-sims)[:top_k]
- return [(float(sims[i]), int(i)) for i in order]
+    q_emb = encoder.encode([query], normalize_embeddings=True)
+    sims = (embeddings @ q_emb.T).flatten()
+    order = np.argsort(-sims)[:top_k]
+    return [(float(sims[i]), int(i)) for i in order]
 ```
 
 L2-normalize embeddings so dot product equals cosine. `all-MiniLM-L6-v2` is 384-dim, fast, and strong enough for most English retrieval. For multilingual work, use `paraphrase-multilingual-MiniLM-L12-v2`. For top accuracy, `bge-large-en-v1.5` or `e5-large-v2`.
@@ -111,12 +111,12 @@ L2-normalize embeddings so dot product equals cosine. `all-MiniLM-L6-v2` is 384-
 
 ```python
 def reciprocal_rank_fusion(rankings, k=60):
- scores = {}
- for ranking in rankings:
- for rank, (_, doc_idx) in enumerate(ranking):
- scores[doc_idx] = scores.get(doc_idx, 0.0) + 1.0 / (k + rank + 1)
- fused = sorted(scores.items(), key=lambda x: x[1], reverse=True)
- return [(score, doc_idx) for doc_idx, score in fused]
+    scores = {}
+    for ranking in rankings:
+        for rank, (_, doc_idx) in enumerate(ranking):
+            scores[doc_idx] = scores.get(doc_idx, 0.0) + 1.0 / (k + rank + 1)
+    fused = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return [(score, doc_idx) for doc_idx, score in fused]
 ```
 
 The `k=60` constant comes from the original RRF paper. Higher `k` flattens the contribution of rank differences; lower `k` makes top ranks dominate. 60 is the published default and rarely needs tuning.
@@ -130,14 +130,14 @@ reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 
 def hybrid_search(query, bm25, encoder, dense_embeddings, corpus, top_k=5, pool_size=30, reranker=reranker):
- sparse_ranking = bm25.rank(query, top_k=pool_size)
- dense_ranking = dense_search(encoder, dense_embeddings, query, top_k=pool_size)
- fused = reciprocal_rank_fusion([sparse_ranking, dense_ranking])[:pool_size]
+    sparse_ranking = bm25.rank(query, top_k=pool_size)
+    dense_ranking = dense_search(encoder, dense_embeddings, query, top_k=pool_size)
+    fused = reciprocal_rank_fusion([sparse_ranking, dense_ranking])[:pool_size]
 
- pairs = [(query, corpus[doc_idx]) for _, doc_idx in fused]
- scores = reranker.predict(pairs)
- reranked = sorted(zip(scores, [doc_idx for _, doc_idx in fused]), reverse=True)
- return reranked[:top_k]
+    pairs = [(query, corpus[doc_idx]) for _, doc_idx in fused]
+    scores = reranker.predict(pairs)
+    reranked = sorted(zip(scores, [doc_idx for _, doc_idx in fused]), reverse=True)
+    return reranked[:top_k]
 ```
 
 Three stages composed. BM25 finds lexical matches. Dense finds semantic matches. RRF merges the two rankings without needing score calibration. Cross-encoder rescores the top-30 using query-document pairs together, which captures fine-grained relevance the bi-encoder missed. Keep top-5.

@@ -48,10 +48,10 @@ In 2026, unpaired image-to-image is mostly done via diffusion (ControlNet, IP-Ad
 
 ```python
 def G(z, c, params):
- return mlp(concat([z, one_hot(c)]), params)
+    return mlp(concat([z, one_hot(c)]), params)
 
 def D(x, c, params):
- return mlp(concat([x, one_hot(c)]), params)
+    return mlp(concat([x, one_hot(c)]), params)
 ```
 
 One-hot encoding is the simplest way. Larger models use learned embeddings, FiLM modulation, or cross-attention.
@@ -60,10 +60,10 @@ One-hot encoding is the simplest way. Larger models use learned embeddings, FiLM
 
 ```python
 for step in range(steps):
- x, c = sample_real_conditional()
- noise = sample_noise()
- update_D(x_real=x, x_fake=G(noise, c), c=c)
- update_G(noise, c)
+    x, c = sample_real_conditional()
+    noise = sample_noise()
+    update_D(x_real=x, x_fake=G(noise, c), c=c)
+    update_G(noise, c)
 ```
 
 The generator must match the real distribution *for the given condition*, not the marginal.
@@ -72,9 +72,9 @@ The generator must match the real distribution *for the given condition*, not th
 
 ```python
 for c in [0, 1]:
- samples = [G(noise, c) for noise in batch]
- mean_c = mean(samples)
- assert_near(mean_c, real_mean_for_class_c)
+    samples = [G(noise, c) for noise in batch]
+    mean_c = mean(samples)
+    assert_near(mean_c, real_mean_for_class_c)
 ```
 
 ## Pitfalls

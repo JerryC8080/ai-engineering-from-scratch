@@ -91,31 +91,31 @@ Any single metric is a lie. Three corroborating metrics + qualitative review are
 
 ```python
 def fid(real_features, gen_features):
- mu_r, cov_r = mean_and_cov(real_features)
- mu_g, cov_g = mean_and_cov(gen_features)
- mean_diff = sum((a - b) ** 2 for a, b in zip(mu_r, mu_g))
- trace_term = trace(cov_r) + trace(cov_g) - 2 * sqrt_cov_product(cov_r, cov_g)
- return mean_diff + trace_term
+    mu_r, cov_r = mean_and_cov(real_features)
+    mu_g, cov_g = mean_and_cov(gen_features)
+    mean_diff = sum((a - b) ** 2 for a, b in zip(mu_r, mu_g))
+    trace_term = trace(cov_r) + trace(cov_g) - 2 * sqrt_cov_product(cov_r, cov_g)
+    return mean_diff + trace_term
 ```
 
 ### Step 2: CLIP-style cosine-similarity
 
 ```python
 def clip_like(image_feat, text_feat):
- dot = sum(a * b for a, b in zip(image_feat, text_feat))
- norm = math.sqrt(dot_self(image_feat) * dot_self(text_feat))
- return dot / max(norm, 1e-8)
+    dot = sum(a * b for a, b in zip(image_feat, text_feat))
+    norm = math.sqrt(dot_self(image_feat) * dot_self(text_feat))
+    return dot / max(norm, 1e-8)
 ```
 
 ### Step 3: Elo aggregation
 
 ```python
 def elo_update(r_a, r_b, winner, k=32):
- expected_a = 1 / (1 + 10 ** ((r_b - r_a) / 400))
- actual_a = 1.0 if winner == "a" else 0.0
- r_a_new = r_a + k * (actual_a - expected_a)
- r_b_new = r_b - k * (actual_a - expected_a)
- return r_a_new, r_b_new
+    expected_a = 1 / (1 + 10 ** ((r_b - r_a) / 400))
+    actual_a = 1.0 if winner == "a" else 0.0
+    r_a_new = r_a + k * (actual_a - expected_a)
+    r_b_new = r_b - k * (actual_a - expected_a)
+    return r_a_new, r_b_new
 ```
 
 ## Pitfalls
@@ -165,7 +165,7 @@ Save `outputs/skill-eval-report.md`. Skill takes a new model checkpoint + baseli
 
 ## Production note: evaluation is an inference workload too
 
-Running FID on 10k samples means generating 10k images. For a 50-step SDXL base at 1024² on a single L4, that is ~11 hours of single-request inference. Evaluation budgets are real, and the framing is exactly the production offline-inference scenario (maximize throughput, ignore TTFT):
+Running FID on 10k samples means generating 10k images. For a 50-step SDXL base at 1024² on a single L4, that is ~11 hours of single-request inference. Evaluation budgets are real, and the framing is exactly stas00's offline-inference scenario (maximize throughput, ignore TTFT):
 
 - **Batch hard, forget latency.** Offline eval = static batching at the largest size that fits in memory. `pipe(...).images` with `num_images_per_prompt=8` on an 80GB H100 runs 4-6× faster wall-clock than single-request.
 - **Cache the real features.** The Inception (FID) or CLIP (CLIP-score, CMMD) feature extraction over the real reference set is run *once*, stored as a `.npz`. Do not recompute per eval.

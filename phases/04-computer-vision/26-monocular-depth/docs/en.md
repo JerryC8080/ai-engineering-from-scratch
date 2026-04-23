@@ -35,14 +35,14 @@ MiDaS and Depth Anything V3 produce relative depth. Marigold produces relative d
 
 ```mermaid
 flowchart LR
- IMG["Image (H x W x 3)"] --> ENC["Frozen ViT encoder<br/>(DINOv2 / DINOv3)"]
- ENC --> FEATS["Dense features<br/>(H/14, W/14, d)"]
- FEATS --> DEC["Depth decoder<br/>(conv upsampler,<br/>DPT-style)"]
- DEC --> DEPTH["Depth map<br/>(H, W, 1)"]
+    IMG["Image (H x W x 3)"] --> ENC["Frozen ViT encoder<br/>(DINOv2 / DINOv3)"]
+    ENC --> FEATS["Dense features<br/>(H/14, W/14, d)"]
+    FEATS --> DEC["Depth decoder<br/>(conv upsampler,<br/>DPT-style)"]
+    DEC --> DEPTH["Depth map<br/>(H, W, 1)"]
 
- style ENC fill:#dbeafe,stroke:#2563eb
- style DEC fill:#fef3c7,stroke:#d97706
- style DEPTH fill:#dcfce7,stroke:#16a34a
+    style ENC fill:#dbeafe,stroke:#2563eb
+    style DEC fill:#fef3c7,stroke:#d97706
+    style DEPTH fill:#dcfce7,stroke:#16a34a
 ```
 
 Depth Anything V3 freezes the encoder and trains only the DPT-style decoder. The encoder provides rich features; the decoder interpolates them back to image resolution and regresses depth.
@@ -109,18 +109,18 @@ For relative depth (Depth Anything V3, MiDaS), evaluation uses scale-and-shift i
 import torch
 
 def abs_rel_error(pred, target, mask=None):
- if mask is not None:
- pred = pred[mask]
- target = target[mask]
- return (torch.abs(pred - target) / target.clamp(min=1e-6)).mean().item()
+    if mask is not None:
+        pred = pred[mask]
+        target = target[mask]
+    return (torch.abs(pred - target) / target.clamp(min=1e-6)).mean().item()
 
 
 def delta_accuracy(pred, target, threshold=1.25, mask=None):
- if mask is not None:
- pred = pred[mask]
- target = target[mask]
- ratio = torch.maximum(pred / target.clamp(min=1e-6), target / pred.clamp(min=1e-6))
- return (ratio < threshold).float().mean().item()
+    if mask is not None:
+        pred = pred[mask]
+        target = target[mask]
+    ratio = torch.maximum(pred / target.clamp(min=1e-6), target / pred.clamp(min=1e-6))
+    return (ratio < threshold).float().mean().item()
 ```
 
 Always mask invalid depth pixels (zero, NaN, saturated) before evaluation.
@@ -131,16 +131,16 @@ For relative-depth models, align prediction to ground truth before computing met
 
 ```python
 def align_scale_shift(pred, target, mask=None):
- if mask is not None:
- p = pred[mask]
- t = target[mask]
- else:
- p = pred.flatten()
- t = target.flatten()
- A = torch.stack([p, torch.ones_like(p)], dim=1)
- coeffs, *_ = torch.linalg.lstsq(A, t.unsqueeze(-1))
- a, b = coeffs[:2, 0]
- return a * pred + b
+    if mask is not None:
+        p = pred[mask]
+        t = target[mask]
+    else:
+        p = pred.flatten()
+        t = target.flatten()
+    A = torch.stack([p, torch.ones_like(p)], dim=1)
+    coeffs, *_ = torch.linalg.lstsq(A, t.unsqueeze(-1))
+    a, b = coeffs[:2, 0]
+    return a * pred + b
 ```
 
 Run `align_scale_shift` before `abs_rel_error` when evaluating MiDaS / Depth Anything.
@@ -151,19 +151,19 @@ Run `align_scale_shift` before `abs_rel_error` when evaluating MiDaS / Depth Any
 import numpy as np
 
 def depth_to_point_cloud(depth, intrinsics):
- H, W = depth.shape
- fx, fy, cx, cy = intrinsics
- v, u = np.meshgrid(np.arange(H), np.arange(W), indexing="ij")
- z = depth
- x = (u - cx) * z / fx
- y = (v - cy) * z / fy
- return np.stack([x, y, z], axis=-1)
+    H, W = depth.shape
+    fx, fy, cx, cy = intrinsics
+    v, u = np.meshgrid(np.arange(H), np.arange(W), indexing="ij")
+    z = depth
+    x = (u - cx) * z / fx
+    y = (v - cy) * z / fy
+    return np.stack([x, y, z], axis=-1)
 
 
 depth = np.random.uniform(0.5, 4.0, (240, 320))
 intr = (320.0, 320.0, 160.0, 120.0)
 pc = depth_to_point_cloud(depth, intr)
-print(f"point cloud shape: {pc.shape} (H, W, 3)")
+print(f"point cloud shape: {pc.shape}  (H, W, 3)")
 ```
 
 One function, every 3D-lifted application. Export the point cloud to `.ply` and open in MeshLab or CloudCompare.
@@ -172,20 +172,20 @@ One function, every 3D-lifted application. Export the point cloud to `.ply` and 
 
 ```python
 def synthetic_depth(size=96):
- yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
- # Floor: linear gradient from near (top) to far (bottom)
- depth = 1.0 + (yy / size) * 4.0
- # Box in the middle: closer
- mask = (np.abs(xx - size / 2) < size / 6) & (np.abs(yy - size * 0.6) < size / 6)
- depth[mask] = 2.0
- return depth.astype(np.float32)
+    yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
+    # Floor: linear gradient from near (top) to far (bottom)
+    depth = 1.0 + (yy / size) * 4.0
+    # Box in the middle: closer
+    mask = (np.abs(xx - size / 2) < size / 6) & (np.abs(yy - size * 0.6) < size / 6)
+    depth[mask] = 2.0
+    return depth.astype(np.float32)
 
 
 gt = torch.from_numpy(synthetic_depth(96))
-pred = gt + 0.3 * torch.randn_like(gt) # simulated prediction
+pred = gt + 0.3 * torch.randn_like(gt)  # simulated prediction
 aligned = align_scale_shift(pred, gt)
-print(f"before align absRel = {abs_rel_error(pred, gt):.3f}")
-print(f"after align absRel = {abs_rel_error(aligned, gt):.3f}")
+print(f"before align  absRel = {abs_rel_error(pred, gt):.3f}")
+print(f"after align   absRel = {abs_rel_error(aligned, gt):.3f}")
 ```
 
 ### Step 5: Depth Anything V3 usage (reference)

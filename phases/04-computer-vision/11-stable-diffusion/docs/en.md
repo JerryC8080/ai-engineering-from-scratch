@@ -28,21 +28,21 @@ Almost every modern image-generation model — SDXL, SD3, FLUX, HunyuanDiT, Wan-
 
 ```mermaid
 flowchart LR
- TXT["Text prompt"] --> TE["Text encoder<br/>(CLIP-L or T5)"]
- TE --> CT["Text<br/>embedding"]
+    TXT["Text prompt"] --> TE["Text encoder<br/>(CLIP-L or T5)"]
+    TE --> CT["Text<br/>embedding"]
 
- NOISE["Noise<br/>4x64x64"] --> UNET["UNet<br/>(denoiser with<br/>cross-attention<br/>to text)"]
- CT --> UNET
+    NOISE["Noise<br/>4x64x64"] --> UNET["UNet<br/>(denoiser with<br/>cross-attention<br/>to text)"]
+    CT --> UNET
 
- UNET --> SCHED["Scheduler<br/>(DPM-Solver++,<br/>Euler)"]
- SCHED --> LATENT["Clean latent<br/>4x64x64"]
- LATENT --> VAE["VAE decoder"]
- VAE --> IMG["512x512<br/>RGB image"]
+    UNET --> SCHED["Scheduler<br/>(DPM-Solver++,<br/>Euler)"]
+    SCHED --> LATENT["Clean latent<br/>4x64x64"]
+    LATENT --> VAE["VAE decoder"]
+    VAE --> IMG["512x512<br/>RGB image"]
 
- style TE fill:#dbeafe,stroke:#2563eb
- style UNET fill:#fef3c7,stroke:#d97706
- style SCHED fill:#fecaca,stroke:#dc2626
- style IMG fill:#dcfce7,stroke:#16a34a
+    style TE fill:#dbeafe,stroke:#2563eb
+    style UNET fill:#fef3c7,stroke:#d97706
+    style SCHED fill:#fecaca,stroke:#dc2626
+    style IMG fill:#dcfce7,stroke:#16a34a
 ```
 
 - **VAE** — frozen autoencoder. Encoder turns image into latents (used for img2img and training). Decoder turns latents back into an image.
@@ -87,8 +87,8 @@ Total parameters in SD 1.5: ~860M. SDXL: ~2.6B. FLUX: ~12B. The jump in params i
 Full fine-tuning of Stable Diffusion needs 20+ GB of VRAM and updates 860M parameters. LoRA (Low-Rank Adaptation) keeps the base model frozen and injects small rank-decomposition matrices into the attention layers. A LoRA adapter for SD is typically 10-50 MB, trains in 10-60 minutes on a single consumer GPU, and loads at inference time as a drop-in modification.
 
 ```
-Original: W_q : (d_in, d_out) frozen
-LoRA: W_q + alpha * (A @ B) where A : (d_in, r), B : (r, d_out)
+Original: W_q : (d_in, d_out)   frozen
+LoRA:     W_q + alpha * (A @ B)   where A : (d_in, r), B : (r, d_out)
 
 r is typically 4-32.
 ```
@@ -115,15 +115,15 @@ import torch
 from diffusers import StableDiffusionPipeline
 
 pipe = StableDiffusionPipeline.from_pretrained(
- "runwayml/stable-diffusion-v1-5",
- torch_dtype=torch.float16,
+    "runwayml/stable-diffusion-v1-5",
+    torch_dtype=torch.float16,
 ).to("cuda")
 
 image = pipe(
- prompt="a dog riding a skateboard in tokyo, studio ghibli style",
- guidance_scale=7.5,
- num_inference_steps=25,
- generator=torch.Generator("cuda").manual_seed(42),
+    prompt="a dog riding a skateboard in tokyo, studio ghibli style",
+    guidance_scale=7.5,
+    num_inference_steps=25,
+    generator=torch.Generator("cuda").manual_seed(42),
 ).images[0]
 image.save("dog.png")
 ```
@@ -148,16 +148,16 @@ from diffusers import StableDiffusionImg2ImgPipeline
 from PIL import Image
 
 img2img = StableDiffusionImg2ImgPipeline.from_pretrained(
- "runwayml/stable-diffusion-v1-5",
- torch_dtype=torch.float16,
+    "runwayml/stable-diffusion-v1-5",
+    torch_dtype=torch.float16,
 ).to("cuda")
 
 init_image = Image.open("dog.png").convert("RGB").resize((512, 512))
 out = img2img(
- prompt="a dog riding a skateboard, oil painting",
- image=init_image,
- strength=0.6,
- guidance_scale=7.5,
+    prompt="a dog riding a skateboard, oil painting",
+    image=init_image,
+    strength=0.6,
+    guidance_scale=7.5,
 ).images[0]
 ```
 
@@ -169,18 +169,18 @@ out = img2img(
 from diffusers import StableDiffusionInpaintPipeline
 
 inpaint = StableDiffusionInpaintPipeline.from_pretrained(
- "runwayml/stable-diffusion-inpainting",
- torch_dtype=torch.float16,
+    "runwayml/stable-diffusion-inpainting",
+    torch_dtype=torch.float16,
 ).to("cuda")
 
 image = Image.open("dog.png").convert("RGB").resize((512, 512))
 mask = Image.open("dog_mask.png").convert("L").resize((512, 512))
 
 out = inpaint(
- prompt="a cat",
- image=image,
- mask_image=mask,
- guidance_scale=7.5,
+    prompt="a cat",
+    image=image,
+    mask_image=mask,
+    guidance_scale=7.5,
 ).images[0]
 ```
 
@@ -204,20 +204,20 @@ Real LoRA training lives in `peft` or `diffusers.training`. The outline:
 ```python
 # Pseudocode
 for step, batch in enumerate(dataloader):
- images, prompts = batch
- latents = vae.encode(images).latent_dist.sample() * 0.18215
+    images, prompts = batch
+    latents = vae.encode(images).latent_dist.sample() * 0.18215
 
- t = torch.randint(0, num_train_timesteps, (batch_size,))
- noise = torch.randn_like(latents)
- noisy_latents = scheduler.add_noise(latents, noise, t)
+    t = torch.randint(0, num_train_timesteps, (batch_size,))
+    noise = torch.randn_like(latents)
+    noisy_latents = scheduler.add_noise(latents, noise, t)
 
- text_emb = text_encoder(tokenizer(prompts))
+    text_emb = text_encoder(tokenizer(prompts))
 
- pred_noise = unet(noisy_latents, t, text_emb) # LoRA weights injected here
+    pred_noise = unet(noisy_latents, t, text_emb)  # LoRA weights injected here
 
- loss = F.mse_loss(pred_noise, noise)
- loss.backward()
- optimizer.step()
+    loss = F.mse_loss(pred_noise, noise)
+    loss.backward()
+    optimizer.step()
 ```
 
 Only the LoRA matrices receive gradient; the base U-Net, VAE, and text encoder are frozen. With a batch size of 1 and gradient checkpointing this fits in 8 GB of VRAM.
