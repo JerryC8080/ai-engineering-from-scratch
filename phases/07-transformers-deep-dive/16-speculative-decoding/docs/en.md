@@ -218,7 +218,5 @@ See `outputs/skill-spec-decode-picker.md`. The skill picks a speculative decodin
 - [Li et al. (2024). EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees](https://arxiv.org/abs/2406.16858) — EAGLE-2; dynamic tree depth.
 - [Li et al. (2025). EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test](https://arxiv.org/abs/2503.01840) — EAGLE-3.
 - [Fu et al. (2024). Break the Sequential Dependency of LLM Inference Using Lookahead Decoding](https://arxiv.org/abs/2402.02057) — lookahead, no-draft approach.
-- [Raschka, *LLMs-from-scratch* — Ch. 4 bonus `03_kv-cache`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/03_kv-cache) — the KV cache patterns this lesson's Exercise 4 rollback builds on; `gpt_with_kv_cache.py` is the direct prerequisite read.
 - [vLLM docs — Speculative Decoding](https://docs.vllm.ai/en/latest/features/spec_decode.html) — canonical production reference with all four strategies wired up.
-- [stas00, `ml-engineering/inference/README.md`](https://github.com/stas00/ml-engineering/blob/master/inference/README.md) — production inference notes including speculative-decoding throughput measurements across hardware.
 - [SafeAILab / EAGLE reference implementation](https://github.com/SafeAILab/EAGLE) — the reference code for EAGLE-1/2/3.

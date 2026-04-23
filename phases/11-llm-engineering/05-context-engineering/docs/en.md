@@ -584,4 +584,3 @@ It also produces `outputs/skill-context-engineering.md` -- a decision framework 
 - [Simon Willison's "Context Engineering"](https://simonwillison.net/2025/Jun/27/context-engineering/) -- the blog post that named the discipline and distinguished it from prompt engineering
 - [LangChain documentation on RAG](https://python.langchain.com/docs/tutorials/rag/) -- practical implementation of retrieval-augmented generation as a context engineering pattern
 - [Greg Kamradt's Needle in a Haystack test](https://github.com/gkamradt/LLMTest_NeedleInAHaystack) -- the benchmark that revealed position-dependent retrieval failures across all major models
-- [Andrej Karpathy on context length](https://karpathy.ai/) -- practical observations on how context window usage affects model performance in real applications

@@ -701,7 +701,6 @@ Key deployment patterns for debugging:
 
 ## Further Reading
 
-- Karpathy, "A Recipe for Training Neural Networks" (2019) -- the most practical debugging guide ever written for neural networks, covers the exact mindset this lesson teaches
 - Smith, "Cyclical Learning Rates for Training Neural Networks" (2017) -- the paper introducing the learning rate range test (LR finder)
 - Northcutt et al., "Pervasive Label Errors in Test Sets Destabilize Machine Learning Benchmarks" (2021) -- demonstrates that 3-6% of labels in ImageNet, CIFAR-10, and other major benchmarks are wrong
 - Zhang et al., "Understanding Deep Learning Requires Rethinking Generalization" (2017) -- the paper showing neural networks can memorize random labels, which is why the overfit-one-batch test works

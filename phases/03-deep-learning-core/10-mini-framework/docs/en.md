@@ -702,7 +702,6 @@ This lesson produces:
 
 ## Further Reading
 
-- Karpathy, "micrograd" (https://github.com/karpathy/micrograd) -- the original ~150-line autograd engine that inspired this lesson's approach
 - Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library" (2019) -- the paper describing PyTorch's design decisions
 - Chollet, "Deep Learning with Python, Second Edition" (2021) -- Chapter 3 covers Keras internals with the same module/layer abstraction
 - Johnson, "Tiny-DNN" (https://github.com/tiny-dnn/tiny-dnn) -- a header-only C++ deep learning framework for understanding framework internals

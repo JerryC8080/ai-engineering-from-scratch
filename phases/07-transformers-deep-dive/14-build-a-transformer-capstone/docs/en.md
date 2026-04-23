@@ -171,15 +171,4 @@ See `outputs/skill-transformer-review.md`. The skill reviews a transformer-from-
 
 ## Further Reading
 
-- [Karpathy — nanoGPT (2022-)](https://github.com/karpathy/nanoGPT) — the reference you are building against.
-- [Karpathy — "Let's build GPT: from scratch, in code, spelled out" (YouTube, 2023)](https://www.youtube.com/watch?v=kCc8FmEb1nY) — the best video walkthrough in existence. Pair with `karpathy/nn-zero-to-hero/lectures/makemore/` notebooks 1–5 as the prerequisite series.
-- [Karpathy — "Let's reproduce GPT-2 (124M)" (YouTube, 2024)](https://www.youtube.com/watch?v=l8pRSuU81PU) — scale the same code to 124M params.
-- [Karpathy — `llm.c`](https://github.com/karpathy/llm.c) — the same nanoGPT training loop reimplemented in pure C+CUDA. After your capstone runs, reading `train_gpt2.c` is the single highest-leverage way to understand what PyTorch is doing under the hood.
-- [Karpathy — `llm.c/train_gpt2.py`](https://github.com/karpathy/llm.c/blob/master/train_gpt2.py) — the PyTorch reference that the C code mirrors; diff against your capstone.
 - [The Annotated Transformer (Harvard NLP)](https://nlp.seas.harvard.edu/annotated-transformer/) — the classic annotated implementation.
-- [modded-nanogpt](https://github.com/KellerJordan/modded-nanogpt) — the Muon-optimizer speedrun of nanoGPT (Keller Jordan 2024); educational and fast.
-- [Raschka, *LLMs-from-scratch* — full book repo](https://github.com/rasbt/LLMs-from-scratch) — if you want to redo this capstone at slightly larger scale with cleaner PyTorch, read Ch. 1 → Ch. 5 end-to-end. Every lesson in Phase 7 has a direct counterpart chapter.
-- [Raschka, *LLMs-from-scratch* — `ch05/10_llm-training-speed`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/10_llm-training-speed) — throughput optimizations (fp16, compile, fused ops) that take your capstone from "laptop" to "A100".
-- [Raschka, *LLMs-from-scratch* — `ch05/11_qwen3` → `17_gemma4`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05) — reproduce 2026 frontier architectures (Qwen 3, Gemma 4) on top of the same training loop as your capstone. The most direct next step if your model trained cleanly.
-- [Raschka, *LLMs-from-scratch* — Ch. 4 bonuses (`03_kv-cache`, `04_gqa`, `05_mla`, `06_swa`, `07_moe`)](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04) — individually-tested drop-in modifications for Exercises 2–5. Each bonus is a working delta from the base GPT code.
-- [stas00, `ml-engineering/training/`](https://github.com/stas00/ml-engineering/tree/master/training) — take your capstone to production with fault-tolerance, checkpointing, and distributed training.

@@ -620,5 +620,4 @@ You just built gradient descent from scratch. PyTorch automates the gradient com
 ## Further Reading
 
 - [3Blue1Brown: Essence of Calculus](https://www.3blue1brown.com/topics/calculus) - visual intuition for derivatives, integrals, and the chain rule
-- [Andrej Karpathy: Micrograd](https://github.com/karpathy/micrograd) - a tiny autograd engine that implements backpropagation in ~100 lines
 - [Stanford CS231n: Backpropagation](https://cs231n.github.io/optimization-2/) - how gradients flow through neural network layers

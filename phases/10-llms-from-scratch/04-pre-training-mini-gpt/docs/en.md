@@ -527,6 +527,5 @@ This lesson produces `outputs/prompt-gpt-architecture-analyzer.md` -- a prompt t
 
 - [Radford et al., 2019 -- "Language Models are Unsupervised Multitask Learners" (GPT-2)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) -- the GPT-2 paper that introduced the 124M to 1.5B parameter family
 - [Vaswani et al., 2017 -- "Attention Is All You Need"](https://arxiv.org/abs/1706.03762) -- the original transformer paper with scaled dot-product attention and multi-head attention
-- [Andrej Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT) -- the cleanest GPT-2 training implementation (~300 lines of PyTorch), the best educational reference for this architecture
 - [Llama 3 Technical Report](https://arxiv.org/abs/2407.21783) -- how Meta scaled the GPT architecture to 405B parameters with 16K GPUs
 - [Pope et al., 2022 -- "Efficiently Scaling Transformer Inference"](https://arxiv.org/abs/2211.05102) -- the paper that formalized prefill vs decode and KV cache analysis

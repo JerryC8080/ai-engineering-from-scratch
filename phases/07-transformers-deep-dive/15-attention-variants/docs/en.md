@@ -205,7 +205,4 @@ See `outputs/skill-attention-variant-picker.md`. The skill picks an attention to
 - [Gemma Team (2025). Gemma 3 technical report](https://arxiv.org/abs/2503.19786) — the 5:1 mix with window=1024 that's now the textbook default.
 - [Ye et al. (2024). Differential Transformer](https://arxiv.org/abs/2410.05258) — DIFF Transformer paper.
 - [Yuan et al. (2025). Native Sparse Attention](https://arxiv.org/abs/2502.11089) — DeepSeek-V3.2's learned-sparsity attention.
-- [Raschka, *LLMs-from-scratch* — Ch. 4 bonus `06_swa`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch04/06_swa) — sliding-window attention as a drop-in on the Ch. 4 GPT block; runnable `gpt_with_kv_swa.py` and `memory_estimator_swa.py` that reproduce the KV savings in this lesson.
-- [Raschka, *LLMs-from-scratch* — Ch. 5 `12_gemma3`](https://github.com/rasbt/LLMs-from-scratch/tree/main/ch05/12_gemma3) — full Gemma 3 implementation with SWA + global layer mix, directly usable alongside Exercise 3.
 - [PyTorch — FlexAttention blog and docs](https://pytorch.org/blog/flexattention/) — API reference for the mask-as-callable pattern in Use It.
-- [stas00, `ml-engineering/inference/README.md`](https://github.com/stas00/ml-engineering/blob/master/inference/README.md) — production-side notes on long-context inference memory budgets that motivate SWA.

@@ -463,6 +463,4 @@ This lesson produces:
 ## Further Reading
 
 - Rumelhart, Hinton & Williams, "Learning representations by back-propagating errors" (1986) -- the paper that made backpropagation mainstream and unlocked multi-layer network training
-- Andrej Karpathy's micrograd (https://github.com/karpathy/micrograd) -- a tiny autograd engine in ~100 lines of Python, the direct inspiration for the Value class in this lesson
-- Andrej Karpathy, "Yes you should understand backprop" (https://karpathy.medium.com/yes-you-should-understand-backprop-e034e8d3c23) -- why relying on autograd without understanding the math leads to real debugging pain
 - 3Blue1Brown, "Neural Networks" series (https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) -- the best visual explanation of backpropagation and gradient flow through networks

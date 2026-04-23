@@ -512,7 +512,6 @@ The Value class built here is the foundation for the neural network training loo
 
 ## Further Reading
 
-- [Karpathy: micrograd](https://github.com/karpathy/micrograd) -- the autograd engine this lesson is modeled after, in 100 lines
 - [3Blue1Brown: Backpropagation calculus](https://www.youtube.com/watch?v=tIeHLnjs5U8) -- visual explanation of the chain rule in neural networks
 - [PyTorch Autograd mechanics](https://pytorch.org/docs/stable/notes/autograd.html) -- how the real system works
 - [Baydin et al., Automatic Differentiation in Machine Learning: a Survey](https://arxiv.org/abs/1502.05767) -- comprehensive reference
