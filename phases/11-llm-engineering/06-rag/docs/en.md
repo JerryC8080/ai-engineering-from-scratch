@@ -30,26 +30,26 @@ The entire pattern fits in four steps:
 
 ```mermaid
 graph LR
-    Q["User Query"] --> R["Retrieve"]
-    R --> A["Augment Prompt"]
-    A --> G["Generate"]
-    G --> Ans["Answer"]
+ Q["User Query"] --> R["Retrieve"]
+ R --> A["Augment Prompt"]
+ A --> G["Generate"]
+ G --> Ans["Answer"]
 
-    subgraph "Retrieve"
-        R --> Embed["Embed query"]
-        Embed --> Search["Search vector store"]
-        Search --> TopK["Return top-k chunks"]
-    end
+ subgraph "Retrieve"
+ R --> Embed["Embed query"]
+ Embed --> Search["Search vector store"]
+ Search --> TopK["Return top-k chunks"]
+ end
 
-    subgraph "Augment"
-        TopK --> Format["Format chunks into prompt"]
-        Format --> Combine["Combine with user question"]
-    end
+ subgraph "Augment"
+ TopK --> Format["Format chunks into prompt"]
+ Format --> Combine["Combine with user question"]
+ end
 
-    subgraph "Generate"
-        Combine --> LLM["LLM generates answer"]
-        LLM --> Cite["Answer grounded in retrieved docs"]
-    end
+ subgraph "Generate"
+ Combine --> LLM["LLM generates answer"]
+ LLM --> Cite["Answer grounded in retrieved docs"]
+ end
 ```
 
 Query -> Retrieve -> Augment prompt -> Generate. Every RAG system follows this pattern. The differences between production RAG systems are in the details of each step: how you chunk, how you embed, how you search, and how you construct the prompt.
@@ -146,20 +146,20 @@ For this lesson, we build a simple in-memory vector store. It stores vectors in 
 
 ```mermaid
 graph TD
-    subgraph "Indexing (offline)"
-        D["Documents"] --> C["Chunk"]
-        C --> E["Embed each chunk"]
-        E --> S["Store vectors + text"]
-    end
+ subgraph "Indexing (offline)"
+ D["Documents"] --> C["Chunk"]
+ C --> E["Embed each chunk"]
+ E --> S["Store vectors + text"]
+ end
 
-    subgraph "Querying (online)"
-        Q["User query"] --> QE["Embed query"]
-        QE --> VS["Vector search (top-k)"]
-        VS --> P["Build prompt with chunks"]
-        P --> LLM["LLM generates answer"]
-    end
+ subgraph "Querying (online)"
+ Q["User query"] --> QE["Embed query"]
+ QE --> VS["Vector search (top-k)"]
+ VS --> P["Build prompt with chunks"]
+ P --> LLM["LLM generates answer"]
+ end
 
-    S -.->|"same vector space"| VS
+ S -.->|"same vector space"| VS
 ```
 
 The indexing phase runs once per document (or when documents update). The querying phase runs on every user request. In production, indexing might process millions of documents over hours. Querying must respond in under a second.
@@ -182,15 +182,15 @@ Most production RAG systems use these parameters:
 
 ```python
 def chunk_text(text, chunk_size=200, overlap=50):
-    words = text.split()
-    chunks = []
-    start = 0
-    while start < len(words):
-        end = start + chunk_size
-        chunk = " ".join(words[start:end])
-        chunks.append(chunk)
-        start += chunk_size - overlap
-    return chunks
+ words = text.split()
+ chunks = []
+ start = 0
+ while start < len(words):
+ end = start + chunk_size
+ chunk = " ".join(words[start:end])
+ chunks.append(chunk)
+ start += chunk_size - overlap
+ return chunks
 ```
 
 ### Step 2: TF-IDF Embeddings
@@ -202,48 +202,48 @@ import math
 from collections import Counter
 
 def build_vocabulary(documents):
-    vocab = set()
-    for doc in documents:
-        vocab.update(doc.lower().split())
-    return sorted(vocab)
+ vocab = set()
+ for doc in documents:
+ vocab.update(doc.lower().split())
+ return sorted(vocab)
 
 def compute_tf(text, vocab):
-    words = text.lower().split()
-    count = Counter(words)
-    total = len(words)
-    return [count.get(word, 0) / total for word in vocab]
+ words = text.lower().split()
+ count = Counter(words)
+ total = len(words)
+ return [count.get(word, 0) / total for word in vocab]
 
 def compute_idf(documents, vocab):
-    n = len(documents)
-    idf = []
-    for word in vocab:
-        doc_count = sum(1 for doc in documents if word in doc.lower().split())
-        idf.append(math.log((n + 1) / (doc_count + 1)) + 1)
-    return idf
+ n = len(documents)
+ idf = []
+ for word in vocab:
+ doc_count = sum(1 for doc in documents if word in doc.lower().split())
+ idf.append(math.log((n + 1) / (doc_count + 1)) + 1)
+ return idf
 
 def tfidf_embed(text, vocab, idf):
-    tf = compute_tf(text, vocab)
-    return [t * i for t, i in zip(tf, idf)]
+ tf = compute_tf(text, vocab)
+ return [t * i for t, i in zip(tf, idf)]
 ```
 
 ### Step 3: Cosine Similarity Search
 
 ```python
 def cosine_similarity(a, b):
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x * x for x in a))
-    norm_b = math.sqrt(sum(x * x for x in b))
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return dot / (norm_a * norm_b)
+ dot = sum(x * y for x, y in zip(a, b))
+ norm_a = math.sqrt(sum(x * x for x in a))
+ norm_b = math.sqrt(sum(x * x for x in b))
+ if norm_a == 0 or norm_b == 0:
+ return 0.0
+ return dot / (norm_a * norm_b)
 
 def search(query_embedding, stored_embeddings, top_k=5):
-    scores = []
-    for i, emb in enumerate(stored_embeddings):
-        sim = cosine_similarity(query_embedding, emb)
-        scores.append((i, sim))
-    scores.sort(key=lambda x: x[1], reverse=True)
-    return scores[:top_k]
+ scores = []
+ for i, emb in enumerate(stored_embeddings):
+ sim = cosine_similarity(query_embedding, emb)
+ scores.append((i, sim))
+ scores.sort(key=lambda x: x[1], reverse=True)
+ return scores[:top_k]
 ```
 
 ### Step 4: Prompt Construction
@@ -252,11 +252,11 @@ This is where the "augmented" in RAG happens. Take the retrieved chunks, format 
 
 ```python
 def build_rag_prompt(query, retrieved_chunks):
-    context = "\n\n---\n\n".join(
-        f"[Source {i+1}]\n{chunk}"
-        for i, chunk in enumerate(retrieved_chunks)
-    )
-    return f"""Answer the question based ONLY on the following context.
+ context = "\n\n---\n\n".join(
+ f"[Source {i+1}]\n{chunk}"
+ for i, chunk in enumerate(retrieved_chunks)
+ )
+ return f"""Answer the question based ONLY on the following context.
 If the context doesn't contain enough information, say "I don't have enough information to answer that."
 
 Context:
@@ -271,32 +271,32 @@ Answer:"""
 
 ```python
 class RAGPipeline:
-    def __init__(self):
-        self.chunks = []
-        self.embeddings = []
-        self.vocab = []
-        self.idf = []
+ def __init__(self):
+ self.chunks = []
+ self.embeddings = []
+ self.vocab = []
+ self.idf = []
 
-    def index(self, documents):
-        all_chunks = []
-        for doc in documents:
-            all_chunks.extend(chunk_text(doc))
-        self.chunks = all_chunks
-        self.vocab = build_vocabulary(all_chunks)
-        self.idf = compute_idf(all_chunks, self.vocab)
-        self.embeddings = [
-            tfidf_embed(chunk, self.vocab, self.idf)
-            for chunk in all_chunks
-        ]
+ def index(self, documents):
+ all_chunks = []
+ for doc in documents:
+ all_chunks.extend(chunk_text(doc))
+ self.chunks = all_chunks
+ self.vocab = build_vocabulary(all_chunks)
+ self.idf = compute_idf(all_chunks, self.vocab)
+ self.embeddings = [
+ tfidf_embed(chunk, self.vocab, self.idf)
+ for chunk in all_chunks
+ ]
 
-    def query(self, question, top_k=5):
-        query_emb = tfidf_embed(question, self.vocab, self.idf)
-        results = search(query_emb, self.embeddings, top_k)
-        retrieved = [(self.chunks[i], score) for i, score in results]
-        prompt = build_rag_prompt(
-            question, [chunk for chunk, _ in retrieved]
-        )
-        return prompt, retrieved
+ def query(self, question, top_k=5):
+ query_emb = tfidf_embed(question, self.vocab, self.idf)
+ results = search(query_emb, self.embeddings, top_k)
+ retrieved = [(self.chunks[i], score) for i, score in results]
+ prompt = build_rag_prompt(
+ question, [chunk for chunk, _ in retrieved]
+ )
+ return prompt, retrieved
 ```
 
 ### Step 6: Generation (simulated)
@@ -305,20 +305,20 @@ In production, this is where you call the LLM API. For this lesson, we simulate 
 
 ```python
 def simple_generate(prompt, retrieved_chunks):
-    query_words = set(prompt.lower().split("question:")[-1].split())
-    best_sentence = ""
-    best_score = 0
-    for chunk in retrieved_chunks:
-        for sentence in chunk.split("."):
-            sentence = sentence.strip()
-            if not sentence:
-                continue
-            words = set(sentence.lower().split())
-            overlap = len(query_words & words)
-            if overlap > best_score:
-                best_score = overlap
-                best_sentence = sentence
-    return best_sentence if best_sentence else "I don't have enough information."
+ query_words = set(prompt.lower().split("question:")[-1].split())
+ best_sentence = ""
+ best_score = 0
+ for chunk in retrieved_chunks:
+ for sentence in chunk.split("."):
+ sentence = sentence.strip()
+ if not sentence:
+ continue
+ words = set(sentence.lower().split())
+ overlap = len(query_words & words)
+ if overlap > best_score:
+ best_score = overlap
+ best_sentence = sentence
+ return best_sentence if best_sentence else "I don't have enough information."
 ```
 
 ## Use It
@@ -331,19 +331,19 @@ from openai import OpenAI
 client = OpenAI()
 
 def embed(text):
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=text
-    )
-    return response.data[0].embedding
+ response = client.embeddings.create(
+ model="text-embedding-3-small",
+ input=text
+ )
+ return response.data[0].embedding
 
 def generate(prompt):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0
-    )
-    return response.choices[0].message.content
+ response = client.chat.completions.create(
+ model="gpt-4o-mini",
+ messages=[{"role": "user", "content": prompt}],
+ temperature=0
+ )
+ return response.choices[0].message.content
 ```
 
 Or with Anthropic:
@@ -354,12 +354,12 @@ import anthropic
 client = anthropic.Anthropic()
 
 def generate(prompt):
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.content[0].text
+ response = client.messages.create(
+ model="claude-sonnet-4-20250514",
+ max_tokens=1024,
+ messages=[{"role": "user", "content": prompt}]
+ )
+ return response.content[0].text
 ```
 
 The pipeline is the same. Swap the embedding function. Swap the generation function. The retrieval logic, chunking, prompt construction -- all identical regardless of which models you use.
@@ -373,13 +373,13 @@ client = chromadb.Client()
 collection = client.create_collection("my_docs")
 
 collection.add(
-    documents=chunks,
-    ids=[f"chunk_{i}" for i in range(len(chunks))]
+ documents=chunks,
+ ids=[f"chunk_{i}" for i in range(len(chunks))]
 )
 
 results = collection.query(
-    query_texts=["What is the refund policy?"],
-    n_results=5
+ query_texts=["What is the refund policy?"],
+ n_results=5
 )
 ```
 

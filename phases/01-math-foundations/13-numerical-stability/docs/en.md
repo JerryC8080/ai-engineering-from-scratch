@@ -40,11 +40,11 @@ Value = (-1)^sign * 2^(exponent - 127) * 1.mantissa
 The mantissa determines precision (how many significant digits). The exponent determines range (how large or small a number can be).
 
 ```
-Format     Bits   Exponent  Mantissa  Decimal digits  Range (approx)
-float64    64     11        52        ~15-16          +/- 1.8e308
-float32    32     8         23        ~7-8            +/- 3.4e38
-float16    16     5         10        ~3-4            +/- 65,504
-bfloat16   16     8         7         ~2-3            +/- 3.4e38
+Format Bits Exponent Mantissa Decimal digits Range (approx)
+float64 64 11 52 ~15-16 +/- 1.8e308
+float32 32 8 23 ~7-8 +/- 3.4e38
+float16 16 5 10 ~3-4 +/- 65,504
+bfloat16 16 8 7 ~2-3 +/- 3.4e38
 ```
 
 float32 gives you about 7 decimal digits of precision. That means it can tell apart 1.0000001 and 1.0000002, but not 1.00000001 and 1.00000002. After 7 digits, everything is rounding noise.
@@ -85,11 +85,11 @@ The fix: never compare floats with `==`. Use `abs(a - b) < epsilon` or `math.isc
 When you subtract two nearly equal floating point numbers, the significant digits cancel and you are left with rounding noise promoted to leading digits.
 
 ```
-a = 1.0000001    (stored as 1.00000011920929 in float32)
-b = 1.0000000    (stored as 1.00000000000000 in float32)
+a = 1.0000001 (stored as 1.00000011920929 in float32)
+b = 1.0000000 (stored as 1.00000000000000 in float32)
 
-True difference:  0.0000001
-Computed:         0.00000011920929
+True difference: 0.0000001
+Computed: 0.00000011920929
 
 Relative error: 19.2%
 ```
@@ -108,29 +108,29 @@ Overflow happens when a result is too large to represent. Underflow happens when
 
 ```
 Float32 boundaries:
-  Maximum:  3.4028235e+38
-  Minimum positive (normal): 1.175e-38
-  Minimum positive (denorm): 1.401e-45
-  Overflow:  anything > 3.4e38 becomes inf
-  Underflow: anything < 1.4e-45 becomes 0.0
+ Maximum: 3.4028235e+38
+ Minimum positive (normal): 1.175e-38
+ Minimum positive (denorm): 1.401e-45
+ Overflow: anything > 3.4e38 becomes inf
+ Underflow: anything < 1.4e-45 becomes 0.0
 ```
 
 The `exp()` function is the primary source of overflow in ML:
 
 ```
-exp(88.7)  = 3.40e+38   (barely fits in float32)
-exp(89.0)  = inf         (overflow)
-exp(-87.3) = 1.18e-38   (barely above underflow)
-exp(-104)  = 0.0         (underflow to zero)
+exp(88.7) = 3.40e+38 (barely fits in float32)
+exp(89.0) = inf (overflow)
+exp(-87.3) = 1.18e-38 (barely above underflow)
+exp(-104) = 0.0 (underflow to zero)
 ```
 
 The `log()` function hits the other direction:
 
 ```
-log(0.0)   = -inf
-log(-1.0)  = nan
-log(1e-45) = -103.3      (fine)
-log(1e-46) = -inf        (input underflowed to 0, then log(0) = -inf)
+log(0.0) = -inf
+log(-1.0) = nan
+log(1e-45) = -103.3 (fine)
+log(1e-46) = -inf (input underflowed to 0, then log(0) = -inf)
 ```
 
 In ML, `exp()` appears in softmax, sigmoid, and probability computations. `log()` appears in cross-entropy, log-likelihoods, and KL divergence. The combination `log(exp(x))` is a minefield without the right tricks.
@@ -151,10 +151,10 @@ Proof:
 
 ```
 log(sum(exp(x_i)))
-= log(sum(exp(x_i - c + c)))                    (add and subtract c)
-= log(sum(exp(x_i - c) * exp(c)))               (exp(a+b) = exp(a)*exp(b))
-= log(exp(c) * sum(exp(x_i - c)))               (factor out exp(c))
-= c + log(sum(exp(x_i - c)))                    (log(a*b) = log(a) + log(b))
+= log(sum(exp(x_i - c + c))) (add and subtract c)
+= log(sum(exp(x_i - c) * exp(c))) (exp(a+b) = exp(a)*exp(b))
+= log(exp(c) * sum(exp(x_i - c))) (factor out exp(c))
+= c + log(sum(exp(x_i - c))) (log(a*b) = log(a) + log(b))
 ```
 
 Set `c = max(x)` and overflow is eliminated.
@@ -180,7 +180,7 @@ Without the trick, logits of [100, 101, 102] cause overflow:
 exp(100) = 2.69e43
 exp(101) = 7.31e43
 exp(102) = 1.99e44
-sum      = 2.99e44
+sum = 2.99e44
 
 These overflow float32 (max ~3.4e38)? No, 2.69e43 < 3.4e38? Actually:
 exp(88.7) is already at the float32 limit.
@@ -192,7 +192,7 @@ With the trick, subtract max(x) = 102:
 ```
 exp(100 - 102) = exp(-2) = 0.135
 exp(101 - 102) = exp(-1) = 0.368
-exp(102 - 102) = exp(0)  = 1.000
+exp(102 - 102) = exp(0) = 1.000
 sum = 1.503
 
 softmax = [0.090, 0.245, 0.665]
@@ -222,9 +222,9 @@ Detection:
 ```python
 import math
 
-math.isnan(x)       # True if x is nan
-math.isinf(x)       # True if x is +inf or -inf
-math.isfinite(x)    # True if x is neither nan nor inf
+math.isnan(x) # True if x is nan
+math.isinf(x) # True if x is +inf or -inf
+math.isfinite(x) # True if x is neither nan nor inf
 ```
 
 Prevention strategies:
@@ -294,8 +294,8 @@ Dynamic loss scaling adjusts the scale factor automatically. Start with a large 
 ### bfloat16 vs float16: Why bfloat16 Wins for Training
 
 ```
-float16:   [1 sign] [5 exponent]  [10 mantissa]
-bfloat16:  [1 sign] [8 exponent]  [7 mantissa]
+float16: [1 sign] [5 exponent] [10 mantissa]
+bfloat16: [1 sign] [8 exponent] [7 mantissa]
 ```
 
 float16 has more precision (10 mantissa bits vs 7) but limited range (max ~65,504). bfloat16 has less precision but the same range as float32 (max ~3.4e38).
@@ -326,7 +326,7 @@ Simple but can change the direction of the gradient vector.
 
 ```
 if ||grad|| > max_norm:
-    grad = grad * (max_norm / ||grad||)
+ grad = grad * (max_norm / ||grad||)
 ```
 
 Preserves the direction of the gradient. This is what `torch.nn.utils.clip_grad_norm_()` does. It is the standard choice.
@@ -405,18 +405,18 @@ print(f"Difference: {(0.1 + 0.2) - 0.3:.2e}")
 import math
 
 def softmax_naive(logits):
-    exps = [math.exp(z) for z in logits]
-    total = sum(exps)
-    return [e / total for e in exps]
+ exps = [math.exp(z) for z in logits]
+ total = sum(exps)
+ return [e / total for e in exps]
 
 def softmax_stable(logits):
-    max_logit = max(logits)
-    exps = [math.exp(z - max_logit) for z in logits]
-    total = sum(exps)
-    return [e / total for e in exps]
+ max_logit = max(logits)
+ exps = [math.exp(z - max_logit) for z in logits]
+ total = sum(exps)
+ return [e / total for e in exps]
 
 safe_logits = [2.0, 1.0, 0.1]
-print(f"Naive:  {softmax_naive(safe_logits)}")
+print(f"Naive: {softmax_naive(safe_logits)}")
 print(f"Stable: {softmax_stable(safe_logits)}")
 
 dangerous_logits = [100.0, 101.0, 102.0]
@@ -428,14 +428,14 @@ print(f"Stable: {softmax_stable(dangerous_logits)}")
 
 ```python
 def logsumexp_naive(values):
-    return math.log(sum(math.exp(v) for v in values))
+ return math.log(sum(math.exp(v) for v in values))
 
 def logsumexp_stable(values):
-    c = max(values)
-    return c + math.log(sum(math.exp(v - c) for v in values))
+ c = max(values)
+ return c + math.log(sum(math.exp(v - c) for v in values))
 
 safe = [1.0, 2.0, 3.0]
-print(f"Naive:  {logsumexp_naive(safe):.6f}")
+print(f"Naive: {logsumexp_naive(safe):.6f}")
 print(f"Stable: {logsumexp_stable(safe):.6f}")
 
 large = [500.0, 501.0, 502.0]
@@ -447,19 +447,19 @@ print(f"Stable: {logsumexp_stable(large):.6f}")
 
 ```python
 def cross_entropy_naive(true_class, logits):
-    probs = softmax_naive(logits)
-    return -math.log(probs[true_class])
+ probs = softmax_naive(logits)
+ return -math.log(probs[true_class])
 
 def cross_entropy_stable(true_class, logits):
-    max_logit = max(logits)
-    shifted = [z - max_logit for z in logits]
-    log_sum_exp = math.log(sum(math.exp(s) for s in shifted))
-    log_prob = shifted[true_class] - log_sum_exp
-    return -log_prob
+ max_logit = max(logits)
+ shifted = [z - max_logit for z in logits]
+ log_sum_exp = math.log(sum(math.exp(s) for s in shifted))
+ log_prob = shifted[true_class] - log_sum_exp
+ return -log_prob
 
 logits = [2.0, 5.0, 1.0]
 true_class = 1
-print(f"Naive:  {cross_entropy_naive(true_class, logits):.6f}")
+print(f"Naive: {cross_entropy_naive(true_class, logits):.6f}")
 print(f"Stable: {cross_entropy_stable(true_class, logits):.6f}")
 ```
 
@@ -467,30 +467,30 @@ print(f"Stable: {cross_entropy_stable(true_class, logits):.6f}")
 
 ```python
 def numerical_gradient(f, x, h=1e-5):
-    grad = []
-    for i in range(len(x)):
-        x_plus = x[:]
-        x_minus = x[:]
-        x_plus[i] += h
-        x_minus[i] -= h
-        grad.append((f(x_plus) - f(x_minus)) / (2 * h))
-    return grad
+ grad = []
+ for i in range(len(x)):
+ x_plus = x[:]
+ x_minus = x[:]
+ x_plus[i] += h
+ x_minus[i] -= h
+ grad.append((f(x_plus) - f(x_minus)) / (2 * h))
+ return grad
 
 def check_gradient(analytical, numerical, tolerance=1e-5):
-    for i, (a, n) in enumerate(zip(analytical, numerical)):
-        denom = max(abs(a), abs(n), 1e-8)
-        rel_error = abs(a - n) / denom
-        status = "OK" if rel_error < tolerance else "FAIL"
-        print(f"  param {i}: analytical={a:.8f} numerical={n:.8f} "
-              f"rel_error={rel_error:.2e} [{status}]")
+ for i, (a, n) in enumerate(zip(analytical, numerical)):
+ denom = max(abs(a), abs(n), 1e-8)
+ rel_error = abs(a - n) / denom
+ status = "OK" if rel_error < tolerance else "FAIL"
+ print(f" param {i}: analytical={a:.8f} numerical={n:.8f} "
+ f"rel_error={rel_error:.2e} [{status}]")
 
 def f(params):
-    x, y = params
-    return x**2 + 3*x*y + y**3
+ x, y = params
+ return x**2 + 3*x*y + y**3
 
 def f_grad(params):
-    x, y = params
-    return [2*x + 3*y, 3*x + 3*y**2]
+ x, y = params
+ return [2*x + 3*y, 3*x + 3*y**2]
 
 point = [2.0, 1.0]
 analytical = f_grad(point)
@@ -506,33 +506,33 @@ check_gradient(analytical, numerical)
 import struct
 
 def float32_to_float16_round(x):
-    packed = struct.pack('f', x)
-    f32 = struct.unpack('f', packed)[0]
-    packed16 = struct.pack('e', f32)
-    return struct.unpack('e', packed16)[0]
+ packed = struct.pack('f', x)
+ f32 = struct.unpack('f', packed)[0]
+ packed16 = struct.pack('e', f32)
+ return struct.unpack('e', packed16)[0]
 
 def simulate_bfloat16(x):
-    packed = struct.pack('f', x)
-    as_int = int.from_bytes(packed, 'little')
-    truncated = as_int & 0xFFFF0000
-    repacked = truncated.to_bytes(4, 'little')
-    return struct.unpack('f', repacked)[0]
+ packed = struct.pack('f', x)
+ as_int = int.from_bytes(packed, 'little')
+ truncated = as_int & 0xFFFF0000
+ repacked = truncated.to_bytes(4, 'little')
+ return struct.unpack('f', repacked)[0]
 ```
 
 ### Gradient clipping
 
 ```python
 def clip_by_norm(gradients, max_norm):
-    total_norm = math.sqrt(sum(g**2 for g in gradients))
-    if total_norm > max_norm:
-        scale = max_norm / total_norm
-        return [g * scale for g in gradients]
-    return gradients
+ total_norm = math.sqrt(sum(g**2 for g in gradients))
+ if total_norm > max_norm:
+ scale = max_norm / total_norm
+ return [g * scale for g in gradients]
+ return gradients
 
 grads = [10.0, 20.0, 30.0]
 clipped = clip_by_norm(grads, max_norm=5.0)
 print(f"Original norm: {math.sqrt(sum(g**2 for g in grads)):.2f}")
-print(f"Clipped norm:  {math.sqrt(sum(g**2 for g in clipped)):.2f}")
+print(f"Clipped norm: {math.sqrt(sum(g**2 for g in clipped)):.2f}")
 print(f"Direction preserved: {[c/clipped[0] for c in clipped]} == {[g/grads[0] for g in grads]}")
 ```
 
@@ -540,15 +540,15 @@ print(f"Direction preserved: {[c/clipped[0] for c in clipped]} == {[g/grads[0] f
 
 ```python
 def check_tensor(name, values):
-    has_nan = any(math.isnan(v) for v in values)
-    has_inf = any(math.isinf(v) for v in values)
-    if has_nan or has_inf:
-        print(f"WARNING {name}: nan={has_nan} inf={has_inf}")
-        return False
-    return True
+ has_nan = any(math.isnan(v) for v in values)
+ has_inf = any(math.isinf(v) for v in values)
+ if has_nan or has_inf:
+ print(f"WARNING {name}: nan={has_nan} inf={has_inf}")
+ return False
+ return True
 
 check_tensor("good", [1.0, 2.0, 3.0])
-check_tensor("bad",  [1.0, float('nan'), 3.0])
+check_tensor("bad", [1.0, float('nan'), 3.0])
 check_tensor("ugly", [1.0, float('inf'), 3.0])
 ```
 

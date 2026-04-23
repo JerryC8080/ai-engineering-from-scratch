@@ -31,18 +31,18 @@ The fix: every project gets its own isolated environment with its own packages.
 
 ```mermaid
 graph TD
-    subgraph without["Without virtual environments"]
-        SP[System Python] --> T24["torch 2.4.0 (CUDA 12.4)\nProject A needs this"]
-        SP --> T21["torch 2.1.0 (CUDA 11.8)\nProject B needs this"]
-        SP --> CONFLICT["CONFLICT: only one\ntorch version can exist"]
-    end
+ subgraph without["Without virtual environments"]
+ SP[System Python] --> T24["torch 2.4.0 (CUDA 12.4)\nProject A needs this"]
+ SP --> T21["torch 2.1.0 (CUDA 11.8)\nProject B needs this"]
+ SP --> CONFLICT["CONFLICT: only one\ntorch version can exist"]
+ end
 
-    subgraph with["With virtual environments"]
-        PA["Project A (.venv/)"] --> PA1["torch 2.4.0 (CUDA 12.4)"]
-        PA --> PA2["transformers 4.44"]
-        PB["Project B (.venv/)"] --> PB1["torch 2.1.0 (CUDA 11.8)"]
-        PB --> PB2["diffusers 0.28"]
-    end
+ subgraph with["With virtual environments"]
+ PA["Project A (.venv/)"] --> PA1["torch 2.4.0 (CUDA 12.4)"]
+ PA --> PA2["transformers 4.44"]
+ PB["Project B (.venv/)"] --> PB1["torch 2.1.0 (CUDA 11.8)"]
+ PB --> PB2["diffusers 0.28"]
+ end
 ```
 
 ## Build It
@@ -58,7 +58,7 @@ uv python install 3.12
 
 cd your-project
 uv venv
-source .venv/bin/activate
+source.venv/bin/activate
 ```
 
 Install packages:
@@ -80,9 +80,8 @@ uv add torch numpy matplotlib
 If you can't install `uv`, Python ships with `venv`:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate     # Windows
+python3 -m venv.venv
+source.venv/bin/activate # Linux/macOS.venv\Scripts\activate # Windows
 
 pip install torch numpy
 ```
@@ -118,16 +117,16 @@ Strategy:
 
 ```
 ai-engineering-from-scratch/
-├── .venv/                    <-- shared lightweight env for phases 0-3
+├──.venv/ <-- shared lightweight env for phases 0-3
 ├── phases/
-│   ├── 04-neural-networks/
-│   │   └── .venv/            <-- PyTorch env
-│   ├── 05-cnns/
-│   │   └── .venv/            <-- same PyTorch env (symlink or shared)
-│   ├── 08-transformers/
-│   │   └── .venv/            <-- might need different transformer versions
-│   └── 11-llm-apis/
-│       └── .venv/            <-- API SDKs, no torch needed
+│ ├── 04-neural-networks/
+│ │ └──.venv/ <-- PyTorch env
+│ ├── 05-cnns/
+│ │ └──.venv/ <-- same PyTorch env (symlink or shared)
+│ ├── 08-transformers/
+│ │ └──.venv/ <-- might need different transformer versions
+│ └── 11-llm-apis/
+│ └──.venv/ <-- API SDKs, no torch needed
 ```
 
 The script in `code/env_setup.sh` creates the base environment for this course.
@@ -142,10 +141,10 @@ name = "ai-engineering-from-scratch"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=1.26",
-    "matplotlib>=3.8",
-    "jupyter>=1.0",
-    "scikit-learn>=1.4",
+ "numpy>=1.26",
+ "matplotlib>=3.8",
+ "jupyter>=1.0",
+ "scikit-learn>=1.4",
 ]
 
 [project.optional-dependencies]
@@ -156,8 +155,8 @@ llm = ["anthropic>=0.39", "openai>=1.50"]
 Then install:
 
 ```bash
-uv pip install -e ".[torch]"    # base + PyTorch
-uv pip install -e ".[llm]"     # base + LLM SDKs
+uv pip install -e ".[torch]" # base + PyTorch
+uv pip install -e ".[llm]" # base + LLM SDKs
 uv pip install -e ".[torch,llm]" # everything
 ```
 
@@ -181,17 +180,17 @@ Commit your lockfile to git. When someone clones the repo, they install from the
 ### 1. Installing globally
 
 ```bash
-pip install torch  # BAD: installs to system Python
+pip install torch # BAD: installs to system Python
 
-source .venv/bin/activate
-pip install torch  # GOOD: installs to virtual environment
+source.venv/bin/activate
+pip install torch # GOOD: installs to virtual environment
 ```
 
 Check where your packages go:
 
 ```bash
-which python       # should show .venv/bin/python, not /usr/bin/python
-which pip           # should show .venv/bin/pip
+which python # should show.venv/bin/python, not /usr/bin/python
+which pip # should show.venv/bin/pip
 ```
 
 ### 2. Mixing pip and conda
@@ -200,7 +199,7 @@ which pip           # should show .venv/bin/pip
 conda create -n myenv python=3.12
 conda activate myenv
 conda install pytorch -c pytorch
-pip install some-other-package   # BAD: can break conda's dependency tracking
+pip install some-other-package # BAD: can break conda's dependency tracking
 conda install some-other-package # GOOD: let conda manage everything
 ```
 
@@ -209,9 +208,9 @@ If you must use pip inside conda (some packages are pip-only), install all conda
 ### 3. Forgetting to activate
 
 ```bash
-python train.py           # uses system Python, missing packages
-source .venv/bin/activate
-python train.py           # uses project Python, packages found
+python train.py # uses system Python, missing packages
+source.venv/bin/activate
+python train.py # uses project Python, packages found
 ```
 
 Your shell prompt should show the environment name:
@@ -220,10 +219,10 @@ Your shell prompt should show the environment name:
 (.venv) $ python train.py
 ```
 
-### 4. Committing .venv to git
+### 4. Committing.venv to git
 
 ```bash
-echo ".venv/" >> .gitignore
+echo ".venv/" >>.gitignore
 ```
 
 Virtual environments are 200MB-2GB. They're local, not portable between machines. Commit `pyproject.toml` and the lockfile instead.
@@ -231,8 +230,8 @@ Virtual environments are 200MB-2GB. They're local, not portable between machines
 ### 5. CUDA version mismatch
 
 ```bash
-nvidia-smi                # shows driver CUDA version (e.g., 12.4)
-python -c "import torch; print(torch.version.cuda)"  # shows PyTorch CUDA version
+nvidia-smi # shows driver CUDA version (e.g., 12.4)
+python -c "import torch; print(torch.version.cuda)" # shows PyTorch CUDA version
 
 # These must be compatible.
 # PyTorch CUDA version must be <= driver CUDA version.

@@ -28,20 +28,20 @@ The trio of pieces (ViT, projector, LLM) is the standard. The differences betwee
 
 ```mermaid
 flowchart LR
-    IMG["Image<br/>(H x W x 3)"] --> ViT["Vision encoder<br/>(ViT, CLIP-L,<br/>SigLIP, DINOv3)"]
-    ViT --> FEATS["Image tokens<br/>(N, d_vit)"]
-    FEATS --> PROJ["Projector<br/>(2-4 layer MLP<br/>or Q-former)"]
-    PROJ --> VTOK["Image tokens<br/>in LLM space<br/>(N, d_llm)"]
-    TXT["Text prompt"] --> TOK["LLM tokenizer"]
-    TOK --> TTOK["Text tokens<br/>(M, d_llm)"]
-    VTOK --> CONCAT["Interleave<br/>or concat"]
-    TTOK --> CONCAT
-    CONCAT --> LLM["Decoder LLM<br/>(Qwen3, LLaMA, etc.)"]
-    LLM --> OUT["Text answer"]
+ IMG["Image<br/>(H x W x 3)"] --> ViT["Vision encoder<br/>(ViT, CLIP-L,<br/>SigLIP, DINOv3)"]
+ ViT --> FEATS["Image tokens<br/>(N, d_vit)"]
+ FEATS --> PROJ["Projector<br/>(2-4 layer MLP<br/>or Q-former)"]
+ PROJ --> VTOK["Image tokens<br/>in LLM space<br/>(N, d_llm)"]
+ TXT["Text prompt"] --> TOK["LLM tokenizer"]
+ TOK --> TTOK["Text tokens<br/>(M, d_llm)"]
+ VTOK --> CONCAT["Interleave<br/>or concat"]
+ TTOK --> CONCAT
+ CONCAT --> LLM["Decoder LLM<br/>(Qwen3, LLaMA, etc.)"]
+ LLM --> OUT["Text answer"]
 
-    style ViT fill:#dbeafe,stroke:#2563eb
-    style PROJ fill:#fef3c7,stroke:#d97706
-    style LLM fill:#dcfce7,stroke:#16a34a
+ style ViT fill:#dbeafe,stroke:#2563eb
+ style PROJ fill:#fef3c7,stroke:#d97706
+ style LLM fill:#dcfce7,stroke:#16a34a
 ```
 
 1. **Vision encoder** — a pretrained ViT (CLIP-L/14, SigLIP, DINOv3, or a fine-tuned variant). Produces patch tokens.
@@ -117,16 +117,16 @@ import torch.nn as nn
 
 
 class Projector(nn.Module):
-    def __init__(self, vit_dim=768, llm_dim=4096, hidden=4096):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(vit_dim, hidden),
-            nn.GELU(),
-            nn.Linear(hidden, llm_dim),
-        )
+ def __init__(self, vit_dim=768, llm_dim=4096, hidden=4096):
+ super().__init__()
+ self.net = nn.Sequential(
+ nn.Linear(vit_dim, hidden),
+ nn.GELU(),
+ nn.Linear(hidden, llm_dim),
+ )
 
-    def forward(self, x):
-        return self.net(x)
+ def forward(self, x):
+ return self.net(x)
 ```
 
 Input is a `(N_patches, d_vit)` token tensor. Output is `(N_patches, d_llm)`. The LLM treats every output row as just another token.
@@ -137,38 +137,38 @@ Skeleton of the forward pass for a minimal VLM. Real code uses `transformers`; t
 
 ```python
 class MinimalVLM(nn.Module):
-    def __init__(self, vit, projector, llm, image_token_id):
-        super().__init__()
-        self.vit = vit
-        self.projector = projector
-        self.llm = llm
-        self.image_token_id = image_token_id  # placeholder token in text prompt
+ def __init__(self, vit, projector, llm, image_token_id):
+ super().__init__()
+ self.vit = vit
+ self.projector = projector
+ self.llm = llm
+ self.image_token_id = image_token_id # placeholder token in text prompt
 
-    def forward(self, image, input_ids, attention_mask):
-        # 1. vision features
-        vision_tokens = self.vit(image)                     # (B, N_patches, d_vit)
-        vision_embeds = self.projector(vision_tokens)       # (B, N_patches, d_llm)
+ def forward(self, image, input_ids, attention_mask):
+ # 1. vision features
+ vision_tokens = self.vit(image) # (B, N_patches, d_vit)
+ vision_embeds = self.projector(vision_tokens) # (B, N_patches, d_llm)
 
-        # 2. text embeddings
-        text_embeds = self.llm.get_input_embeddings()(input_ids)  # (B, M, d_llm)
+ # 2. text embeddings
+ text_embeds = self.llm.get_input_embeddings()(input_ids) # (B, M, d_llm)
 
-        # 3. replace image placeholder tokens with vision embeds
-        merged = self._merge(text_embeds, vision_embeds, input_ids)
+ # 3. replace image placeholder tokens with vision embeds
+ merged = self._merge(text_embeds, vision_embeds, input_ids)
 
-        # 4. run LLM
-        return self.llm(inputs_embeds=merged, attention_mask=attention_mask)
+ # 4. run LLM
+ return self.llm(inputs_embeds=merged, attention_mask=attention_mask)
 
-    def _merge(self, text_embeds, vision_embeds, input_ids):
-        out = text_embeds.clone()
-        expected = vision_embeds.size(1)
-        for b in range(input_ids.size(0)):
-            positions = (input_ids[b] == self.image_token_id).nonzero(as_tuple=True)[0]
-            if len(positions) != expected:
-                raise ValueError(
-                    f"batch item {b} has {len(positions)} image tokens but vision_embeds has {expected} patches."
-                    " Every sample in the batch must be pre-padded to the same number of image placeholder tokens.")
-            out[b, positions] = vision_embeds[b]
-        return out
+ def _merge(self, text_embeds, vision_embeds, input_ids):
+ out = text_embeds.clone()
+ expected = vision_embeds.size(1)
+ for b in range(input_ids.size(0)):
+ positions = (input_ids[b] == self.image_token_id).nonzero(as_tuple=True)[0]
+ if len(positions) != expected:
+ raise ValueError(
+ f"batch item {b} has {len(positions)} image tokens but vision_embeds has {expected} patches."
+ " Every sample in the batch must be pre-padded to the same number of image placeholder tokens.")
+ out[b, positions] = vision_embeds[b]
+ return out
 ```
 
 The `<image>` placeholder token in the text gets replaced with real image embeddings — same pattern LLaVA, Qwen-VL, and InternVL use.
@@ -182,16 +182,16 @@ import torch.nn.functional as F
 
 
 def cross_modal_error_rate(image_emb, text_emb, text_confidence, sim_threshold=0.25, conf_threshold=0.8):
-    """
-    image_emb, text_emb: embeddings of image and generated text (normalised internally)
-    text_confidence:     mean per-token probability in [0, 1]
-    Returns:             fraction of high-confidence outputs with low image-text alignment
-    """
-    image_emb = F.normalize(image_emb, dim=-1)
-    text_emb = F.normalize(text_emb, dim=-1)
-    sim = (image_emb * text_emb).sum(dim=-1)        # cosine similarity
-    high_conf_low_sim = (text_confidence > conf_threshold) & (sim < sim_threshold)
-    return high_conf_low_sim.float().mean().item()
+ """
+ image_emb, text_emb: embeddings of image and generated text (normalised internally)
+ text_confidence: mean per-token probability in [0, 1]
+ Returns: fraction of high-confidence outputs with low image-text alignment
+ """
+ image_emb = F.normalize(image_emb, dim=-1)
+ text_emb = F.normalize(text_emb, dim=-1)
+ sim = (image_emb * text_emb).sum(dim=-1) # cosine similarity
+ high_conf_low_sim = (text_confidence > conf_threshold) & (sim < sim_threshold)
+ return high_conf_low_sim.float().mean().item()
 ```
 
 Treat CMER as a production KPI. Monitor it per endpoint, per prompt type, per customer. Rising CMER indicates the model is starting to hallucinate on some input distribution.
@@ -202,15 +202,15 @@ Demonstrate the projector trains. Fake "ViT features" go in; a tiny LLM-style to
 
 ```python
 class ToyVLM(nn.Module):
-    def __init__(self, vit_dim=32, llm_dim=64, num_classes=5):
-        super().__init__()
-        self.projector = Projector(vit_dim, llm_dim, hidden=64)
-        self.head = nn.Linear(llm_dim, num_classes)
+ def __init__(self, vit_dim=32, llm_dim=64, num_classes=5):
+ super().__init__()
+ self.projector = Projector(vit_dim, llm_dim, hidden=64)
+ self.head = nn.Linear(llm_dim, num_classes)
 
-    def forward(self, vision_tokens):
-        projected = self.projector(vision_tokens)
-        pooled = projected.mean(dim=1)
-        return self.head(pooled)
+ def forward(self, vision_tokens):
+ projected = self.projector(vision_tokens)
+ pooled = projected.mean(dim=1)
+ return self.head(pooled)
 ```
 
 One can fit this on synthetic (feature, class) pairs in under 200 steps — enough to show the projector pattern works.
@@ -233,11 +233,11 @@ processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForVision2Seq.from_pretrained(model_id, torch_dtype=torch.bfloat16, device_map="auto")
 
 messages = [{
-    "role": "user",
-    "content": [
-        {"type": "image", "image": Image.open("plot.png")},
-        {"type": "text", "text": "What does this chart show?"},
-    ],
+ "role": "user",
+ "content": [
+ {"type": "image", "image": Image.open("plot.png")},
+ {"type": "text", "text": "What does this chart show?"},
+ ],
 }]
 inputs = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to("cuda")
 generated = model.generate(**inputs, max_new_tokens=256)

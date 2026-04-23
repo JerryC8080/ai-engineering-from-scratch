@@ -32,25 +32,25 @@ Every Phase 10 lesson is a stage. Here is the full dependency graph.
 
 ```mermaid
 graph TD
-    S1["01 Tokenizer vocab"] --> S2["02 Trained tokenizer"]
-    S2 --> S3["03 Sharded dataset"]
-    S3 --> S4["04 Base model checkpoint"]
-    S4 --> S5["05 Scaled training recipe"]
-    S5 --> S6["06 SFT checkpoint"]
-    S6 --> S7["07 Reward model + PPO policy"]
-    S6 --> S8["08 DPO policy"]
-    S7 --> S9["09 CAI / GRPO refined policy"]
-    S8 --> S9
-    S9 --> S10["10 Eval report"]
-    S9 --> S11["11 Quantized weights"]
-    S11 --> S12["12 Inference server"]
-    S10 --> GATE["Ship gate"]
-    S12 --> GATE
+ S1["01 Tokenizer vocab"] --> S2["02 Trained tokenizer"]
+ S2 --> S3["03 Sharded dataset"]
+ S3 --> S4["04 Base model checkpoint"]
+ S4 --> S5["05 Scaled training recipe"]
+ S5 --> S6["06 SFT checkpoint"]
+ S6 --> S7["07 Reward model + PPO policy"]
+ S6 --> S8["08 DPO policy"]
+ S7 --> S9["09 CAI / GRPO refined policy"]
+ S8 --> S9
+ S9 --> S10["10 Eval report"]
+ S9 --> S11["11 Quantized weights"]
+ S11 --> S12["12 Inference server"]
+ S10 --> GATE["Ship gate"]
+ S12 --> GATE
 
-    style S1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style S4 fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style S9 fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style GATE fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style S1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style S4 fill:#1a1a2e,stroke:#0f3460,color:#fff
+ style S9 fill:#1a1a2e,stroke:#0f3460,color:#fff
+ style GATE fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 Stages 07 and 08 can run in parallel. Everything else is a hard dependency. A change in stage 02 (tokenizer) invalidates every downstream artifact. A change in stage 10 (eval) invalidates only the ship decision.
@@ -64,12 +64,12 @@ pipeline_version: 1.2.3
 seed: 42
 git_commit: a1b2c3d4
 stages:
-  01_tokenizer:
-    recipe: bpe_32k
-    input_hash: sha256:...
-    output_hash: sha256:...
-    wall_clock_sec: 3600
-    cost_usd: 12
+ 01_tokenizer:
+ recipe: bpe_32k
+ input_hash: sha256:...
+ output_hash: sha256:...
+ wall_clock_sec: 3600
+ cost_usd: 12
 ```
 
 The output hash of stage N is the input hash of stage N+1. Any deviation and the pipeline halts. This is how you catch data corruption early. It is also how a teammate on a different continent verifies that their replay produced the same artifact as yours.
@@ -100,12 +100,12 @@ Shipping is not "training finished." Shipping is "training finished and the eval
 
 ```
 gates:
-  mmlu:      >= baseline + 0.5   # no regression
-  humaneval: >= baseline + 1.0
-  truthfulqa: >= baseline         # no drop
-  safety_refusal_rate: <= 0.05
-  kl_from_reference: <= 25.0
-  cost_total_usd: <= 50000
+ mmlu: >= baseline + 0.5 # no regression
+ humaneval: >= baseline + 1.0
+ truthfulqa: >= baseline # no drop
+ safety_refusal_rate: <= 0.05
+ kl_from_reference: <= 25.0
+ cost_total_usd: <= 50000
 ```
 
 Every gate is a numeric threshold. No "looks good" gates. No subjective sign-offs. If every gate passes, the artifact is marked shippable. If any gate fails, the run is held pending explicit override by a named reviewer, which itself is logged in the manifest.
@@ -154,19 +154,19 @@ Modern LLM training is reproducible but not deterministic. Distributed training'
 
 ```mermaid
 graph LR
-    M["Manifest v1.2.3"] --> O["Orchestrator"]
-    O --> S["Stages 01 → 12"]
-    S --> AS["Artifact Store\n(content-addressed)"]
-    S --> ET["Experiment Tracker\n(metrics, curves)"]
-    AS --> GATE["Eval Gate"]
-    ET --> GATE
-    GATE -->|pass| SHIP["Ship"]
-    GATE -->|fail| ROLL["Rollback plan"]
+ M["Manifest v1.2.3"] --> O["Orchestrator"]
+ O --> S["Stages 01 → 12"]
+ S --> AS["Artifact Store\n(content-addressed)"]
+ S --> ET["Experiment Tracker\n(metrics, curves)"]
+ AS --> GATE["Eval Gate"]
+ ET --> GATE
+ GATE -->|pass| SHIP["Ship"]
+ GATE -->|fail| ROLL["Rollback plan"]
 
-    style M fill:#1a1a2e,stroke:#0f3460,color:#fff
-    style GATE fill:#1a1a2e,stroke:#e94560,color:#fff
-    style SHIP fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style ROLL fill:#1a1a2e,stroke:#c0392b,color:#fff
+ style M fill:#1a1a2e,stroke:#0f3460,color:#fff
+ style GATE fill:#1a1a2e,stroke:#e94560,color:#fff
+ style SHIP fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style ROLL fill:#1a1a2e,stroke:#c0392b,color:#fff
 ```
 
 ### Rollback Plan
@@ -213,9 +213,9 @@ The pipeline in `main.py` runs twelve placeholder stages, produces a manifest, a
 The canonical workflow has three commands.
 
 ```
-python code/main.py plan    # validate manifest, compute cost estimate, print DAG
-python code/main.py run     # execute stages, writing to manifest.out.yaml
-python code/main.py gate    # read manifest.out.yaml, apply eval gates, ship-or-hold
+python code/main.py plan # validate manifest, compute cost estimate, print DAG
+python code/main.py run # execute stages, writing to manifest.out.yaml
+python code/main.py gate # read manifest.out.yaml, apply eval gates, ship-or-hold
 ```
 
 Run `plan` first every time. Most pipeline bugs show up at plan time -- missing gate thresholds, stale hashes, budget overruns. Running `plan` is free. Running `run` is expensive. Save money by catching bugs on the cheap side.

@@ -26,11 +26,11 @@ An AI engineering editor setup needs five things:
 
 ```mermaid
 graph TD
-    L5["5. Remote Development<br/>SSH into GPU boxes, cloud VMs"] --> L4
-    L4["4. Terminal Integration<br/>Run scripts, debug, monitor GPU"] --> L3
-    L3["3. AI-Specific Settings<br/>Auto-format, type checking, rulers"] --> L2
-    L2["2. Extensions<br/>Python, Jupyter, Pylance, GitLens"] --> L1
-    L1["1. Base Editor<br/>VS Code — free, extensible, universal"]
+ L5["5. Remote Development<br/>SSH into GPU boxes, cloud VMs"] --> L4
+ L4["4. Terminal Integration<br/>Run scripts, debug, monitor GPU"] --> L3
+ L3["3. AI-Specific Settings<br/>Auto-format, type checking, rulers"] --> L2
+ L2["2. Extensions<br/>Python, Jupyter, Pylance, GitLens"] --> L1
+ L1["1. Base Editor<br/>VS Code — free, extensible, universal"]
 ```
 
 ## Build It
@@ -87,11 +87,11 @@ The key settings for AI work:
 
 ```jsonc
 {
-    "python.analysis.typeCheckingMode": "basic",
-    "editor.formatOnSave": true,
-    "editor.rulers": [88, 120],
-    "notebook.output.scrolling": true,
-    "files.autoSave": "afterDelay"
+ "python.analysis.typeCheckingMode": "basic",
+ "editor.formatOnSave": true,
+ "editor.rulers": [88, 120],
+ "notebook.output.scrolling": true,
+ "files.autoSave": "afterDelay"
 }
 ```
 
@@ -111,10 +111,10 @@ Set it up properly:
 
 ```jsonc
 {
-    "terminal.integrated.defaultProfile.osx": "zsh",
-    "terminal.integrated.defaultProfile.linux": "bash",
-    "terminal.integrated.fontSize": 13,
-    "terminal.integrated.scrollback": 10000
+ "terminal.integrated.defaultProfile.osx": "zsh",
+ "terminal.integrated.defaultProfile.linux": "bash",
+ "terminal.integrated.fontSize": 13,
+ "terminal.integrated.scrollback": 10000
 }
 ```
 
@@ -150,10 +150,10 @@ Add the host to `~/.ssh/config` for convenience:
 
 ```
 Host gpu-box
-    HostName 203.0.113.50
-    User ubuntu
-    IdentityFile ~/.ssh/id_ed25519
-    ForwardAgent yes
+ HostName 203.0.113.50
+ User ubuntu
+ IdentityFile ~/.ssh/id_ed25519
+ ForwardAgent yes
 ```
 
 Now `Remote-SSH: Connect to Host > gpu-box` connects instantly.

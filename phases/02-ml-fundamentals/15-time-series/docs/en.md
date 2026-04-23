@@ -39,25 +39,25 @@ These violations are not minor. They change how you build features, how you eval
 
 ```mermaid
 flowchart LR
-    subgraph IID["Standard ML (i.i.d.)"]
-        direction TB
-        S1[Sample 1] ~~~ S2[Sample 2]
-        S2 ~~~ S3[Sample 3]
-    end
-    subgraph TS["Time Series (not i.i.d.)"]
-        direction LR
-        T1[t=1] --> T2[t=2]
-        T2 --> T3[t=3]
-        T3 --> T4[t=4]
-    end
+ subgraph IID["Standard ML (i.i.d.)"]
+ direction TB
+ S1[Sample 1] ~~~ S2[Sample 2]
+ S2 ~~~ S3[Sample 3]
+ end
+ subgraph TS["Time Series (not i.i.d.)"]
+ direction LR
+ T1[t=1] --> T2[t=2]
+ T2 --> T3[t=3]
+ T3 --> T4[t=4]
+ end
 
-    style S1 fill:#dfd
-    style S2 fill:#dfd
-    style S3 fill:#dfd
-    style T1 fill:#ffd
-    style T2 fill:#ffd
-    style T3 fill:#ffd
-    style T4 fill:#ffd
+ style S1 fill:#dfd
+ style S2 fill:#dfd
+ style S3 fill:#dfd
+ style T1 fill:#ffd
+ style T2 fill:#ffd
+ style T3 fill:#ffd
+ style T4 fill:#ffd
 ```
 
 In standard ML, samples are interchangeable. Shuffling them changes nothing. In time series, order is everything. Shuffling destroys the signal.
@@ -68,13 +68,13 @@ Every time series is a combination of:
 
 ```mermaid
 flowchart TD
-    A[Observed Time Series] --> B[Trend]
-    A --> C[Seasonality]
-    A --> D[Residual/Noise]
+ A[Observed Time Series] --> B[Trend]
+ A --> C[Seasonality]
+ A --> D[Residual/Noise]
 
-    B --> E[Long-term direction: up, down, flat]
-    C --> F[Repeating patterns: daily, weekly, yearly]
-    D --> G[Random variation after removing trend and seasonality]
+ B --> E[Long-term direction: up, down, flat]
+ C --> F[Repeating patterns: daily, weekly, yearly]
+ D --> G[Random variation after removing trend and seasonality]
 ```
 
 - **Trend**: The long-term direction. Revenue growing 10% per year. Global temperature rising.
@@ -100,8 +100,8 @@ If one round of differencing does not make the series stationary, apply it again
 **Example:**
 
 Original series: [100, 102, 106, 112, 120]
-First difference:  [2, 4, 6, 8] (still trending upward)
-Second difference:  [2, 2, 2] (constant -- stationary)
+First difference: [2, 4, 6, 8] (still trending upward)
+Second difference: [2, 2, 2] (constant -- stationary)
 
 The original series had a quadratic trend. First differencing turned it into a linear trend. Second differencing made it flat. In practice, you rarely need more than two rounds.
 
@@ -126,9 +126,9 @@ Take the series [10, 12, 14, 13, 15] and create lag-1 and lag-2 features:
 
 | lag_2 | lag_1 | target |
 |-------|-------|--------|
-| 10    | 12    | 14     |
-| 12    | 14    | 13     |
-| 14    | 13    | 15     |
+| 10 | 12 | 14 |
+| 12 | 14 | 13 |
+| 14 | 13 | 15 |
 
 Now you have a standard regression problem. Any ML model (linear regression, random forest, gradient boosting) can predict the target from the lags.
 
@@ -150,31 +150,31 @@ This is the most important concept in this lesson. Standard k-fold cross-validat
 
 ```mermaid
 flowchart TD
-    subgraph WRONG["Random Split (WRONG)"]
-        direction LR
-        W1[Jan] --> W2[Mar]
-        W2 --> W3[Feb]
-        W3 --> W4[May]
-        W4 --> W5[Apr]
-        style W1 fill:#fdd
-        style W3 fill:#fdd
-        style W5 fill:#fdd
-        style W2 fill:#dfd
-        style W4 fill:#dfd
-    end
+ subgraph WRONG["Random Split (WRONG)"]
+ direction LR
+ W1[Jan] --> W2[Mar]
+ W2 --> W3[Feb]
+ W3 --> W4[May]
+ W4 --> W5[Apr]
+ style W1 fill:#fdd
+ style W3 fill:#fdd
+ style W5 fill:#fdd
+ style W2 fill:#dfd
+ style W4 fill:#dfd
+ end
 
-    subgraph RIGHT["Walk-Forward (CORRECT)"]
-        direction LR
-        R1["Train: Jan-Mar"] --> R2["Test: Apr"]
-        R3["Train: Jan-Apr"] --> R4["Test: May"]
-        R5["Train: Jan-May"] --> R6["Test: Jun"]
-        style R1 fill:#dfd
-        style R2 fill:#fdd
-        style R3 fill:#dfd
-        style R4 fill:#fdd
-        style R5 fill:#dfd
-        style R6 fill:#fdd
-    end
+ subgraph RIGHT["Walk-Forward (CORRECT)"]
+ direction LR
+ R1["Train: Jan-Mar"] --> R2["Test: Apr"]
+ R3["Train: Jan-Apr"] --> R4["Test: May"]
+ R5["Train: Jan-May"] --> R6["Test: Jun"]
+ style R1 fill:#dfd
+ style R2 fill:#fdd
+ style R3 fill:#dfd
+ style R4 fill:#fdd
+ style R5 fill:#dfd
+ style R6 fill:#fdd
+ end
 ```
 
 Walk-forward validation:
@@ -242,12 +242,12 @@ The code in `code/time_series.py` implements the core building blocks from scrat
 
 ```python
 def make_lag_features(series, n_lags):
-    n = len(series)
-    X = np.full((n, n_lags), np.nan)
-    for lag in range(1, n_lags + 1):
-        X[lag:, lag - 1] = series[:-lag]
-    valid = ~np.isnan(X).any(axis=1)
-    return X[valid], series[valid]
+ n = len(series)
+ X = np.full((n, n_lags), np.nan)
+ for lag in range(1, n_lags + 1):
+ X[lag:, lag - 1] = series[:-lag]
+ valid = ~np.isnan(X).any(axis=1)
+ return X[valid], series[valid]
 ```
 
 This converts a 1D series into a feature matrix where each row has the last `n_lags` values as features, and the current value as the target.
@@ -256,14 +256,14 @@ This converts a 1D series into a feature matrix where each row has the last `n_l
 
 ```python
 def walk_forward_split(n_samples, n_splits=5, min_train=50):
-    assert min_train < n_samples, "min_train must be less than n_samples"
-    step = max(1, (n_samples - min_train) // n_splits)
-    for i in range(n_splits):
-        train_end = min_train + i * step
-        test_end = min(train_end + step, n_samples)
-        if train_end >= n_samples:
-            break
-        yield slice(0, train_end), slice(train_end, test_end)
+ assert min_train < n_samples, "min_train must be less than n_samples"
+ step = max(1, (n_samples - min_train) // n_splits)
+ for i in range(n_splits):
+ train_end = min_train + i * step
+ test_end = min(train_end + step, n_samples)
+ if train_end >= n_samples:
+ break
+ yield slice(0, train_end), slice(train_end, test_end)
 ```
 
 Each split ensures training data comes strictly before test data. The training window expands with each fold.
@@ -274,19 +274,19 @@ A pure AR model is just linear regression on lag features:
 
 ```python
 class SimpleAR:
-    def __init__(self, n_lags=5):
-        self.n_lags = n_lags
-        self.weights = None
-        self.bias = None
+ def __init__(self, n_lags=5):
+ self.n_lags = n_lags
+ self.weights = None
+ self.bias = None
 
-    def fit(self, series):
-        X, y = make_lag_features(series, self.n_lags)
-        # Solve via normal equations
-        X_b = np.column_stack([np.ones(len(X)), X])
-        theta = np.linalg.lstsq(X_b, y, rcond=None)[0]
-        self.bias = theta[0]
-        self.weights = theta[1:]
-        return self
+ def fit(self, series):
+ X, y = make_lag_features(series, self.n_lags)
+ # Solve via normal equations
+ X_b = np.column_stack([np.ones(len(X)), X])
+ theta = np.linalg.lstsq(X_b, y, rcond=None)[0]
+ self.bias = theta[0]
+ self.weights = theta[1:]
+ return self
 ```
 
 This is conceptually identical to linear regression from Lesson 02, but applied to time-lagged versions of the same variable.
@@ -297,15 +297,15 @@ The code computes rolling statistics to visually and numerically assess stationa
 
 ```python
 def check_stationarity(series, window=50):
-    rolling_mean = np.array([
-        series[max(0, i - window):i].mean()
-        for i in range(1, len(series) + 1)
-    ])
-    rolling_std = np.array([
-        series[max(0, i - window):i].std()
-        for i in range(1, len(series) + 1)
-    ])
-    return rolling_mean, rolling_std
+ rolling_mean = np.array([
+ series[max(0, i - window):i].mean()
+ for i in range(1, len(series) + 1)
+ ])
+ rolling_std = np.array([
+ series[max(0, i - window):i].std()
+ for i in range(1, len(series) + 1)
+ ])
+ return rolling_mean, rolling_std
 ```
 
 If the rolling mean drifts or the rolling std changes, the series is non-stationary. Apply differencing and check again.
@@ -316,14 +316,14 @@ The code also checks stationarity by comparing the first half and second half of
 
 ```python
 def autocorrelation(series, max_lag=20):
-    n = len(series)
-    mean = series.mean()
-    var = series.var()
-    acf = np.zeros(max_lag + 1)
-    for k in range(max_lag + 1):
-        cov = np.mean((series[:n-k] - mean) * (series[k:] - mean))
-        acf[k] = cov / var if var > 0 else 0
-    return acf
+ n = len(series)
+ mean = series.mean()
+ var = series.var()
+ acf = np.zeros(max_lag + 1)
+ for k in range(max_lag + 1):
+ cov = np.mean((series[:n-k] - mean) * (series[k:] - mean))
+ acf[k] = cov / var if var > 0 else 0
+ return acf
 ```
 
 ## Use It
@@ -337,9 +337,9 @@ from sklearn.ensemble import GradientBoostingRegressor
 X, y = make_lag_features(series, n_lags=10)
 
 for train_idx, test_idx in walk_forward_split(len(X)):
-    model = Ridge(alpha=1.0)
-    model.fit(X[train_idx], y[train_idx])
-    predictions = model.predict(X[test_idx])
+ model = Ridge(alpha=1.0)
+ model.fit(X[train_idx], y[train_idx])
+ predictions = model.predict(X[test_idx])
 ```
 
 For ARIMA, use statsmodels:
@@ -363,10 +363,10 @@ from sklearn.model_selection import TimeSeriesSplit
 
 tscv = TimeSeriesSplit(n_splits=5)
 for train_index, test_index in tscv.split(X):
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    model.fit(X_train, y_train)
-    score = model.score(X_test, y_test)
+ X_train, X_test = X[train_index], X[test_index]
+ y_train, y_test = y[train_index], y[test_index]
+ model.fit(X_train, y_train)
+ score = model.score(X_test, y_test)
 ```
 
 This is equivalent to our from-scratch `walk_forward_split` but integrated into sklearn's cross-validation framework. You can use it with `cross_val_score`:
@@ -443,7 +443,7 @@ If your fancy ML model loses to the seasonal naive baseline, you have a bug. Mos
 | Differencing | "Subtract consecutive values" | Computing y[t] - y[t-1] to remove trends and achieve stationarity |
 | Autocorrelation (ACF) | "How a series correlates with itself" | The correlation between a time series and a lagged copy of itself, as a function of the lag |
 | Partial autocorrelation (PACF) | "Direct correlation only" | Autocorrelation at lag k after removing the effect of all shorter lags |
-| Lag features | "Past values as inputs" | Using y[t-1], y[t-2], ..., y[t-k] as features to predict y[t] |
+| Lag features | "Past values as inputs" | Using y[t-1], y[t-2],..., y[t-k] as features to predict y[t] |
 | Walk-forward validation | "Time-respecting cross-validation" | Evaluation where training data always precedes test data chronologically |
 | ARIMA | "The classic time series model" | AutoRegressive Integrated Moving Average: combines past values (AR), differencing (I), and past errors (MA) |
 | Seasonality | "Repeating calendar patterns" | Regular, predictable cycles in a time series tied to calendar periods (daily, weekly, yearly) |

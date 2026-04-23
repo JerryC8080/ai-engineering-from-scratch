@@ -40,14 +40,14 @@ Every modern LLM uses subword tokenization. GPT-2, GPT-4, BERT, Llama 3, Claude 
 
 ```mermaid
 graph TD
-    A["Text: 'unhappiness'"] --> B{"Tokenization Strategy"}
-    B -->|Word-level| C["['unhappiness']\n1 token if in vocab\n[UNK] if not"]
-    B -->|Character-level| D["['u','n','h','a','p','p','i','n','e','s','s']\n11 tokens"]
-    B -->|Subword BPE| E["['un','happi','ness']\n3 tokens"]
+ A["Text: 'unhappiness'"] --> B{"Tokenization Strategy"}
+ B -->|Word-level| C["['unhappiness']\n1 token if in vocab\n[UNK] if not"]
+ B -->|Character-level| D["['u','n','h','a','p','p','i','n','e','s','s']\n11 tokens"]
+ B -->|Subword BPE| E["['un','happi','ness']\n3 tokens"]
 
-    style C fill:#ff6b6b,color:#fff
-    style D fill:#ffa500,color:#fff
-    style E fill:#51cf66,color:#fff
+ style C fill:#ff6b6b,color:#fff
+ style D fill:#ffa500,color:#fff
+ style E fill:#51cf66,color:#fff
 ```
 
 ### BPE: Byte Pair Encoding
@@ -60,61 +60,59 @@ Here is BPE running on a tiny corpus with the words "lower", "lowest", and "newe
 
 ```
 Corpus (with word frequencies):
-  "lower"  x5
-  "lowest" x2
-  "newest" x6
+ "lower" x5
+ "lowest" x2
+ "newest" x6
 
 Step 0 -- Start with characters:
-  l o w e r       (x5)
-  l o w e s t     (x2)
-  n e w e s t     (x6)
+ l o w e r (x5)
+ l o w e s t (x2)
+ n e w e s t (x6)
 
 Step 1 -- Count adjacent pairs:
-  (e,s): 8    (s,t): 8    (l,o): 7    (o,w): 7
-  (w,e): 13   (e,r): 5    (n,e): 6    ...
+ (e,s): 8 (s,t): 8 (l,o): 7 (o,w): 7
+ (w,e): 13 (e,r): 5 (n,e): 6...
 
 Step 2 -- Merge most frequent pair (w,e) -> "we":
-  l o we r        (x5)
-  l o we s t      (x2)
-  n e we s t      (x6)
+ l o we r (x5)
+ l o we s t (x2)
+ n e we s t (x6)
 
 Step 3 -- Recount and merge (e,s) -> "es":
-  l o we r        (x5)
-  l o we s t      (x2)    <- 'es' only forms from 'e'+'s', not 'we'+'s'
-  n e we s t      (x6)    <- wait, the 'e' before 'we' and 's' after 'we'
+ l o we r (x5)
+ l o we s t (x2) <- 'es' only forms from 'e'+'s', not 'we'+'s'
+ n e we s t (x6) <- wait, the 'e' before 'we' and 's' after 'we'
 
 Actually tracking this precisely:
-  After "we" merge, remaining pairs:
-  (l,o): 7   (o,we): 7   (we,r): 5   (we,s): 8
-  (s,t): 8   (n,e): 6    (e,we): 6
+ After "we" merge, remaining pairs:
+ (l,o): 7 (o,we): 7 (we,r): 5 (we,s): 8
+ (s,t): 8 (n,e): 6 (e,we): 6
 
 Step 3 -- Merge (we,s) -> "wes" or (s,t) -> "st" (tied at 8, pick first):
-  Merge (we,s) -> "wes":
-  l o we r        (x5)
-  l o wes t       (x2)
-  n e wes t       (x6)
+ Merge (we,s) -> "wes":
+ l o we r (x5)
+ l o wes t (x2)
+ n e wes t (x6)
 
 Step 4 -- Merge (wes,t) -> "west":
-  l o we r        (x5)
-  l o west        (x2)
-  n e west        (x6)
-
-...continue until target vocab size reached.
+ l o we r (x5)
+ l o west (x2)
+ n e west (x6)...continue until target vocab size reached.
 ```
 
 The merge table is the tokenizer. To encode new text, apply merges in the order they were learned. The training corpus determines which merges exist, and that choice permanently shapes what the model sees.
 
 ```mermaid
 graph LR
-    subgraph Training["BPE Training Loop"]
-        direction TB
-        T1["Start: character vocabulary"] --> T2["Count all adjacent pairs"]
-        T2 --> T3["Merge most frequent pair"]
-        T3 --> T4["Add merged token to vocab"]
-        T4 --> T5{"Reached target\nvocab size?"}
-        T5 -->|No| T2
-        T5 -->|Yes| T6["Done: save merge table"]
-    end
+ subgraph Training["BPE Training Loop"]
+ direction TB
+ T1["Start: character vocabulary"] --> T2["Count all adjacent pairs"]
+ T2 --> T3["Merge most frequent pair"]
+ T3 --> T4["Add merged token to vocab"]
+ T4 --> T5{"Reached target\nvocab size?"}
+ T5 -->|No| T2
+ T5 -->|Yes| T6["Done: save merge table"]
+ end
 ```
 
 ### Byte-Level BPE (GPT-2, GPT-3, GPT-4)
@@ -132,7 +130,7 @@ GPT-2 introduced this approach. The base vocabulary covers every possible byte. 
 WordPiece looks similar to BPE but picks merges differently. Instead of raw frequency, it maximizes the likelihood of the training data:
 
 ```
-BPE merge criterion:      count(A, B)
+BPE merge criterion: count(A, B)
 WordPiece merge criterion: count(AB) / (count(A) * count(B))
 ```
 
@@ -142,7 +140,7 @@ WordPiece also uses a "##" prefix for continuation subwords:
 
 ```
 "unhappiness" -> ["un", "##happi", "##ness"]
-"embedding"   -> ["em", "##bed", "##ding"]
+"embedding" -> ["em", "##bed", "##ding"]
 ```
 
 The "##" prefix tells you this piece continues a previous token. BERT uses WordPiece with a vocabulary of 30,522 tokens. Every BERT variant -- DistilBERT, RoBERTa's tokenizer is actually BPE, but BERT itself is WordPiece.
@@ -163,18 +161,18 @@ This is a real engineering decision with measurable consequences.
 
 ```mermaid
 graph LR
-    subgraph Small["Small Vocab (32K)\ne.g., BERT, T5"]
-        S1["More tokens per text"]
-        S2["Longer sequences"]
-        S3["Smaller embedding matrix"]
-        S4["Better rare-word handling"]
-    end
-    subgraph Large["Large Vocab (128K+)\ne.g., Llama 3, GPT-4o"]
-        L1["Fewer tokens per text"]
-        L2["Shorter sequences"]
-        L3["Larger embedding matrix"]
-        L4["Faster inference"]
-    end
+ subgraph Small["Small Vocab (32K)\ne.g., BERT, T5"]
+ S1["More tokens per text"]
+ S2["Longer sequences"]
+ S3["Smaller embedding matrix"]
+ S4["Better rare-word handling"]
+ end
+ subgraph Large["Large Vocab (128K+)\ne.g., Llama 3, GPT-4o"]
+ L1["Fewer tokens per text"]
+ L2["Shorter sequences"]
+ L3["Larger embedding matrix"]
+ L4["Faster inference"]
+ end
 ```
 
 Concrete numbers. For a 128K vocabulary with 4,096-dimensional embeddings, the embedding matrix alone is 128,000 x 4,096 = 524 million parameters. For a 32K vocabulary, it is 131 million parameters. That is a 400M parameter difference from the tokenizer choice alone.
@@ -206,11 +204,11 @@ Start at the foundation. A character-level tokenizer maps each character to its 
 
 ```python
 class CharTokenizer:
-    def encode(self, text):
-        return [ord(c) for c in text]
+ def encode(self, text):
+ return [ord(c) for c in text]
 
-    def decode(self, tokens):
-        return "".join(chr(t) for t in tokens)
+ def decode(self, tokens):
+ return "".join(chr(t) for t in tokens)
 ```
 
 "hello" becomes [104, 101, 108, 108, 111]. Every character is its own token. This is the baseline we improve on.
@@ -223,53 +221,53 @@ The real implementation. We train on raw bytes (like GPT-2), count pairs, merge 
 from collections import Counter
 
 class BPETokenizer:
-    def __init__(self):
-        self.merges = {}
-        self.vocab = {}
+ def __init__(self):
+ self.merges = {}
+ self.vocab = {}
 
-    def _get_pairs(self, tokens):
-        pairs = Counter()
-        for i in range(len(tokens) - 1):
-            pairs[(tokens[i], tokens[i + 1])] += 1
-        return pairs
+ def _get_pairs(self, tokens):
+ pairs = Counter()
+ for i in range(len(tokens) - 1):
+ pairs[(tokens[i], tokens[i + 1])] += 1
+ return pairs
 
-    def _merge_pair(self, tokens, pair, new_token):
-        merged = []
-        i = 0
-        while i < len(tokens):
-            if i < len(tokens) - 1 and tokens[i] == pair[0] and tokens[i + 1] == pair[1]:
-                merged.append(new_token)
-                i += 2
-            else:
-                merged.append(tokens[i])
-                i += 1
-        return merged
+ def _merge_pair(self, tokens, pair, new_token):
+ merged = []
+ i = 0
+ while i < len(tokens):
+ if i < len(tokens) - 1 and tokens[i] == pair[0] and tokens[i + 1] == pair[1]:
+ merged.append(new_token)
+ i += 2
+ else:
+ merged.append(tokens[i])
+ i += 1
+ return merged
 
-    def train(self, text, num_merges):
-        tokens = list(text.encode("utf-8"))
-        self.vocab = {i: bytes([i]) for i in range(256)}
+ def train(self, text, num_merges):
+ tokens = list(text.encode("utf-8"))
+ self.vocab = {i: bytes([i]) for i in range(256)}
 
-        for i in range(num_merges):
-            pairs = self._get_pairs(tokens)
-            if not pairs:
-                break
-            best_pair = max(pairs, key=pairs.get)
-            new_token = 256 + i
-            tokens = self._merge_pair(tokens, best_pair, new_token)
-            self.merges[best_pair] = new_token
-            self.vocab[new_token] = self.vocab[best_pair[0]] + self.vocab[best_pair[1]]
+ for i in range(num_merges):
+ pairs = self._get_pairs(tokens)
+ if not pairs:
+ break
+ best_pair = max(pairs, key=pairs.get)
+ new_token = 256 + i
+ tokens = self._merge_pair(tokens, best_pair, new_token)
+ self.merges[best_pair] = new_token
+ self.vocab[new_token] = self.vocab[best_pair[0]] + self.vocab[best_pair[1]]
 
-        return self
+ return self
 
-    def encode(self, text):
-        tokens = list(text.encode("utf-8"))
-        for pair, new_token in self.merges.items():
-            tokens = self._merge_pair(tokens, pair, new_token)
-        return tokens
+ def encode(self, text):
+ tokens = list(text.encode("utf-8"))
+ for pair, new_token in self.merges.items():
+ tokens = self._merge_pair(tokens, pair, new_token)
+ return tokens
 
-    def decode(self, tokens):
-        byte_sequence = b"".join(self.vocab[t] for t in tokens)
-        return byte_sequence.decode("utf-8", errors="replace")
+ def decode(self, tokens):
+ byte_sequence = b"".join(self.vocab[t] for t in tokens)
+ return byte_sequence.decode("utf-8", errors="replace")
 ```
 
 The training loop is the core of BPE: count pairs, merge the winner, repeat. Each merge reduces the total token count. After `num_merges` rounds, the vocabulary grows from 256 (base bytes) to 256 + num_merges.
@@ -282,31 +280,31 @@ Decoding is the inverse: look up each token ID in the vocabulary, concatenate th
 
 ```python
 corpus = (
-    "The cat sat on the mat. The cat ate the rat. "
-    "The dog sat on the log. The dog ate the frog. "
-    "Natural language processing is the study of how computers "
-    "understand and generate human language. "
-    "Tokenization is the first step in any NLP pipeline."
+ "The cat sat on the mat. The cat ate the rat. "
+ "The dog sat on the log. The dog ate the frog. "
+ "Natural language processing is the study of how computers "
+ "understand and generate human language. "
+ "Tokenization is the first step in any NLP pipeline."
 )
 
 tokenizer = BPETokenizer()
 tokenizer.train(corpus, num_merges=40)
 
 test_sentences = [
-    "The cat sat on the mat.",
-    "Natural language processing",
-    "tokenization pipeline",
-    "unhappiness",
+ "The cat sat on the mat.",
+ "Natural language processing",
+ "tokenization pipeline",
+ "unhappiness",
 ]
 
 for sentence in test_sentences:
-    encoded = tokenizer.encode(sentence)
-    decoded = tokenizer.decode(encoded)
-    raw_bytes = len(sentence.encode("utf-8"))
-    ratio = len(encoded) / raw_bytes
-    print(f"'{sentence}'")
-    print(f"  Tokens: {len(encoded)} (from {raw_bytes} bytes) -- ratio: {ratio:.2f}")
-    print(f"  Roundtrip: {'PASS' if decoded == sentence else 'FAIL'}")
+ encoded = tokenizer.encode(sentence)
+ decoded = tokenizer.decode(encoded)
+ raw_bytes = len(sentence.encode("utf-8"))
+ ratio = len(encoded) / raw_bytes
+ print(f"'{sentence}'")
+ print(f" Tokens: {len(encoded)} (from {raw_bytes} bytes) -- ratio: {ratio:.2f}")
+ print(f" Roundtrip: {'PASS' if decoded == sentence else 'FAIL'}")
 ```
 
 The compression ratio tells you how effective the tokenizer is. A ratio of 0.50 means the tokenizer compressed the text to half as many tokens as raw bytes. Lower is better. On the training corpus, the ratio will be good. On out-of-distribution text like "unhappiness" (which does not appear in the corpus), the ratio will be worse -- the tokenizer falls back to character-level encoding for unseen patterns.
@@ -319,20 +317,20 @@ import tiktoken
 enc = tiktoken.get_encoding("cl100k_base")
 
 texts = [
-    "The cat sat on the mat.",
-    "unhappiness",
-    "Hello, world!",
-    "def fibonacci(n): return n if n < 2 else fibonacci(n-1) + fibonacci(n-2)",
-    "Geschwindigkeitsbegrenzung",
+ "The cat sat on the mat.",
+ "unhappiness",
+ "Hello, world!",
+ "def fibonacci(n): return n if n < 2 else fibonacci(n-1) + fibonacci(n-2)",
+ "Geschwindigkeitsbegrenzung",
 ]
 
 for text in texts:
-    our_tokens = tokenizer.encode(text)
-    tiktoken_tokens = enc.encode(text)
-    tiktoken_pieces = [enc.decode([t]) for t in tiktoken_tokens]
-    print(f"'{text}'")
-    print(f"  Our BPE:   {len(our_tokens)} tokens")
-    print(f"  tiktoken:  {len(tiktoken_tokens)} tokens -> {tiktoken_pieces}")
+ our_tokens = tokenizer.encode(text)
+ tiktoken_tokens = enc.encode(text)
+ tiktoken_pieces = [enc.decode([t]) for t in tiktoken_tokens]
+ print(f"'{text}'")
+ print(f" Our BPE: {len(our_tokens)} tokens")
+ print(f" tiktoken: {len(tiktoken_tokens)} tokens -> {tiktoken_pieces}")
 ```
 
 tiktoken uses the exact same algorithm but trained on hundreds of gigabytes of text with 100,000 merges. The algorithm is identical. The difference is the training data and the number of merges. Your tokenizer trained on a paragraph with 40 merges cannot compete with tiktoken's 100K merges on a massive corpus. But the mechanism is the same.
@@ -341,30 +339,30 @@ tiktoken uses the exact same algorithm but trained on hundreds of gigabytes of t
 
 ```python
 def analyze_vocabulary(tokenizer, test_texts):
-    total_tokens = 0
-    total_chars = 0
-    token_usage = Counter()
+ total_tokens = 0
+ total_chars = 0
+ token_usage = Counter()
 
-    for text in test_texts:
-        encoded = tokenizer.encode(text)
-        total_tokens += len(encoded)
-        total_chars += len(text)
-        for t in encoded:
-            token_usage[t] += 1
+ for text in test_texts:
+ encoded = tokenizer.encode(text)
+ total_tokens += len(encoded)
+ total_chars += len(text)
+ for t in encoded:
+ token_usage[t] += 1
 
-    print(f"Vocabulary size: {len(tokenizer.vocab)}")
-    print(f"Total tokens across all texts: {total_tokens}")
-    print(f"Total characters: {total_chars}")
-    print(f"Avg tokens per character: {total_tokens / total_chars:.2f}")
+ print(f"Vocabulary size: {len(tokenizer.vocab)}")
+ print(f"Total tokens across all texts: {total_tokens}")
+ print(f"Total characters: {total_chars}")
+ print(f"Avg tokens per character: {total_tokens / total_chars:.2f}")
 
-    print(f"\nMost used tokens:")
-    for token_id, count in token_usage.most_common(10):
-        token_bytes = tokenizer.vocab[token_id]
-        display = token_bytes.decode("utf-8", errors="replace")
-        print(f"  Token {token_id:4d}: '{display}' (used {count} times)")
+ print(f"\nMost used tokens:")
+ for token_id, count in token_usage.most_common(10):
+ token_bytes = tokenizer.vocab[token_id]
+ display = token_bytes.decode("utf-8", errors="replace")
+ print(f" Token {token_id:4d}: '{display}' (used {count} times)")
 
-    unused = [t for t in tokenizer.vocab if t not in token_usage]
-    print(f"\nUnused tokens: {len(unused)} out of {len(tokenizer.vocab)}")
+ unused = [t for t in tokenizer.vocab if t not in token_usage]
+ print(f"\nUnused tokens: {len(unused)} out of {len(tokenizer.vocab)}")
 ```
 
 This reveals the Zipf distribution in your vocabulary. A few tokens dominate (spaces, "the", "e"). Most tokens are rarely used. Production tokenizers optimize for this distribution -- common patterns get short token IDs, rare patterns get longer representations.
@@ -425,8 +423,8 @@ print(f"Vocab size: {tokenizer.vocab_size}")
 
 multilingual = ["Hello world", "Hola mundo", "Bonjour le monde"]
 for text in multilingual:
-    ids = tokenizer.encode(text)
-    print(f"'{text}' -> {len(ids)} tokens")
+ ids = tokenizer.encode(text)
+ print(f"'{text}' -> {len(ids)} tokens")
 ```
 
 Llama 3's 128K vocabulary compresses non-English text significantly better than GPT-2's 50K vocabulary. You can verify this yourself -- encode the same sentence in multiple languages and count the tokens.

@@ -29,8 +29,8 @@ Every matrix, regardless of shape, performs three operations in sequence: rotate
 ```
 A = U * Sigma * V^T
 
-      m x n     m x m    m x n    n x n
-     (any)    (rotate)  (scale)  (rotate)
+ m x n m x m m x n n x n
+ (any) (rotate) (scale) (rotate)
 ```
 
 Given any matrix A, SVD factors it into:
@@ -40,8 +40,8 @@ Given any matrix A, SVD factors it into:
 
 ```mermaid
 graph LR
-    A["Input space (n-dim)\nData cloud\n(arbitrary orientation)"] -->|"V^T\n(rotate)"| B["Scaled space\nAligned with axes\nthen scaled by Sigma"]
-    B -->|"U\n(rotate)"| C["Output space (m-dim)\nRotated to output\norientation"]
+ A["Input space (n-dim)\nData cloud\n(arbitrary orientation)"] -->|"V^T\n(rotate)"| B["Scaled space\nAligned with axes\nthen scaled by Sigma"]
+ B -->|"U\n(rotate)"| C["Output space (m-dim)\nRotated to output\norientation"]
 ```
 
 Think of it this way. You hand SVD a matrix. It tells you: "This matrix takes a sphere of inputs, first rotates it by V^T, then stretches it into an ellipsoid by Sigma, then rotates the ellipsoid by U." The singular values are the lengths of the ellipsoid's axes.
@@ -54,11 +54,11 @@ For a matrix A with shape m x n:
 A = U * Sigma * V^T
 
 where:
-  U     is m x m, orthogonal (U^T U = I)
-  Sigma is m x n, diagonal (singular values on the diagonal)
-  V     is n x n, orthogonal (V^T V = I)
+ U is m x m, orthogonal (U^T U = I)
+ Sigma is m x n, diagonal (singular values on the diagonal)
+ V is n x n, orthogonal (V^T V = I)
 
-The singular values sigma_1 >= sigma_2 >= ... >= sigma_r > 0
+The singular values sigma_1 >= sigma_2 >=... >= sigma_r > 0
 where r = rank(A)
 ```
 
@@ -90,7 +90,7 @@ This gives you a coordinate-by-coordinate picture of what any matrix does.
 The SVD can be written as a sum of rank-1 matrices:
 
 ```
-A = sigma_1 * u_1 * v_1^T + sigma_2 * u_2 * v_2^T + ... + sigma_r * u_r * v_r^T
+A = sigma_1 * u_1 * v_1^T + sigma_2 * u_2 * v_2^T +... + sigma_r * u_r * v_r^T
 
 Each term sigma_i * u_i * v_i^T is a rank-1 matrix (an outer product).
 The full matrix is the sum of r such matrices, where r is the rank.
@@ -99,14 +99,14 @@ The full matrix is the sum of r such matrices, where r is the rank.
 This form is the foundation of low-rank approximation. Each term adds one layer of structure. The first term captures the single most important pattern. The second captures the next most important. And so on. Truncating this sum gives you the best possible approximation at any given rank.
 
 ```
-Rank-1 approx:    A_1 = sigma_1 * u_1 * v_1^T
-                  (captures the dominant pattern)
+Rank-1 approx: A_1 = sigma_1 * u_1 * v_1^T
+ (captures the dominant pattern)
 
-Rank-2 approx:    A_2 = sigma_1 * u_1 * v_1^T + sigma_2 * u_2 * v_2^T
-                  (captures the two most important patterns)
+Rank-2 approx: A_2 = sigma_1 * u_1 * v_1^T + sigma_2 * u_2 * v_2^T
+ (captures the two most important patterns)
 
-Rank-k approx:    A_k = sum of top k terms
-                  (optimal by the Eckart-Young theorem)
+Rank-k approx: A_k = sum of top k terms
+ (optimal by the Eckart-Young theorem)
 ```
 
 ### Relationship to eigendecomposition
@@ -115,8 +115,8 @@ SVD and eigendecomposition are deeply connected. The singular values and vectors
 
 ```
 A^T A = V * Sigma^T * U^T * U * Sigma * V^T
-      = V * Sigma^T * Sigma * V^T
-      = V * D * V^T
+ = V * Sigma^T * Sigma * V^T
+ = V * D * V^T
 
 where D = Sigma^T * Sigma is a diagonal matrix with sigma_i^2 on the diagonal.
 
@@ -126,7 +126,7 @@ So:
 
 Similarly:
 A A^T = U * Sigma * V^T * V * Sigma^T * U^T
-      = U * Sigma * Sigma^T * U^T
+ = U * Sigma * Sigma^T * U^T
 
 So:
 - The left singular vectors (U) are eigenvectors of A A^T
@@ -146,12 +146,12 @@ The Eckart-Young-Mirsky theorem states that the best rank-k approximation to A (
 A_k = U_k * Sigma_k * V_k^T
 
 where:
-  U_k     is m x k  (first k columns of U)
-  Sigma_k is k x k  (top-left k x k block of Sigma)
-  V_k     is n x k  (first k columns of V)
+ U_k is m x k (first k columns of U)
+ Sigma_k is k x k (top-left k x k block of Sigma)
+ V_k is n x k (first k columns of V)
 
-Approximation error = sigma_{k+1}  (in spectral norm)
-                    = sqrt(sigma_{k+1}^2 + ... + sigma_r^2)  (in Frobenius norm)
+Approximation error = sigma_{k+1} (in spectral norm)
+ = sqrt(sigma_{k+1}^2 +... + sigma_r^2) (in Frobenius norm)
 ```
 
 This is not just "a good" approximation. It is provably the best possible approximation of rank k. No other rank-k matrix is closer to A.
@@ -179,17 +179,17 @@ A grayscale image is a matrix of pixel intensities. An 800x600 image has 480,000
 Original image: 800 x 600 = 480,000 values
 
 SVD with rank k:
-  U_k:      800 x k values
-  Sigma_k:  k values
-  V_k:      600 x k values
-  Total:    k * (800 + 600 + 1) = k * 1401 values
+ U_k: 800 x k values
+ Sigma_k: k values
+ V_k: 600 x k values
+ Total: k * (800 + 600 + 1) = k * 1401 values
 
-  k=10:   14,010 values   (2.9% of original)
-  k=50:   70,050 values  (14.6% of original)
-  k=100: 140,100 values  (29.2% of original)
+ k=10: 14,010 values (2.9% of original)
+ k=50: 70,050 values (14.6% of original)
+ k=100: 140,100 values (29.2% of original)
 
-  The compression ratio improves as k gets smaller,
-  but visual quality degrades.
+ The compression ratio improves as k gets smaller,
+ but visual quality degrades.
 ```
 
 The key insight: natural images have rapidly decaying singular values. The first few singular values capture the broad structure (shapes, gradients). The later ones capture fine detail and noise. Truncating at rank 50 often produces an image that looks nearly identical to the original while using 85% less storage.
@@ -199,13 +199,13 @@ The key insight: natural images have rapidly decaying singular values. The first
 The Netflix Prize made this famous. You have a user-movie ratings matrix where most entries are missing.
 
 ```
-             Movie1  Movie2  Movie3  Movie4  Movie5
-  User1      [  5      ?       3       ?       1  ]
-  User2      [  ?      4       ?       2       ?  ]
-  User3      [  3      ?       5       ?       ?  ]
-  User4      [  ?      ?       ?       4       3  ]
+ Movie1 Movie2 Movie3 Movie4 Movie5
+ User1 [ 5 ? 3 ? 1 ]
+ User2 [ ? 4 ? 2 ? ]
+ User3 [ 3 ? 5 ? ? ]
+ User4 [ ? ? ? 4 3 ]
 
-  ? = unknown rating
+ ? = unknown rating
 ```
 
 The idea: this ratings matrix has low rank. Users do not have completely independent tastes. There are a handful of latent factors (action vs. drama, old vs. new, cerebral vs. visceral) that explain most preferences.
@@ -224,23 +224,23 @@ In practice, you use variants like Simon Funk's incremental SVD or ALS (alternat
 Latent Semantic Analysis (LSA), also called Latent Semantic Indexing (LSI), applies SVD to a term-document matrix.
 
 ```
-             Doc1   Doc2   Doc3   Doc4
-  "cat"      [  3      0      1      0  ]
-  "dog"      [  2      0      0      1  ]
-  "fish"     [  0      4      1      0  ]
-  "pet"      [  1      1      1      1  ]
-  "ocean"    [  0      3      0      0  ]
+ Doc1 Doc2 Doc3 Doc4
+ "cat" [ 3 0 1 0 ]
+ "dog" [ 2 0 0 1 ]
+ "fish" [ 0 4 1 0 ]
+ "pet" [ 1 1 1 1 ]
+ "ocean" [ 0 3 0 0 ]
 
 After SVD with rank k=2:
 
-  Each document becomes a point in 2D "concept space."
-  Each term becomes a point in the same 2D space.
-  Documents about similar topics cluster together.
-  Terms with similar meanings cluster together.
+ Each document becomes a point in 2D "concept space."
+ Each term becomes a point in the same 2D space.
+ Documents about similar topics cluster together.
+ Terms with similar meanings cluster together.
 
-  "cat" and "dog" end up near each other (land pets).
-  "fish" and "ocean" end up near each other (water concepts).
-  Doc1 and Doc3 cluster if they share similar topics.
+ "cat" and "dog" end up near each other (land pets).
+ "fish" and "ocean" end up near each other (water concepts).
+ Doc1 and Doc3 cluster if they share similar topics.
 ```
 
 LSA was one of the first successful methods for capturing semantic similarity from raw text. It works because synonymous terms tend to appear in similar documents, so SVD groups them into the same latent dimensions. Modern word embeddings (Word2Vec, GloVe) can be seen as descendants of this idea.
@@ -273,10 +273,10 @@ Noisy data has signal concentrated in the top singular values and noise spread a
 
 ```mermaid
 graph TD
-    A["All singular values"] --> B{"Clear gap?"}
-    B -->|"Above gap"| C["Signal: keep these (top k)"]
-    B -->|"Below gap"| D["Noise: discard these"]
-    C --> E["Reconstruct with A_k to get denoised version"]
+ A["All singular values"] --> B{"Clear gap?"}
+ B -->|"Above gap"| C["Signal: keep these (top k)"]
+ B -->|"Below gap"| D["Noise: discard these"]
+ C --> E["Reconstruct with A_k to get denoised version"]
 ```
 
 This is used in signal processing, scientific measurement, and data cleaning. Any time you have a matrix corrupted by additive noise, truncated SVD is a principled way to separate signal from noise.
@@ -291,12 +291,12 @@ If A = U * Sigma * V^T, then:
 A+ = V * Sigma+ * U^T
 
 where Sigma+ is formed by:
-  1. Transpose Sigma (swap rows and columns)
-  2. Replace each non-zero diagonal entry sigma_i with 1/sigma_i
-  3. Leave zeros as zeros
+ 1. Transpose Sigma (swap rows and columns)
+ 2. Replace each non-zero diagonal entry sigma_i with 1/sigma_i
+ 3. Leave zeros as zeros
 
-For A (m x n):      A+ is (n x m)
-For Sigma (m x n):  Sigma+ is (n x m)
+For A (m x n): A+ is (n x m)
+For Sigma (m x n): Sigma+ is (n x m)
 ```
 
 The pseudoinverse solves least-squares problems. If Ax = b has no exact solution (overdetermined system), then x = A+ b is the least-squares solution (minimizes ||Ax - b||).
@@ -304,15 +304,15 @@ The pseudoinverse solves least-squares problems. If Ax = b has no exact solution
 ```
 Overdetermined system (more equations than unknowns):
 
-  [1  1]         [3]
-  [2  1] x   =   [5]       No exact solution exists.
-  [3  1]         [6]
+ [1 1] [3]
+ [2 1] x = [5] No exact solution exists.
+ [3 1] [6]
 
-  x_ls = A+ b = V * Sigma+ * U^T * b
+ x_ls = A+ b = V * Sigma+ * U^T * b
 
-  This gives the x that minimizes the sum of squared residuals.
-  Same result as the normal equations (A^T A)^(-1) A^T b,
-  but numerically more stable.
+ This gives the x that minimizes the sum of squared residuals.
+ Same result as the normal equations (A^T A)^(-1) A^T b,
+ but numerically more stable.
 ```
 
 ### Numerical stability advantages
@@ -321,15 +321,15 @@ Computing eigendecomposition of A^T A squares the singular values (eigenvalues o
 
 ```
 Example:
-  A has singular values [1000, 1, 0.001]
-  Condition number of A: 1000 / 0.001 = 10^6
+ A has singular values [1000, 1, 0.001]
+ Condition number of A: 1000 / 0.001 = 10^6
 
-  A^T A has eigenvalues [10^6, 1, 10^{-6}]
-  Condition number of A^T A: 10^6 / 10^{-6} = 10^{12}
+ A^T A has eigenvalues [10^6, 1, 10^{-6}]
+ Condition number of A^T A: 10^6 / 10^{-6} = 10^{12}
 
-  Computing SVD directly: works with condition number 10^6
-  Computing via A^T A:     works with condition number 10^{12}
-                           (6 extra digits of precision lost)
+ Computing SVD directly: works with condition number 10^6
+ Computing via A^T A: works with condition number 10^{12}
+ (6 extra digits of precision lost)
 ```
 
 Modern SVD algorithms (Golub-Kahan bidiagonalization) work directly on A, never forming A^T A. This is why you should always prefer `np.linalg.svd(A)` over `np.linalg.eig(A.T @ A)`.
@@ -345,11 +345,11 @@ Covariance matrix: C = (1/(n-1)) * X^T X
 
 PCA finds eigenvectors of C. But:
 
-  X = U * Sigma * V^T    (SVD of X)
+ X = U * Sigma * V^T (SVD of X)
 
-  X^T X = V * Sigma^2 * V^T
+ X^T X = V * Sigma^2 * V^T
 
-  C = (1/(n-1)) * V * Sigma^2 * V^T
+ C = (1/(n-1)) * V * Sigma^2 * V^T
 
 So the principal components are exactly the right singular vectors V.
 The explained variance for each component is sigma_i^2 / (n-1).
@@ -370,49 +370,49 @@ The idea: to find the largest singular value and its vectors, use power iteratio
 import numpy as np
 
 def power_iteration(M, num_iters=100):
-    n = M.shape[1]
-    v = np.random.randn(n)
-    v = v / np.linalg.norm(v)
+ n = M.shape[1]
+ v = np.random.randn(n)
+ v = v / np.linalg.norm(v)
 
-    for _ in range(num_iters):
-        Mv = M @ v
-        v = Mv / np.linalg.norm(Mv)
+ for _ in range(num_iters):
+ Mv = M @ v
+ v = Mv / np.linalg.norm(Mv)
 
-    eigenvalue = v @ M @ v
-    return eigenvalue, v
+ eigenvalue = v @ M @ v
+ return eigenvalue, v
 
 def svd_from_scratch(A, k=None):
-    m, n = A.shape
-    if k is None:
-        k = min(m, n)
+ m, n = A.shape
+ if k is None:
+ k = min(m, n)
 
-    sigmas = []
-    us = []
-    vs = []
+ sigmas = []
+ us = []
+ vs = []
 
-    A_residual = A.copy().astype(float)
+ A_residual = A.copy().astype(float)
 
-    for _ in range(k):
-        AtA = A_residual.T @ A_residual
-        eigenvalue, v = power_iteration(AtA, num_iters=200)
+ for _ in range(k):
+ AtA = A_residual.T @ A_residual
+ eigenvalue, v = power_iteration(AtA, num_iters=200)
 
-        if eigenvalue < 1e-10:
-            break
+ if eigenvalue < 1e-10:
+ break
 
-        sigma = np.sqrt(eigenvalue)
-        u = A_residual @ v / sigma
+ sigma = np.sqrt(eigenvalue)
+ u = A_residual @ v / sigma
 
-        sigmas.append(sigma)
-        us.append(u)
-        vs.append(v)
+ sigmas.append(sigma)
+ us.append(u)
+ vs.append(v)
 
-        A_residual = A_residual - sigma * np.outer(u, v)
+ A_residual = A_residual - sigma * np.outer(u, v)
 
-    U = np.column_stack(us) if us else np.empty((m, 0))
-    S = np.array(sigmas)
-    V = np.column_stack(vs) if vs else np.empty((n, 0))
+ U = np.column_stack(us) if us else np.empty((m, 0))
+ S = np.array(sigmas)
+ V = np.column_stack(vs) if vs else np.empty((n, 0))
 
-    return U, S, V
+ return U, S, V
 ```
 
 ### Step 2: Test and compare with NumPy
@@ -435,21 +435,21 @@ print(f"Reconstruction error: {np.linalg.norm(A - A_reconstructed):.8f}")
 
 ```python
 def compress_image_svd(image_matrix, k):
-    U, S, Vt = np.linalg.svd(image_matrix, full_matrices=False)
-    compressed = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
-    return compressed
+ U, S, Vt = np.linalg.svd(image_matrix, full_matrices=False)
+ compressed = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
+ return compressed
 
 image = np.random.seed(42)
 rows, cols = 200, 300
 image = np.random.randn(rows, cols)
 
 for k in [1, 5, 10, 20, 50]:
-    compressed = compress_image_svd(image, k)
-    error = np.linalg.norm(image - compressed) / np.linalg.norm(image)
-    original_size = rows * cols
-    compressed_size = k * (rows + cols + 1)
-    ratio = compressed_size / original_size
-    print(f"k={k:>3d}  error={error:.4f}  storage={ratio:.1%}")
+ compressed = compress_image_svd(image, k)
+ error = np.linalg.norm(image - compressed) / np.linalg.norm(image)
+ original_size = rows * cols
+ compressed_size = k * (rows + cols + 1)
+ ratio = compressed_size / original_size
+ print(f"k={k:>3d} error={error:.4f} storage={ratio:.1%}")
 ```
 
 ### Step 4: Noise reduction
@@ -457,16 +457,16 @@ for k in [1, 5, 10, 20, 50]:
 ```python
 np.random.seed(42)
 clean = np.outer(np.sin(np.linspace(0, 4*np.pi, 100)),
-                 np.cos(np.linspace(0, 2*np.pi, 80)))
+ np.cos(np.linspace(0, 2*np.pi, 80)))
 noise = 0.3 * np.random.randn(100, 80)
 noisy = clean + noise
 
 U, S, Vt = np.linalg.svd(noisy, full_matrices=False)
 denoised = U[:, :5] @ np.diag(S[:5]) @ Vt[:5, :]
 
-print(f"Noisy error:    {np.linalg.norm(noisy - clean):.4f}")
+print(f"Noisy error: {np.linalg.norm(noisy - clean):.4f}")
 print(f"Denoised error: {np.linalg.norm(denoised - clean):.4f}")
-print(f"Improvement:    {(1 - np.linalg.norm(denoised - clean) / np.linalg.norm(noisy - clean)):.1%}")
+print(f"Improvement: {(1 - np.linalg.norm(denoised - clean) / np.linalg.norm(noisy - clean)):.1%}")
 ```
 
 ### Step 5: Pseudoinverse
@@ -483,9 +483,9 @@ x_svd = A_pinv @ b
 x_lstsq = np.linalg.lstsq(A, b, rcond=None)[0]
 x_pinv = np.linalg.pinv(A) @ b
 
-print(f"SVD pseudoinverse solution:  {x_svd}")
-print(f"np.linalg.lstsq solution:   {x_lstsq}")
-print(f"np.linalg.pinv solution:    {x_pinv}")
+print(f"SVD pseudoinverse solution: {x_svd}")
+print(f"np.linalg.lstsq solution: {x_lstsq}")
+print(f"np.linalg.pinv solution: {x_pinv}")
 ```
 
 ## Use It

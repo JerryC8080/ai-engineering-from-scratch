@@ -28,25 +28,25 @@ This lesson is about the structural shift this represents. 2D seg, detection, an
 
 ```mermaid
 flowchart LR
-    subgraph SAM1["SAM (2023)"]
-        A1["Image + point/box prompt"] --> A2["ViT encoder"] --> A3["Mask decoder"]
-        A3 --> A4["Mask for that prompt"]
-    end
-    subgraph GSAM2["Grounded SAM 2 (2024)"]
-        B1["Text"] --> B2["Grounding DINO"] --> B3["Boxes"] --> B4["SAM 2"] --> B5["Masks + tracking"]
-        B6["Image"] --> B2
-        B6 --> B4
-    end
-    subgraph SAM3["SAM 3 (2025)"]
-        C1["Text OR image exemplar"] --> C2["Shared backbone"]
-        C3["Image"] --> C2
-        C2 --> C4["Image detector + memory tracker<br/>+ presence head"]
-        C4 --> C5["All matching masks<br/>+ instance IDs"]
-    end
+ subgraph SAM1["SAM (2023)"]
+ A1["Image + point/box prompt"] --> A2["ViT encoder"] --> A3["Mask decoder"]
+ A3 --> A4["Mask for that prompt"]
+ end
+ subgraph GSAM2["Grounded SAM 2 (2024)"]
+ B1["Text"] --> B2["Grounding DINO"] --> B3["Boxes"] --> B4["SAM 2"] --> B5["Masks + tracking"]
+ B6["Image"] --> B2
+ B6 --> B4
+ end
+ subgraph SAM3["SAM 3 (2025)"]
+ C1["Text OR image exemplar"] --> C2["Shared backbone"]
+ C3["Image"] --> C2
+ C2 --> C4["Image detector + memory tracker<br/>+ presence head"]
+ C4 --> C5["All matching masks<br/>+ instance IDs"]
+ end
 
-    style SAM1 fill:#e5e7eb,stroke:#6b7280
-    style GSAM2 fill:#fef3c7,stroke:#d97706
-    style SAM3 fill:#dcfce7,stroke:#16a34a
+ style SAM1 fill:#e5e7eb,stroke:#6b7280
+ style GSAM2 fill:#fef3c7,stroke:#d97706
+ style SAM3 fill:#dcfce7,stroke:#16a34a
 ```
 
 ### Promptable Concept Segmentation
@@ -112,15 +112,15 @@ Build a helper that turns a user sentence into a list of SAM 3 concept prompts. 
 
 ```python
 def split_concepts(sentence):
-    """
-    Heuristic splitter for multi-concept prompts.
-    Returns list of short noun phrases.
-    """
-    for sep in [",", ";", "and", "or", "&"]:
-        if sep in sentence:
-            parts = [p.strip() for p in sentence.replace("and ", ",").split(",")]
-            return [p for p in parts if p]
-    return [sentence.strip()]
+ """
+ Heuristic splitter for multi-concept prompts.
+ Returns list of short noun phrases.
+ """
+ for sep in [",", ";", "and", "or", "&"]:
+ if sep in sentence:
+ parts = [p.strip() for p in sentence.replace("and ", ",").split(",")]
+ return [p for p in parts if p]
+ return [sentence.strip()]
 
 print(split_concepts("cats, dogs and balloons"))
 ```
@@ -137,25 +137,25 @@ from typing import List
 
 @dataclass
 class ConceptDetection:
-    concept: str
-    instance_id: int
-    box: tuple          # (x1, y1, x2, y2)
-    score: float
-    mask_rle: str       # run-length encoded
+ concept: str
+ instance_id: int
+ box: tuple # (x1, y1, x2, y2)
+ score: float
+ mask_rle: str # run-length encoded
 
 
 def rle_encode(binary_mask):
-    flat = binary_mask.flatten().astype("uint8")
-    runs = []
-    prev, count = flat[0], 0
-    for v in flat:
-        if v == prev:
-            count += 1
-        else:
-            runs.append((int(prev), count))
-            prev, count = v, 1
-    runs.append((int(prev), count))
-    return ";".join(f"{v}x{c}" for v, c in runs)
+ flat = binary_mask.flatten().astype("uint8")
+ runs = []
+ prev, count = flat[0], 0
+ for v in flat:
+ if v == prev:
+ count += 1
+ else:
+ runs.append((int(prev), count))
+ prev, count = v, 1
+ runs.append((int(prev), count))
+ return ";".join(f"{v}x{c}" for v, c in runs)
 ```
 
 RLE keeps response payloads small even for many high-resolution masks. The same format works across SAM 2, SAM 3, Grounded SAM 2.
@@ -169,33 +169,32 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 class OpenVocabSeg(ABC):
-    @abstractmethod
-    def detect(self, image: np.ndarray, concept: str) -> List[ConceptDetection]:
-        ...
+ @abstractmethod
+ def detect(self, image: np.ndarray, concept: str) -> List[ConceptDetection]:...
 
 
 class StubOpenVocabSeg(OpenVocabSeg):
-    """
-    Deterministic stub used for pipeline testing when real models are not loaded.
-    """
-    def detect(self, image, concept):
-        h, w = image.shape[:2]
-        return [
-            ConceptDetection(
-                concept=concept,
-                instance_id=0,
-                box=(w * 0.2, h * 0.3, w * 0.5, h * 0.8),
-                score=0.89,
-                mask_rle="0x100;1x50;0x200",
-            ),
-            ConceptDetection(
-                concept=concept,
-                instance_id=1,
-                box=(w * 0.55, h * 0.25, w * 0.85, h * 0.75),
-                score=0.74,
-                mask_rle="0x80;1x40;0x220",
-            ),
-        ]
+ """
+ Deterministic stub used for pipeline testing when real models are not loaded.
+ """
+ def detect(self, image, concept):
+ h, w = image.shape[:2]
+ return [
+ ConceptDetection(
+ concept=concept,
+ instance_id=0,
+ box=(w * 0.2, h * 0.3, w * 0.5, h * 0.8),
+ score=0.89,
+ mask_rle="0x100;1x50;0x200",
+ ),
+ ConceptDetection(
+ concept=concept,
+ instance_id=1,
+ box=(w * 0.55, h * 0.25, w * 0.85, h * 0.75),
+ score=0.74,
+ mask_rle="0x80;1x40;0x220",
+ ),
+ ]
 ```
 
 The real `SAM3OpenVocabSeg` subclass would wrap `transformers.Sam3Model` and `Sam3Processor`.
@@ -215,10 +214,10 @@ inputs = processor(images=pil_image, return_tensors="pt")
 inputs = processor.set_text_prompt(inputs, "yellow school bus")
 
 with torch.no_grad():
-    outputs = model(**inputs)
+ outputs = model(**inputs)
 
 masks = processor.post_process_masks(
-    outputs.masks, inputs.original_sizes, inputs.reshaped_input_sizes
+ outputs.masks, inputs.original_sizes, inputs.reshaped_input_sizes
 )
 boxes = outputs.boxes
 scores = outputs.scores

@@ -28,19 +28,19 @@ Every linear transformation in 2D can be written as a 2x2 matrix. The matrix tel
 
 ```mermaid
 graph LR
-    subgraph Before["Standard Basis"]
-        e1["e1 = [1, 0] (along x)"]
-        e2["e2 = [0, 1] (along y)"]
-    end
-    subgraph Transform["Matrix M"]
-        M["M = columns are new basis vectors"]
-    end
-    subgraph After["After Transformation M"]
-        e1p["e1' = new x-basis"]
-        e2p["e2' = new y-basis"]
-    end
-    e1 --> M --> e1p
-    e2 --> M --> e2p
+ subgraph Before["Standard Basis"]
+ e1["e1 = [1, 0] (along x)"]
+ e2["e2 = [0, 1] (along y)"]
+ end
+ subgraph Transform["Matrix M"]
+ M["M = columns are new basis vectors"]
+ end
+ subgraph After["After Transformation M"]
+ e1p["e1' = new x-basis"]
+ e2p["e2' = new y-basis"]
+ end
+ e1 --> M --> e1p
+ e2 --> M --> e2p
 ```
 
 ### Rotation
@@ -49,35 +49,35 @@ A 2D rotation by angle theta keeps distances and angles intact. It moves every p
 
 ```mermaid
 graph LR
-    subgraph Before["Before Rotation"]
-        A["A(2, 1)"]
-        B["B(0, 2)"]
-    end
-    subgraph Rot["Rotate 45 degrees"]
-        R["R(θ) = [[cos θ, -sin θ], [sin θ, cos θ]]"]
-    end
-    subgraph After["After Rotation"]
-        Ap["A'(0.71, 2.12)"]
-        Bp["B'(-1.41, 1.41)"]
-    end
-    A --> R --> Ap
-    B --> R --> Bp
+ subgraph Before["Before Rotation"]
+ A["A(2, 1)"]
+ B["B(0, 2)"]
+ end
+ subgraph Rot["Rotate 45 degrees"]
+ R["R(θ) = [[cos θ, -sin θ], [sin θ, cos θ]]"]
+ end
+ subgraph After["After Rotation"]
+ Ap["A'(0.71, 2.12)"]
+ Bp["B'(-1.41, 1.41)"]
+ end
+ A --> R --> Ap
+ B --> R --> Bp
 ```
 
 In 3D, you rotate around an axis. Each axis has its own rotation matrix:
 
 ```
-Rz(theta) = | cos  -sin  0 |     Rotate around z-axis
-            | sin   cos  0 |     (x-y plane spins, z stays)
-            |  0     0   1 |
+Rz(theta) = | cos -sin 0 | Rotate around z-axis
+ | sin cos 0 | (x-y plane spins, z stays)
+ | 0 0 1 |
 
-Rx(theta) = | 1   0     0    |   Rotate around x-axis
-            | 0  cos  -sin   |   (y-z plane spins, x stays)
-            | 0  sin   cos   |
+Rx(theta) = | 1 0 0 | Rotate around x-axis
+ | 0 cos -sin | (y-z plane spins, x stays)
+ | 0 sin cos |
 
-Ry(theta) = |  cos  0  sin |     Rotate around y-axis
-            |   0   1   0  |     (x-z plane spins, y stays)
-            | -sin  0  cos |
+Ry(theta) = | cos 0 sin | Rotate around y-axis
+ | 0 1 0 | (x-z plane spins, y stays)
+ | -sin 0 cos |
 ```
 
 ### Scaling
@@ -86,19 +86,19 @@ Scaling stretches or compresses along each axis independently.
 
 ```mermaid
 graph LR
-    subgraph Before["Before Scaling"]
-        A["A(2, 1)"]
-        B["B(0, 2)"]
-    end
-    subgraph Scale["Scale sx=2, sy=0.5"]
-        S["S = [[2, 0], [0, 0.5]]"]
-    end
-    subgraph After["After Scaling"]
-        Ap["A'(4, 0.5)"]
-        Bp["B'(0, 1)"]
-    end
-    A --> S --> Ap
-    B --> S --> Bp
+ subgraph Before["Before Scaling"]
+ A["A(2, 1)"]
+ B["B(0, 2)"]
+ end
+ subgraph Scale["Scale sx=2, sy=0.5"]
+ S["S = [[2, 0], [0, 0.5]]"]
+ end
+ subgraph After["After Scaling"]
+ Ap["A'(4, 0.5)"]
+ Bp["B'(0, 1)"]
+ end
+ A --> S --> Ap
+ B --> S --> Bp
 ```
 
 ### Shearing
@@ -107,19 +107,19 @@ Shearing tilts one axis while keeping the other fixed. It turns rectangles into 
 
 ```mermaid
 graph LR
-    subgraph Before["Before Shear"]
-        A["A(1, 0)"]
-        B["B(0, 1)"]
-    end
-    subgraph Shear["Shear in x, k=1"]
-        Sh["Shx = [[1, k], [0, 1]]"]
-    end
-    subgraph After["After Shear"]
-        Ap["A(1, 0) unchanged"]
-        Bp["B'(1, 1) shifted"]
-    end
-    A --> Sh --> Ap
-    B --> Sh --> Bp
+ subgraph Before["Before Shear"]
+ A["A(1, 0)"]
+ B["B(0, 1)"]
+ end
+ subgraph Shear["Shear in x, k=1"]
+ Sh["Shx = [[1, k], [0, 1]]"]
+ end
+ subgraph After["After Shear"]
+ Ap["A(1, 0) unchanged"]
+ Bp["B'(1, 1) shifted"]
+ end
+ A --> Sh --> Ap
+ B --> Sh --> Bp
 ```
 
 Shear matrices:
@@ -132,16 +132,16 @@ Reflection mirrors points across an axis or line.
 
 ```mermaid
 graph LR
-    subgraph Before["Before Reflection"]
-        A["A(2, 1)"]
-    end
-    subgraph Reflect["Reflect across y-axis"]
-        R["[[-1, 0], [0, 1]]"]
-    end
-    subgraph After["After Reflection"]
-        Ap["A'(-2, 1)"]
-    end
-    A --> R --> Ap
+ subgraph Before["Before Reflection"]
+ A["A(2, 1)"]
+ end
+ subgraph Reflect["Reflect across y-axis"]
+ R["[[-1, 0], [0, 1]]"]
+ end
+ subgraph After["After Reflection"]
+ Ap["A'(-2, 1)"]
+ end
+ A --> R --> Ap
 ```
 
 Reflection matrices:
@@ -154,18 +154,18 @@ Applying transformation A then B is the same as multiplying their matrices: `res
 
 ```mermaid
 graph LR
-    subgraph Path1["Rotate 90 then Scale (2, 0.5)"]
-        P1["(1, 0)"] -->|"Rotate 90"| P2["(0, 1)"] -->|"Scale"| P3["(0, 0.5)"]
-    end
+ subgraph Path1["Rotate 90 then Scale (2, 0.5)"]
+ P1["(1, 0)"] -->|"Rotate 90"| P2["(0, 1)"] -->|"Scale"| P3["(0, 0.5)"]
+ end
 ```
 
 Composed: `S @ R = [[0, -2], [0.5, 0]]`
 
 ```mermaid
 graph LR
-    subgraph Path2["Scale (2, 0.5) then Rotate 90"]
-        Q1["(1, 0)"] -->|"Scale"| Q2["(2, 0)"] -->|"Rotate 90"| Q3["(0, 2)"]
-    end
+ subgraph Path2["Scale (2, 0.5) then Rotate 90"]
+ Q1["(1, 0)"] -->|"Scale"| Q2["(2, 0)"] -->|"Rotate 90"| Q3["(0, 2)"]
+ end
 ```
 
 Composed: `R @ S = [[0, -0.5], [2, 0]]`
@@ -182,14 +182,14 @@ A @ v = lambda * v
 v is the eigenvector (direction that survives)
 lambda is the eigenvalue (how much it stretches)
 
-Example: A = | 2  1 |
-             | 1  2 |
+Example: A = | 2 1 |
+ | 1 2 |
 
 Eigenvector [1, 1] with eigenvalue 3:
-  A @ [1,1] = [3, 3] = 3 * [1, 1]     (same direction, scaled by 3)
+ A @ [1,1] = [3, 3] = 3 * [1, 1] (same direction, scaled by 3)
 
 Eigenvector [1, -1] with eigenvalue 1:
-  A @ [1,-1] = [1, -1] = 1 * [1, -1]  (same direction, unchanged)
+ A @ [1,-1] = [1, -1] = 1 * [1, -1] (same direction, unchanged)
 ```
 
 The matrix stretches space by 3x along [1, 1] and keeps [1, -1] unchanged. Every other direction is a mix of these two.
@@ -221,15 +221,15 @@ This says: rotate into eigenvector coordinates, scale along each axis, rotate ba
 The determinant of a transformation matrix tells you how much it scales area (2D) or volume (3D).
 
 ```
-det = 1:   area preserved (rotation)
-det = 2:   area doubled
-det = 0:   space crushed to lower dimension (singular)
-det = -1:  area preserved but orientation flipped (reflection)
+det = 1: area preserved (rotation)
+det = 2: area doubled
+det = 0: space crushed to lower dimension (singular)
+det = -1: area preserved but orientation flipped (reflection)
 
-| det(Rotation) | = 1        (always)
+| det(Rotation) | = 1 (always)
 | det(Scale sx, sy) | = sx * sy
-| det(Shear) | = 1           (area preserved)
-| det(Reflection) | = -1     (orientation flipped)
+| det(Shear) | = 1 (area preserved)
+| det(Reflection) | = -1 (orientation flipped)
 ```
 
 ## Build It
@@ -240,34 +240,34 @@ det = -1:  area preserved but orientation flipped (reflection)
 import math
 
 def rotation_2d(theta):
-    c, s = math.cos(theta), math.sin(theta)
-    return [[c, -s], [s, c]]
+ c, s = math.cos(theta), math.sin(theta)
+ return [[c, -s], [s, c]]
 
 def scaling_2d(sx, sy):
-    return [[sx, 0], [0, sy]]
+ return [[sx, 0], [0, sy]]
 
 def shearing_2d(kx, ky):
-    return [[1, kx], [ky, 1]]
+ return [[1, kx], [ky, 1]]
 
 def reflection_x():
-    return [[1, 0], [0, -1]]
+ return [[1, 0], [0, -1]]
 
 def reflection_y():
-    return [[-1, 0], [0, 1]]
+ return [[-1, 0], [0, 1]]
 
 def mat_vec_mul(matrix, vector):
-    return [
-        sum(matrix[i][j] * vector[j] for j in range(len(vector)))
-        for i in range(len(matrix))
-    ]
+ return [
+ sum(matrix[i][j] * vector[j] for j in range(len(vector)))
+ for i in range(len(matrix))
+ ]
 
 def mat_mul(a, b):
-    rows_a, cols_b = len(a), len(b[0])
-    cols_a = len(a[0])
-    return [
-        [sum(a[i][k] * b[k][j] for k in range(cols_a)) for j in range(cols_b)]
-        for i in range(rows_a)
-    ]
+ rows_a, cols_b = len(a), len(b[0])
+ cols_a = len(a[0])
+ return [
+ [sum(a[i][k] * b[k][j] for k in range(cols_a)) for j in range(cols_b)]
+ for i in range(rows_a)
+ ]
 
 point = [1.0, 0.0]
 angle = math.pi / 4
@@ -309,32 +309,32 @@ For a 2x2 matrix `[[a, b], [c, d]]`, eigenvalues solve the characteristic equati
 
 ```python
 def eigenvalues_2x2(matrix):
-    a, b = matrix[0]
-    c, d = matrix[1]
-    trace = a + d
-    det = a * d - b * c
-    discriminant = trace ** 2 - 4 * det
-    if discriminant < 0:
-        real = trace / 2
-        imag = (-discriminant) ** 0.5 / 2
-        return (complex(real, imag), complex(real, -imag))
-    sqrt_disc = discriminant ** 0.5
-    return ((trace + sqrt_disc) / 2, (trace - sqrt_disc) / 2)
+ a, b = matrix[0]
+ c, d = matrix[1]
+ trace = a + d
+ det = a * d - b * c
+ discriminant = trace ** 2 - 4 * det
+ if discriminant < 0:
+ real = trace / 2
+ imag = (-discriminant) ** 0.5 / 2
+ return (complex(real, imag), complex(real, -imag))
+ sqrt_disc = discriminant ** 0.5
+ return ((trace + sqrt_disc) / 2, (trace - sqrt_disc) / 2)
 
 def eigenvector_2x2(matrix, eigenvalue):
-    a, b = matrix[0]
-    c, d = matrix[1]
-    if abs(b) > 1e-10:
-        v = [b, eigenvalue - a]
-    elif abs(c) > 1e-10:
-        v = [eigenvalue - d, c]
-    else:
-        if abs(a - eigenvalue) < 1e-10:
-            v = [1, 0]
-        else:
-            v = [0, 1]
-    mag = (v[0] ** 2 + v[1] ** 2) ** 0.5
-    return [v[0] / mag, v[1] / mag]
+ a, b = matrix[0]
+ c, d = matrix[1]
+ if abs(b) > 1e-10:
+ v = [b, eigenvalue - a]
+ elif abs(c) > 1e-10:
+ v = [eigenvalue - d, c]
+ else:
+ if abs(a - eigenvalue) < 1e-10:
+ v = [1, 0]
+ else:
+ v = [0, 1]
+ mag = (v[0] ** 2 + v[1] ** 2) ** 0.5
+ return [v[0] / mag, v[1] / mag]
 
 A = [[2, 1], [1, 2]]
 vals = eigenvalues_2x2(A)
@@ -342,27 +342,27 @@ print(f"Matrix: {A}")
 print(f"Eigenvalues: {vals[0]:.4f}, {vals[1]:.4f}")
 
 for val in vals:
-    vec = eigenvector_2x2(A, val)
-    result = mat_vec_mul(A, vec)
-    scaled = [val * vec[0], val * vec[1]]
-    print(f"  lambda={val:.1f}, v={[round(x,4) for x in vec]}")
-    print(f"    A@v = {[round(x,4) for x in result]}")
-    print(f"    l*v = {[round(x,4) for x in scaled]}")
+ vec = eigenvector_2x2(A, val)
+ result = mat_vec_mul(A, vec)
+ scaled = [val * vec[0], val * vec[1]]
+ print(f" lambda={val:.1f}, v={[round(x,4) for x in vec]}")
+ print(f" A@v = {[round(x,4) for x in result]}")
+ print(f" l*v = {[round(x,4) for x in scaled]}")
 ```
 
 ### Step 4: Determinant as volume scaling factor
 
 ```python
 def det_2x2(matrix):
-    return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+ return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
 print(f"det(rotation 45) = {det_2x2(rotation_2d(math.pi/4)):.4f}")
-print(f"det(scale 2,3)   = {det_2x2(scaling_2d(2, 3)):.1f}")
-print(f"det(shear kx=1)  = {det_2x2(shearing_2d(1, 0)):.1f}")
-print(f"det(reflect y)   = {det_2x2(reflection_y()):.1f}")
+print(f"det(scale 2,3) = {det_2x2(scaling_2d(2, 3)):.1f}")
+print(f"det(shear kx=1) = {det_2x2(shearing_2d(1, 0)):.1f}")
+print(f"det(reflect y) = {det_2x2(reflection_y()):.1f}")
 
 singular = [[1, 2], [2, 4]]
-print(f"det(singular)     = {det_2x2(singular):.1f}")
+print(f"det(singular) = {det_2x2(singular):.1f}")
 print("Singular: columns are proportional, space collapses to a line.")
 ```
 
@@ -375,7 +375,7 @@ import numpy as np
 
 theta = np.pi / 4
 R = np.array([[np.cos(theta), -np.sin(theta)],
-              [np.sin(theta),  np.cos(theta)]])
+ [np.sin(theta), np.cos(theta)]])
 
 point = np.array([1.0, 0.0])
 print(f"Rotate (1,0) by 45 deg: {R @ point}")
@@ -390,9 +390,9 @@ print(f"\nEigenvalues: {eigenvalues}")
 print(f"Eigenvectors (columns):\n{eigenvectors}")
 
 for i in range(len(eigenvalues)):
-    v = eigenvectors[:, i]
-    lam = eigenvalues[i]
-    print(f"  A @ v{i} = {A @ v}, lambda * v{i} = {lam * v}")
+ v = eigenvectors[:, i]
+ lam = eigenvalues[i]
+ print(f" A @ v{i} = {A @ v}, lambda * v{i} = {lam * v}")
 
 print(f"\ndet(R) = {np.linalg.det(R):.4f}")
 print(f"det(S) = {np.linalg.det(S):.1f}")
@@ -411,12 +411,12 @@ print(f"Reconstructed:\n{reconstructed}")
 
 ```python
 def rotation_3d_z(theta):
-    c, s = np.cos(theta), np.sin(theta)
-    return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
+ c, s = np.cos(theta), np.sin(theta)
+ return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
 
 def rotation_3d_x(theta):
-    c, s = np.cos(theta), np.sin(theta)
-    return np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
+ c, s = np.cos(theta), np.sin(theta)
+ return np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
 
 point_3d = np.array([1.0, 0.0, 0.0])
 rotated_z = rotation_3d_z(np.pi / 2) @ point_3d

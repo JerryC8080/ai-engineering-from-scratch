@@ -30,10 +30,10 @@ A tensor is a multi-dimensional array of numbers with a uniform data type. The n
 
 ```mermaid
 graph LR
-    S["Scalar<br/>rank 0<br/>shape: ()"] --> V["Vector<br/>rank 1<br/>shape: (3,)"]
-    V --> M["Matrix<br/>rank 2<br/>shape: (2,3)"]
-    M --> T3["3D Tensor<br/>rank 3<br/>shape: (2,2,2)"]
-    T3 --> T4["4D Tensor<br/>rank 4<br/>shape: (B,C,H,W)"]
+ S["Scalar<br/>rank 0<br/>shape: ()"] --> V["Vector<br/>rank 1<br/>shape: (3,)"]
+ V --> M["Matrix<br/>rank 2<br/>shape: (2,3)"]
+ M --> T3["3D Tensor<br/>rank 3<br/>shape: (2,2,2)"]
+ T3 --> T4["4D Tensor<br/>rank 4<br/>shape: (B,C,H,W)"]
 ```
 
 Total elements = product of all sizes. A shape `(2, 3, 4)` holds `2 * 3 * 4 = 24` elements.
@@ -44,18 +44,18 @@ Different data types map to specific tensor shapes by convention.
 
 ```mermaid
 graph TD
-    subgraph Vision
-        V1["(B, C, H, W)<br/>32, 3, 224, 224"]
-    end
-    subgraph NLP
-        N1["(B, T, D)<br/>16, 128, 768"]
-    end
-    subgraph Attention
-        A1["(B, H, T, D)<br/>16, 12, 128, 64"]
-    end
-    subgraph Weights
-        W1["Linear: (out, in)<br/>Conv2D: (out_c, in_c, kH, kW)<br/>Embedding: (vocab, dim)"]
-    end
+ subgraph Vision
+ V1["(B, C, H, W)<br/>32, 3, 224, 224"]
+ end
+ subgraph NLP
+ N1["(B, T, D)<br/>16, 128, 768"]
+ end
+ subgraph Attention
+ A1["(B, H, T, D)<br/>16, 12, 128, 64"]
+ end
+ subgraph Weights
+ W1["Linear: (out, in)<br/>Conv2D: (out_c, in_c, kH, kW)<br/>Embedding: (vocab, dim)"]
+ end
 ```
 
 PyTorch uses NCHW (channels-first). TensorFlow defaults to NHWC (channels-last). Mismatched layouts cause silent slowdowns or errors.
@@ -66,12 +66,12 @@ A 2D array in memory is a 1D sequence of bytes. **Strides** tell you how many el
 
 ```mermaid
 graph LR
-    subgraph "Row-major (C order)"
-        R["a b c d e f<br/>strides: (3, 1)"]
-    end
-    subgraph "Column-major (F order)"
-        C["a d b e c f<br/>strides: (1, 2)"]
-    end
+ subgraph "Row-major (C order)"
+ R["a b c d e f<br/>strides: (3, 1)"]
+ end
+ subgraph "Column-major (F order)"
+ C["a d b e c f<br/>strides: (1, 2)"]
+ end
 ```
 
 Transpose does not move data. It swaps the strides, making the tensor **non-contiguous** -- the elements for a row are no longer adjacent in memory.
@@ -81,10 +81,10 @@ Transpose does not move data. It swaps the strides, making the tensor **non-cont
 Broadcasting lets you operate on tensors of different shapes without copying data. Align shapes from the right. Two dimensions are compatible when they are equal or one is 1. Fewer dimensions get padded with 1s on the left.
 
 ```
-Tensor A:     (8, 1, 6, 1)
-Tensor B:        (7, 1, 5)
-Padded B:     (1, 7, 1, 5)
-Result:       (8, 7, 6, 5)
+Tensor A: (8, 1, 6, 1)
+Tensor B: (7, 1, 5)
+Padded B: (1, 7, 1, 5)
+Result: (8, 7, 6, 5)
 ```
 
 ### Einsum: the universal tensor operation
@@ -93,10 +93,10 @@ Einstein summation labels each axis with a letter. Axes in the input but not the
 
 ```mermaid
 graph LR
-    subgraph "matmul: ik,kj -> ij"
-        A["A(I,K)"] --> |"sum over k"| C["C(I,J)"]
-        B["B(K,J)"] --> |"sum over k"| C
-    end
+ subgraph "matmul: ik,kj -> ij"
+ A["A(I,K)"] --> |"sum over k"| C["C(I,J)"]
+ B["B(K,J)"] --> |"sum over k"| C
+ end
 ```
 
 Key patterns: `i,i->` (dot product), `i,j->ij` (outer product), `ii->` (trace), `ij->ji` (transpose), `bij,bjk->bik` (batch matmul), `bhtd,bhsd->bhts` (attention scores).
@@ -111,34 +111,34 @@ A tensor stores a flat list of numbers plus shape metadata. Strides tell the ind
 
 ```python
 class Tensor:
-    def __init__(self, data, shape=None):
-        if isinstance(data, (list, tuple)):
-            self._data, self._shape = self._flatten_nested(data)
-        elif isinstance(data, np.ndarray):
-            self._data = data.flatten().tolist()
-            self._shape = tuple(data.shape)
-        else:
-            self._data = [data]
-            self._shape = ()
+ def __init__(self, data, shape=None):
+ if isinstance(data, (list, tuple)):
+ self._data, self._shape = self._flatten_nested(data)
+ elif isinstance(data, np.ndarray):
+ self._data = data.flatten().tolist()
+ self._shape = tuple(data.shape)
+ else:
+ self._data = [data]
+ self._shape = ()
 
-        if shape is not None:
-            total = reduce(lambda a, b: a * b, shape, 1)
-            if total != len(self._data):
-                raise ValueError(
-                    f"Cannot reshape {len(self._data)} elements into shape {shape}"
-                )
-            self._shape = tuple(shape)
+ if shape is not None:
+ total = reduce(lambda a, b: a * b, shape, 1)
+ if total != len(self._data):
+ raise ValueError(
+ f"Cannot reshape {len(self._data)} elements into shape {shape}"
+ )
+ self._shape = tuple(shape)
 
-        self._strides = self._compute_strides(self._shape)
+ self._strides = self._compute_strides(self._shape)
 
-    @staticmethod
-    def _compute_strides(shape):
-        if len(shape) == 0:
-            return ()
-        strides = [1] * len(shape)
-        for i in range(len(shape) - 2, -1, -1):
-            strides[i] = strides[i + 1] * shape[i + 1]
-        return tuple(strides)
+ @staticmethod
+ def _compute_strides(shape):
+ if len(shape) == 0:
+ return ()
+ strides = [1] * len(shape)
+ for i in range(len(shape) - 2, -1, -1):
+ strides[i] = strides[i + 1] * shape[i + 1]
+ return tuple(strides)
 ```
 
 For shape `(3, 4)`, strides are `(4, 1)` -- skip 4 elements to advance one row, skip 1 element to advance one column.

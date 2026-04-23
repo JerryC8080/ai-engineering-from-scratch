@@ -69,7 +69,7 @@ Rotary Position Embedding (RoPE, Su et al. 2021) injects position by rotating ea
 ```
 q_rotated = rotate(q, angle(pos))
 k_rotated = rotate(k, angle(pos))
-score = q_rotated . k_rotated
+score = q_rotated. k_rotated
 ```
 
 Every Llama, Mistral, Qwen, DeepSeek, and Gemma uses RoPE. Gemma 2 uses a hybrid (RoPE on most layers, local sliding-window attention on others).
@@ -96,10 +96,10 @@ GPT-2 used **Multi-Head Attention (MHA)**: every head has its own Q, K, V projec
 
 | Scheme | KV Heads | KV Cache | Accuracy |
 |--------|----------|----------|----------|
-| MHA    | num_heads | full | best |
-| GQA    | num_groups (G < num_heads) | num_heads / G reduction | near-MHA |
-| MQA    | 1 | num_heads reduction | small hit |
-| MLA    | latent, per-head decompression | smaller than MQA | near-MHA |
+| MHA | num_heads | full | best |
+| GQA | num_groups (G < num_heads) | num_heads / G reduction | near-MHA |
+| MQA | 1 | num_heads reduction | small hit |
+| MLA | latent, per-head decompression | smaller than MQA | near-MHA |
 
 For any model above ~13B parameters, GQA or MLA is effectively mandatory. Full MHA at scale is a KV cache disaster.
 
@@ -117,19 +117,19 @@ The appeal: you can have 64 experts of size 7B each (so total param count is hug
 
 ```mermaid
 graph LR
-    I["Token hidden state"] --> R["Router\n(linear -> softmax)"]
-    R --> T["Top-k selection"]
-    T --> E1["Expert 1\n(MLP)"]
-    T --> E2["Expert 2\n(MLP)"]
-    T --> EN["Expert 64\n(MLP, unused)"]
-    E1 --> S["Weighted sum"]
-    E2 --> S
-    S --> O["Output"]
+ I["Token hidden state"] --> R["Router\n(linear -> softmax)"]
+ R --> T["Top-k selection"]
+ T --> E1["Expert 1\n(MLP)"]
+ T --> E2["Expert 2\n(MLP)"]
+ T --> EN["Expert 64\n(MLP, unused)"]
+ E1 --> S["Weighted sum"]
+ E2 --> S
+ S --> O["Output"]
 
-    style EN fill:#eeeeee,stroke:#999,color:#999
-    style E1 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style E2 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style R fill:#1a1a2e,stroke:#e94560,color:#fff
+ style EN fill:#eeeeee,stroke:#999,color:#999
+ style E1 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style E2 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style R fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 Pros: same compute, more parameters, better capacity. Cons: the expert memory still has to live somewhere (so serving needs more VRAM than a dense equivalent), load-balancing the router is hard, and fine-tuning the router during alignment is its own research area.
@@ -163,15 +163,15 @@ Llama 3 8B config:
 
 ```
 {
-  "hidden_size": 4096,
-  "intermediate_size": 14336,
-  "num_hidden_layers": 32,
-  "num_attention_heads": 32,
-  "num_key_value_heads": 8,
-  "max_position_embeddings": 131072,
-  "rope_theta": 500000.0,
-  "rms_norm_eps": 1e-5,
-  "vocab_size": 128256
+ "hidden_size": 4096,
+ "intermediate_size": 14336,
+ "num_hidden_layers": 32,
+ "num_attention_heads": 32,
+ "num_key_value_heads": 8,
+ "max_position_embeddings": 131072,
+ "rope_theta": 500000.0,
+ "rms_norm_eps": 1e-5,
+ "vocab_size": 128256
 }
 ```
 
@@ -226,10 +226,10 @@ The lesson's code is a calculator. Given any config.json, it prints parameter co
 
 ```python
 config = {
-    "hidden_size": 4096, "intermediate_size": 14336,
-    "num_hidden_layers": 32, "num_attention_heads": 32,
-    "num_key_value_heads": 8, "vocab_size": 128256,
-    "max_position_embeddings": 131072,
+ "hidden_size": 4096, "intermediate_size": 14336,
+ "num_hidden_layers": 32, "num_attention_heads": 32,
+ "num_key_value_heads": 8, "vocab_size": 128256,
+ "max_position_embeddings": 131072,
 }
 ```
 

@@ -36,16 +36,16 @@ The intuition: examples are compressed instructions. Instead of describing the o
 
 ```mermaid
 graph TD
-    subgraph Comparison["Zero-Shot vs Few-Shot"]
-        direction LR
-        Z["Zero-Shot\n'Classify this review'\nModel guesses format\n78% on GSM8K"]
-        F["Few-Shot\n'Here are 3 examples...\nNow classify this review'\nModel matches pattern\n85% on GSM8K"]
-    end
+ subgraph Comparison["Zero-Shot vs Few-Shot"]
+ direction LR
+ Z["Zero-Shot\n'Classify this review'\nModel guesses format\n78% on GSM8K"]
+ F["Few-Shot\n'Here are 3 examples...\nNow classify this review'\nModel matches pattern\n85% on GSM8K"]
+ end
 
-    Z ~~~ F
+ Z ~~~ F
 
-    style Z fill:#1a1a2e,stroke:#e94560,color:#fff
-    style F fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Z fill:#1a1a2e,stroke:#e94560,color:#fff
+ style F fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 **When few-shot wins:** format-sensitive tasks, classification, structured extraction, domain-specific jargon, any task where the model needs to match a specific pattern.
@@ -68,19 +68,19 @@ Chain-of-Thought (CoT) prompting was introduced by Wei et al. (2022) at Google B
 
 ```mermaid
 graph LR
-    subgraph Standard["Standard Prompting"]
-        Q1["Q: Roger has 5 balls.\nHe buys 2 cans of 3.\nHow many balls?"] --> A1["A: 11"]
-    end
+ subgraph Standard["Standard Prompting"]
+ Q1["Q: Roger has 5 balls.\nHe buys 2 cans of 3.\nHow many balls?"] --> A1["A: 11"]
+ end
 
-    subgraph CoT["Chain-of-Thought Prompting"]
-        Q2["Q: Roger has 5 balls.\nHe buys 2 cans of 3.\nHow many balls?"] --> R2["Roger starts with 5.\n2 cans of 3 = 6.\n5 + 6 = 11."] --> A2["A: 11"]
-    end
+ subgraph CoT["Chain-of-Thought Prompting"]
+ Q2["Q: Roger has 5 balls.\nHe buys 2 cans of 3.\nHow many balls?"] --> R2["Roger starts with 5.\n2 cans of 3 = 6.\n5 + 6 = 11."] --> A2["A: 11"]
+ end
 
-    style Q1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style Q2 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style R2 fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style A2 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Q1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style Q2 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style R2 fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style A2 fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 Why does this work mechanically? Each token a transformer generates becomes context for the next token. Without CoT, the model must compress all reasoning into the hidden state of a single forward pass. With CoT, the model externalizes intermediate computations as tokens. Each reasoning token extends the effective computation depth.
@@ -108,27 +108,27 @@ Wang et al. (2023) introduced self-consistency. The insight: a single CoT path m
 
 ```mermaid
 graph TD
-    P["Problem: 'A store has 48 apples.\nThey sell 1/3 on Monday\nand 1/4 of the rest on Tuesday.\nHow many are left?'"]
+ P["Problem: 'A store has 48 apples.\nThey sell 1/3 on Monday\nand 1/4 of the rest on Tuesday.\nHow many are left?'"]
 
-    P --> Path1["Path 1: 48 - 16 = 32\n32 - 8 = 24\nAnswer: 24"]
-    P --> Path2["Path 2: 1/3 of 48 = 16\nRemaining: 32\n1/4 of 32 = 8\n32 - 8 = 24\nAnswer: 24"]
-    P --> Path3["Path 3: 48/3 = 16 sold\n48 - 16 = 32\n32/4 = 8 sold\n32 - 8 = 24\nAnswer: 24"]
-    P --> Path4["Path 4: Sell 1/3: 48 - 12 = 36\nSell 1/4: 36 - 9 = 27\nAnswer: 27"]
-    P --> Path5["Path 5: Monday: 48 * 2/3 = 32\nTuesday: 32 * 3/4 = 24\nAnswer: 24"]
+ P --> Path1["Path 1: 48 - 16 = 32\n32 - 8 = 24\nAnswer: 24"]
+ P --> Path2["Path 2: 1/3 of 48 = 16\nRemaining: 32\n1/4 of 32 = 8\n32 - 8 = 24\nAnswer: 24"]
+ P --> Path3["Path 3: 48/3 = 16 sold\n48 - 16 = 32\n32/4 = 8 sold\n32 - 8 = 24\nAnswer: 24"]
+ P --> Path4["Path 4: Sell 1/3: 48 - 12 = 36\nSell 1/4: 36 - 9 = 27\nAnswer: 27"]
+ P --> Path5["Path 5: Monday: 48 * 2/3 = 32\nTuesday: 32 * 3/4 = 24\nAnswer: 24"]
 
-    Path1 --> V["Majority Vote\n24: 4 votes\n27: 1 vote\nFinal: 24"]
-    Path2 --> V
-    Path3 --> V
-    Path4 --> V
-    Path5 --> V
+ Path1 --> V["Majority Vote\n24: 4 votes\n27: 1 vote\nFinal: 24"]
+ Path2 --> V
+ Path3 --> V
+ Path4 --> V
+ Path5 --> V
 
-    style P fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style Path1 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style Path2 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style Path3 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style Path4 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style Path5 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style V fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style P fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style Path1 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Path2 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Path3 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Path4 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style Path5 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style V fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 Self-consistency improved GSM8K accuracy from 56.5% (single CoT) to 74.4% with N=40 on the original PaLM 540B experiments. On GPT-4o, the improvement is smaller (95% to 97%) because the base accuracy is already high. The technique shines most on models with 60-85% base CoT accuracy -- the sweet spot where single-path errors are frequent but not systematic.
@@ -141,41 +141,41 @@ Yao et al. (2023) introduced Tree-of-Thought (ToT). Where CoT follows one linear
 
 ```mermaid
 graph TD
-    Root["Problem"] --> B1["Thought 1a"]
-    Root --> B2["Thought 1b"]
-    Root --> B3["Thought 1c"]
+ Root["Problem"] --> B1["Thought 1a"]
+ Root --> B2["Thought 1b"]
+ Root --> B3["Thought 1c"]
 
-    B1 --> E1["Eval: 0.8"]
-    B2 --> E2["Eval: 0.3"]
-    B3 --> E3["Eval: 0.9"]
+ B1 --> E1["Eval: 0.8"]
+ B2 --> E2["Eval: 0.3"]
+ B3 --> E3["Eval: 0.9"]
 
-    E1 -->|Continue| B1a["Thought 2a"]
-    E1 -->|Continue| B1b["Thought 2b"]
-    E3 -->|Continue| B3a["Thought 2a"]
-    E3 -->|Continue| B3b["Thought 2b"]
+ E1 -->|Continue| B1a["Thought 2a"]
+ E1 -->|Continue| B1b["Thought 2b"]
+ E3 -->|Continue| B3a["Thought 2a"]
+ E3 -->|Continue| B3b["Thought 2b"]
 
-    E2 -->|Prune| X["X"]
+ E2 -->|Prune| X["X"]
 
-    B1a --> E4["Eval: 0.7"]
-    B3a --> E5["Eval: 0.95"]
+ B1a --> E4["Eval: 0.7"]
+ B3a --> E5["Eval: 0.95"]
 
-    E5 -->|Best path| Final["Solution"]
+ E5 -->|Best path| Final["Solution"]
 
-    style Root fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style E2 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style X fill:#1a1a2e,stroke:#e94560,color:#fff
-    style E5 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style Final fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style B1 fill:#1a1a2e,stroke:#808080,color:#fff
-    style B2 fill:#1a1a2e,stroke:#808080,color:#fff
-    style B3 fill:#1a1a2e,stroke:#808080,color:#fff
-    style B1a fill:#1a1a2e,stroke:#808080,color:#fff
-    style B1b fill:#1a1a2e,stroke:#808080,color:#fff
-    style B3a fill:#1a1a2e,stroke:#808080,color:#fff
-    style B3b fill:#1a1a2e,stroke:#808080,color:#fff
-    style E1 fill:#1a1a2e,stroke:#808080,color:#fff
-    style E3 fill:#1a1a2e,stroke:#808080,color:#fff
-    style E4 fill:#1a1a2e,stroke:#808080,color:#fff
+ style Root fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style E2 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style X fill:#1a1a2e,stroke:#e94560,color:#fff
+ style E5 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Final fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style B1 fill:#1a1a2e,stroke:#808080,color:#fff
+ style B2 fill:#1a1a2e,stroke:#808080,color:#fff
+ style B3 fill:#1a1a2e,stroke:#808080,color:#fff
+ style B1a fill:#1a1a2e,stroke:#808080,color:#fff
+ style B1b fill:#1a1a2e,stroke:#808080,color:#fff
+ style B3a fill:#1a1a2e,stroke:#808080,color:#fff
+ style B3b fill:#1a1a2e,stroke:#808080,color:#fff
+ style E1 fill:#1a1a2e,stroke:#808080,color:#fff
+ style E3 fill:#1a1a2e,stroke:#808080,color:#fff
+ style E4 fill:#1a1a2e,stroke:#808080,color:#fff
 ```
 
 ToT has three components:
@@ -194,27 +194,27 @@ Yao et al. (2022) combined reasoning traces with actions. The model alternates b
 
 ```mermaid
 graph LR
-    Q["Question:\nWhat is the\npopulation of the\ncountry where\nthe Eiffel Tower\nis located?"]
-    T1["Thought: I need to\nfind which country\nhas the Eiffel Tower"]
-    A1["Action: search\n'Eiffel Tower location'"]
-    O1["Observation:\nParis, France"]
-    T2["Thought: Now I need\nFrance's population"]
-    A2["Action: search\n'France population 2024'"]
-    O2["Observation:\n68.4 million"]
-    T3["Thought: I have\nthe answer"]
-    F["Answer:\n68.4 million"]
+ Q["Question:\nWhat is the\npopulation of the\ncountry where\nthe Eiffel Tower\nis located?"]
+ T1["Thought: I need to\nfind which country\nhas the Eiffel Tower"]
+ A1["Action: search\n'Eiffel Tower location'"]
+ O1["Observation:\nParis, France"]
+ T2["Thought: Now I need\nFrance's population"]
+ A2["Action: search\n'France population 2024'"]
+ O2["Observation:\n68.4 million"]
+ T3["Thought: I have\nthe answer"]
+ F["Answer:\n68.4 million"]
 
-    Q --> T1 --> A1 --> O1 --> T2 --> A2 --> O2 --> T3 --> F
+ Q --> T1 --> A1 --> O1 --> T2 --> A2 --> O2 --> T3 --> F
 
-    style Q fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style T1 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style O1 fill:#1a1a2e,stroke:#808080,color:#fff
-    style T2 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style A2 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style O2 fill:#1a1a2e,stroke:#808080,color:#fff
-    style T3 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style F fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style Q fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style T1 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style O1 fill:#1a1a2e,stroke:#808080,color:#fff
+ style T2 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style A2 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style O2 fill:#1a1a2e,stroke:#808080,color:#fff
+ style T3 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style F fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 ReAct outperforms pure CoT on knowledge-intensive tasks because it can ground its reasoning in real data. On HotpotQA (multi-hop question answering), ReAct with GPT-4 achieves 35.1% exact match vs 29.4% for CoT alone. The real power is that reasoning errors get corrected by observations -- the model can update its plan mid-execution.
@@ -279,20 +279,20 @@ Some tasks are too complex for a single prompt. Prompt chaining breaks them into
 
 ```mermaid
 graph LR
-    I["Raw Input"] --> P1["Prompt 1:\nExtract\nkey facts"]
-    P1 --> O1["Facts"]
-    O1 --> P2["Prompt 2:\nAnalyze\nfacts"]
-    P2 --> O2["Analysis"]
-    O2 --> P3["Prompt 3:\nGenerate\nrecommendation"]
-    P3 --> F["Final Output"]
+ I["Raw Input"] --> P1["Prompt 1:\nExtract\nkey facts"]
+ P1 --> O1["Facts"]
+ O1 --> P2["Prompt 2:\nAnalyze\nfacts"]
+ P2 --> O2["Analysis"]
+ O2 --> P3["Prompt 3:\nGenerate\nrecommendation"]
+ P3 --> F["Final Output"]
 
-    style I fill:#1a1a2e,stroke:#808080,color:#fff
-    style P1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style O1 fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style P2 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style O2 fill:#1a1a2e,stroke:#ffa500,color:#fff
-    style P3 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style F fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style I fill:#1a1a2e,stroke:#808080,color:#fff
+ style P1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style O1 fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style P2 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style O2 fill:#1a1a2e,stroke:#ffa500,color:#fff
+ style P3 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style F fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 Chaining beats single-prompt for three reasons:
@@ -328,12 +328,11 @@ The first component manages few-shot examples and selects the most relevant ones
 
 ```python
 GSM8K_EXAMPLES = [
-    {
-        "question": "Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells every egg at the farmers' market for $2. How much does she make every day at the farmers' market?",
-        "reasoning": "Janet's ducks lay 16 eggs per day. She eats 3 and bakes 4, using 3 + 4 = 7 eggs. So she has 16 - 7 = 9 eggs left. She sells each for $2, so she makes 9 * 2 = $18 per day.",
-        "answer": "18"
-    },
-    ...
+ {
+ "question": "Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells every egg at the farmers' market for $2. How much does she make every day at the farmers' market?",
+ "reasoning": "Janet's ducks lay 16 eggs per day. She eats 3 and bakes 4, using 3 + 4 = 7 eggs. So she has 16 - 7 = 9 eggs left. She sells each for $2, so she makes 9 * 2 = $18 per day.",
+ "answer": "18"
+ },...
 ]
 ```
 
@@ -345,20 +344,20 @@ The prompt builder assembles a system message, few-shot examples with reasoning 
 
 ```python
 def build_cot_prompt(question, examples, num_examples=3):
-    system = (
-        "You are a math problem solver. "
-        "For each problem, show your step-by-step reasoning, "
-        "then give the final numerical answer on the last line "
-        "in the format: 'The answer is [number]'."
-    )
+ system = (
+ "You are a math problem solver. "
+ "For each problem, show your step-by-step reasoning, "
+ "then give the final numerical answer on the last line "
+ "in the format: 'The answer is [number]'."
+ )
 
-    example_text = ""
-    for ex in examples[:num_examples]:
-        example_text += f"Q: {ex['question']}\n"
-        example_text += f"A: {ex['reasoning']} The answer is {ex['answer']}.\n\n"
+ example_text = ""
+ for ex in examples[:num_examples]:
+ example_text += f"Q: {ex['question']}\n"
+ example_text += f"A: {ex['reasoning']} The answer is {ex['answer']}.\n\n"
 
-    user = f"{example_text}Q: {question}\nA:"
-    return system, user
+ user = f"{example_text}Q: {question}\nA:"
+ return system, user
 ```
 
 The format constraint ("The answer is [number]") is critical. Without it, self-consistency cannot extract and compare answers across samples.
@@ -369,30 +368,30 @@ Sample N reasoning paths and take the majority answer.
 
 ```python
 def self_consistency_solve(question, examples, client, model, n_samples=5):
-    system, user = build_cot_prompt(question, examples)
+ system, user = build_cot_prompt(question, examples)
 
-    answers = []
-    reasonings = []
-    for _ in range(n_samples):
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user}
-            ],
-            temperature=0.7
-        )
-        text = response.choices[0].message.content
-        reasonings.append(text)
-        answer = extract_answer(text)
-        if answer is not None:
-            answers.append(answer)
+ answers = []
+ reasonings = []
+ for _ in range(n_samples):
+ response = client.chat.completions.create(
+ model=model,
+ messages=[
+ {"role": "system", "content": system},
+ {"role": "user", "content": user}
+ ],
+ temperature=0.7
+ )
+ text = response.choices[0].message.content
+ reasonings.append(text)
+ answer = extract_answer(text)
+ if answer is not None:
+ answers.append(answer)
 
-    vote_counts = Counter(answers)
-    best_answer = vote_counts.most_common(1)[0][0] if vote_counts else None
-    confidence = vote_counts[best_answer] / len(answers) if best_answer else 0
+ vote_counts = Counter(answers)
+ best_answer = vote_counts.most_common(1)[0][0] if vote_counts else None
+ confidence = vote_counts[best_answer] / len(answers) if best_answer else 0
 
-    return best_answer, confidence, reasonings, vote_counts
+ return best_answer, confidence, reasonings, vote_counts
 ```
 
 Temperature 0.7 is important. At temperature 0.0, all N samples would be identical, defeating the purpose. You need enough randomness for diverse reasoning paths but not so much that the model produces gibberish.
@@ -403,21 +402,21 @@ For problems where linear reasoning fails, ToT explores multiple approaches and 
 
 ```python
 def tree_of_thought_solve(question, client, model, breadth=3, depth=3):
-    thoughts = generate_initial_thoughts(question, client, model, breadth)
-    scored = [(t, evaluate_thought(t, question, client, model)) for t in thoughts]
-    scored.sort(key=lambda x: x[1], reverse=True)
+ thoughts = generate_initial_thoughts(question, client, model, breadth)
+ scored = [(t, evaluate_thought(t, question, client, model)) for t in thoughts]
+ scored.sort(key=lambda x: x[1], reverse=True)
 
-    for current_depth in range(1, depth):
-        next_thoughts = []
-        for thought, score in scored[:2]:
-            extensions = extend_thought(thought, question, client, model, breadth)
-            for ext in extensions:
-                ext_score = evaluate_thought(ext, question, client, model)
-                next_thoughts.append((ext, ext_score))
-        scored = sorted(next_thoughts, key=lambda x: x[1], reverse=True)
+ for current_depth in range(1, depth):
+ next_thoughts = []
+ for thought, score in scored[:2]:
+ extensions = extend_thought(thought, question, client, model, breadth)
+ for ext in extensions:
+ ext_score = evaluate_thought(ext, question, client, model)
+ next_thoughts.append((ext, ext_score))
+ scored = sorted(next_thoughts, key=lambda x: x[1], reverse=True)
 
-    best_thought = scored[0][0] if scored else ""
-    return extract_answer(best_thought), best_thought
+ best_thought = scored[0][0] if scored else ""
+ return extract_answer(best_thought), best_thought
 ```
 
 The evaluator is itself an LLM call. You ask the model: "On a scale of 0.0 to 1.0, how promising is this reasoning path for solving the problem?" This is the key insight of ToT -- the model evaluates its own partial solutions.
@@ -428,19 +427,19 @@ The pipeline combines all techniques with an escalation strategy.
 
 ```python
 def solve_with_escalation(question, examples, client, model):
-    system, user = build_cot_prompt(question, examples)
-    single_response = call_llm(client, model, system, user, temperature=0.0)
-    single_answer = extract_answer(single_response)
+ system, user = build_cot_prompt(question, examples)
+ single_response = call_llm(client, model, system, user, temperature=0.0)
+ single_answer = extract_answer(single_response)
 
-    sc_answer, confidence, _, _ = self_consistency_solve(
-        question, examples, client, model, n_samples=5
-    )
+ sc_answer, confidence, _, _ = self_consistency_solve(
+ question, examples, client, model, n_samples=5
+ )
 
-    if confidence >= 0.8:
-        return sc_answer, "self_consistency", confidence
+ if confidence >= 0.8:
+ return sc_answer, "self_consistency", confidence
 
-    tot_answer, _ = tree_of_thought_solve(question, client, model)
-    return tot_answer, "tree_of_thought", None
+ tot_answer, _ = tree_of_thought_solve(question, client, model)
+ return tot_answer, "tree_of_thought", None
 ```
 
 The escalation logic: try cheap (single CoT) first. If self-consistency confidence is below 0.8 (less than 4 of 5 samples agree), escalate to ToT. This balances cost and accuracy -- most problems are solved cheaply, hard problems get more compute.
@@ -456,15 +455,15 @@ from langchain_core.prompts import FewShotPromptTemplate, PromptTemplate
 from langchain_openai import ChatOpenAI
 
 example_prompt = PromptTemplate(
-    input_variables=["question", "reasoning", "answer"],
-    template="Q: {question}\nA: {reasoning} The answer is {answer}."
+ input_variables=["question", "reasoning", "answer"],
+ template="Q: {question}\nA: {reasoning} The answer is {answer}."
 )
 
 few_shot_prompt = FewShotPromptTemplate(
-    examples=examples,
-    example_prompt=example_prompt,
-    suffix="Q: {input}\nA: Let's think step by step.",
-    input_variables=["input"]
+ examples=examples,
+ example_prompt=example_prompt,
+ suffix="Q: {input}\nA: Let's think step by step.",
+ input_variables=["input"]
 )
 
 llm = ChatOpenAI(model="gpt-4o", temperature=0.7)
@@ -479,9 +478,9 @@ from langchain_core.example_selectors import SemanticSimilarityExampleSelector
 from langchain_openai import OpenAIEmbeddings
 
 selector = SemanticSimilarityExampleSelector.from_examples(
-    examples,
-    OpenAIEmbeddings(),
-    k=3
+ examples,
+ OpenAIEmbeddings(),
+ k=3
 )
 ```
 
@@ -495,11 +494,11 @@ import dspy
 dspy.configure(lm=dspy.LM("openai/gpt-4o", temperature=0.7))
 
 class MathSolver(dspy.Module):
-    def __init__(self):
-        self.solve = dspy.ChainOfThought("question -> answer")
+ def __init__(self):
+ self.solve = dspy.ChainOfThought("question -> answer")
 
-    def forward(self, question):
-        return self.solve(question=question)
+ def forward(self, question):
+ return self.solve(question=question)
 
 solver = MathSolver()
 result = solver(question="Janet's ducks lay 16 eggs per day...")
@@ -509,8 +508,8 @@ DSPy's `ChainOfThought` automatically adds reasoning traces. `dspy.majority` imp
 
 ```python
 result = dspy.majority(
-    [solver(question=q) for _ in range(5)],
-    field="answer"
+ [solver(question=q) for _ in range(5)],
+ field="answer"
 )
 ```
 

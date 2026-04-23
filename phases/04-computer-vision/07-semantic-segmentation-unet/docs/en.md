@@ -28,13 +28,13 @@ The architectural problem is simple to state and not simple to solve: you need t
 
 ```mermaid
 flowchart LR
-    IN["Input image"] --> SEM["Semantic<br/>(pixel → class)"]
-    IN --> INS["Instance<br/>(pixel → object id,<br/>only foreground classes)"]
-    IN --> PAN["Panoptic<br/>(every pixel → class + id)"]
+ IN["Input image"] --> SEM["Semantic<br/>(pixel → class)"]
+ IN --> INS["Instance<br/>(pixel → object id,<br/>only foreground classes)"]
+ IN --> PAN["Panoptic<br/>(every pixel → class + id)"]
 
-    style SEM fill:#dbeafe,stroke:#2563eb
-    style INS fill:#fef3c7,stroke:#d97706
-    style PAN fill:#dcfce7,stroke:#16a34a
+ style SEM fill:#dbeafe,stroke:#2563eb
+ style INS fill:#fef3c7,stroke:#d97706
+ style PAN fill:#dcfce7,stroke:#16a34a
 ```
 
 - **Semantic** says "this pixel is road, that pixel is car." Two cars next to each other collapse into a single blob.
@@ -47,29 +47,29 @@ This lesson covers semantic. The next lesson (Mask R-CNN) covers instance.
 
 ```mermaid
 flowchart LR
-    subgraph ENC["Encoder (contracting)"]
-        E1["64<br/>H x W"] --> E2["128<br/>H/2 x W/2"]
-        E2 --> E3["256<br/>H/4 x W/4"]
-        E3 --> E4["512<br/>H/8 x W/8"]
-    end
-    subgraph BOT["Bottleneck"]
-        B1["1024<br/>H/16 x W/16"]
-    end
-    subgraph DEC["Decoder (expanding)"]
-        D4["512<br/>H/8 x W/8"] --> D3["256<br/>H/4 x W/4"]
-        D3 --> D2["128<br/>H/2 x W/2"]
-        D2 --> D1["64<br/>H x W"]
-    end
-    E4 --> B1 --> D4
-    E1 -. skip .-> D1
-    E2 -. skip .-> D2
-    E3 -. skip .-> D3
-    E4 -. skip .-> D4
-    D1 --> OUT["1x1 conv<br/>classes"]
+ subgraph ENC["Encoder (contracting)"]
+ E1["64<br/>H x W"] --> E2["128<br/>H/2 x W/2"]
+ E2 --> E3["256<br/>H/4 x W/4"]
+ E3 --> E4["512<br/>H/8 x W/8"]
+ end
+ subgraph BOT["Bottleneck"]
+ B1["1024<br/>H/16 x W/16"]
+ end
+ subgraph DEC["Decoder (expanding)"]
+ D4["512<br/>H/8 x W/8"] --> D3["256<br/>H/4 x W/4"]
+ D3 --> D2["128<br/>H/2 x W/2"]
+ D2 --> D1["64<br/>H x W"]
+ end
+ E4 --> B1 --> D4
+ E1 -. skip.-> D1
+ E2 -. skip.-> D2
+ E3 -. skip.-> D3
+ E4 -. skip.-> D4
+ D1 --> OUT["1x1 conv<br/>classes"]
 
-    style ENC fill:#dbeafe,stroke:#2563eb
-    style BOT fill:#fef3c7,stroke:#d97706
-    style DEC fill:#dcfce7,stroke:#16a34a
+ style ENC fill:#dbeafe,stroke:#2563eb
+ style BOT fill:#fef3c7,stroke:#d97706
+ style DEC fill:#dcfce7,stroke:#16a34a
 ```
 
 The encoder halves spatial resolution four times and doubles channels. The decoder reverses: doubles spatial resolution four times and halves channels. The skip connections concatenate matching encoder features with decoder features at every resolution. The final 1x1 conv maps `64 -> num_classes` at full resolution.
@@ -111,7 +111,7 @@ where `p` is the sigmoid/softmax probability map for a class and `y` is the bina
 In practice, use the **combined loss**:
 
 ```
-L = L_cross_entropy + lambda * L_dice       (lambda ~ 1)
+L = L_cross_entropy + lambda * L_dice (lambda ~ 1)
 ```
 
 Cross-entropy gives stable gradients early in training; Dice focuses the tail of training on actually matching the mask shape. This combination is the medical-imaging default and hard to beat on any class-imbalanced dataset.
@@ -147,19 +147,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class DoubleConv(nn.Module):
-    def __init__(self, in_c, out_c):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Conv2d(in_c, out_c, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_c),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_c, out_c, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_c),
-            nn.ReLU(inplace=True),
-        )
+ def __init__(self, in_c, out_c):
+ super().__init__()
+ self.net = nn.Sequential(
+ nn.Conv2d(in_c, out_c, kernel_size=3, padding=1, bias=False),
+ nn.BatchNorm2d(out_c),
+ nn.ReLU(inplace=True),
+ nn.Conv2d(out_c, out_c, kernel_size=3, padding=1, bias=False),
+ nn.BatchNorm2d(out_c),
+ nn.ReLU(inplace=True),
+ )
 
-    def forward(self, x):
-        return self.net(x)
+ def forward(self, x):
+ return self.net(x)
 ```
 
 This block is reused throughout. `bias=False` because BN's beta handles the bias.
@@ -168,29 +168,29 @@ This block is reused throughout. `bias=False` because BN's beta handles the bias
 
 ```python
 class Down(nn.Module):
-    def __init__(self, in_c, out_c):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.MaxPool2d(2),
-            DoubleConv(in_c, out_c),
-        )
+ def __init__(self, in_c, out_c):
+ super().__init__()
+ self.net = nn.Sequential(
+ nn.MaxPool2d(2),
+ DoubleConv(in_c, out_c),
+ )
 
-    def forward(self, x):
-        return self.net(x)
+ def forward(self, x):
+ return self.net(x)
 
 
 class Up(nn.Module):
-    def __init__(self, in_c, out_c):
-        super().__init__()
-        self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)
-        self.conv = DoubleConv(in_c, out_c)
+ def __init__(self, in_c, out_c):
+ super().__init__()
+ self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)
+ self.conv = DoubleConv(in_c, out_c)
 
-    def forward(self, x, skip):
-        x = self.up(x)
-        if x.shape[-2:] != skip.shape[-2:]:
-            x = F.interpolate(x, size=skip.shape[-2:], mode="bilinear", align_corners=False)
-        x = torch.cat([skip, x], dim=1)
-        return self.conv(x)
+ def forward(self, x, skip):
+ x = self.up(x)
+ if x.shape[-2:] != skip.shape[-2:]:
+ x = F.interpolate(x, size=skip.shape[-2:], mode="bilinear", align_corners=False)
+ x = torch.cat([skip, x], dim=1)
+ return self.conv(x)
 ```
 
 The spatial-only shape check (`shape[-2:]`) handles inputs whose dimensions are not divisible by 16; a safe `F.interpolate` aligns the tensor before the concat. Comparing the full shape would also trigger on channel-count differences, which should be a loud error, not a silent interpolate.
@@ -199,30 +199,30 @@ The spatial-only shape check (`shape[-2:]`) handles inputs whose dimensions are 
 
 ```python
 class UNet(nn.Module):
-    def __init__(self, in_channels=3, num_classes=2, base=64):
-        super().__init__()
-        self.inc = DoubleConv(in_channels, base)
-        self.d1 = Down(base, base * 2)
-        self.d2 = Down(base * 2, base * 4)
-        self.d3 = Down(base * 4, base * 8)
-        self.d4 = Down(base * 8, base * 16)
-        self.u1 = Up(base * 16 + base * 8, base * 8)
-        self.u2 = Up(base * 8 + base * 4, base * 4)
-        self.u3 = Up(base * 4 + base * 2, base * 2)
-        self.u4 = Up(base * 2 + base, base)
-        self.outc = nn.Conv2d(base, num_classes, kernel_size=1)
+ def __init__(self, in_channels=3, num_classes=2, base=64):
+ super().__init__()
+ self.inc = DoubleConv(in_channels, base)
+ self.d1 = Down(base, base * 2)
+ self.d2 = Down(base * 2, base * 4)
+ self.d3 = Down(base * 4, base * 8)
+ self.d4 = Down(base * 8, base * 16)
+ self.u1 = Up(base * 16 + base * 8, base * 8)
+ self.u2 = Up(base * 8 + base * 4, base * 4)
+ self.u3 = Up(base * 4 + base * 2, base * 2)
+ self.u4 = Up(base * 2 + base, base)
+ self.outc = nn.Conv2d(base, num_classes, kernel_size=1)
 
-    def forward(self, x):
-        x1 = self.inc(x)
-        x2 = self.d1(x1)
-        x3 = self.d2(x2)
-        x4 = self.d3(x3)
-        x5 = self.d4(x4)
-        x = self.u1(x5, x4)
-        x = self.u2(x, x3)
-        x = self.u3(x, x2)
-        x = self.u4(x, x1)
-        return self.outc(x)
+ def forward(self, x):
+ x1 = self.inc(x)
+ x2 = self.d1(x1)
+ x3 = self.d2(x2)
+ x4 = self.d3(x3)
+ x5 = self.d4(x4)
+ x = self.u1(x5, x4)
+ x = self.u2(x, x3)
+ x = self.u3(x, x2)
+ x = self.u4(x, x1)
+ return self.outc(x)
 
 net = UNet(in_channels=3, num_classes=2, base=32)
 x = torch.randn(1, 3, 256, 256)
@@ -236,19 +236,19 @@ Output shape `(1, 2, 256, 256)` — same spatial size as the input, `num_classes
 
 ```python
 def dice_loss(logits, targets, num_classes, eps=1e-6):
-    probs = F.softmax(logits, dim=1)
-    targets_one_hot = F.one_hot(targets, num_classes).permute(0, 3, 1, 2).float()
-    dims = (0, 2, 3)
-    intersection = (probs * targets_one_hot).sum(dim=dims)
-    denom = probs.sum(dim=dims) + targets_one_hot.sum(dim=dims)
-    dice = (2 * intersection + eps) / (denom + eps)
-    return 1 - dice.mean()
+ probs = F.softmax(logits, dim=1)
+ targets_one_hot = F.one_hot(targets, num_classes).permute(0, 3, 1, 2).float()
+ dims = (0, 2, 3)
+ intersection = (probs * targets_one_hot).sum(dim=dims)
+ denom = probs.sum(dim=dims) + targets_one_hot.sum(dim=dims)
+ dice = (2 * intersection + eps) / (denom + eps)
+ return 1 - dice.mean()
 
 
 def combined_loss(logits, targets, num_classes, lam=1.0):
-    ce = F.cross_entropy(logits, targets)
-    dc = dice_loss(logits, targets, num_classes)
-    return ce + lam * dc, {"ce": ce.item(), "dice": dc.item()}
+ ce = F.cross_entropy(logits, targets)
+ dc = dice_loss(logits, targets, num_classes)
+ return ce + lam * dc, {"ce": ce.item(), "dice": dc.item()}
 ```
 
 Dice is computed per class then averaged (macro Dice). The `eps` prevents division by zero on classes absent from the batch.
@@ -258,15 +258,15 @@ Dice is computed per class then averaged (macro Dice). The `eps` prevents divisi
 ```python
 @torch.no_grad()
 def iou_per_class(logits, targets, num_classes):
-    preds = logits.argmax(dim=1)
-    ious = torch.zeros(num_classes)
-    for c in range(num_classes):
-        pred_c = (preds == c)
-        true_c = (targets == c)
-        inter = (pred_c & true_c).sum().float()
-        union = (pred_c | true_c).sum().float()
-        ious[c] = (inter / union) if union > 0 else torch.tensor(float("nan"))
-    return ious
+ preds = logits.argmax(dim=1)
+ ious = torch.zeros(num_classes)
+ for c in range(num_classes):
+ pred_c = (preds == c)
+ true_c = (targets == c)
+ inter = (pred_c & true_c).sum().float()
+ union = (pred_c | true_c).sum().float()
+ ious[c] = (inter / union) if union > 0 else torch.tensor(float("nan"))
+ return ious
 ```
 
 Returns a vector of length C. `nan` marks classes absent from the batch — do not average over those when computing mIoU.
@@ -280,43 +280,43 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
 def synthetic_segmentation(num_samples=200, size=64, seed=0):
-    rng = np.random.default_rng(seed)
-    images = np.zeros((num_samples, size, size, 3), dtype=np.float32)
-    masks = np.zeros((num_samples, size, size), dtype=np.int64)
-    for i in range(num_samples):
-        bg = rng.uniform(0, 1, (3,))
-        images[i] = bg
-        masks[i] = 0
-        num_shapes = rng.integers(1, 4)
-        for _ in range(num_shapes):
-            cls = int(rng.integers(1, 3))
-            color = rng.uniform(0, 1, (3,))
-            cx, cy = rng.integers(10, size - 10, size=2)
-            r = int(rng.integers(4, 12))
-            yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
-            if cls == 1:
-                mask = (xx - cx) ** 2 + (yy - cy) ** 2 < r ** 2
-            else:
-                mask = (np.abs(xx - cx) < r) & (np.abs(yy - cy) < r)
-            images[i][mask] = color
-            masks[i][mask] = cls
-        images[i] += rng.normal(0, 0.02, images[i].shape)
-        images[i] = np.clip(images[i], 0, 1)
-    return images, masks
+ rng = np.random.default_rng(seed)
+ images = np.zeros((num_samples, size, size, 3), dtype=np.float32)
+ masks = np.zeros((num_samples, size, size), dtype=np.int64)
+ for i in range(num_samples):
+ bg = rng.uniform(0, 1, (3,))
+ images[i] = bg
+ masks[i] = 0
+ num_shapes = rng.integers(1, 4)
+ for _ in range(num_shapes):
+ cls = int(rng.integers(1, 3))
+ color = rng.uniform(0, 1, (3,))
+ cx, cy = rng.integers(10, size - 10, size=2)
+ r = int(rng.integers(4, 12))
+ yy, xx = np.meshgrid(np.arange(size), np.arange(size), indexing="ij")
+ if cls == 1:
+ mask = (xx - cx) ** 2 + (yy - cy) ** 2 < r ** 2
+ else:
+ mask = (np.abs(xx - cx) < r) & (np.abs(yy - cy) < r)
+ images[i][mask] = color
+ masks[i][mask] = cls
+ images[i] += rng.normal(0, 0.02, images[i].shape)
+ images[i] = np.clip(images[i], 0, 1)
+ return images, masks
 
 
 class SegDataset(Dataset):
-    def __init__(self, images, masks):
-        self.images = images
-        self.masks = masks
+ def __init__(self, images, masks):
+ self.images = images
+ self.masks = masks
 
-    def __len__(self):
-        return len(self.images)
+ def __len__(self):
+ return len(self.images)
 
-    def __getitem__(self, i):
-        img = torch.from_numpy(self.images[i]).permute(2, 0, 1).float()
-        mask = torch.from_numpy(self.masks[i]).long()
-        return img, mask
+ def __getitem__(self, i):
+ img = torch.from_numpy(self.images[i]).permute(2, 0, 1).float()
+ mask = torch.from_numpy(self.masks[i]).long()
+ return img, mask
 ```
 
 Three classes: background (0), circles (1), squares (2). The network must learn to distinguish shape.
@@ -325,20 +325,20 @@ Three classes: background (0), circles (1), squares (2). The network must learn 
 
 ```python
 def train_one_epoch(model, loader, optimizer, device, num_classes):
-    model.train()
-    loss_sum, total = 0.0, 0
-    iou_sum = torch.zeros(num_classes)
-    for x, y in loader:
-        x, y = x.to(device), y.to(device)
-        logits = model(x)
-        loss, _ = combined_loss(logits, y, num_classes)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        loss_sum += loss.item() * x.size(0)
-        total += x.size(0)
-        iou_sum += iou_per_class(logits, y, num_classes).nan_to_num(0)
-    return loss_sum / total, iou_sum / len(loader)
+ model.train()
+ loss_sum, total = 0.0, 0
+ iou_sum = torch.zeros(num_classes)
+ for x, y in loader:
+ x, y = x.to(device), y.to(device)
+ logits = model(x)
+ loss, _ = combined_loss(logits, y, num_classes)
+ optimizer.zero_grad()
+ loss.backward()
+ optimizer.step()
+ loss_sum += loss.item() * x.size(0)
+ total += x.size(0)
+ iou_sum += iou_per_class(logits, y, num_classes).nan_to_num(0)
+ return loss_sum / total, iou_sum / len(loader)
 ```
 
 Run this for 10-30 epochs on the synthetic dataset and watch mIoU climb past 0.9 for the shape classes. Note the `nan_to_num(0)` treats classes absent from a batch as zero; for accurate per-class IoU, mask by presence and use `torch.nanmean` across batches at evaluation time rather than averaging here.
@@ -351,10 +351,10 @@ For production, `segmentation_models_pytorch` ("smp") wraps every standard segme
 import segmentation_models_pytorch as smp
 
 model = smp.Unet(
-    encoder_name="resnet34",
-    encoder_weights="imagenet",
-    in_channels=3,
-    classes=3,
+ encoder_name="resnet34",
+ encoder_weights="imagenet",
+ in_channels=3,
+ classes=3,
 )
 ```
 

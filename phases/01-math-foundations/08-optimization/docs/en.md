@@ -30,8 +30,8 @@ Optimization is finding the input values that minimize (or maximize) a function.
 
 ```
 minimize L(w) where:
-  L = loss function
-  w = model weights (could be millions of parameters)
+ L = loss function
+ w = model weights (could be millions of parameters)
 ```
 
 ### Gradient descent (vanilla)
@@ -46,9 +46,9 @@ That is the entire algorithm. One line.
 
 ```mermaid
 graph TD
-    A["* Starting point (high loss)"] --> B["Moving downhill along gradient"]
-    B --> C["Approaching minimum"]
-    C --> D["o Minimum (low loss)"]
+ A["* Starting point (high loss)"] --> B["Moving downhill along gradient"]
+ B --> C["Approaching minimum"]
+ C --> D["o Minimum (low loss)"]
 ```
 
 ### Learning rate: the most important hyperparameter
@@ -57,19 +57,19 @@ The learning rate controls step size. It determines everything about convergence
 
 ```mermaid
 graph LR
-    subgraph TooLarge["Too Large (lr = 1.0)"]
-        A1["Step 1"] -->|overshoot| A2["Step 2"]
-        A2 -->|overshoot| A3["Step 3"]
-        A3 -->|diverging| A4["..."]
-    end
-    subgraph TooSmall["Too Small (lr = 0.0001)"]
-        B1["Step 1"] -->|tiny step| B2["Step 2"]
-        B2 -->|tiny step| B3["Step 3"]
-        B3 -->|10,000 steps later| B4["Minimum"]
-    end
-    subgraph JustRight["Just Right (lr = 0.01)"]
-        C1["Start"] --> C2["..."] --> C3["Converged in ~100 steps"]
-    end
+ subgraph TooLarge["Too Large (lr = 1.0)"]
+ A1["Step 1"] -->|overshoot| A2["Step 2"]
+ A2 -->|overshoot| A3["Step 3"]
+ A3 -->|diverging| A4["..."]
+ end
+ subgraph TooSmall["Too Small (lr = 0.0001)"]
+ B1["Step 1"] -->|tiny step| B2["Step 2"]
+ B2 -->|tiny step| B3["Step 3"]
+ B3 -->|10,000 steps later| B4["Minimum"]
+ end
+ subgraph JustRight["Just Right (lr = 0.01)"]
+ C1["Start"] --> C2["..."] --> C3["Converged in ~100 steps"]
+ end
 ```
 
 There is no formula for the right learning rate. You find it by experiment. Common starting points: 0.001 for Adam, 0.01 for SGD with momentum.
@@ -103,17 +103,17 @@ The analogy: a ball rolling downhill. It does not stop and restart at every bump
 
 ```mermaid
 graph TD
-    subgraph Without["Without Momentum (zigzag, slow)"]
-        W1["Start"] -->|left| W2[" "]
-        W2 -->|right| W3[" "]
-        W3 -->|left| W4[" "]
-        W4 -->|right| W5[" "]
-        W5 -->|left| W6[" "]
-        W6 --> W7["Minimum"]
-    end
-    subgraph With["With Momentum (smooth, fast)"]
-        M1["Start"] --> M2[" "] --> M3[" "] --> M4["Minimum"]
-    end
+ subgraph Without["Without Momentum (zigzag, slow)"]
+ W1["Start"] -->|left| W2[" "]
+ W2 -->|right| W3[" "]
+ W3 -->|left| W4[" "]
+ W4 -->|right| W5[" "]
+ W5 -->|left| W6[" "]
+ W6 --> W7["Minimum"]
+ end
+ subgraph With["With Momentum (smooth, fast)"]
+ M1["Start"] --> M2[" "] --> M3[" "] --> M4["Minimum"]
+ end
 ```
 
 `beta` (typically 0.9) controls how much history to keep. Higher beta means more momentum, smoother paths, but slower response to direction changes.
@@ -131,8 +131,8 @@ Adam (Adaptive Moment Estimation) tracks two things per weight:
 m = beta1 * m + (1 - beta1) * gradient
 v = beta2 * v + (1 - beta2) * gradient^2
 
-m_hat = m / (1 - beta1^t)    bias correction
-v_hat = v / (1 - beta2^t)    bias correction
+m_hat = m / (1 - beta1^t) bias correction
+v_hat = v / (1 - beta2^t) bias correction
 
 w = w - lr * m_hat / (sqrt(v_hat) + epsilon)
 ```
@@ -162,16 +162,16 @@ Neural network loss functions are non-convex. They have many local minima, saddl
 
 ```mermaid
 graph LR
-    subgraph Convex["Convex: One valley, one answer"]
-        direction TB
-        CV1["High loss"] --> CV2["Global minimum"]
-    end
-    subgraph NonConvex["Non-convex: Multiple valleys, saddle points"]
-        direction TB
-        NC1["Start"] --> NC2["Local minimum"]
-        NC1 --> NC3["Saddle point"]
-        NC1 --> NC4["Global minimum"]
-    end
+ subgraph Convex["Convex: One valley, one answer"]
+ direction TB
+ CV1["High loss"] --> CV2["Global minimum"]
+ end
+ subgraph NonConvex["Non-convex: Multiple valleys, saddle points"]
+ direction TB
+ NC1["Start"] --> NC2["Local minimum"]
+ NC1 --> NC3["Saddle point"]
+ NC1 --> NC4["Global minimum"]
+ end
 ```
 
 In practice, local minima in high-dimensional neural networks are rarely a problem. Most local minima have loss values close to the global minimum. Saddle points (flat in some directions, curved in others) are the real obstacle. Momentum and noise from mini-batches help escape them.
@@ -182,15 +182,15 @@ The loss is a function of all weights. For a model with 1 million weights, the l
 
 ```mermaid
 graph TD
-    HL["High loss region"] --> SP["Saddle point"]
-    HL --> LM["Local minimum"]
-    SP --> LM
-    SP --> GM["Global minimum"]
-    LM -.->|"shallow barrier"| GM
-    style HL fill:#ff6666,color:#000
-    style SP fill:#ffcc66,color:#000
-    style LM fill:#66ccff,color:#000
-    style GM fill:#66ff66,color:#000
+ HL["High loss region"] --> SP["Saddle point"]
+ HL --> LM["Local minimum"]
+ SP --> LM
+ SP --> GM["Global minimum"]
+ LM -.->|"shallow barrier"| GM
+ style HL fill:#ff6666,color:#000
+ style SP fill:#ffcc66,color:#000
+ style LM fill:#66ccff,color:#000
+ style GM fill:#66ff66,color:#000
 ```
 
 Sharp minima generalize poorly. Flat minima generalize well. This is one reason SGD with momentum often outperforms Adam on final test accuracy: its noise prevents settling into sharp minima.
@@ -207,95 +207,95 @@ f(x, y) = (1 - x)^2 + 100 * (y - x^2)^2
 
 ```python
 def rosenbrock(params):
-    x, y = params
-    return (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+ x, y = params
+ return (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
 
 def rosenbrock_gradient(params):
-    x, y = params
-    df_dx = -2 * (1 - x) + 200 * (y - x ** 2) * (-2 * x)
-    df_dy = 200 * (y - x ** 2)
-    return [df_dx, df_dy]
+ x, y = params
+ df_dx = -2 * (1 - x) + 200 * (y - x ** 2) * (-2 * x)
+ df_dy = 200 * (y - x ** 2)
+ return [df_dx, df_dy]
 ```
 
 ### Step 2: Vanilla gradient descent
 
 ```python
 class GradientDescent:
-    def __init__(self, lr=0.001):
-        self.lr = lr
+ def __init__(self, lr=0.001):
+ self.lr = lr
 
-    def step(self, params, grads):
-        return [p - self.lr * g for p, g in zip(params, grads)]
+ def step(self, params, grads):
+ return [p - self.lr * g for p, g in zip(params, grads)]
 ```
 
 ### Step 3: SGD with momentum
 
 ```python
 class SGDMomentum:
-    def __init__(self, lr=0.001, momentum=0.9):
-        self.lr = lr
-        self.momentum = momentum
-        self.velocity = None
+ def __init__(self, lr=0.001, momentum=0.9):
+ self.lr = lr
+ self.momentum = momentum
+ self.velocity = None
 
-    def step(self, params, grads):
-        if self.velocity is None:
-            self.velocity = [0.0] * len(params)
-        self.velocity = [
-            self.momentum * v + g
-            for v, g in zip(self.velocity, grads)
-        ]
-        return [p - self.lr * v for p, v in zip(params, self.velocity)]
+ def step(self, params, grads):
+ if self.velocity is None:
+ self.velocity = [0.0] * len(params)
+ self.velocity = [
+ self.momentum * v + g
+ for v, g in zip(self.velocity, grads)
+ ]
+ return [p - self.lr * v for p, v in zip(params, self.velocity)]
 ```
 
 ### Step 4: Adam
 
 ```python
 class Adam:
-    def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, epsilon=1e-8):
-        self.lr = lr
-        self.beta1 = beta1
-        self.beta2 = beta2
-        self.epsilon = epsilon
-        self.m = None
-        self.v = None
-        self.t = 0
+ def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, epsilon=1e-8):
+ self.lr = lr
+ self.beta1 = beta1
+ self.beta2 = beta2
+ self.epsilon = epsilon
+ self.m = None
+ self.v = None
+ self.t = 0
 
-    def step(self, params, grads):
-        if self.m is None:
-            self.m = [0.0] * len(params)
-            self.v = [0.0] * len(params)
+ def step(self, params, grads):
+ if self.m is None:
+ self.m = [0.0] * len(params)
+ self.v = [0.0] * len(params)
 
-        self.t += 1
+ self.t += 1
 
-        self.m = [
-            self.beta1 * m + (1 - self.beta1) * g
-            for m, g in zip(self.m, grads)
-        ]
-        self.v = [
-            self.beta2 * v + (1 - self.beta2) * g ** 2
-            for v, g in zip(self.v, grads)
-        ]
+ self.m = [
+ self.beta1 * m + (1 - self.beta1) * g
+ for m, g in zip(self.m, grads)
+ ]
+ self.v = [
+ self.beta2 * v + (1 - self.beta2) * g ** 2
+ for v, g in zip(self.v, grads)
+ ]
 
-        m_hat = [m / (1 - self.beta1 ** self.t) for m in self.m]
-        v_hat = [v / (1 - self.beta2 ** self.t) for v in self.v]
+ m_hat = [m / (1 - self.beta1 ** self.t) for m in self.m]
+ v_hat = [v / (1 - self.beta2 ** self.t) for v in self.v]
 
-        return [
-            p - self.lr * mh / (vh ** 0.5 + self.epsilon)
-            for p, mh, vh in zip(params, m_hat, v_hat)
-        ]
+ return [
+ p - self.lr * mh / (vh ** 0.5 + self.epsilon)
+ for p, mh, vh in zip(params, m_hat, v_hat)
+ ]
 ```
 
 ### Step 5: Run and compare
 
 ```python
 def optimize(optimizer, func, grad_func, start, steps=5000):
-    params = list(start)
-    history = [params[:]]
-    for _ in range(steps):
-        grads = grad_func(params)
-        params = optimizer.step(params, grads)
-        history.append(params[:])
-    return history
+ params = list(start)
+ history = [params[:]]
+ for _ in range(steps):
+ grads = grad_func(params)
+ params = optimizer.step(params, grads)
+ history.append(params[:])
+ return history
 
 start = [-1.0, 1.0]
 
@@ -304,9 +304,9 @@ sgd_history = optimize(SGDMomentum(lr=0.0001, momentum=0.9), rosenbrock, rosenbr
 adam_history = optimize(Adam(lr=0.01), rosenbrock, rosenbrock_gradient, start)
 
 for name, history in [("GD", gd_history), ("SGD+M", sgd_history), ("Adam", adam_history)]:
-    final = history[-1]
-    loss = rosenbrock(final)
-    print(f"{name:6s} -> x={final[0]:.6f}, y={final[1]:.6f}, loss={loss:.8f}")
+ final = history[-1]
+ loss = rosenbrock(final)
+ print(f"{name:6s} -> x={final[0]:.6f}, y={final[1]:.6f}, loss={loss:.8f}")
 ```
 
 Expected output: Adam converges fastest. SGD with momentum follows a smoother path. Vanilla GD makes slow progress along the narrow valley.

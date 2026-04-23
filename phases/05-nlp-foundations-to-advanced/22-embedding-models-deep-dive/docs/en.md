@@ -59,9 +59,9 @@ import numpy as np
 
 encoder = SentenceTransformer("BAAI/bge-small-en-v1.5")
 corpus = [
-    "The first iPhone launched in 2007.",
-    "Apple released the iPod in 2001.",
-    "Android is an operating system from Google.",
+ "The first iPhone launched in 2007.",
+ "Apple released the iPod in 2001.",
+ "Android is an operating system from Google.",
 ]
 emb = encoder.encode(corpus, normalize_embeddings=True)
 
@@ -77,8 +77,8 @@ print(sorted(enumerate(scores), key=lambda x: -x[1]))
 
 ```python
 def truncate(vectors, dim):
-    out = vectors[:, :dim]
-    return out / np.linalg.norm(out, axis=1, keepdims=True)
+ out = vectors[:, :dim]
+ return out / np.linalg.norm(out, axis=1, keepdims=True)
 
 emb_256 = truncate(emb, 256)
 emb_128 = truncate(emb, 128)
@@ -94,20 +94,20 @@ from FlagEmbedding import BGEM3FlagModel
 model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
 
 output = model.encode(
-    corpus,
-    return_dense=True,
-    return_sparse=True,
-    return_colbert_vecs=True,
+ corpus,
+ return_dense=True,
+ return_sparse=True,
+ return_colbert_vecs=True,
 )
-# output["dense_vecs"]:    (n_docs, 1024)
+# output["dense_vecs"]: (n_docs, 1024)
 # output["lexical_weights"]: list of dict {token_id: weight}
-# output["colbert_vecs"]:  list of (n_tokens, 1024) arrays
+# output["colbert_vecs"]: list of (n_tokens, 1024) arrays
 ```
 
 Three indexes, one inference call. Score fusion:
 
 ```python
-dense_score = ... # cosine over dense_vecs
+dense_score =... # cosine over dense_vecs
 sparse_score = model.compute_lexical_matching_score(q_lex, d_lex)
 colbert_score = model.colbert_score(q_col, d_col)
 final = 0.4 * dense_score + 0.2 * sparse_score + 0.4 * colbert_score

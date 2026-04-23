@@ -30,12 +30,12 @@ A decision tree partitions the feature space into rectangular regions by asking 
 
 ```mermaid
 graph TD
-    A["Age < 30?"] -->|Yes| B["Income > 50k?"]
-    A -->|No| C["Credit Score > 700?"]
-    B -->|Yes| D["Approve"]
-    B -->|No| E["Deny"]
-    C -->|Yes| F["Approve"]
-    C -->|No| G["Deny"]
+ A["Age < 30?"] -->|Yes| B["Income > 50k?"]
+ A -->|No| C["Credit Score > 700?"]
+ B -->|Yes| D["Approve"]
+ B -->|No| E["Deny"]
+ C -->|Yes| F["Approve"]
+ C -->|No| G["Deny"]
 ```
 
 Each internal node tests a feature against a threshold. Each leaf node makes a prediction. To classify a new data point, you start at the root and follow the branches until you reach a leaf.
@@ -74,9 +74,9 @@ For a pure node, entropy = 0. For a 50/50 binary split, entropy = 1.0. Lower is 
 Example: 6 cats, 4 dogs
 
 Entropy = -(0.6 * log2(0.6) + 0.4 * log2(0.4))
-        = -(0.6 * -0.737 + 0.4 * -1.322)
-        = 0.442 + 0.529
-        = 0.971 bits
+ = -(0.6 * -0.737 + 0.4 * -1.322)
+ = 0.442 + 0.529
+ = 0.971 bits
 ```
 
 **Information gain** is the reduction in impurity (entropy or Gini) after a split.
@@ -94,9 +94,9 @@ The greedy algorithm at each node: try every feature and every possible threshol
 For a dataset with n features and m samples at the current node:
 
 1. For each feature j (j = 1 to n):
-   - Sort the samples by feature j
-   - Try every midpoint between consecutive distinct values as a threshold
-   - Compute the information gain for each threshold
+ - Sort the samples by feature j
+ - Try every midpoint between consecutive distinct values as a threshold
+ - Compute the information gain for each threshold
 2. Select the feature and threshold with the highest information gain
 3. Split the data into left (feature <= threshold) and right (feature > threshold)
 4. Recurse on each child
@@ -137,18 +137,18 @@ A single decision tree is high variance. Small changes in the data can produce c
 
 ```mermaid
 graph TD
-    D["Training Data"] --> B1["Bootstrap Sample 1"]
-    D --> B2["Bootstrap Sample 2"]
-    D --> B3["Bootstrap Sample 3"]
-    D --> BN["Bootstrap Sample N"]
-    B1 --> T1["Tree 1<br>(random feature subset)"]
-    B2 --> T2["Tree 2<br>(random feature subset)"]
-    B3 --> T3["Tree 3<br>(random feature subset)"]
-    BN --> TN["Tree N<br>(random feature subset)"]
-    T1 --> V["Aggregate Predictions<br>(majority vote or average)"]
-    T2 --> V
-    T3 --> V
-    TN --> V
+ D["Training Data"] --> B1["Bootstrap Sample 1"]
+ D --> B2["Bootstrap Sample 2"]
+ D --> B3["Bootstrap Sample 3"]
+ D --> BN["Bootstrap Sample N"]
+ B1 --> T1["Tree 1<br>(random feature subset)"]
+ B2 --> T2["Tree 2<br>(random feature subset)"]
+ B3 --> T3["Tree 3<br>(random feature subset)"]
+ BN --> TN["Tree N<br>(random feature subset)"]
+ T1 --> V["Aggregate Predictions<br>(majority vote or average)"]
+ T2 --> V
+ T3 --> V
+ TN --> V
 ```
 
 Two sources of randomness make the trees diverse:
@@ -167,7 +167,7 @@ Random forests naturally provide feature importance scores. The most common meth
 
 ```
 importance(feature_j) = sum over all nodes where feature_j is used:
-    (n_samples_at_node / n_total_samples) * impurity_decrease
+ (n_samples_at_node / n_total_samples) * impurity_decrease
 ```
 
 This is fast (computed during training) but biased toward high-cardinality features and features with many possible split points.
@@ -199,24 +199,24 @@ Build both split criteria from scratch and verify they agree on which splits are
 import math
 
 def gini_impurity(labels):
-    n = len(labels)
-    if n == 0:
-        return 0.0
-    counts = {}
-    for label in labels:
-        counts[label] = counts.get(label, 0) + 1
-    return 1.0 - sum((c / n) ** 2 for c in counts.values())
+ n = len(labels)
+ if n == 0:
+ return 0.0
+ counts = {}
+ for label in labels:
+ counts[label] = counts.get(label, 0) + 1
+ return 1.0 - sum((c / n) ** 2 for c in counts.values())
 
 def entropy(labels):
-    n = len(labels)
-    if n == 0:
-        return 0.0
-    counts = {}
-    for label in labels:
-        counts[label] = counts.get(label, 0) + 1
-    return -sum(
-        (c / n) * math.log2(c / n) for c in counts.values() if c > 0
-    )
+ n = len(labels)
+ if n == 0:
+ return 0.0
+ counts = {}
+ for label in labels:
+ counts[label] = counts.get(label, 0) + 1
+ return -sum(
+ (c / n) * math.log2(c / n) for c in counts.values() if c > 0
+ )
 ```
 
 ### Step 2: Find the best split
@@ -225,18 +225,18 @@ Try every feature and every threshold. Return the one with the highest informati
 
 ```python
 def information_gain(parent_labels, left_labels, right_labels, criterion="gini"):
-    measure = gini_impurity if criterion == "gini" else entropy
-    n = len(parent_labels)
-    n_left = len(left_labels)
-    n_right = len(right_labels)
-    if n_left == 0 or n_right == 0:
-        return 0.0
-    parent_impurity = measure(parent_labels)
-    child_impurity = (
-        (n_left / n) * measure(left_labels) +
-        (n_right / n) * measure(right_labels)
-    )
-    return parent_impurity - child_impurity
+ measure = gini_impurity if criterion == "gini" else entropy
+ n = len(parent_labels)
+ n_left = len(left_labels)
+ n_right = len(right_labels)
+ if n_left == 0 or n_right == 0:
+ return 0.0
+ parent_impurity = measure(parent_labels)
+ child_impurity = (
+ (n_left / n) * measure(left_labels) +
+ (n_right / n) * measure(right_labels)
+ )
+ return parent_impurity - child_impurity
 ```
 
 ### Step 3: Build the DecisionTree class
@@ -245,30 +245,30 @@ Recursive splitting, prediction, and feature importance tracking.
 
 ```python
 class DecisionTree:
-    def __init__(self, max_depth=None, min_samples_split=2,
-                 min_samples_leaf=1, criterion="gini",
-                 max_features=None):
-        self.max_depth = max_depth
-        self.min_samples_split = min_samples_split
-        self.min_samples_leaf = min_samples_leaf
-        self.criterion = criterion
-        self.max_features = max_features
-        self.tree = None
-        self.feature_importances_ = None
+ def __init__(self, max_depth=None, min_samples_split=2,
+ min_samples_leaf=1, criterion="gini",
+ max_features=None):
+ self.max_depth = max_depth
+ self.min_samples_split = min_samples_split
+ self.min_samples_leaf = min_samples_leaf
+ self.criterion = criterion
+ self.max_features = max_features
+ self.tree = None
+ self.feature_importances_ = None
 
-    def fit(self, X, y):
-        self.n_features = len(X[0])
-        self.feature_importances_ = [0.0] * self.n_features
-        self.n_samples = len(X)
-        self.tree = self._build(X, y, depth=0)
-        total = sum(self.feature_importances_)
-        if total > 0:
-            self.feature_importances_ = [
-                fi / total for fi in self.feature_importances_
-            ]
+ def fit(self, X, y):
+ self.n_features = len(X[0])
+ self.feature_importances_ = [0.0] * self.n_features
+ self.n_samples = len(X)
+ self.tree = self._build(X, y, depth=0)
+ total = sum(self.feature_importances_)
+ if total > 0:
+ self.feature_importances_ = [
+ fi / total for fi in self.feature_importances_
+ ]
 
-    def predict(self, X):
-        return [self._predict_one(x, self.tree) for x in X]
+ def predict(self, X):
+ return [self._predict_one(x, self.tree) for x in X]
 ```
 
 ### Step 4: Build the RandomForest class
@@ -277,41 +277,41 @@ Bootstrap sampling, feature randomization, and majority voting.
 
 ```python
 class RandomForest:
-    def __init__(self, n_trees=100, max_depth=None,
-                 min_samples_split=2, max_features="sqrt",
-                 criterion="gini"):
-        self.n_trees = n_trees
-        self.max_depth = max_depth
-        self.min_samples_split = min_samples_split
-        self.max_features = max_features
-        self.criterion = criterion
-        self.trees = []
+ def __init__(self, n_trees=100, max_depth=None,
+ min_samples_split=2, max_features="sqrt",
+ criterion="gini"):
+ self.n_trees = n_trees
+ self.max_depth = max_depth
+ self.min_samples_split = min_samples_split
+ self.max_features = max_features
+ self.criterion = criterion
+ self.trees = []
 
-    def fit(self, X, y):
-        n = len(X)
-        for _ in range(self.n_trees):
-            indices = [random.randint(0, n - 1) for _ in range(n)]
-            X_boot = [X[i] for i in indices]
-            y_boot = [y[i] for i in indices]
-            tree = DecisionTree(
-                max_depth=self.max_depth,
-                min_samples_split=self.min_samples_split,
-                max_features=self.max_features,
-                criterion=self.criterion,
-            )
-            tree.fit(X_boot, y_boot)
-            self.trees.append(tree)
+ def fit(self, X, y):
+ n = len(X)
+ for _ in range(self.n_trees):
+ indices = [random.randint(0, n - 1) for _ in range(n)]
+ X_boot = [X[i] for i in indices]
+ y_boot = [y[i] for i in indices]
+ tree = DecisionTree(
+ max_depth=self.max_depth,
+ min_samples_split=self.min_samples_split,
+ max_features=self.max_features,
+ criterion=self.criterion,
+ )
+ tree.fit(X_boot, y_boot)
+ self.trees.append(tree)
 
-    def predict(self, X):
-        all_preds = [tree.predict(X) for tree in self.trees]
-        predictions = []
-        for i in range(len(X)):
-            votes = {}
-            for preds in all_preds:
-                v = preds[i]
-                votes[v] = votes.get(v, 0) + 1
-            predictions.append(max(votes, key=votes.get))
-        return predictions
+ def predict(self, X):
+ all_preds = [tree.predict(X) for tree in self.trees]
+ predictions = []
+ for i in range(len(X)):
+ votes = {}
+ for preds in all_preds:
+ v = preds[i]
+ votes[v] = votes.get(v, 0) + 1
+ predictions.append(max(votes, key=votes.get))
+ return predictions
 ```
 
 See `code/trees.py` for the complete implementation with all helper methods.

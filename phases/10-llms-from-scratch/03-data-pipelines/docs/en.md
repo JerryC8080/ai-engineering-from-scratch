@@ -62,20 +62,20 @@ Cleaning this is not optional. It is the difference between a model that generat
 
 ```mermaid
 graph TD
-    A[Raw Text] --> B[HTML Strip]
-    B --> C[Language Detection]
-    C --> D[Quality Filter]
-    D --> E[Deduplication]
-    E --> F[PII Removal]
-    F --> G[Clean Text]
+ A[Raw Text] --> B[HTML Strip]
+ B --> C[Language Detection]
+ C --> D[Quality Filter]
+ D --> E[Deduplication]
+ E --> F[PII Removal]
+ F --> G[Clean Text]
 
-    style A fill:#1a1a2e,stroke:#e94560,color:#fff
-    style B fill:#1a1a2e,stroke:#e94560,color:#fff
-    style C fill:#1a1a2e,stroke:#e94560,color:#fff
-    style D fill:#1a1a2e,stroke:#e94560,color:#fff
-    style E fill:#1a1a2e,stroke:#e94560,color:#fff
-    style F fill:#1a1a2e,stroke:#e94560,color:#fff
-    style G fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A fill:#1a1a2e,stroke:#e94560,color:#fff
+ style B fill:#1a1a2e,stroke:#e94560,color:#fff
+ style C fill:#1a1a2e,stroke:#e94560,color:#fff
+ style D fill:#1a1a2e,stroke:#e94560,color:#fff
+ style E fill:#1a1a2e,stroke:#e94560,color:#fff
+ style F fill:#1a1a2e,stroke:#e94560,color:#fff
+ style G fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 Each step eliminates a category of noise:
@@ -98,20 +98,20 @@ MinHash + Locality-Sensitive Hashing (LSH) solves this efficiently.
 
 ```mermaid
 graph LR
-    A[Document] --> B[Shingling]
-    B --> C[MinHash Signature]
-    C --> D[LSH Buckets]
-    D --> E[Candidate Pairs]
-    E --> F[Jaccard Similarity]
-    F --> G[Deduplicated Set]
+ A[Document] --> B[Shingling]
+ B --> C[MinHash Signature]
+ C --> D[LSH Buckets]
+ D --> E[Candidate Pairs]
+ E --> F[Jaccard Similarity]
+ F --> G[Deduplicated Set]
 
-    style A fill:#1a1a2e,stroke:#e94560,color:#fff
-    style B fill:#1a1a2e,stroke:#e94560,color:#fff
-    style C fill:#1a1a2e,stroke:#e94560,color:#fff
-    style D fill:#1a1a2e,stroke:#e94560,color:#fff
-    style E fill:#1a1a2e,stroke:#e94560,color:#fff
-    style F fill:#1a1a2e,stroke:#e94560,color:#fff
-    style G fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A fill:#1a1a2e,stroke:#e94560,color:#fff
+ style B fill:#1a1a2e,stroke:#e94560,color:#fff
+ style C fill:#1a1a2e,stroke:#e94560,color:#fff
+ style D fill:#1a1a2e,stroke:#e94560,color:#fff
+ style E fill:#1a1a2e,stroke:#e94560,color:#fff
+ style F fill:#1a1a2e,stroke:#e94560,color:#fff
+ style G fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 The idea:
@@ -136,23 +136,23 @@ Better approach: pack multiple documents into a single sequence, separated by en
 
 ```mermaid
 graph TD
-    subgraph Naive Packing
-        A1["Doc A (200 tokens)"] --> P1["[PAD] x 1848"]
-        A2["Doc B (500 tokens)"] --> P2["[PAD] x 1548"]
-        A3["Doc C (100 tokens)"] --> P3["[PAD] x 1948"]
-    end
+ subgraph Naive Packing
+ A1["Doc A (200 tokens)"] --> P1["[PAD] x 1848"]
+ A2["Doc B (500 tokens)"] --> P2["[PAD] x 1548"]
+ A3["Doc C (100 tokens)"] --> P3["[PAD] x 1948"]
+ end
 
-    subgraph Efficient Packing
-        B1["Doc A (200) | Doc B (500) | Doc C (100) | Doc D (400) | Doc E (848)"]
-    end
+ subgraph Efficient Packing
+ B1["Doc A (200) | Doc B (500) | Doc C (100) | Doc D (400) | Doc E (848)"]
+ end
 
-    style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style A2 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style A3 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style P1 fill:#333,stroke:#666,color:#999
-    style P2 fill:#333,stroke:#666,color:#999
-    style P3 fill:#333,stroke:#666,color:#999
-    style B1 fill:#1a1a2e,stroke:#16c784,color:#fff
+ style A1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A2 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A3 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style P1 fill:#333,stroke:#666,color:#999
+ style P2 fill:#333,stroke:#666,color:#999
+ style P3 fill:#333,stroke:#666,color:#999
+ style B1 fill:#1a1a2e,stroke:#16c784,color:#fff
 ```
 
 The attention mask must be set correctly. Tokens from Document A should not attend to tokens from Document B within the same packed sequence. This requires a block-diagonal attention mask.
@@ -189,24 +189,24 @@ Strip HTML, normalize whitespace, remove non-text content. We will use a public 
 import re
 
 def clean_text(text):
-    text = re.sub(r"<[^>]+>", "", text)
-    text = re.sub(r"http\S+", "", text)
-    text = re.sub(r"[^\x20-\x7E\n]", "", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    text = re.sub(r" {2,}", " ", text)
-    return text.strip()
+ text = re.sub(r"<[^>]+>", "", text)
+ text = re.sub(r"http\S+", "", text)
+ text = re.sub(r"[^\x20-\x7E\n]", "", text)
+ text = re.sub(r"\n{3,}", "\n\n", text)
+ text = re.sub(r" {2,}", " ", text)
+ return text.strip()
 
 def quality_filter(text, min_words=50, max_ratio_caps=0.3, max_ratio_special=0.1):
-    words = text.split()
-    if len(words) < min_words:
-        return False
-    caps_ratio = sum(1 for w in words if w.isupper()) / len(words)
-    if caps_ratio > max_ratio_caps:
-        return False
-    special_chars = sum(1 for c in text if not c.isalnum() and not c.isspace())
-    if special_chars / max(len(text), 1) > max_ratio_special:
-        return False
-    return True
+ words = text.split()
+ if len(words) < min_words:
+ return False
+ caps_ratio = sum(1 for w in words if w.isupper()) / len(words)
+ if caps_ratio > max_ratio_caps:
+ return False
+ special_chars = sum(1 for c in text if not c.isalnum() and not c.isspace())
+ if special_chars / max(len(text), 1) > max_ratio_special:
+ return False
+ return True
 ```
 
 The quality filter catches SEO spam (ALL CAPS), machine-generated noise (high special character ratio), and stub pages (too short). These three checks alone remove a surprising amount of garbage from web crawls.
@@ -220,64 +220,64 @@ import hashlib
 from collections import defaultdict
 
 def get_shingles(text, k=5):
-    words = text.lower().split()
-    if len(words) < k:
-        return set()
-    return {" ".join(words[i:i+k]) for i in range(len(words) - k + 1)}
+ words = text.lower().split()
+ if len(words) < k:
+ return set()
+ return {" ".join(words[i:i+k]) for i in range(len(words) - k + 1)}
 
 def minhash_signature(shingles, num_hashes=128):
-    signature = []
-    for i in range(num_hashes):
-        min_hash = float("inf")
-        for shingle in shingles:
-            h = int(hashlib.sha256(f"{i}:{shingle}".encode()).hexdigest(), 16)
-            min_hash = min(min_hash, h)
-        signature.append(min_hash)
-    return signature
+ signature = []
+ for i in range(num_hashes):
+ min_hash = float("inf")
+ for shingle in shingles:
+ h = int(hashlib.sha256(f"{i}:{shingle}".encode()).hexdigest(), 16)
+ min_hash = min(min_hash, h)
+ signature.append(min_hash)
+ return signature
 
 def lsh_buckets(signature, bands=16):
-    rows_per_band = len(signature) // bands
-    buckets = []
-    for b in range(bands):
-        start = b * rows_per_band
-        band_data = tuple(signature[start:start + rows_per_band])
-        bucket_hash = hashlib.md5(str(band_data).encode()).hexdigest()
-        buckets.append((b, bucket_hash))
-    return buckets
+ rows_per_band = len(signature) // bands
+ buckets = []
+ for b in range(bands):
+ start = b * rows_per_band
+ band_data = tuple(signature[start:start + rows_per_band])
+ bucket_hash = hashlib.md5(str(band_data).encode()).hexdigest()
+ buckets.append((b, bucket_hash))
+ return buckets
 
 def deduplicate(documents, threshold=0.8, num_hashes=128, bands=16):
-    signatures = []
-    shingle_sets = []
-    for doc in documents:
-        shingles = get_shingles(doc)
-        shingle_sets.append(shingles)
-        signatures.append(minhash_signature(shingles, num_hashes))
+ signatures = []
+ shingle_sets = []
+ for doc in documents:
+ shingles = get_shingles(doc)
+ shingle_sets.append(shingles)
+ signatures.append(minhash_signature(shingles, num_hashes))
 
-    bucket_map = defaultdict(list)
-    for doc_idx, sig in enumerate(signatures):
-        for band_id, bucket_hash in lsh_buckets(sig, bands):
-            bucket_map[(band_id, bucket_hash)].append(doc_idx)
+ bucket_map = defaultdict(list)
+ for doc_idx, sig in enumerate(signatures):
+ for band_id, bucket_hash in lsh_buckets(sig, bands):
+ bucket_map[(band_id, bucket_hash)].append(doc_idx)
 
-    duplicate_pairs = set()
-    for bucket_docs in bucket_map.values():
-        if len(bucket_docs) < 2:
-            continue
-        for i in range(len(bucket_docs)):
-            for j in range(i + 1, len(bucket_docs)):
-                duplicate_pairs.add((bucket_docs[i], bucket_docs[j]))
+ duplicate_pairs = set()
+ for bucket_docs in bucket_map.values():
+ if len(bucket_docs) < 2:
+ continue
+ for i in range(len(bucket_docs)):
+ for j in range(i + 1, len(bucket_docs)):
+ duplicate_pairs.add((bucket_docs[i], bucket_docs[j]))
 
-    removed = set()
-    for i, j in duplicate_pairs:
-        if i in removed or j in removed:
-            continue
-        s1, s2 = shingle_sets[i], shingle_sets[j]
-        if not s1 or not s2:
-            continue
-        jaccard = len(s1 & s2) / len(s1 | s2)
-        if jaccard >= threshold:
-            removed.add(j)
+ removed = set()
+ for i, j in duplicate_pairs:
+ if i in removed or j in removed:
+ continue
+ s1, s2 = shingle_sets[i], shingle_sets[j]
+ if not s1 or not s2:
+ continue
+ jaccard = len(s1 & s2) / len(s1 | s2)
+ if jaccard >= threshold:
+ removed.add(j)
 
-    return [doc for idx, doc in enumerate(documents) if idx not in removed], len(removed)
+ return [doc for idx, doc in enumerate(documents) if idx not in removed], len(removed)
 ```
 
 The `num_hashes=128` and `bands=16` parameters control the precision-recall tradeoff. More hashes give more accurate similarity estimates. More bands increase recall (catch more duplicates) at the cost of more false positives. These values work well for typical web text.
@@ -288,26 +288,26 @@ Take the clean, deduplicated text, tokenize it, and pack into fixed-length seque
 
 ```python
 def tokenize_corpus(documents, tokenizer):
-    all_tokens = []
-    for doc in documents:
-        tokens = tokenizer.encode(doc)
-        all_tokens.extend(tokens)
-        all_tokens.append(tokenizer.eos_id)
-    return all_tokens
+ all_tokens = []
+ for doc in documents:
+ tokens = tokenizer.encode(doc)
+ all_tokens.extend(tokens)
+ all_tokens.append(tokenizer.eos_id)
+ return all_tokens
 
 def pack_sequences(token_ids, seq_length, pad_id=0):
-    sequences = []
-    attention_masks = []
-    for i in range(0, len(token_ids), seq_length):
-        seq = token_ids[i:i + seq_length]
-        mask = [1] * len(seq)
-        if len(seq) < seq_length:
-            pad_count = seq_length - len(seq)
-            seq = seq + [pad_id] * pad_count
-            mask = mask + [0] * pad_count
-        sequences.append(seq)
-        attention_masks.append(mask)
-    return sequences, attention_masks
+ sequences = []
+ attention_masks = []
+ for i in range(0, len(token_ids), seq_length):
+ seq = token_ids[i:i + seq_length]
+ mask = [1] * len(seq)
+ if len(seq) < seq_length:
+ pad_count = seq_length - len(seq)
+ seq = seq + [pad_id] * pad_count
+ mask = mask + [0] * pad_count
+ sequences.append(seq)
+ attention_masks.append(mask)
+ return sequences, attention_masks
 ```
 
 ### Step 4: DataLoader for Training
@@ -318,24 +318,24 @@ Yield randomized batches of packed sequences. This is what the training loop con
 import random
 
 class PreTrainingDataLoader:
-    def __init__(self, sequences, attention_masks, batch_size, shuffle=True):
-        self.sequences = sequences
-        self.attention_masks = attention_masks
-        self.batch_size = batch_size
-        self.shuffle = shuffle
+ def __init__(self, sequences, attention_masks, batch_size, shuffle=True):
+ self.sequences = sequences
+ self.attention_masks = attention_masks
+ self.batch_size = batch_size
+ self.shuffle = shuffle
 
-    def __len__(self):
-        return (len(self.sequences) + self.batch_size - 1) // self.batch_size
+ def __len__(self):
+ return (len(self.sequences) + self.batch_size - 1) // self.batch_size
 
-    def __iter__(self):
-        indices = list(range(len(self.sequences)))
-        if self.shuffle:
-            random.shuffle(indices)
-        for start in range(0, len(indices), self.batch_size):
-            batch_idx = indices[start:start + self.batch_size]
-            batch_seqs = [self.sequences[i] for i in batch_idx]
-            batch_masks = [self.attention_masks[i] for i in batch_idx]
-            yield batch_seqs, batch_masks
+ def __iter__(self):
+ indices = list(range(len(self.sequences)))
+ if self.shuffle:
+ random.shuffle(indices)
+ for start in range(0, len(indices), self.batch_size):
+ batch_idx = indices[start:start + self.batch_size]
+ batch_seqs = [self.sequences[i] for i in batch_idx]
+ batch_masks = [self.attention_masks[i] for i in batch_idx]
+ yield batch_seqs, batch_masks
 ```
 
 ### Step 5: Dataset Statistics
@@ -346,38 +346,38 @@ Compute the numbers that matter: total tokens, unique tokens, compression ratio,
 from collections import Counter
 
 def compute_statistics(documents, token_ids, sequences, tokenizer_vocab_size):
-    total_chars = sum(len(d) for d in documents)
-    total_tokens = len(token_ids)
-    unique_tokens = len(set(token_ids))
-    compression_ratio = total_chars / total_tokens
+ total_chars = sum(len(d) for d in documents)
+ total_tokens = len(token_ids)
+ unique_tokens = len(set(token_ids))
+ compression_ratio = total_chars / total_tokens
 
-    doc_lengths = [len(d.split()) for d in documents]
-    avg_doc_length = sum(doc_lengths) / max(len(doc_lengths), 1)
-    max_doc_length = max(doc_lengths) if doc_lengths else 0
-    min_doc_length = min(doc_lengths) if doc_lengths else 0
+ doc_lengths = [len(d.split()) for d in documents]
+ avg_doc_length = sum(doc_lengths) / max(len(doc_lengths), 1)
+ max_doc_length = max(doc_lengths) if doc_lengths else 0
+ min_doc_length = min(doc_lengths) if doc_lengths else 0
 
-    token_counts = Counter(token_ids)
-    top_tokens = token_counts.most_common(10)
+ token_counts = Counter(token_ids)
+ top_tokens = token_counts.most_common(10)
 
-    non_pad_tokens = sum(sum(1 for t in seq if t != 0) for seq in sequences)
-    total_positions = sum(len(seq) for seq in sequences)
-    utilization = non_pad_tokens / max(total_positions, 1)
+ non_pad_tokens = sum(sum(1 for t in seq if t != 0) for seq in sequences)
+ total_positions = sum(len(seq) for seq in sequences)
+ utilization = non_pad_tokens / max(total_positions, 1)
 
-    stats = {
-        "total_documents": len(documents),
-        "total_characters": total_chars,
-        "total_tokens": total_tokens,
-        "unique_tokens": unique_tokens,
-        "vocab_utilization": unique_tokens / tokenizer_vocab_size,
-        "compression_ratio": compression_ratio,
-        "avg_doc_length_words": avg_doc_length,
-        "max_doc_length_words": max_doc_length,
-        "min_doc_length_words": min_doc_length,
-        "num_sequences": len(sequences),
-        "sequence_utilization": utilization,
-        "top_10_tokens": top_tokens,
-    }
-    return stats
+ stats = {
+ "total_documents": len(documents),
+ "total_characters": total_chars,
+ "total_tokens": total_tokens,
+ "unique_tokens": unique_tokens,
+ "vocab_utilization": unique_tokens / tokenizer_vocab_size,
+ "compression_ratio": compression_ratio,
+ "avg_doc_length_words": avg_doc_length,
+ "max_doc_length_words": max_doc_length,
+ "min_doc_length_words": min_doc_length,
+ "num_sequences": len(sequences),
+ "sequence_utilization": utilization,
+ "top_10_tokens": top_tokens,
+ }
+ return stats
 ```
 
 Compression ratio tells you how efficient the tokenizer is on this corpus. English text typically compresses to about 3-4 characters per token. If you see 1.5 characters per token, your tokenizer is splitting too aggressively. If you see 8+, it has learned very domain-specific merges.
@@ -401,9 +401,9 @@ import time
 
 start = time.time()
 tokenized = ds.map(
-    lambda x: tokenizer(x["text"], truncation=True, max_length=2048),
-    batched=True,
-    num_proc=4,
+ lambda x: tokenizer(x["text"], truncation=True, max_length=2048),
+ batched=True,
+ num_proc=4,
 )
 hf_time = time.time() - start
 total_tokens = sum(len(t) for t in tokenized["input_ids"])

@@ -22,10 +22,10 @@ Starting from Phase 11, you'll call LLM APIs (Anthropic, OpenAI, Google). In Pha
 
 ```mermaid
 sequenceDiagram
-    participant C as Your Code
-    participant S as API Server
-    C->>S: HTTP Request (with API key)
-    S->>C: HTTP Response (JSON)
+ participant C as Your Code
+ participant S as API Server
+ C->>S: HTTP Request (with API key)
+ S->>C: HTTP Response (JSON)
 ```
 
 Every API call has:
@@ -60,9 +60,9 @@ import anthropic
 client = anthropic.Anthropic()
 
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
-    max_tokens=256,
-    messages=[{"role": "user", "content": "What is a neural network in one sentence?"}]
+ model="claude-sonnet-4-20250514",
+ max_tokens=256,
+ messages=[{"role": "user", "content": "What is a neural network in one sentence?"}]
 )
 
 print(response.content[0].text)
@@ -76,9 +76,9 @@ import Anthropic from "@anthropic-ai/sdk";
 const client = new Anthropic();
 
 const response = await client.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 256,
-  messages: [{ role: "user", content: "What is a neural network in one sentence?" }],
+ model: "claude-sonnet-4-20250514",
+ max_tokens: 256,
+ messages: [{ role: "user", content: "What is a neural network in one sentence?" }],
 });
 
 console.log(response.content[0].text);
@@ -93,20 +93,20 @@ import json
 
 url = "https://api.anthropic.com/v1/messages"
 headers = {
-    "Content-Type": "application/json",
-    "x-api-key": os.environ["ANTHROPIC_API_KEY"],
-    "anthropic-version": "2023-06-01",
+ "Content-Type": "application/json",
+ "x-api-key": os.environ["ANTHROPIC_API_KEY"],
+ "anthropic-version": "2023-06-01",
 }
 body = json.dumps({
-    "model": "claude-sonnet-4-20250514",
-    "max_tokens": 256,
-    "messages": [{"role": "user", "content": "What is a neural network in one sentence?"}],
+ "model": "claude-sonnet-4-20250514",
+ "max_tokens": 256,
+ "messages": [{"role": "user", "content": "What is a neural network in one sentence?"}],
 }).encode()
 
 req = urllib.request.Request(url, data=body, headers=headers, method="POST")
 with urllib.request.urlopen(req) as resp:
-    result = json.loads(resp.read())
-    print(result["content"][0]["text"])
+ result = json.loads(resp.read())
+ print(result["content"][0]["text"])
 ```
 
 This is what the SDKs do under the hood. Understanding the raw HTTP call helps when debugging.

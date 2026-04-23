@@ -36,17 +36,17 @@ Every LLM inference request has two distinct phases.
 
 ```mermaid
 graph LR
-    subgraph "Prefill (compute-bound)"
-        P1["All prompt tokens"] --> P2["Parallel attention"]
-        P2 --> P3["Full matmul utilization"]
-    end
+ subgraph "Prefill (compute-bound)"
+ P1["All prompt tokens"] --> P2["Parallel attention"]
+ P2 --> P3["Full matmul utilization"]
+ end
 
-    subgraph "Decode (memory-bound)"
-        D1["One token at a time"] --> D2["Sequential generation"]
-        D2 --> D3["Waiting on memory reads"]
-    end
+ subgraph "Decode (memory-bound)"
+ D1["One token at a time"] --> D2["Sequential generation"]
+ D2 --> D3["Waiting on memory reads"]
+ end
 
-    P3 --> D1
+ P3 --> D1
 ```
 
 The **ops:byte ratio** (also called arithmetic intensity) captures this tradeoff. It measures how many operations you perform per byte loaded from memory.
@@ -67,17 +67,17 @@ The KV cache stores the key and value projections from all previous tokens. When
 
 ```mermaid
 graph TD
-    subgraph "Without KV Cache"
-        A1["Token 5: recompute K,V for tokens 1-4"]
-        A2["Token 6: recompute K,V for tokens 1-5"]
-        A3["Token 7: recompute K,V for tokens 1-6"]
-    end
+ subgraph "Without KV Cache"
+ A1["Token 5: recompute K,V for tokens 1-4"]
+ A2["Token 6: recompute K,V for tokens 1-5"]
+ A3["Token 7: recompute K,V for tokens 1-6"]
+ end
 
-    subgraph "With KV Cache"
-        B1["Token 5: compute K5,V5, read K1-4,V1-4 from cache"]
-        B2["Token 6: compute K6,V6, read K1-5,V1-5 from cache"]
-        B3["Token 7: compute K7,V7, read K1-6,V1-6 from cache"]
-    end
+ subgraph "With KV Cache"
+ B1["Token 5: compute K5,V5, read K1-4,V1-4 from cache"]
+ B2["Token 6: compute K6,V6, read K1-5,V1-5 from cache"]
+ B3["Token 7: compute K7,V7, read K1-6,V1-6 from cache"]
+ end
 ```
 
 **Memory formula for KV cache:**
@@ -104,25 +104,25 @@ Continuous batching (also called iteration-level batching) inserts new requests 
 
 ```mermaid
 sequenceDiagram
-    participant GPU
-    participant R1 as Request 1 (50 tokens)
-    participant R2 as Request 2 (10 tokens)
-    participant R3 as Request 3 (30 tokens)
-    participant R4 as Request 4 (waiting)
+ participant GPU
+ participant R1 as Request 1 (50 tokens)
+ participant R2 as Request 2 (10 tokens)
+ participant R3 as Request 3 (30 tokens)
+ participant R4 as Request 4 (waiting)
 
-    Note over GPU: Static batching
-    GPU->>R1: Process batch [R1, R2, R3]
-    Note over R2: R2 done at step 10
-    Note over R2: Wasting 40 steps...
-    Note over R3: R3 done at step 30
-    Note over R3: Wasting 20 steps...
-    GPU->>R4: Finally start R4 at step 50
+ Note over GPU: Static batching
+ GPU->>R1: Process batch [R1, R2, R3]
+ Note over R2: R2 done at step 10
+ Note over R2: Wasting 40 steps...
+ Note over R3: R3 done at step 30
+ Note over R3: Wasting 20 steps...
+ GPU->>R4: Finally start R4 at step 50
 
-    Note over GPU: Continuous batching
-    GPU->>R1: Process batch [R1, R2, R3]
-    Note over R2: R2 done at step 10
-    GPU->>R4: Insert R4 at step 11
-    Note over R3: R3 done at step 30
+ Note over GPU: Continuous batching
+ GPU->>R1: Process batch [R1, R2, R3]
+ Note over R2: R2 done at step 10
+ GPU->>R4: Insert R4 at step 11
+ Note over R3: R3 done at step 30
 ```
 
 The throughput improvement depends on how much output lengths vary. With uniform lengths, continuous batching matches static batching. With variable lengths (the common case), continuous batching can deliver 2-5x higher throughput because GPU slots never sit empty.
@@ -135,19 +135,19 @@ PagedAttention (from vLLM) applies OS-style virtual memory to KV cache. Instead 
 
 ```mermaid
 graph TD
-    subgraph "Contiguous allocation"
-        C1["Request A: 2GB block"]
-        C2["[free: 0.5GB]"]
-        C3["Request B: 1GB block"]
-        C4["[free: 1.5GB -- but fragmented]"]
-    end
+ subgraph "Contiguous allocation"
+ C1["Request A: 2GB block"]
+ C2["[free: 0.5GB]"]
+ C3["Request B: 1GB block"]
+ C4["[free: 1.5GB -- but fragmented]"]
+ end
 
-    subgraph "PagedAttention"
-        P1["Page pool: 256 pages of 16 tokens each"]
-        P2["Request A: pages 3,7,12,45,88..."]
-        P3["Request B: pages 1,4,9,22,67..."]
-        P4["No fragmentation, no waste"]
-    end
+ subgraph "PagedAttention"
+ P1["Page pool: 256 pages of 16 tokens each"]
+ P2["Request A: pages 3,7,12,45,88..."]
+ P3["Request B: pages 1,4,9,22,67..."]
+ P4["No fragmentation, no waste"]
+ end
 ```
 
 PagedAttention also enables **copy-on-write** for shared prefixes. If 50 requests share the same system prompt, the KV cache pages for that system prompt are stored once and referenced by all 50 requests. Only when a request diverges (different user messages) does it get its own pages. This cuts memory usage dramatically for applications with shared system prompts.
@@ -162,11 +162,11 @@ Speculative decoding uses a small, fast **draft model** to generate K candidate 
 
 ```mermaid
 graph LR
-    D["Draft model (1B)"] -->|"Generate 5 tokens<br/>~5ms"| C["Candidates: the cat sat on the"]
-    C --> T["Target model (70B)"]
-    T -->|"Verify all 5 in one pass<br/>~70ms"| V{"Match?"}
-    V -->|"4 of 5 match"| A["Accept 4 tokens in 75ms<br/>vs 280ms sequential"]
-    V -->|"Mismatch at pos 5"| R["Reject token 5<br/>Resample from target"]
+ D["Draft model (1B)"] -->|"Generate 5 tokens<br/>~5ms"| C["Candidates: the cat sat on the"]
+ C --> T["Target model (70B)"]
+ T -->|"Verify all 5 in one pass<br/>~70ms"| V{"Match?"}
+ V -->|"4 of 5 match"| A["Accept 4 tokens in 75ms<br/>vs 280ms sequential"]
+ V -->|"Mismatch at pos 5"| R["Reject token 5<br/>Resample from target"]
 ```
 
 The speedup depends on the **acceptance rate** -- how often the draft model's predictions match the target. For a Llama 3 8B drafting for Llama 3 70B, acceptance rates of 70-85% are typical on natural language. This translates to 2-3x decode speedup.
@@ -226,7 +226,7 @@ You cannot optimize what you do not measure. The ops:byte ratio tells you whethe
 
 ```
 Compute roof: peak FLOPS of the GPU
-Memory roof:  peak bandwidth * ops:byte ratio
+Memory roof: peak bandwidth * ops:byte ratio
 ```
 
 When ops:byte is low (decode, small batches), you hit the memory bandwidth roof. Adding more compute (higher clock, more cores) does not help. You need to reduce memory reads (quantization, KV cache compression) or increase the batch size to amortize reads across more useful work.
@@ -253,40 +253,40 @@ We build a multi-head KV cache that stores key and value projections per layer, 
 import numpy as np
 
 class KVCache:
-    def __init__(self, num_layers, num_heads, head_dim, max_seq_len, dtype=np.float16):
-        self.num_layers = num_layers
-        self.num_heads = num_heads
-        self.head_dim = head_dim
-        self.max_seq_len = max_seq_len
-        self.dtype = dtype
+ def __init__(self, num_layers, num_heads, head_dim, max_seq_len, dtype=np.float16):
+ self.num_layers = num_layers
+ self.num_heads = num_heads
+ self.head_dim = head_dim
+ self.max_seq_len = max_seq_len
+ self.dtype = dtype
 
-        self.k_cache = np.zeros(
-            (num_layers, num_heads, max_seq_len, head_dim), dtype=dtype
-        )
-        self.v_cache = np.zeros(
-            (num_layers, num_heads, max_seq_len, head_dim), dtype=dtype
-        )
-        self.seq_len = 0
+ self.k_cache = np.zeros(
+ (num_layers, num_heads, max_seq_len, head_dim), dtype=dtype
+ )
+ self.v_cache = np.zeros(
+ (num_layers, num_heads, max_seq_len, head_dim), dtype=dtype
+ )
+ self.seq_len = 0
 
-    def update(self, layer_idx, new_keys, new_values):
-        num_new = new_keys.shape[1]
-        end = self.seq_len + num_new
-        self.k_cache[layer_idx, :, self.seq_len:end, :] = new_keys
-        self.v_cache[layer_idx, :, self.seq_len:end, :] = new_values
-        return (
-            self.k_cache[layer_idx, :, :end, :],
-            self.v_cache[layer_idx, :, :end, :]
-        )
+ def update(self, layer_idx, new_keys, new_values):
+ num_new = new_keys.shape[1]
+ end = self.seq_len + num_new
+ self.k_cache[layer_idx, :, self.seq_len:end, :] = new_keys
+ self.v_cache[layer_idx, :, self.seq_len:end, :] = new_values
+ return (
+ self.k_cache[layer_idx, :, :end, :],
+ self.v_cache[layer_idx, :, :end, :]
+ )
 
-    def advance(self, num_tokens):
-        self.seq_len += num_tokens
+ def advance(self, num_tokens):
+ self.seq_len += num_tokens
 
-    def memory_bytes(self):
-        return self.k_cache.nbytes + self.v_cache.nbytes
+ def memory_bytes(self):
+ return self.k_cache.nbytes + self.v_cache.nbytes
 
-    def used_bytes(self):
-        per_token = 2 * self.num_layers * self.num_heads * self.head_dim * np.dtype(self.dtype).itemsize
-        return per_token * self.seq_len
+ def used_bytes(self):
+ per_token = 2 * self.num_layers * self.num_heads * self.head_dim * np.dtype(self.dtype).itemsize
+ return per_token * self.seq_len
 ```
 
 ### Step 2: Attention with KV Cache
@@ -295,45 +295,45 @@ A simplified multi-head attention that uses the KV cache for decode steps.
 
 ```python
 def scaled_dot_product_attention(query, keys, values):
-    head_dim = query.shape[-1]
-    scores = np.matmul(query, keys.transpose(0, 1, 3, 2)) / np.sqrt(head_dim)
-    seq_len_q = scores.shape[-2]
-    seq_len_k = scores.shape[-1]
-    if seq_len_q > 1:
-        mask = np.triu(np.ones((seq_len_q, seq_len_k), dtype=np.float32), k=seq_len_k - seq_len_q + 1)
-        scores = scores + mask * (-1e9)
-    max_scores = np.max(scores, axis=-1, keepdims=True)
-    exp_scores = np.exp(scores - max_scores)
-    attn_weights = exp_scores / np.sum(exp_scores, axis=-1, keepdims=True)
-    return np.matmul(attn_weights, values)
+ head_dim = query.shape[-1]
+ scores = np.matmul(query, keys.transpose(0, 1, 3, 2)) / np.sqrt(head_dim)
+ seq_len_q = scores.shape[-2]
+ seq_len_k = scores.shape[-1]
+ if seq_len_q > 1:
+ mask = np.triu(np.ones((seq_len_q, seq_len_k), dtype=np.float32), k=seq_len_k - seq_len_q + 1)
+ scores = scores + mask * (-1e9)
+ max_scores = np.max(scores, axis=-1, keepdims=True)
+ exp_scores = np.exp(scores - max_scores)
+ attn_weights = exp_scores / np.sum(exp_scores, axis=-1, keepdims=True)
+ return np.matmul(attn_weights, values)
 
 
 class MultiHeadAttention:
-    def __init__(self, d_model, num_heads):
-        self.num_heads = num_heads
-        self.head_dim = d_model // num_heads
-        scale = np.sqrt(2.0 / d_model)
-        self.W_q = np.random.randn(d_model, d_model).astype(np.float32) * scale
-        self.W_k = np.random.randn(d_model, d_model).astype(np.float32) * scale
-        self.W_v = np.random.randn(d_model, d_model).astype(np.float32) * scale
-        self.W_o = np.random.randn(d_model, d_model).astype(np.float32) * scale
+ def __init__(self, d_model, num_heads):
+ self.num_heads = num_heads
+ self.head_dim = d_model // num_heads
+ scale = np.sqrt(2.0 / d_model)
+ self.W_q = np.random.randn(d_model, d_model).astype(np.float32) * scale
+ self.W_k = np.random.randn(d_model, d_model).astype(np.float32) * scale
+ self.W_v = np.random.randn(d_model, d_model).astype(np.float32) * scale
+ self.W_o = np.random.randn(d_model, d_model).astype(np.float32) * scale
 
-    def forward(self, x, kv_cache=None, layer_idx=0):
-        batch, seq_len, d_model = x.shape
-        Q = np.matmul(x, self.W_q).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
-        K = np.matmul(x, self.W_k).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
-        V = np.matmul(x, self.W_v).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
+ def forward(self, x, kv_cache=None, layer_idx=0):
+ batch, seq_len, d_model = x.shape
+ Q = np.matmul(x, self.W_q).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
+ K = np.matmul(x, self.W_k).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
+ V = np.matmul(x, self.W_v).reshape(batch, seq_len, self.num_heads, self.head_dim).transpose(0, 2, 1, 3)
 
-        if kv_cache is not None:
-            K_full, V_full = kv_cache.update(layer_idx, K[0], V[0])
-            K = K_full[np.newaxis, :, :, :]
-            V = V_full[np.newaxis, :, :, :]
-            if seq_len == 1:
-                kv_cache.advance(1)
+ if kv_cache is not None:
+ K_full, V_full = kv_cache.update(layer_idx, K[0], V[0])
+ K = K_full[np.newaxis, :, :, :]
+ V = V_full[np.newaxis, :, :, :]
+ if seq_len == 1:
+ kv_cache.advance(1)
 
-        attn_out = scaled_dot_product_attention(Q, K, V)
-        attn_out = attn_out.transpose(0, 2, 1, 3).reshape(batch, -1, d_model)
-        return np.matmul(attn_out, self.W_o)
+ attn_out = scaled_dot_product_attention(Q, K, V)
+ attn_out = attn_out.transpose(0, 2, 1, 3).reshape(batch, -1, d_model)
+ return np.matmul(attn_out, self.W_o)
 ```
 
 ### Step 3: Continuous Batching Simulator
@@ -344,97 +344,97 @@ This simulates the scheduling difference between static and continuous batching.
 import heapq
 
 class Request:
-    def __init__(self, request_id, prompt_tokens, output_tokens, arrival_step):
-        self.request_id = request_id
-        self.prompt_tokens = prompt_tokens
-        self.output_tokens = output_tokens
-        self.arrival_step = arrival_step
-        self.tokens_generated = 0
-        self.start_step = None
-        self.end_step = None
+ def __init__(self, request_id, prompt_tokens, output_tokens, arrival_step):
+ self.request_id = request_id
+ self.prompt_tokens = prompt_tokens
+ self.output_tokens = output_tokens
+ self.arrival_step = arrival_step
+ self.tokens_generated = 0
+ self.start_step = None
+ self.end_step = None
 
-    def is_done(self):
-        return self.tokens_generated >= self.output_tokens
+ def is_done(self):
+ return self.tokens_generated >= self.output_tokens
 
 
 def simulate_static_batching(requests, batch_size):
-    step = 0
-    completed = []
-    queue = list(requests)
-    queue.sort(key=lambda r: r.arrival_step)
+ step = 0
+ completed = []
+ queue = list(requests)
+ queue.sort(key=lambda r: r.arrival_step)
 
-    while queue:
-        batch = []
-        while queue and len(batch) < batch_size:
-            r = queue.pop(0)
-            r.start_step = max(step, r.arrival_step)
-            batch.append(r)
+ while queue:
+ batch = []
+ while queue and len(batch) < batch_size:
+ r = queue.pop(0)
+ r.start_step = max(step, r.arrival_step)
+ batch.append(r)
 
-        if batch:
-            step = max(step, max(r.start_step for r in batch))
-            max_output = max(r.output_tokens for r in batch)
-            for r in batch:
-                r.tokens_generated = r.output_tokens
-                r.end_step = step + max_output
-            step += max_output
-            completed.extend(batch)
+ if batch:
+ step = max(step, max(r.start_step for r in batch))
+ max_output = max(r.output_tokens for r in batch)
+ for r in batch:
+ r.tokens_generated = r.output_tokens
+ r.end_step = step + max_output
+ step += max_output
+ completed.extend(batch)
 
-    return completed
+ return completed
 
 
 def simulate_continuous_batching(requests, batch_size):
-    step = 0
-    completed = []
-    queue = sorted(requests, key=lambda r: r.arrival_step)
-    queue_idx = 0
-    active = []
-    waiting = []
+ step = 0
+ completed = []
+ queue = sorted(requests, key=lambda r: r.arrival_step)
+ queue_idx = 0
+ active = []
+ waiting = []
 
-    while queue_idx < len(queue) or active or waiting:
-        while queue_idx < len(queue) and queue[queue_idx].arrival_step <= step:
-            waiting.append(queue[queue_idx])
-            queue_idx += 1
+ while queue_idx < len(queue) or active or waiting:
+ while queue_idx < len(queue) and queue[queue_idx].arrival_step <= step:
+ waiting.append(queue[queue_idx])
+ queue_idx += 1
 
-        while waiting and len(active) < batch_size:
-            r = waiting.pop(0)
-            r.start_step = step
-            active.append(r)
+ while waiting and len(active) < batch_size:
+ r = waiting.pop(0)
+ r.start_step = step
+ active.append(r)
 
-        if not active:
-            if waiting:
-                step += 1
-                continue
-            elif queue_idx < len(queue):
-                step = queue[queue_idx].arrival_step
-                continue
-            else:
-                break
+ if not active:
+ if waiting:
+ step += 1
+ continue
+ elif queue_idx < len(queue):
+ step = queue[queue_idx].arrival_step
+ continue
+ else:
+ break
 
-        for r in active:
-            r.tokens_generated += 1
+ for r in active:
+ r.tokens_generated += 1
 
-        done = [r for r in active if r.is_done()]
-        for r in done:
-            r.end_step = step + 1
-            completed.append(r)
-        active = [r for r in active if not r.is_done()]
+ done = [r for r in active if r.is_done()]
+ for r in done:
+ r.end_step = step + 1
+ completed.append(r)
+ active = [r for r in active if not r.is_done()]
 
-        step += 1
+ step += 1
 
-    return completed
+ return completed
 
 
 def batching_stats(completed):
-    latencies = [r.end_step - r.arrival_step for r in completed]
-    total_time = max(r.end_step for r in completed) - min(r.arrival_step for r in completed)
-    total_tokens = sum(r.output_tokens for r in completed)
-    return {
-        "avg_latency": np.mean(latencies),
-        "p50_latency": np.median(latencies),
-        "p99_latency": np.percentile(latencies, 99),
-        "total_time": total_time,
-        "throughput": total_tokens / total_time if total_time > 0 else 0,
-    }
+ latencies = [r.end_step - r.arrival_step for r in completed]
+ total_time = max(r.end_step for r in completed) - min(r.arrival_step for r in completed)
+ total_tokens = sum(r.output_tokens for r in completed)
+ return {
+ "avg_latency": np.mean(latencies),
+ "p50_latency": np.median(latencies),
+ "p99_latency": np.percentile(latencies, 99),
+ "total_time": total_time,
+ "throughput": total_tokens / total_time if total_time > 0 else 0,
+ }
 ```
 
 ### Step 4: Prefix Cache
@@ -443,64 +443,64 @@ A trie-based prefix cache that stores KV entries for shared prefixes.
 
 ```python
 class TrieNode:
-    def __init__(self):
-        self.children = {}
-        self.kv_data = None
-        self.hit_count = 0
+ def __init__(self):
+ self.children = {}
+ self.kv_data = None
+ self.hit_count = 0
 
 
 class PrefixCache:
-    def __init__(self, max_entries=1000):
-        self.root = TrieNode()
-        self.max_entries = max_entries
-        self.total_entries = 0
-        self.hits = 0
-        self.misses = 0
+ def __init__(self, max_entries=1000):
+ self.root = TrieNode()
+ self.max_entries = max_entries
+ self.total_entries = 0
+ self.hits = 0
+ self.misses = 0
 
-    def _walk(self, token_ids):
-        node = self.root
-        depth = 0
-        for tid in token_ids:
-            if tid not in node.children:
-                break
-            node = node.children[tid]
-            depth += 1
-        return node, depth
+ def _walk(self, token_ids):
+ node = self.root
+ depth = 0
+ for tid in token_ids:
+ if tid not in node.children:
+ break
+ node = node.children[tid]
+ depth += 1
+ return node, depth
 
-    def lookup(self, token_ids):
-        node, depth = self._walk(token_ids)
-        if depth > 0:
-            self.hits += 1
-            current = self.root
-            for tid in token_ids[:depth]:
-                current = current.children[tid]
-                current.hit_count += 1
-            kv_entries = []
-            current = self.root
-            for tid in token_ids[:depth]:
-                current = current.children[tid]
-                if current.kv_data is not None:
-                    kv_entries.append(current.kv_data)
-            return depth, kv_entries
-        self.misses += 1
-        return 0, []
+ def lookup(self, token_ids):
+ node, depth = self._walk(token_ids)
+ if depth > 0:
+ self.hits += 1
+ current = self.root
+ for tid in token_ids[:depth]:
+ current = current.children[tid]
+ current.hit_count += 1
+ kv_entries = []
+ current = self.root
+ for tid in token_ids[:depth]:
+ current = current.children[tid]
+ if current.kv_data is not None:
+ kv_entries.append(current.kv_data)
+ return depth, kv_entries
+ self.misses += 1
+ return 0, []
 
-    def insert(self, token_ids, kv_per_token):
-        node = self.root
-        for i, tid in enumerate(token_ids):
-            if tid not in node.children:
-                if self.total_entries >= self.max_entries:
-                    return i
-                node.children[tid] = TrieNode()
-                self.total_entries += 1
-            node = node.children[tid]
-            if i < len(kv_per_token):
-                node.kv_data = kv_per_token[i]
-        return len(token_ids)
+ def insert(self, token_ids, kv_per_token):
+ node = self.root
+ for i, tid in enumerate(token_ids):
+ if tid not in node.children:
+ if self.total_entries >= self.max_entries:
+ return i
+ node.children[tid] = TrieNode()
+ self.total_entries += 1
+ node = node.children[tid]
+ if i < len(kv_per_token):
+ node.kv_data = kv_per_token[i]
+ return len(token_ids)
 
-    def hit_rate(self):
-        total = self.hits + self.misses
-        return self.hits / total if total > 0 else 0.0
+ def hit_rate(self):
+ total = self.hits + self.misses
+ return self.hits / total if total > 0 else 0.0
 ```
 
 ### Step 5: Speculative Decoding Simulator
@@ -509,114 +509,114 @@ We simulate draft-target speculative decoding with configurable acceptance rates
 
 ```python
 class DraftModel:
-    def __init__(self, vocab_size, acceptance_rate=0.8):
-        self.vocab_size = vocab_size
-        self.acceptance_rate = acceptance_rate
+ def __init__(self, vocab_size, acceptance_rate=0.8):
+ self.vocab_size = vocab_size
+ self.acceptance_rate = acceptance_rate
 
-    def generate(self, context, num_tokens):
-        tokens = np.random.randint(0, self.vocab_size, size=num_tokens)
-        return tokens
+ def generate(self, context, num_tokens):
+ tokens = np.random.randint(0, self.vocab_size, size=num_tokens)
+ return tokens
 
-    def get_probs(self, context, token):
-        probs = np.random.dirichlet(np.ones(self.vocab_size))
-        return probs
+ def get_probs(self, context, token):
+ probs = np.random.dirichlet(np.ones(self.vocab_size))
+ return probs
 
 
 class TargetModel:
-    def __init__(self, vocab_size):
-        self.vocab_size = vocab_size
+ def __init__(self, vocab_size):
+ self.vocab_size = vocab_size
 
-    def get_probs(self, context, tokens=None):
-        if tokens is not None:
-            return [np.random.dirichlet(np.ones(self.vocab_size)) for _ in tokens]
-        return np.random.dirichlet(np.ones(self.vocab_size))
+ def get_probs(self, context, tokens=None):
+ if tokens is not None:
+ return [np.random.dirichlet(np.ones(self.vocab_size)) for _ in tokens]
+ return np.random.dirichlet(np.ones(self.vocab_size))
 
 
 def speculative_decode(draft_model, target_model, context, num_speculative=5,
-                       draft_cost=1.0, target_cost=10.0, verify_cost=12.0):
-    total_tokens = 0
-    total_cost = 0.0
-    accepted_counts = []
-    context = list(context)
+ draft_cost=1.0, target_cost=10.0, verify_cost=12.0):
+ total_tokens = 0
+ total_cost = 0.0
+ accepted_counts = []
+ context = list(context)
 
-    max_tokens = 100
+ max_tokens = 100
 
-    while total_tokens < max_tokens:
-        draft_tokens = draft_model.generate(context, num_speculative)
-        total_cost += draft_cost * num_speculative
+ while total_tokens < max_tokens:
+ draft_tokens = draft_model.generate(context, num_speculative)
+ total_cost += draft_cost * num_speculative
 
-        target_probs = target_model.get_probs(context, draft_tokens)
-        total_cost += verify_cost
+ target_probs = target_model.get_probs(context, draft_tokens)
+ total_cost += verify_cost
 
-        accepted = 0
-        for i, token in enumerate(draft_tokens):
-            draft_p = draft_model.get_probs(context + list(draft_tokens[:i]), token)
-            target_p = target_probs[i]
+ accepted = 0
+ for i, token in enumerate(draft_tokens):
+ draft_p = draft_model.get_probs(context + list(draft_tokens[:i]), token)
+ target_p = target_probs[i]
 
-            r = np.random.random()
-            acceptance_prob = min(1.0, target_p[token] / (draft_p[token] + 1e-10))
+ r = np.random.random()
+ acceptance_prob = min(1.0, target_p[token] / (draft_p[token] + 1e-10))
 
-            if r < draft_model.acceptance_rate:
-                accepted += 1
-                context.append(token)
-                total_tokens += 1
-            else:
-                new_token = np.random.choice(draft_model.vocab_size, p=target_p)
-                context.append(new_token)
-                total_tokens += 1
-                break
+ if r < draft_model.acceptance_rate:
+ accepted += 1
+ context.append(token)
+ total_tokens += 1
+ else:
+ new_token = np.random.choice(draft_model.vocab_size, p=target_p)
+ context.append(new_token)
+ total_tokens += 1
+ break
 
-        accepted_counts.append(accepted)
+ accepted_counts.append(accepted)
 
-        if accepted == num_speculative:
-            bonus_probs = target_model.get_probs(context)
-            bonus_token = np.random.choice(draft_model.vocab_size, p=bonus_probs)
-            context.append(bonus_token)
-            total_tokens += 1
+ if accepted == num_speculative:
+ bonus_probs = target_model.get_probs(context)
+ bonus_token = np.random.choice(draft_model.vocab_size, p=bonus_probs)
+ context.append(bonus_token)
+ total_tokens += 1
 
-    sequential_cost = total_tokens * target_cost
-    return {
-        "total_tokens": total_tokens,
-        "speculative_cost": total_cost,
-        "sequential_cost": sequential_cost,
-        "speedup": sequential_cost / total_cost if total_cost > 0 else 1.0,
-        "avg_accepted": np.mean(accepted_counts),
-        "acceptance_rate": np.mean(accepted_counts) / num_speculative,
-    }
+ sequential_cost = total_tokens * target_cost
+ return {
+ "total_tokens": total_tokens,
+ "speculative_cost": total_cost,
+ "sequential_cost": sequential_cost,
+ "speedup": sequential_cost / total_cost if total_cost > 0 else 1.0,
+ "avg_accepted": np.mean(accepted_counts),
+ "acceptance_rate": np.mean(accepted_counts) / num_speculative,
+ }
 
 
 def compare_speculation_strategies(vocab_size=1000, num_trials=20):
-    results = {}
+ results = {}
 
-    for name, acceptance_rate, spec_tokens in [
-        ("Draft-target (8B->70B)", 0.78, 5),
-        ("EAGLE", 0.85, 6),
-        ("N-gram", 0.50, 4),
-        ("No speculation", 0.0, 0),
-    ]:
-        if spec_tokens == 0:
-            results[name] = {
-                "speedup": 1.0,
-                "acceptance_rate": 0.0,
-                "avg_accepted": 0.0,
-            }
-            continue
+ for name, acceptance_rate, spec_tokens in [
+ ("Draft-target (8B->70B)", 0.78, 5),
+ ("EAGLE", 0.85, 6),
+ ("N-gram", 0.50, 4),
+ ("No speculation", 0.0, 0),
+ ]:
+ if spec_tokens == 0:
+ results[name] = {
+ "speedup": 1.0,
+ "acceptance_rate": 0.0,
+ "avg_accepted": 0.0,
+ }
+ continue
 
-        trial_results = []
-        for _ in range(num_trials):
-            draft = DraftModel(vocab_size, acceptance_rate=acceptance_rate)
-            target = TargetModel(vocab_size)
-            context = list(np.random.randint(0, vocab_size, size=10))
-            result = speculative_decode(draft, target, context, num_speculative=spec_tokens)
-            trial_results.append(result)
+ trial_results = []
+ for _ in range(num_trials):
+ draft = DraftModel(vocab_size, acceptance_rate=acceptance_rate)
+ target = TargetModel(vocab_size)
+ context = list(np.random.randint(0, vocab_size, size=10))
+ result = speculative_decode(draft, target, context, num_speculative=spec_tokens)
+ trial_results.append(result)
 
-        results[name] = {
-            "speedup": np.mean([r["speedup"] for r in trial_results]),
-            "acceptance_rate": np.mean([r["acceptance_rate"] for r in trial_results]),
-            "avg_accepted": np.mean([r["avg_accepted"] for r in trial_results]),
-        }
+ results[name] = {
+ "speedup": np.mean([r["speedup"] for r in trial_results]),
+ "acceptance_rate": np.mean([r["acceptance_rate"] for r in trial_results]),
+ "avg_accepted": np.mean([r["avg_accepted"] for r in trial_results]),
+ }
 
-    return results
+ return results
 ```
 
 ### Step 6: KV Cache Memory Profiler
@@ -625,62 +625,62 @@ Compute KV cache memory requirements for real model configurations.
 
 ```python
 MODEL_CONFIGS = {
-    "Llama-3-8B": {
-        "num_layers": 32, "num_kv_heads": 8, "head_dim": 128,
-        "model_params_b": 8, "gqa": True,
-    },
-    "Llama-3-70B": {
-        "num_layers": 80, "num_kv_heads": 8, "head_dim": 128,
-        "model_params_b": 70, "gqa": True,
-    },
-    "Llama-3-405B": {
-        "num_layers": 126, "num_kv_heads": 8, "head_dim": 128,
-        "model_params_b": 405, "gqa": True,
-    },
-    "Mistral-7B": {
-        "num_layers": 32, "num_kv_heads": 8, "head_dim": 128,
-        "model_params_b": 7, "gqa": True,
-    },
-    "GPT-4-est": {
-        "num_layers": 120, "num_kv_heads": 96, "head_dim": 128,
-        "model_params_b": 1800, "gqa": False,
-    },
+ "Llama-3-8B": {
+ "num_layers": 32, "num_kv_heads": 8, "head_dim": 128,
+ "model_params_b": 8, "gqa": True,
+ },
+ "Llama-3-70B": {
+ "num_layers": 80, "num_kv_heads": 8, "head_dim": 128,
+ "model_params_b": 70, "gqa": True,
+ },
+ "Llama-3-405B": {
+ "num_layers": 126, "num_kv_heads": 8, "head_dim": 128,
+ "model_params_b": 405, "gqa": True,
+ },
+ "Mistral-7B": {
+ "num_layers": 32, "num_kv_heads": 8, "head_dim": 128,
+ "model_params_b": 7, "gqa": True,
+ },
+ "GPT-4-est": {
+ "num_layers": 120, "num_kv_heads": 96, "head_dim": 128,
+ "model_params_b": 1800, "gqa": False,
+ },
 }
 
 
 def kv_cache_memory(config, seq_len, dtype_bytes=2):
-    per_token = 2 * config["num_layers"] * config["num_kv_heads"] * config["head_dim"] * dtype_bytes
-    total = per_token * seq_len
-    return {
-        "per_token_bytes": per_token,
-        "per_token_kb": per_token / 1024,
-        "total_bytes": total,
-        "total_mb": total / (1024 ** 2),
-        "total_gb": total / (1024 ** 3),
-    }
+ per_token = 2 * config["num_layers"] * config["num_kv_heads"] * config["head_dim"] * dtype_bytes
+ total = per_token * seq_len
+ return {
+ "per_token_bytes": per_token,
+ "per_token_kb": per_token / 1024,
+ "total_bytes": total,
+ "total_mb": total / (1024 ** 2),
+ "total_gb": total / (1024 ** 3),
+ }
 
 
 def memory_budget(config, gpu_memory_gb, model_dtype_bytes=2, kv_dtype_bytes=2):
-    model_memory_gb = config["model_params_b"] * 1e9 * model_dtype_bytes / (1024 ** 3)
-    overhead_gb = gpu_memory_gb * 0.1
-    available_for_kv = gpu_memory_gb - model_memory_gb - overhead_gb
+ model_memory_gb = config["model_params_b"] * 1e9 * model_dtype_bytes / (1024 ** 3)
+ overhead_gb = gpu_memory_gb * 0.1
+ available_for_kv = gpu_memory_gb - model_memory_gb - overhead_gb
 
-    if available_for_kv <= 0:
-        return {"error": "Model does not fit in GPU memory", "model_memory_gb": model_memory_gb}
+ if available_for_kv <= 0:
+ return {"error": "Model does not fit in GPU memory", "model_memory_gb": model_memory_gb}
 
-    per_token = 2 * config["num_layers"] * config["num_kv_heads"] * config["head_dim"] * kv_dtype_bytes
-    max_tokens = int(available_for_kv * (1024 ** 3) / per_token)
+ per_token = 2 * config["num_layers"] * config["num_kv_heads"] * config["head_dim"] * kv_dtype_bytes
+ max_tokens = int(available_for_kv * (1024 ** 3) / per_token)
 
-    return {
-        "gpu_memory_gb": gpu_memory_gb,
-        "model_memory_gb": round(model_memory_gb, 1),
-        "overhead_gb": round(overhead_gb, 1),
-        "available_for_kv_gb": round(available_for_kv, 1),
-        "max_total_tokens": max_tokens,
-        "max_users_at_2k": max_tokens // 2048,
-        "max_users_at_4k": max_tokens // 4096,
-        "max_users_at_32k": max_tokens // 32768,
-    }
+ return {
+ "gpu_memory_gb": gpu_memory_gb,
+ "model_memory_gb": round(model_memory_gb, 1),
+ "overhead_gb": round(overhead_gb, 1),
+ "available_for_kv_gb": round(available_for_kv, 1),
+ "max_total_tokens": max_tokens,
+ "max_users_at_2k": max_tokens // 2048,
+ "max_users_at_4k": max_tokens // 4096,
+ "max_users_at_32k": max_tokens // 32768,
+ }
 ```
 
 ## Use It
@@ -691,11 +691,11 @@ With vLLM:
 from vllm import LLM, SamplingParams
 
 llm = LLM(
-    model="meta-llama/Llama-3-70B-Instruct",
-    tensor_parallel_size=4,
-    enable_prefix_caching=True,
-    max_model_len=8192,
-    gpu_memory_utilization=0.9,
+ model="meta-llama/Llama-3-70B-Instruct",
+ tensor_parallel_size=4,
+ enable_prefix_caching=True,
+ max_model_len=8192,
+ gpu_memory_utilization=0.9,
 )
 
 params = SamplingParams(temperature=0.7, max_tokens=256)
@@ -709,17 +709,17 @@ import sglang as sgl
 
 @sgl.function
 def classify(s, text):
-    s += sgl.system("You are a classifier. Output JSON only.")
-    s += sgl.user(f"Classify this text: {text}")
-    s += sgl.assistant(sgl.gen("result", regex=r'\{"label": "(positive|negative|neutral)"\}'))
+ s += sgl.system("You are a classifier. Output JSON only.")
+ s += sgl.user(f"Classify this text: {text}")
+ s += sgl.assistant(sgl.gen("result", regex=r'\{"label": "(positive|negative|neutral)"\}'))
 
 runtime = sgl.Runtime(model_path="meta-llama/Llama-3-70B-Instruct", tp_size=4)
 sgl.set_default_backend(runtime)
 
 results = classify.run_batch([
-    {"text": "This product is amazing!"},
-    {"text": "Terrible experience."},
-    {"text": "It was okay I guess."},
+ {"text": "This product is amazing!"},
+ {"text": "Terrible experience."},
+ {"text": "It was okay I guess."},
 ])
 ```
 
@@ -732,9 +732,9 @@ from tensorrt_llm.runtime import ModelRunner
 runner = ModelRunner.from_dir("./llama-70b-trt-engine/", rank=0)
 
 outputs = runner.generate(
-    batch_input_ids=[tokenizer.encode("Explain KV caching.")],
-    max_new_tokens=256,
-    temperature=0.7,
+ batch_input_ids=[tokenizer.encode("Explain KV caching.")],
+ max_new_tokens=256,
+ temperature=0.7,
 )
 ```
 

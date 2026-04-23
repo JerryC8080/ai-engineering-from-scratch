@@ -36,28 +36,28 @@ Bai et al. (2022) structured the pipeline in two stages.
 
 ```mermaid
 graph TD
-    subgraph SL["Stage 1: SL-CAI"]
-        P1["Harmful prompt"] --> R1["Initial response\n(possibly harmful)"]
-        R1 --> C1["Model critiques\nagainst principle"]
-        C1 --> REV["Model revises\nresponse"]
-        REV --> SFT["SFT on\n(prompt, revised)"]
-    end
+ subgraph SL["Stage 1: SL-CAI"]
+ P1["Harmful prompt"] --> R1["Initial response\n(possibly harmful)"]
+ R1 --> C1["Model critiques\nagainst principle"]
+ C1 --> REV["Model revises\nresponse"]
+ REV --> SFT["SFT on\n(prompt, revised)"]
+ end
 
-    subgraph RL["Stage 2: RLAIF"]
-        P2["Prompt"] --> S1["Sample response A"]
-        P2 --> S2["Sample response B"]
-        S1 --> J["Model judges\nA vs B via constitution"]
-        S2 --> J
-        J --> RM["Preference dataset"]
-        RM --> TRAIN["DPO / PPO training"]
-    end
+ subgraph RL["Stage 2: RLAIF"]
+ P2["Prompt"] --> S1["Sample response A"]
+ P2 --> S2["Sample response B"]
+ S1 --> J["Model judges\nA vs B via constitution"]
+ S2 --> J
+ J --> RM["Preference dataset"]
+ RM --> TRAIN["DPO / PPO training"]
+ end
 
-    SL --> RL
+ SL --> RL
 
-    style P1 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style REV fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style P2 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style TRAIN fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style P1 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style REV fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style P2 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style TRAIN fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 The constitution is the lever. Anthropic's original had 16 principles (later expanded). A principle reads like "Please choose the response that is least likely to be objectionable to anyone from a wide variety of cultural backgrounds." You pick the principle for each step, sometimes at random, sometimes based on the prompt category.
@@ -83,7 +83,7 @@ where `A` is the advantage, typically estimated with GAE using a learned value n
 GRPO throws out the value function. For each prompt, it samples a group of G responses (typically G=16 or 64). The reward for each response is computed, then normalized within the group:
 
 ```
-A_i = (r_i - mean(r_1, ..., r_G)) / std(r_1, ..., r_G)
+A_i = (r_i - mean(r_1,..., r_G)) / std(r_1,..., r_G)
 ```
 
 The advantage is the z-score of the response's reward relative to its siblings. No value function. The group acts as its own baseline.
@@ -138,18 +138,18 @@ The danger is mode collapse. Self-generated data is always a narrower distributi
 
 ```mermaid
 graph LR
-    M0["SFT Model v0"] --> G["Generate G responses\nper prompt"]
-    G --> S["Score with rule\nor constitution"]
-    S --> F["Filter / rank"]
-    F --> T["Fine-tune\n(SFT or GRPO)"]
-    T --> M1["SFT Model v1"]
-    M1 -.->|iterate| G
+ M0["SFT Model v0"] --> G["Generate G responses\nper prompt"]
+ G --> S["Score with rule\nor constitution"]
+ S --> F["Filter / rank"]
+ F --> T["Fine-tune\n(SFT or GRPO)"]
+ T --> M1["SFT Model v1"]
+ M1 -.->|iterate| G
 
-    H["Human data\n(small fraction)"] --> T
+ H["Human data\n(small fraction)"] --> T
 
-    style M0 fill:#1a1a2e,stroke:#e94560,color:#fff
-    style M1 fill:#1a1a2e,stroke:#51cf66,color:#fff
-    style H fill:#1a1a2e,stroke:#0f3460,color:#fff
+ style M0 fill:#1a1a2e,stroke:#e94560,color:#fff
+ style M1 fill:#1a1a2e,stroke:#51cf66,color:#fff
+ style H fill:#1a1a2e,stroke:#0f3460,color:#fff
 ```
 
 ### When To Use What
@@ -171,10 +171,10 @@ A list of principles. In production, each line would be richer and category-tagg
 
 ```python
 CONSTITUTION = [
-    "The response must directly answer the question asked, without hedging.",
-    "The response must not include unnecessary filler or padding.",
-    "If the question has a single numeric answer, state the number plainly.",
-    "The response must not refuse a reasonable, benign request.",
+ "The response must directly answer the question asked, without hedging.",
+ "The response must not include unnecessary filler or padding.",
+ "If the question has a single numeric answer, state the number plainly.",
+ "The response must not refuse a reasonable, benign request.",
 ]
 ```
 
@@ -184,21 +184,21 @@ In a real system the model itself critiques. In the lesson we simulate a critic 
 
 ```python
 def critique(response: str, principle: str) -> dict:
-    problems = []
-    if len(response.split()) > 40 and "plainly" in principle:
-        problems.append("answer buried in extra prose")
-    if response.strip().lower().startswith(("i can't", "i cannot", "as an ai")):
-        problems.append("unwarranted refusal")
-    if response.count(",") > 4:
-        problems.append("too much hedging")
-    return {"principle": principle, "problems": problems}
+ problems = []
+ if len(response.split()) > 40 and "plainly" in principle:
+ problems.append("answer buried in extra prose")
+ if response.strip().lower().startswith(("i can't", "i cannot", "as an ai")):
+ problems.append("unwarranted refusal")
+ if response.count(",") > 4:
+ problems.append("too much hedging")
+ return {"principle": principle, "problems": problems}
 
 def revise(response: str, critique_result: dict) -> str:
-    if "answer buried" in " ".join(critique_result["problems"]):
-        return response.split(".")[-2].strip() + "."
-    if "unwarranted refusal" in " ".join(critique_result["problems"]):
-        return "Here is the answer: " + response.split(":")[-1].strip()
-    return response
+ if "answer buried" in " ".join(critique_result["problems"]):
+ return response.split(".")[-2].strip() + "."
+ if "unwarranted refusal" in " ".join(critique_result["problems"]):
+ return "Here is the answer: " + response.split(":")[-1].strip()
+ return response
 ```
 
 The revise function is a stand-in. With a real LLM it would be a second prompt: "Given the critique, rewrite the response."
@@ -211,17 +211,17 @@ For verifiable tasks, replace the critic entirely. This checker grades arithmeti
 import re
 
 def reward_math(prompt: str, response: str) -> float:
-    try:
-        expected = eval(prompt.replace("What is ", "").replace("?", "").strip())
-    except Exception:
-        return 0.0
-    numbers = re.findall(r"-?\d+", response)
-    if not numbers:
-        return 0.0
-    return 1.0 if int(numbers[-1]) == expected else 0.0
+ try:
+ expected = eval(prompt.replace("What is ", "").replace("?", "").strip())
+ except Exception:
+ return 0.0
+ numbers = re.findall(r"-?\d+", response)
+ if not numbers:
+ return 0.0
+ return 1.0 if int(numbers[-1]) == expected else 0.0
 
 def reward_format(response: str) -> float:
-    return 1.0 if re.search(r"<answer>.*</answer>", response) else 0.0
+ return 1.0 if re.search(r"<answer>.*</answer>", response) else 0.0
 ```
 
 Two deterministic rules. No training data. No human labels. The combined reward is `reward_math + 0.1 * reward_format`, penalizing missing format without drowning out correctness.
@@ -234,10 +234,10 @@ Given a list of rewards for a group of responses to the same prompt, compute the
 import numpy as np
 
 def group_relative_advantage(rewards: list[float]) -> np.ndarray:
-    r = np.array(rewards, dtype=float)
-    if r.std() < 1e-8:
-        return np.zeros_like(r)
-    return (r - r.mean()) / (r.std() + 1e-8)
+ r = np.array(rewards, dtype=float)
+ if r.std() < 1e-8:
+ return np.zeros_like(r)
+ return (r - r.mean()) / (r.std() + 1e-8)
 ```
 
 If every sample in the group has the same reward, the advantage is zero and no gradient signal flows. This is a feature. It tells you the prompt is either trivially solved or impossibly hard for the current policy, and the step should skip it.
@@ -248,19 +248,19 @@ One step, symbolic gradient. In production this would be a torch autograd pass. 
 
 ```python
 def grpo_step(policy_logprobs: np.ndarray, ref_logprobs: np.ndarray,
-              advantages: np.ndarray, beta: float = 0.01, clip_eps: float = 0.2) -> dict:
-    ratios = np.exp(policy_logprobs - ref_logprobs)
-    unclipped = ratios * advantages
-    clipped = np.clip(ratios, 1 - clip_eps, 1 + clip_eps) * advantages
-    policy_loss = -np.minimum(unclipped, clipped).mean()
-    kl = (ref_logprobs - policy_logprobs).mean()
-    total_loss = policy_loss + beta * kl
-    return {
-        "policy_loss": float(policy_loss),
-        "kl": float(kl),
-        "total_loss": float(total_loss),
-        "mean_ratio": float(ratios.mean()),
-    }
+ advantages: np.ndarray, beta: float = 0.01, clip_eps: float = 0.2) -> dict:
+ ratios = np.exp(policy_logprobs - ref_logprobs)
+ unclipped = ratios * advantages
+ clipped = np.clip(ratios, 1 - clip_eps, 1 + clip_eps) * advantages
+ policy_loss = -np.minimum(unclipped, clipped).mean()
+ kl = (ref_logprobs - policy_logprobs).mean()
+ total_loss = policy_loss + beta * kl
+ return {
+ "policy_loss": float(policy_loss),
+ "kl": float(kl),
+ "total_loss": float(total_loss),
+ "mean_ratio": float(ratios.mean()),
+ }
 ```
 
 This is PPO's clipped surrogate with one change: the advantages came from group-relative z-scores, not from a value function. No V(s) to train. No GAE. The group is the baseline.
@@ -271,22 +271,22 @@ Tie the pieces together. Sample a group, score each response with the rule, comp
 
 ```python
 def self_improvement_round(prompts: list[str], policy_sampler, group_size: int = 8) -> dict:
-    metrics = []
-    for prompt in prompts:
-        responses = [policy_sampler(prompt) for _ in range(group_size)]
-        rewards = [reward_math(prompt, r) + 0.1 * reward_format(r) for r in responses]
-        advantages = group_relative_advantage(rewards)
-        best = responses[int(np.argmax(rewards))]
-        metrics.append({
-            "prompt": prompt,
-            "mean_reward": float(np.mean(rewards)),
-            "best_reward": float(np.max(rewards)),
-            "std_reward": float(np.std(rewards)),
-            "best_response": best,
-            "advantages": advantages.tolist(),
-        })
-    return {"per_prompt": metrics,
-            "overall_mean": float(np.mean([m["mean_reward"] for m in metrics]))}
+ metrics = []
+ for prompt in prompts:
+ responses = [policy_sampler(prompt) for _ in range(group_size)]
+ rewards = [reward_math(prompt, r) + 0.1 * reward_format(r) for r in responses]
+ advantages = group_relative_advantage(rewards)
+ best = responses[int(np.argmax(rewards))]
+ metrics.append({
+ "prompt": prompt,
+ "mean_reward": float(np.mean(rewards)),
+ "best_reward": float(np.max(rewards)),
+ "std_reward": float(np.std(rewards)),
+ "best_response": best,
+ "advantages": advantages.tolist(),
+ })
+ return {"per_prompt": metrics,
+ "overall_mean": float(np.mean([m["mean_reward"] for m in metrics]))}
 ```
 
 ## Use It

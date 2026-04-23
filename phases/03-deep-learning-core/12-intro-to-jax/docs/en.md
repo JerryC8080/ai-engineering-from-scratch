@@ -65,7 +65,7 @@ PyTorch attaches gradients to tensors (`.grad`). JAX attaches gradients to funct
 import jax
 
 def f(x):
-    return x ** 2
+ return x ** 2
 
 df = jax.grad(f)
 df(3.0)
@@ -89,8 +89,8 @@ The constraint: `grad` only works on pure functions. No print statements inside 
 ```python
 @jax.jit
 def train_step(params, x, y):
-    loss = loss_fn(params, x, y)
-    return loss
+ loss = loss_fn(params, x, y)
+ return loss
 
 fast_step = jax.jit(train_step)
 ```
@@ -117,7 +117,7 @@ You write a function that processes one example:
 
 ```python
 def predict(params, x):
-    return jnp.dot(params['w'], x) + params['b']
+ return jnp.dot(params['w'], x) + params['b']
 ```
 
 `vmap` lifts it to process a batch:
@@ -152,9 +152,9 @@ JAX operates on "pytrees" -- nested combinations of lists, tuples, dicts, and ar
 
 ```python
 params = {
-    'layer1': {'w': jnp.zeros((784, 256)), 'b': jnp.zeros(256)},
-    'layer2': {'w': jnp.zeros((256, 128)), 'b': jnp.zeros(128)},
-    'layer3': {'w': jnp.zeros((128, 10)),  'b': jnp.zeros(10)},
+ 'layer1': {'w': jnp.zeros((784, 256)), 'b': jnp.zeros(256)},
+ 'layer2': {'w': jnp.zeros((256, 128)), 'b': jnp.zeros(128)},
+ 'layer3': {'w': jnp.zeros((128, 10)), 'b': jnp.zeros(10)},
 }
 ```
 
@@ -172,18 +172,18 @@ PyTorch stores state inside objects:
 
 ```python
 class Model(nn.Module):
-    def __init__(self):
-        self.linear = nn.Linear(784, 10)
+ def __init__(self):
+ self.linear = nn.Linear(784, 10)
 
-    def forward(self, x):
-        return self.linear(x)
+ def forward(self, x):
+ return self.linear(x)
 ```
 
 JAX uses pure functions with explicit state:
 
 ```python
 def predict(params, x):
-    return jnp.dot(x, params['w']) + params['b']
+ return jnp.dot(x, params['w']) + params['b']
 ```
 
 The params are passed in. Nothing is stored. Nothing is mutated. This makes every function testable, composable, and compilable. It also means you manage the params yourself -- or use a library like Flax or Equinox.
@@ -204,8 +204,8 @@ Optax is the standard optimizer library. It separates the gradient transformatio
 
 ```python
 optimizer = optax.chain(
-    optax.clip_by_global_norm(1.0),
-    optax.adam(learning_rate=1e-3),
+ optax.clip_by_global_norm(1.0),
+ optax.adam(learning_rate=1e-3),
 )
 ```
 
@@ -250,13 +250,13 @@ from jax import random
 import optax
 
 def get_mnist_data():
-    from sklearn.datasets import fetch_openml
-    mnist = fetch_openml('mnist_784', version=1, as_frame=False, parser='auto')
-    X = mnist.data.astype('float32') / 255.0
-    y = mnist.target.astype('int')
-    X_train, X_test = X[:60000], X[60000:]
-    y_train, y_test = y[:60000], y[60000:]
-    return X_train, y_train, X_test, y_test
+ from sklearn.datasets import fetch_openml
+ mnist = fetch_openml('mnist_784', version=1, as_frame=False, parser='auto')
+ X = mnist.data.astype('float32') / 255.0
+ y = mnist.target.astype('int')
+ X_train, X_test = X[:60000], X[60000:]
+ y_train, y_test = y[:60000], y[60000:]
+ return X_train, y_train, X_test, y_test
 ```
 
 ### Step 2: Initialize Parameters
@@ -265,25 +265,25 @@ No class. Just a function that returns a pytree:
 
 ```python
 def init_params(key):
-    k1, k2, k3 = random.split(key, 3)
-    scale1 = jnp.sqrt(2.0 / 784)
-    scale2 = jnp.sqrt(2.0 / 256)
-    scale3 = jnp.sqrt(2.0 / 128)
-    params = {
-        'layer1': {
-            'w': scale1 * random.normal(k1, (784, 256)),
-            'b': jnp.zeros(256),
-        },
-        'layer2': {
-            'w': scale2 * random.normal(k2, (256, 128)),
-            'b': jnp.zeros(128),
-        },
-        'layer3': {
-            'w': scale3 * random.normal(k3, (128, 10)),
-            'b': jnp.zeros(10),
-        },
-    }
-    return params
+ k1, k2, k3 = random.split(key, 3)
+ scale1 = jnp.sqrt(2.0 / 784)
+ scale2 = jnp.sqrt(2.0 / 256)
+ scale3 = jnp.sqrt(2.0 / 128)
+ params = {
+ 'layer1': {
+ 'w': scale1 * random.normal(k1, (784, 256)),
+ 'b': jnp.zeros(256),
+ },
+ 'layer2': {
+ 'w': scale2 * random.normal(k2, (256, 128)),
+ 'b': jnp.zeros(128),
+ },
+ 'layer3': {
+ 'w': scale3 * random.normal(k3, (128, 10)),
+ 'b': jnp.zeros(10),
+ },
+ }
+ return params
 ```
 
 He-initialization, done manually. Three PRNG keys split from one seed. Every weight is an immutable array in a nested dict.
@@ -292,17 +292,17 @@ He-initialization, done manually. Three PRNG keys split from one seed. Every wei
 
 ```python
 def forward(params, x):
-    x = jnp.dot(x, params['layer1']['w']) + params['layer1']['b']
-    x = jax.nn.relu(x)
-    x = jnp.dot(x, params['layer2']['w']) + params['layer2']['b']
-    x = jax.nn.relu(x)
-    x = jnp.dot(x, params['layer3']['w']) + params['layer3']['b']
-    return x
+ x = jnp.dot(x, params['layer1']['w']) + params['layer1']['b']
+ x = jax.nn.relu(x)
+ x = jnp.dot(x, params['layer2']['w']) + params['layer2']['b']
+ x = jax.nn.relu(x)
+ x = jnp.dot(x, params['layer3']['w']) + params['layer3']['b']
+ return x
 
 def loss_fn(params, x, y):
-    logits = forward(params, x)
-    one_hot = jax.nn.one_hot(y, 10)
-    return -jnp.mean(jnp.sum(jax.nn.log_softmax(logits) * one_hot, axis=-1))
+ logits = forward(params, x)
+ one_hot = jax.nn.one_hot(y, 10)
+ return -jnp.mean(jnp.sum(jax.nn.log_softmax(logits) * one_hot, axis=-1))
 ```
 
 Pure functions. Params in, prediction out. No `self`, no stored state. `loss_fn` computes cross-entropy from scratch -- softmax, log, negative mean.
@@ -312,16 +312,16 @@ Pure functions. Params in, prediction out. No `self`, no stored state. `loss_fn`
 ```python
 @jax.jit
 def train_step(params, opt_state, x, y):
-    loss, grads = jax.value_and_grad(loss_fn)(params, x, y)
-    updates, opt_state = optimizer.update(grads, opt_state, params)
-    params = optax.apply_updates(params, updates)
-    return params, opt_state, loss
+ loss, grads = jax.value_and_grad(loss_fn)(params, x, y)
+ updates, opt_state = optimizer.update(grads, opt_state, params)
+ params = optax.apply_updates(params, updates)
+ return params, opt_state, loss
 
 @jax.jit
 def accuracy(params, x, y):
-    logits = forward(params, x)
-    preds = jnp.argmax(logits, axis=-1)
-    return jnp.mean(preds == y)
+ logits = forward(params, x)
+ preds = jnp.argmax(logits, axis=-1)
+ return jnp.mean(preds == y)
 ```
 
 `jax.value_and_grad` returns both the loss value and the gradients in one pass. The `@jax.jit` decorator compiles both functions to XLA. After the first call, each training step runs without touching Python.
@@ -343,24 +343,24 @@ batch_size = 128
 n_epochs = 10
 
 for epoch in range(n_epochs):
-    key, subkey = random.split(key)
-    perm = random.permutation(subkey, len(X_train))
-    X_shuffled = X_train[perm]
-    y_shuffled = y_train[perm]
+ key, subkey = random.split(key)
+ perm = random.permutation(subkey, len(X_train))
+ X_shuffled = X_train[perm]
+ y_shuffled = y_train[perm]
 
-    epoch_loss = 0.0
-    n_batches = len(X_train) // batch_size
-    for i in range(n_batches):
-        start = i * batch_size
-        xb = X_shuffled[start:start + batch_size]
-        yb = y_shuffled[start:start + batch_size]
-        params, opt_state, loss = train_step(params, opt_state, xb, yb)
-        epoch_loss += loss
+ epoch_loss = 0.0
+ n_batches = len(X_train) // batch_size
+ for i in range(n_batches):
+ start = i * batch_size
+ xb = X_shuffled[start:start + batch_size]
+ yb = y_shuffled[start:start + batch_size]
+ params, opt_state, loss = train_step(params, opt_state, xb, yb)
+ epoch_loss += loss
 
-    train_acc = accuracy(params, X_train[:5000], y_train[:5000])
-    test_acc = accuracy(params, X_test, y_test)
-    print(f"Epoch {epoch + 1:2d} | Loss: {epoch_loss / n_batches:.4f} | "
-          f"Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}")
+ train_acc = accuracy(params, X_train[:5000], y_train[:5000])
+ test_acc = accuracy(params, X_test, y_test)
+ print(f"Epoch {epoch + 1:2d} | Loss: {epoch_loss / n_batches:.4f} | "
+ f"Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}")
 ```
 
 10 epochs. ~97% test accuracy. The first epoch is slow (JIT compilation). Epochs 2-10 are fast.
@@ -377,14 +377,14 @@ Flax is the most common JAX neural network library. It adds `nn.Module` back, bu
 import flax.linen as nn
 
 class MLP(nn.Module):
-    @nn.compact
-    def __call__(self, x):
-        x = nn.Dense(256)(x)
-        x = nn.relu(x)
-        x = nn.Dense(128)(x)
-        x = nn.relu(x)
-        x = nn.Dense(10)(x)
-        return x
+ @nn.compact
+ def __call__(self, x):
+ x = nn.Dense(256)(x)
+ x = nn.relu(x)
+ x = nn.Dense(128)(x)
+ x = nn.relu(x)
+ x = nn.Dense(10)(x)
+ return x
 
 model = MLP()
 params = model.init(jax.random.PRNGKey(0), jnp.ones((1, 784)))
@@ -401,8 +401,8 @@ Equinox (by Patrick Kidger) represents models as pytrees:
 import equinox as eqx
 
 model = eqx.nn.MLP(
-    in_size=784, out_size=10, width_size=256, depth=2,
-    activation=jax.nn.relu, key=jax.random.PRNGKey(0)
+ in_size=784, out_size=10, width_size=256, depth=2,
+ activation=jax.nn.relu, key=jax.random.PRNGKey(0)
 )
 logits = model(x)
 ```
@@ -415,13 +415,13 @@ Optax decouples the gradient transformation from the update:
 
 ```python
 schedule = optax.warmup_cosine_decay_schedule(
-    init_value=0.0, peak_value=1e-3,
-    warmup_steps=1000, decay_steps=50000
+ init_value=0.0, peak_value=1e-3,
+ warmup_steps=1000, decay_steps=50000
 )
 
 optimizer = optax.chain(
-    optax.clip_by_global_norm(1.0),
-    optax.adamw(learning_rate=schedule, weight_decay=0.01),
+ optax.clip_by_global_norm(1.0),
+ optax.adamw(learning_rate=schedule, weight_decay=0.01),
 )
 ```
 

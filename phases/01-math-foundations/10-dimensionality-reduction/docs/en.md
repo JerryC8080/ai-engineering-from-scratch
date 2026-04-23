@@ -31,11 +31,11 @@ High-dimensional spaces are unintuitive. Three things break as dimensions grow.
 **Distance becomes meaningless.** In high dimensions, the distance between any two random points converges to the same value. If every point is roughly the same distance from every other point, nearest-neighbor search stops working.
 
 ```
-Dimension    Avg distance ratio (max/min between random points)
-2            ~5.0
-10           ~1.8
-100          ~1.2
-1000         ~1.02
+Dimension Avg distance ratio (max/min between random points)
+2 ~5.0
+10 ~1.8
+100 ~1.2
+1000 ~1.02
 ```
 
 **Volume concentrates in corners.** A unit hypercube in d dimensions has 2^d corners. In 100 dimensions, nearly all the volume is in the corners, far from the center. Data points spread to the edges and your models starve for data in the interior.
@@ -49,18 +49,18 @@ Principal Component Analysis (PCA) finds the axes along which your data varies t
 The algorithm:
 
 ```
-1. Center the data        (subtract the mean from each feature)
-2. Compute covariance     (how features move together)
-3. Eigendecomposition     (find the principal directions)
-4. Sort by eigenvalue     (biggest variance first)
-5. Project               (keep top k eigenvectors, drop the rest)
+1. Center the data (subtract the mean from each feature)
+2. Compute covariance (how features move together)
+3. Eigendecomposition (find the principal directions)
+4. Sort by eigenvalue (biggest variance first)
+5. Project (keep top k eigenvectors, drop the rest)
 ```
 
 Why eigendecomposition? The covariance matrix is symmetric and positive semi-definite. Its eigenvectors are orthogonal directions in feature space. The eigenvalues tell you how much variance each direction captures. The eigenvector with the largest eigenvalue points along the direction of maximum variance.
 
 ```mermaid
 graph LR
-    A["Original data (2D)\nData spread in both\nx and y directions"] -->|"PCA rotation"| B["After PCA\nPC1 captures the elongated spread\nPC2 captures the narrow spread\nDrop PC2 and you lose little info"]
+ A["Original data (2D)\nData spread in both\nx and y directions"] -->|"PCA rotation"| B["After PCA\nPC1 captures the elongated spread\nPC2 captures the narrow spread\nDrop PC2 and you lose little info"]
 ```
 
 - **Before PCA:** Data cloud is spread diagonally across both x and y axes
@@ -72,12 +72,11 @@ graph LR
 Each principal component captures a fraction of the total variance. The explained variance ratio tells you how much.
 
 ```
-Component    Eigenvalue    Explained ratio    Cumulative
-PC1          4.73          0.473              0.473
-PC2          2.51          0.251              0.724
-PC3          1.12          0.112              0.836
-PC4          0.89          0.089              0.925
-...
+Component Eigenvalue Explained ratio Cumulative
+PC1 4.73 0.473 0.473
+PC2 2.51 0.251 0.724
+PC3 1.12 0.112 0.836
+PC4 0.89 0.089 0.925...
 ```
 
 When the cumulative explained variance reaches 0.95, you know that many components capture 95% of the information. Everything after that is mostly noise.
@@ -145,8 +144,8 @@ Common kernel functions:
 | Kernel | Formula | Good for |
 |--------|---------|----------|
 | RBF (Gaussian) | exp(-gamma * \|\|x - y\|\|^2) | Most nonlinear data, smooth manifolds |
-| Polynomial | (x . y + c)^d | Polynomial relationships |
-| Sigmoid | tanh(alpha * x . y + c) | Neural network-like mappings |
+| Polynomial | (x. y + c)^d | Polynomial relationships |
+| Sigmoid | tanh(alpha * x. y + c) | Neural network-like mappings |
 
 When to use kernel PCA vs standard PCA:
 
@@ -198,39 +197,39 @@ Reconstruction error is useful beyond choosing k. You can use it for anomaly det
 import numpy as np
 
 class PCA:
-    def __init__(self, n_components):
-        self.n_components = n_components
-        self.components = None
-        self.mean = None
-        self.eigenvalues = None
-        self.explained_variance_ratio_ = None
+ def __init__(self, n_components):
+ self.n_components = n_components
+ self.components = None
+ self.mean = None
+ self.eigenvalues = None
+ self.explained_variance_ratio_ = None
 
-    def fit(self, X):
-        self.mean = np.mean(X, axis=0)
-        X_centered = X - self.mean
+ def fit(self, X):
+ self.mean = np.mean(X, axis=0)
+ X_centered = X - self.mean
 
-        cov_matrix = np.cov(X_centered, rowvar=False)
+ cov_matrix = np.cov(X_centered, rowvar=False)
 
-        eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+ eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
 
-        sorted_idx = np.argsort(eigenvalues)[::-1]
-        eigenvalues = eigenvalues[sorted_idx]
-        eigenvectors = eigenvectors[:, sorted_idx]
+ sorted_idx = np.argsort(eigenvalues)[::-1]
+ eigenvalues = eigenvalues[sorted_idx]
+ eigenvectors = eigenvectors[:, sorted_idx]
 
-        self.components = eigenvectors[:, :self.n_components].T
-        self.eigenvalues = eigenvalues[:self.n_components]
-        total_var = np.sum(eigenvalues)
-        self.explained_variance_ratio_ = self.eigenvalues / total_var
+ self.components = eigenvectors[:, :self.n_components].T
+ self.eigenvalues = eigenvalues[:self.n_components]
+ total_var = np.sum(eigenvalues)
+ self.explained_variance_ratio_ = self.eigenvalues / total_var
 
-        return self
+ return self
 
-    def transform(self, X):
-        X_centered = X - self.mean
-        return X_centered @ self.components.T
+ def transform(self, X):
+ X_centered = X - self.mean
+ return X_centered @ self.components.T
 
-    def fit_transform(self, X):
-        self.fit(X)
-        return self.transform(X)
+ def fit_transform(self, X):
+ self.fit(X)
+ return self.transform(X)
 ```
 
 ### Step 2: Test on synthetic data
@@ -250,7 +249,7 @@ pca = PCA(n_components=2)
 X_reduced = pca.fit_transform(X_synthetic)
 
 print(f"Original shape: {X_synthetic.shape}")
-print(f"Reduced shape:  {X_reduced.shape}")
+print(f"Reduced shape: {X_reduced.shape}")
 print(f"Explained variance ratios: {pca.explained_variance_ratio_}")
 print(f"Total variance captured: {sum(pca.explained_variance_ratio_):.4f}")
 ```
@@ -282,7 +281,7 @@ from sklearn.manifold import TSNE
 sklearn_pca = SklearnPCA(n_components=2)
 X_sklearn_pca = sklearn_pca.fit_transform(X_mnist)
 
-print(f"\nOur PCA explained variance:     {pca_2d.explained_variance_ratio_}")
+print(f"\nOur PCA explained variance: {pca_2d.explained_variance_ratio_}")
 print(f"Sklearn PCA explained variance: {sklearn_pca.explained_variance_ratio_}")
 
 diff = np.abs(np.abs(X_pca2d) - np.abs(X_sklearn_pca))
@@ -297,13 +296,13 @@ print(f"\nt-SNE output shape: {X_tsne.shape}")
 
 ```python
 try:
-    from umap import UMAP
+ from umap import UMAP
 
-    reducer = UMAP(n_components=2, n_neighbors=15, min_dist=0.1, random_state=42)
-    X_umap = reducer.fit_transform(X_mnist)
-    print(f"UMAP output shape: {X_umap.shape}")
+ reducer = UMAP(n_components=2, n_neighbors=15, min_dist=0.1, random_state=42)
+ X_umap = reducer.fit_transform(X_mnist)
+ print(f"UMAP output shape: {X_umap.shape}")
 except ImportError:
-    print("Install umap-learn: pip install umap-learn")
+ print("Install umap-learn: pip install umap-learn")
 ```
 
 ## Use It
@@ -317,21 +316,21 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X_mnist, y_mnist, test_size=0.2, random_state=42
+ X_mnist, y_mnist, test_size=0.2, random_state=42
 )
 
 results = {}
 for k in [10, 30, 50, 100, 200]:
-    pca_k = SklearnPCA(n_components=k)
-    X_tr = pca_k.fit_transform(X_train)
-    X_te = pca_k.transform(X_test)
+ pca_k = SklearnPCA(n_components=k)
+ X_tr = pca_k.fit_transform(X_train)
+ X_te = pca_k.transform(X_test)
 
-    clf = LogisticRegression(max_iter=1000, random_state=42)
-    clf.fit(X_tr, y_train)
-    acc = accuracy_score(y_test, clf.predict(X_te))
-    var_captured = sum(pca_k.explained_variance_ratio_)
-    results[k] = (acc, var_captured)
-    print(f"k={k:>3d}  accuracy={acc:.4f}  variance={var_captured:.4f}")
+ clf = LogisticRegression(max_iter=1000, random_state=42)
+ clf.fit(X_tr, y_train)
+ acc = accuracy_score(y_test, clf.predict(X_te))
+ var_captured = sum(pca_k.explained_variance_ratio_)
+ results[k] = (acc, var_captured)
+ print(f"k={k:>3d} accuracy={acc:.4f} variance={var_captured:.4f}")
 ```
 
 Performance plateaus well before 784 dimensions. That plateau is your operating point.

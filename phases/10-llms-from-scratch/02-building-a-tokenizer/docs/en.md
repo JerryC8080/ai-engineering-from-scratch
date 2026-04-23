@@ -34,18 +34,18 @@ A production tokenizer is not one algorithm. It is a pipeline of five stages, ea
 
 ```mermaid
 graph LR
-    A[Raw Text] --> B[Normalize]
-    B --> C[Pre-Tokenize]
-    C --> D[BPE Merge]
-    D --> E[Special Tokens]
-    E --> F[Token IDs]
+ A[Raw Text] --> B[Normalize]
+ B --> C[Pre-Tokenize]
+ C --> D[BPE Merge]
+ D --> E[Special Tokens]
+ E --> F[Token IDs]
 
-    style A fill:#1a1a2e,stroke:#e94560,color:#fff
-    style B fill:#1a1a2e,stroke:#e94560,color:#fff
-    style C fill:#1a1a2e,stroke:#e94560,color:#fff
-    style D fill:#1a1a2e,stroke:#e94560,color:#fff
-    style E fill:#1a1a2e,stroke:#e94560,color:#fff
-    style F fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A fill:#1a1a2e,stroke:#e94560,color:#fff
+ style B fill:#1a1a2e,stroke:#e94560,color:#fff
+ style C fill:#1a1a2e,stroke:#e94560,color:#fff
+ style D fill:#1a1a2e,stroke:#e94560,color:#fff
+ style E fill:#1a1a2e,stroke:#e94560,color:#fff
+ style F fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 Each stage has a specific job:
@@ -109,9 +109,9 @@ When you send messages to a chat model, the API accepts a list of messages:
 
 ```
 [
-  {"role": "system", "content": "You are helpful."},
-  {"role": "user", "content": "Hello"},
-  {"role": "assistant", "content": "Hi there!"}
+ {"role": "system", "content": "You are helpful."},
+ {"role": "user", "content": "Hello"},
+ {"role": "assistant", "content": "Hi there!"}
 ]
 ```
 
@@ -156,25 +156,25 @@ The foundation. Convert any string into a sequence of bytes, map each byte to a 
 
 ```python
 def bytes_to_tokens(text):
-    return list(text.encode("utf-8"))
+ return list(text.encode("utf-8"))
 
 def tokens_to_text(token_bytes):
-    return bytes(token_bytes).decode("utf-8", errors="replace")
+ return bytes(token_bytes).decode("utf-8", errors="replace")
 ```
 
 Test on multilingual text to see the byte counts:
 
 ```python
 texts = [
-    ("English", "hello"),
-    ("Chinese", "你好"),
-    ("Emoji", "🔥"),
-    ("Mixed", "hello你好🔥"),
+ ("English", "hello"),
+ ("Chinese", "你好"),
+ ("Emoji", "🔥"),
+ ("Mixed", "hello你好🔥"),
 ]
 
 for label, text in texts:
-    b = bytes_to_tokens(text)
-    print(f"{label}: {len(text)} chars -> {len(b)} bytes -> {b}")
+ b = bytes_to_tokens(text)
+ print(f"{label}: {len(text)} chars -> {len(b)} bytes -> {b}")
 ```
 
 "hello" is 5 bytes. "你好" is 6 bytes (3 per character). The fire emoji is 4 bytes. The byte-level tokenizer does not care what language it is. Bytes are bytes.
@@ -187,17 +187,17 @@ Split text into chunks using the GPT-2 regex pattern. Each chunk gets tokenized 
 import re
 
 try:
-    import regex
-    GPT2_PATTERN = regex.compile(
-        r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
-    )
+ import regex
+ GPT2_PATTERN = regex.compile(
+ r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+ )
 except ImportError:
-    GPT2_PATTERN = re.compile(
-        r"""'(?:[sdmt]|ll|ve|re)| ?[a-zA-Z]+| ?[0-9]+| ?[^\s\w]+|\s+(?!\S)|\s+"""
-    )
+ GPT2_PATTERN = re.compile(
+ r"""'(?:[sdmt]|ll|ve|re)| ?[a-zA-Z]+| ?[0-9]+| ?[^\s\w]+|\s+(?!\S)|\s+"""
+ )
 
 def pre_tokenize(text):
-    return [match.group() for match in GPT2_PATTERN.finditer(text)]
+ return [match.group() for match in GPT2_PATTERN.finditer(text)]
 ```
 
 The `regex` module supports Unicode property escapes (`\p{L}` for letters, `\p{N}` for numbers). The standard library `re` module does not, so we fall back to ASCII character classes. For production multilingual tokenizers, install `regex`.
@@ -219,24 +219,24 @@ The core algorithm from Lesson 01, but now operating on pre-tokenized chunks ind
 from collections import Counter
 
 def get_byte_pairs(chunks):
-    pairs = Counter()
-    for chunk in chunks:
-        byte_seq = list(chunk.encode("utf-8"))
-        for i in range(len(byte_seq) - 1):
-            pairs[(byte_seq[i], byte_seq[i + 1])] += 1
-    return pairs
+ pairs = Counter()
+ for chunk in chunks:
+ byte_seq = list(chunk.encode("utf-8"))
+ for i in range(len(byte_seq) - 1):
+ pairs[(byte_seq[i], byte_seq[i + 1])] += 1
+ return pairs
 
 def apply_merge(byte_seq, pair, new_id):
-    merged = []
-    i = 0
-    while i < len(byte_seq):
-        if i < len(byte_seq) - 1 and byte_seq[i] == pair[0] and byte_seq[i + 1] == pair[1]:
-            merged.append(new_id)
-            i += 2
-        else:
-            merged.append(byte_seq[i])
-            i += 1
-    return merged
+ merged = []
+ i = 0
+ while i < len(byte_seq):
+ if i < len(byte_seq) - 1 and byte_seq[i] == pair[0] and byte_seq[i + 1] == pair[1]:
+ merged.append(new_id)
+ i += 2
+ else:
+ merged.append(byte_seq[i])
+ i += 1
+ return merged
 ```
 
 ### Step 4: Special Token Handling
@@ -245,28 +245,28 @@ Special tokens need exact matching and fixed IDs. They bypass BPE entirely.
 
 ```python
 class SpecialTokenHandler:
-    def __init__(self):
-        self.special_tokens = {}
-        self.pattern = None
+ def __init__(self):
+ self.special_tokens = {}
+ self.pattern = None
 
-    def add_token(self, token_str, token_id):
-        self.special_tokens[token_str] = token_id
-        escaped = [re.escape(t) for t in sorted(self.special_tokens.keys(), key=len, reverse=True)]
-        self.pattern = re.compile("|".join(escaped))
+ def add_token(self, token_str, token_id):
+ self.special_tokens[token_str] = token_id
+ escaped = [re.escape(t) for t in sorted(self.special_tokens.keys(), key=len, reverse=True)]
+ self.pattern = re.compile("|".join(escaped))
 
-    def split_with_specials(self, text):
-        if not self.pattern:
-            return [(text, False)]
-        parts = []
-        last_end = 0
-        for match in self.pattern.finditer(text):
-            if match.start() > last_end:
-                parts.append((text[last_end:match.start()], False))
-            parts.append((match.group(), True))
-            last_end = match.end()
-        if last_end < len(text):
-            parts.append((text[last_end:], False))
-        return parts
+ def split_with_specials(self, text):
+ if not self.pattern:
+ return [(text, False)]
+ parts = []
+ last_end = 0
+ for match in self.pattern.finditer(text):
+ if match.start() > last_end:
+ parts.append((text[last_end:match.start()], False))
+ parts.append((match.group(), True))
+ last_end = match.end()
+ if last_end < len(text):
+ parts.append((text[last_end:], False))
+ return parts
 ```
 
 ### Step 5: Full Tokenizer Class
@@ -277,65 +277,65 @@ Chain everything together: normalize, split on special tokens, pre-tokenize, BPE
 import unicodedata
 
 class ProductionTokenizer:
-    def __init__(self):
-        self.merges = {}
-        self.vocab = {i: bytes([i]) for i in range(256)}
-        self.special_handler = SpecialTokenHandler()
-        self.next_id = 256
+ def __init__(self):
+ self.merges = {}
+ self.vocab = {i: bytes([i]) for i in range(256)}
+ self.special_handler = SpecialTokenHandler()
+ self.next_id = 256
 
-    def normalize(self, text):
-        return unicodedata.normalize("NFKC", text)
+ def normalize(self, text):
+ return unicodedata.normalize("NFKC", text)
 
-    def train(self, text, num_merges):
-        text = self.normalize(text)
-        chunks = pre_tokenize(text)
-        chunk_bytes = [list(chunk.encode("utf-8")) for chunk in chunks]
+ def train(self, text, num_merges):
+ text = self.normalize(text)
+ chunks = pre_tokenize(text)
+ chunk_bytes = [list(chunk.encode("utf-8")) for chunk in chunks]
 
-        for i in range(num_merges):
-            pairs = Counter()
-            for seq in chunk_bytes:
-                for j in range(len(seq) - 1):
-                    pairs[(seq[j], seq[j + 1])] += 1
-            if not pairs:
-                break
-            best = max(pairs, key=pairs.get)
-            new_id = self.next_id
-            self.next_id += 1
-            self.merges[best] = new_id
-            self.vocab[new_id] = self.vocab[best[0]] + self.vocab[best[1]]
-            chunk_bytes = [apply_merge(seq, best, new_id) for seq in chunk_bytes]
+ for i in range(num_merges):
+ pairs = Counter()
+ for seq in chunk_bytes:
+ for j in range(len(seq) - 1):
+ pairs[(seq[j], seq[j + 1])] += 1
+ if not pairs:
+ break
+ best = max(pairs, key=pairs.get)
+ new_id = self.next_id
+ self.next_id += 1
+ self.merges[best] = new_id
+ self.vocab[new_id] = self.vocab[best[0]] + self.vocab[best[1]]
+ chunk_bytes = [apply_merge(seq, best, new_id) for seq in chunk_bytes]
 
-    def add_special_token(self, token_str):
-        token_id = self.next_id
-        self.next_id += 1
-        self.special_handler.add_token(token_str, token_id)
-        self.vocab[token_id] = token_str.encode("utf-8")
-        return token_id
+ def add_special_token(self, token_str):
+ token_id = self.next_id
+ self.next_id += 1
+ self.special_handler.add_token(token_str, token_id)
+ self.vocab[token_id] = token_str.encode("utf-8")
+ return token_id
 
-    def encode(self, text):
-        text = self.normalize(text)
-        parts = self.special_handler.split_with_specials(text)
-        all_ids = []
-        for part_text, is_special in parts:
-            if is_special:
-                all_ids.append(self.special_handler.special_tokens[part_text])
-            else:
-                for chunk in pre_tokenize(part_text):
-                    byte_seq = list(chunk.encode("utf-8"))
-                    for pair, new_id in self.merges.items():
-                        byte_seq = apply_merge(byte_seq, pair, new_id)
-                    all_ids.extend(byte_seq)
-        return all_ids
+ def encode(self, text):
+ text = self.normalize(text)
+ parts = self.special_handler.split_with_specials(text)
+ all_ids = []
+ for part_text, is_special in parts:
+ if is_special:
+ all_ids.append(self.special_handler.special_tokens[part_text])
+ else:
+ for chunk in pre_tokenize(part_text):
+ byte_seq = list(chunk.encode("utf-8"))
+ for pair, new_id in self.merges.items():
+ byte_seq = apply_merge(byte_seq, pair, new_id)
+ all_ids.extend(byte_seq)
+ return all_ids
 
-    def decode(self, ids):
-        byte_parts = []
-        for token_id in ids:
-            if token_id in self.vocab:
-                byte_parts.append(self.vocab[token_id])
-        return b"".join(byte_parts).decode("utf-8", errors="replace")
+ def decode(self, ids):
+ byte_parts = []
+ for token_id in ids:
+ if token_id in self.vocab:
+ byte_parts.append(self.vocab[token_id])
+ return b"".join(byte_parts).decode("utf-8", errors="replace")
 
-    def vocab_size(self):
-        return len(self.vocab)
+ def vocab_size(self):
+ return len(self.vocab)
 ```
 
 ### Step 6: Multilingual Test
@@ -344,12 +344,12 @@ The real test. Throw English, Chinese, emoji, and code at it.
 
 ```python
 corpus = (
-    "The quick brown fox jumps over the lazy dog. "
-    "The quick brown fox runs through the forest. "
-    "Machine learning models process natural language. "
-    "Deep learning transforms how we build software. "
-    "def train(model, data): return model.fit(data) "
-    "def predict(model, x): return model(x) "
+ "The quick brown fox jumps over the lazy dog. "
+ "The quick brown fox runs through the forest. "
+ "Machine learning models process natural language. "
+ "Deep learning transforms how we build software. "
+ "def train(model, data): return model.fit(data) "
+ "def predict(model, x): return model(x) "
 )
 
 tok = ProductionTokenizer()
@@ -359,20 +359,20 @@ bos = tok.add_special_token("<|begin|>")
 eos = tok.add_special_token("<|end|>")
 
 test_texts = [
-    "The quick brown fox.",
-    "你好世界",
-    "Hello 🌍 World",
-    "def foo(x): return x + 1",
-    f"<|begin|>Hello<|end|>",
+ "The quick brown fox.",
+ "你好世界",
+ "Hello 🌍 World",
+ "def foo(x): return x + 1",
+ f"<|begin|>Hello<|end|>",
 ]
 
 for text in test_texts:
-    ids = tok.encode(text)
-    decoded = tok.decode(ids)
-    print(f"Input:   {text}")
-    print(f"Tokens:  {len(ids)} ids")
-    print(f"Decoded: {decoded}")
-    print()
+ ids = tok.encode(text)
+ decoded = tok.decode(ids)
+ print(f"Input: {text}")
+ print(f"Tokens: {len(ids)} ids")
+ print(f"Decoded: {decoded}")
+ print()
 ```
 
 Chinese characters produce 3 bytes each. The emoji produces 4 bytes. None of these crash the tokenizer. None produce unknown tokens. That is the power of byte-level BPE.
@@ -402,9 +402,9 @@ llama_tok = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
 mistral_tok = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
 
 for name, tok in [("Llama 3", llama_tok), ("Mistral", mistral_tok)]:
-    tokens = tok.encode(test_paragraph)
-    pieces = tok.convert_ids_to_tokens(tokens)
-    print(f"{name} ({len(tokens)} tokens): {pieces[:20]}...")
+ tokens = tok.encode(test_paragraph)
+ pieces = tok.convert_ids_to_tokens(tokens)
+ print(f"{name} ({len(tokens)} tokens): {pieces[:20]}...")
 ```
 
 You will see different token counts for the same text. Llama 3 with 128K vocabulary is more aggressive at merging common patterns. GPT-4 with 100K sits in the middle. Mistral with 32K produces more tokens but has a smaller embedding layer.
@@ -419,7 +419,7 @@ This lesson produces a prompt for building and debugging production tokenizers. 
 
 1. **Easy:** Add a `get_token_bytes(id)` method that shows the raw bytes for any token ID. Use it to inspect what your most common merged tokens actually represent.
 2. **Medium:** Implement the Llama-style pre-tokenizer that splits on whitespace and digits but keeps leading spaces. Compare its vocabulary with the GPT-2 regex approach on the same corpus.
-3. **Hard:** Add a chat template method that takes a list of `{"role": ..., "content": ...}` messages and produces the correct token sequence for the Llama 3 chat format. Test it against the HuggingFace implementation.
+3. **Hard:** Add a chat template method that takes a list of `{"role":..., "content":...}` messages and produces the correct token sequence for the Llama 3 chat format. Test it against the HuggingFace implementation.
 
 ## Key Terms
 
