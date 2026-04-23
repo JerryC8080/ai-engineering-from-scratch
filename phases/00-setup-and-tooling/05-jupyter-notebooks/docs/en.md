@@ -26,18 +26,18 @@ A notebook is a list of cells. Each cell is either code or text.
 
 ```mermaid
 graph TD
- A["**Markdown Cell**\n# My Experiment\nTesting learning rate 0.01"] --> B["**Code Cell** ► Run\nmodel.fit(X, y, lr=0.01)\n---\nOutput: loss = 0.342"]
- B --> C["**Code Cell** ► Run\nplt.plot(losses)\n---\nOutput: inline plot"]
+    A["**Markdown Cell**\n# My Experiment\nTesting learning rate 0.01"] --> B["**Code Cell** ► Run\nmodel.fit(X, y, lr=0.01)\n---\nOutput: loss = 0.342"]
+    B --> C["**Code Cell** ► Run\nplt.plot(losses)\n---\nOutput: inline plot"]
 ```
 
 The kernel is a Python process running in the background. When you run a cell, it sends the code to the kernel, which executes it and sends back the result. All cells share the same kernel, so variables persist between cells.
 
 ```mermaid
 graph LR
- A[Notebook UI] <--> B[Kernel\nPython process]
- B --> C[Keeps variables in memory]
- B --> D[Runs cells in whatever order you click]
- B --> E[Dies when you restart it]
+    A[Notebook UI] <--> B[Kernel\nPython process]
+    B --> C[Keeps variables in memory]
+    B --> D[Runs cells in whatever order you click]
+    B --> E[Dies when you restart it]
 ```
 
 That "whatever order you click" part is both the superpower and the foot-gun.
@@ -153,9 +153,9 @@ Notebooks auto-display the last expression in a cell. But you can control it:
 import pandas as pd
 
 df = pd.DataFrame({
- "model": ["Linear", "Random Forest", "Neural Net"],
- "accuracy": [0.72, 0.89, 0.94],
- "training_time": [0.1, 2.3, 45.6]
+    "model": ["Linear", "Random Forest", "Neural Net"],
+    "accuracy": [0.72, 0.89, 0.94],
+    "training_time": [0.1, 2.3, 45.6]
 })
 df
 ```

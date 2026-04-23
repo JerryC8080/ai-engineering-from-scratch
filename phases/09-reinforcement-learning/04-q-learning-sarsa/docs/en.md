@@ -55,25 +55,25 @@ Lower variance than SARSA (no sample of `a'`), same on-policy target. Often the 
 
 ```python
 def sarsa(env, episodes, alpha=0.1, gamma=0.99, epsilon=0.1):
- Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
+    Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
 
- def choose(s):
- if random() < epsilon:
- return choice(ACTIONS)
- return max(Q[s], key=Q[s].get)
+    def choose(s):
+        if random() < epsilon:
+            return choice(ACTIONS)
+        return max(Q[s], key=Q[s].get)
 
- for _ in range(episodes):
- s = env.reset()
- a = choose(s)
- while True:
- s_next, r, done = env.step(s, a)
- a_next = choose(s_next) if not done else None
- target = r + (gamma * Q[s_next][a_next] if not done else 0.0)
- Q[s][a] += alpha * (target - Q[s][a])
- if done:
- break
- s, a = s_next, a_next
- return Q
+    for _ in range(episodes):
+        s = env.reset()
+        a = choose(s)
+        while True:
+            s_next, r, done = env.step(s, a)
+            a_next = choose(s_next) if not done else None
+            target = r + (gamma * Q[s_next][a_next] if not done else 0.0)
+            Q[s][a] += alpha * (target - Q[s][a])
+            if done:
+                break
+            s, a = s_next, a_next
+    return Q
 ```
 
 Eight lines. The *only* difference from Q-learning is the target line.
@@ -82,18 +82,18 @@ Eight lines. The *only* difference from Q-learning is the target line.
 
 ```python
 def q_learning(env, episodes, alpha=0.1, gamma=0.99, epsilon=0.1):
- Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
- for _ in range(episodes):
- s = env.reset()
- while True:
- a = choose(s, Q, epsilon)
- s_next, r, done = env.step(s, a)
- target = r + (gamma * max(Q[s_next].values()) if not done else 0.0)
- Q[s][a] += alpha * (target - Q[s][a])
- if done:
- break
- s = s_next
- return Q
+    Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
+    for _ in range(episodes):
+        s = env.reset()
+        while True:
+            a = choose(s, Q, epsilon)
+            s_next, r, done = env.step(s, a)
+            target = r + (gamma * max(Q[s_next].values()) if not done else 0.0)
+            Q[s][a] += alpha * (target - Q[s][a])
+            if done:
+                break
+            s = s_next
+    return Q
 ```
 
 The `max` decouples target from behavior. That one symbol is the difference between on-policy and off-policy.

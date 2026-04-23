@@ -24,13 +24,13 @@ This lesson covers the terminal skills that matter for AI work. No history of Un
 
 ```mermaid
 graph TD
- subgraph tmux["tmux session: training"]
- subgraph top["Top row"]
- P1["Pane 1: Training run<br/>python train.py<br/>Epoch 12/100..."]
- P2["Pane 2: GPU monitor<br/>watch -n1 nvidia-smi<br/>GPU: 78% | Mem: 14/24G"]
- end
- P3["Pane 3: Logs + experiments<br/>tail -f logs/train.log | grep loss"]
- end
+    subgraph tmux["tmux session: training"]
+        subgraph top["Top row"]
+            P1["Pane 1: Training run<br/>python train.py<br/>Epoch 12/100 ..."]
+            P2["Pane 2: GPU monitor<br/>watch -n1 nvidia-smi<br/>GPU: 78% | Mem: 14/24G"]
+        end
+        P3["Pane 3: Logs + experiments<br/>tail -f logs/train.log | grep loss"]
+    end
 ```
 
 Three things running at once. One terminal. You can detach, go home, SSH back in, and reattach. The training keeps running.
@@ -60,7 +60,7 @@ ls -la
 # Press Ctrl+R again to cycle through matches
 
 # Clear terminal
-clear # or Ctrl+L
+clear   # or Ctrl+L
 
 # Cancel a running command
 # Ctrl+C
@@ -233,10 +233,10 @@ ssh -i ~/.ssh/my_gpu_key user@gpu-box-ip
 scp model.pt user@gpu-box-ip:~/models/
 
 # Copy files from remote
-scp user@gpu-box-ip:~/results/metrics.json./
+scp user@gpu-box-ip:~/results/metrics.json ./
 
 # Sync a whole directory (faster for many files)
-rsync -avz./data/ user@gpu-box-ip:~/data/
+rsync -avz ./data/ user@gpu-box-ip:~/data/
 
 # Port forward (access remote Jupyter/TensorBoard locally)
 ssh -L 8888:localhost:8888 user@gpu-box-ip
@@ -245,9 +245,9 @@ ssh -L 8888:localhost:8888 user@gpu-box-ip
 # SSH config for convenience
 # Add to ~/.ssh/config:
 # Host gpu
-# HostName 192.168.1.100
-# User ubuntu
-# IdentityFile ~/.ssh/gpu_key
+#     HostName 192.168.1.100
+#     User ubuntu
+#     IdentityFile ~/.ssh/gpu_key
 #
 # Then just:
 # ssh gpu
@@ -271,7 +271,7 @@ alias gpu='nvidia-smi --query-gpu=index,name,utilization.gpu,memory.used,memory.
 alias killtraining='pkill -f "python.*train"'
 
 # Quick virtual environment activate
-alias ae='source.venv/bin/activate'
+alias ae='source .venv/bin/activate'
 
 # Watch training loss
 alias watchloss='tail -f logs/*.log | grep --line-buffered "loss"'
@@ -291,20 +291,20 @@ python train.py 2>&1 | tee train.log; echo "DONE" | mail -s "Training complete" 
 diff <(grep "accuracy" exp1.log) <(grep "accuracy" exp2.log)
 
 # Find the largest model files (clean up disk space)
-find. -name "*.pt" -o -name "*.safetensors" | xargs du -h | sort -rh | head -20
+find . -name "*.pt" -o -name "*.safetensors" | xargs du -h | sort -rh | head -20
 
 # Download a model from Hugging Face
 wget https://huggingface.co/model/resolve/main/model.safetensors
 
 # Untar a dataset
-tar xzf dataset.tar.gz -C./data/
+tar xzf dataset.tar.gz -C ./data/
 
 # Count lines in all Python files (see how big your project is)
-find. -name "*.py" | xargs wc -l | tail -1
+find . -name "*.py" | xargs wc -l | tail -1
 
 # Check disk space (training data fills disks fast)
 df -h
-du -sh./data/*
+du -sh ./data/*
 
 # Environment variable check before training
 env | grep -i cuda

@@ -57,26 +57,26 @@ The simplest distributed strategy. Copy the entire model to N GPUs. Split each t
 
 ```mermaid
 graph TD
- subgraph DataParallel["Data Parallelism (N=4 GPUs)"]
- B["Full Batch\n(1024 samples)"] --> S["Split"]
- S --> G1["GPU 1\nFull Model Copy\n256 samples"]
- S --> G2["GPU 2\nFull Model Copy\n256 samples"]
- S --> G3["GPU 3\nFull Model Copy\n256 samples"]
- S --> G4["GPU 4\nFull Model Copy\n256 samples"]
- G1 --> AR["AllReduce\nAverage Gradients"]
- G2 --> AR
- G3 --> AR
- G4 --> AR
- AR --> U["Update\n(identical on all GPUs)"]
- end
+    subgraph DataParallel["Data Parallelism (N=4 GPUs)"]
+        B["Full Batch\n(1024 samples)"] --> S["Split"]
+        S --> G1["GPU 1\nFull Model Copy\n256 samples"]
+        S --> G2["GPU 2\nFull Model Copy\n256 samples"]
+        S --> G3["GPU 3\nFull Model Copy\n256 samples"]
+        S --> G4["GPU 4\nFull Model Copy\n256 samples"]
+        G1 --> AR["AllReduce\nAverage Gradients"]
+        G2 --> AR
+        G3 --> AR
+        G4 --> AR
+        AR --> U["Update\n(identical on all GPUs)"]
+    end
 
- style B fill:#1a1a2e,stroke:#e94560,color:#fff
- style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G3 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G4 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style AR fill:#1a1a2e,stroke:#51cf66,color:#fff
- style U fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style B fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G3 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G4 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style AR fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style U fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
 ### Tensor Parallelism
@@ -122,46 +122,46 @@ The communication cost is higher than vanilla data parallelism because of the al
 
 ```mermaid
 graph TD
- subgraph FSDP["FSDP: Fully Sharded Data Parallel (4 GPUs)"]
- direction TB
- S["Model: 4 layers, sharded"]
+    subgraph FSDP["FSDP: Fully Sharded Data Parallel (4 GPUs)"]
+        direction TB
+        S["Model: 4 layers, sharded"]
 
- subgraph GPU1["GPU 1"]
- G1S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
- end
- subgraph GPU2["GPU 2"]
- G2S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
- end
- subgraph GPU3["GPU 3"]
- G3S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
- end
- subgraph GPU4["GPU 4"]
- G4S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
- end
+        subgraph GPU1["GPU 1"]
+            G1S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
+        end
+        subgraph GPU2["GPU 2"]
+            G2S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
+        end
+        subgraph GPU3["GPU 3"]
+            G3S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
+        end
+        subgraph GPU4["GPU 4"]
+            G4S["Shard: 1/4 params\n1/4 optimizer\n1/4 gradients"]
+        end
 
- AG["All-Gather\n(reconstruct full params\nbefore each layer)"]
- FW["Forward Pass\n(full params temporarily)"]
- RS["Reduce-Scatter\n(distribute gradient shards\nafter backward)"]
+        AG["All-Gather\n(reconstruct full params\nbefore each layer)"]
+        FW["Forward Pass\n(full params temporarily)"]
+        RS["Reduce-Scatter\n(distribute gradient shards\nafter backward)"]
 
- S --> GPU1
- S --> GPU2
- S --> GPU3
- S --> GPU4
- GPU1 --> AG
- GPU2 --> AG
- GPU3 --> AG
- GPU4 --> AG
- AG --> FW
- FW --> RS
- end
+        S --> GPU1
+        S --> GPU2
+        S --> GPU3
+        S --> GPU4
+        GPU1 --> AG
+        GPU2 --> AG
+        GPU3 --> AG
+        GPU4 --> AG
+        AG --> FW
+        FW --> RS
+    end
 
- style G1S fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G2S fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G3S fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G4S fill:#1a1a2e,stroke:#0f3460,color:#fff
- style AG fill:#1a1a2e,stroke:#e94560,color:#fff
- style FW fill:#1a1a2e,stroke:#51cf66,color:#fff
- style RS fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G1S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G3S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G4S fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style AG fill:#1a1a2e,stroke:#e94560,color:#fff
+    style FW fill:#1a1a2e,stroke:#51cf66,color:#fff
+    style RS fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 ### DeepSpeed ZeRO
@@ -218,25 +218,25 @@ DeepSeek V3 took a different approach. Their Mixture of Experts architecture act
 
 ```mermaid
 graph TD
- subgraph ThreeD["3D Parallelism (Llama 3 405B)"]
- direction TB
- subgraph DP["Data Parallel (128-way)\nSplit batch across 128 groups"]
- subgraph PP["Pipeline Parallel (16-way)\nSplit layers across 16 stages"]
- subgraph TP["Tensor Parallel (8-way)\nSplit each layer across 8 GPUs"]
- G1["GPU 1\nSlice of layers 1-N"]
- G2["GPU 2\nSlice of layers 1-N"]
- G8["GPU 8\nSlice of layers 1-N"]
- end
- end
- end
- end
+    subgraph ThreeD["3D Parallelism (Llama 3 405B)"]
+        direction TB
+        subgraph DP["Data Parallel (128-way)\nSplit batch across 128 groups"]
+            subgraph PP["Pipeline Parallel (16-way)\nSplit layers across 16 stages"]
+                subgraph TP["Tensor Parallel (8-way)\nSplit each layer across 8 GPUs"]
+                    G1["GPU 1\nSlice of layers 1-N"]
+                    G2["GPU 2\nSlice of layers 1-N"]
+                    G8["GPU 8\nSlice of layers 1-N"]
+                end
+            end
+        end
+    end
 
- N1["Total: 8 x 16 x 128 = 16,384 GPUs"]
+    N1["Total: 8 x 16 x 128 = 16,384 GPUs"]
 
- style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style G8 fill:#1a1a2e,stroke:#0f3460,color:#fff
- style N1 fill:#1a1a2e,stroke:#e94560,color:#fff
+    style G1 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G2 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style G8 fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style N1 fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
 ## Build It
@@ -249,27 +249,27 @@ Split a batch across simulated GPUs. Each GPU computes a forward pass on its sha
 import numpy as np
 
 def simulate_data_parallelism(data, num_gpus, model_fn):
- batch_size = len(data)
- shard_size = batch_size // num_gpus
- remainder = batch_size % num_gpus
+    batch_size = len(data)
+    shard_size = batch_size // num_gpus
+    remainder = batch_size % num_gpus
 
- gpu_losses = []
- gpu_gradients = []
+    gpu_losses = []
+    gpu_gradients = []
 
- offset = 0
- for gpu_id in range(num_gpus):
- extra = 1 if gpu_id < remainder else 0
- shard = data[offset:offset + shard_size + extra]
- offset += shard_size + extra
+    offset = 0
+    for gpu_id in range(num_gpus):
+        extra = 1 if gpu_id < remainder else 0
+        shard = data[offset:offset + shard_size + extra]
+        offset += shard_size + extra
 
- loss, grad = model_fn(shard)
- gpu_losses.append(loss)
- gpu_gradients.append(grad)
+        loss, grad = model_fn(shard)
+        gpu_losses.append(loss)
+        gpu_gradients.append(grad)
 
- avg_loss = np.mean(gpu_losses)
- avg_gradient = np.mean(gpu_gradients, axis=0)
+    avg_loss = np.mean(gpu_losses)
+    avg_gradient = np.mean(gpu_gradients, axis=0)
 
- return avg_loss, avg_gradient
+    return avg_loss, avg_gradient
 ```
 
 The all-reduce operation (averaging gradients) is the only communication in data parallelism. In practice, this uses the NCCL library on NVIDIA GPUs, which implements ring all-reduce: each GPU sends 1/N of its gradients to its neighbor, receives 1/N from the other neighbor, and after N-1 steps every GPU has the complete average. Total communication volume: 2 x gradient_size x (N-1)/N, approaching 2x the gradient size for large N.
@@ -280,25 +280,25 @@ Split a weight matrix across GPUs. Each GPU computes a partial matrix multiplica
 
 ```python
 def simulate_tensor_parallelism(input_data, weight_matrix, num_gpus):
- d_in, d_out = weight_matrix.shape
- assert d_out % num_gpus == 0, f"d_out {d_out} not divisible by num_gpus {num_gpus}"
- shard_size = d_out // num_gpus
+    d_in, d_out = weight_matrix.shape
+    assert d_out % num_gpus == 0, f"d_out {d_out} not divisible by num_gpus {num_gpus}"
+    shard_size = d_out // num_gpus
 
- partial_results = []
- for gpu_id in range(num_gpus):
- start = gpu_id * shard_size
- end = start + shard_size
- weight_shard = weight_matrix[:, start:end]
+    partial_results = []
+    for gpu_id in range(num_gpus):
+        start = gpu_id * shard_size
+        end = start + shard_size
+        weight_shard = weight_matrix[:, start:end]
 
- partial = input_data @ weight_shard
- partial_results.append(partial)
+        partial = input_data @ weight_shard
+        partial_results.append(partial)
 
- full_output = np.concatenate(partial_results, axis=-1)
+    full_output = np.concatenate(partial_results, axis=-1)
 
- direct_output = input_data @ weight_matrix
- error = np.abs(full_output - direct_output).max()
+    direct_output = input_data @ weight_matrix
+    error = np.abs(full_output - direct_output).max()
 
- return full_output, error
+    return full_output, error
 ```
 
 The error should be exactly zero (or machine epsilon). Tensor parallelism is mathematically exact -- it produces the same result as computing the full matmul on one GPU. The split is along the output dimension, so each GPU produces a different chunk of columns, and concatenation reconstructs the full result.
@@ -311,38 +311,38 @@ Split a model's layers across virtual GPUs. Show the bubble problem where early 
 
 ```python
 def simulate_pipeline_parallelism(num_layers, num_stages, num_microbatches):
- layers_per_stage = num_layers // num_stages
+    layers_per_stage = num_layers // num_stages
 
- timeline = {}
- clock = 0
+    timeline = {}
+    clock = 0
 
- for mb in range(num_microbatches):
- for stage in range(num_stages):
- start_time = max(
- timeline.get((stage, mb - 1, "fwd"), (0, 0))[1] if mb > 0 else 0,
- timeline.get((stage - 1, mb, "fwd"), (0, 0))[1] if stage > 0 else 0,
- )
- end_time = start_time + layers_per_stage
- timeline[(stage, mb, "fwd")] = (start_time, end_time)
+    for mb in range(num_microbatches):
+        for stage in range(num_stages):
+            start_time = max(
+                timeline.get((stage, mb - 1, "fwd"), (0, 0))[1] if mb > 0 else 0,
+                timeline.get((stage - 1, mb, "fwd"), (0, 0))[1] if stage > 0 else 0,
+            )
+            end_time = start_time + layers_per_stage
+            timeline[(stage, mb, "fwd")] = (start_time, end_time)
 
- last_fwd_end = max(v[1] for v in timeline.values())
+    last_fwd_end = max(v[1] for v in timeline.values())
 
- for mb in range(num_microbatches - 1, -1, -1):
- for stage in range(num_stages - 1, -1, -1):
- deps = [last_fwd_end]
- if mb < num_microbatches - 1 and (stage, mb + 1, "bwd") in timeline:
- deps.append(timeline[(stage, mb + 1, "bwd")][1])
- if stage < num_stages - 1 and (stage + 1, mb, "bwd") in timeline:
- deps.append(timeline[(stage + 1, mb, "bwd")][1])
- start_time = max(deps)
- end_time = start_time + layers_per_stage
- timeline[(stage, mb, "bwd")] = (start_time, end_time)
+    for mb in range(num_microbatches - 1, -1, -1):
+        for stage in range(num_stages - 1, -1, -1):
+            deps = [last_fwd_end]
+            if mb < num_microbatches - 1 and (stage, mb + 1, "bwd") in timeline:
+                deps.append(timeline[(stage, mb + 1, "bwd")][1])
+            if stage < num_stages - 1 and (stage + 1, mb, "bwd") in timeline:
+                deps.append(timeline[(stage + 1, mb, "bwd")][1])
+            start_time = max(deps)
+            end_time = start_time + layers_per_stage
+            timeline[(stage, mb, "bwd")] = (start_time, end_time)
 
- total_time = max(v[1] for v in timeline.values())
- compute_time = num_microbatches * num_stages * layers_per_stage * 2
- bubble_fraction = 1.0 - compute_time / (total_time * num_stages)
+    total_time = max(v[1] for v in timeline.values())
+    compute_time = num_microbatches * num_stages * layers_per_stage * 2
+    bubble_fraction = 1.0 - compute_time / (total_time * num_stages)
 
- return timeline, total_time, bubble_fraction
+    return timeline, total_time, bubble_fraction
 ```
 
 With 4 stages and 1 micro-batch, the bubble fraction is 75% -- three out of four GPUs idle at any time. With 16 micro-batches, it drops to about 19%. The cost of eliminating bubbles is memory: you must store activations for all in-flight micro-batches simultaneously.
@@ -353,63 +353,63 @@ Compute the exact memory requirements for training any model size.
 
 ```python
 def memory_calculator(
- params_billions,
- precision_bytes=2,
- optimizer="adam",
- num_gpus=1,
- sharding="none",
- sequence_length=2048,
- batch_size_per_gpu=1,
- hidden_dim=None,
- num_layers=None,
+    params_billions,
+    precision_bytes=2,
+    optimizer="adam",
+    num_gpus=1,
+    sharding="none",
+    sequence_length=2048,
+    batch_size_per_gpu=1,
+    hidden_dim=None,
+    num_layers=None,
 ):
- params = params_billions * 1e9
+    params = params_billions * 1e9
 
- weight_memory = params * precision_bytes
+    weight_memory = params * precision_bytes
 
- if optimizer == "adam":
- optimizer_memory = params * 4 * 2
- elif optimizer == "sgd":
- optimizer_memory = params * 4
- else:
- optimizer_memory = 0
+    if optimizer == "adam":
+        optimizer_memory = params * 4 * 2
+    elif optimizer == "sgd":
+        optimizer_memory = params * 4
+    else:
+        optimizer_memory = 0
 
- gradient_memory = params * precision_bytes
+    gradient_memory = params * precision_bytes
 
- total_no_activation = weight_memory + optimizer_memory + gradient_memory
+    total_no_activation = weight_memory + optimizer_memory + gradient_memory
 
- if hidden_dim and num_layers:
- activation_per_layer = (
- sequence_length * batch_size_per_gpu * hidden_dim * precision_bytes * 4
- )
- activation_memory = activation_per_layer * num_layers
- else:
- activation_memory = params * precision_bytes * 0.5
+    if hidden_dim and num_layers:
+        activation_per_layer = (
+            sequence_length * batch_size_per_gpu * hidden_dim * precision_bytes * 4
+        )
+        activation_memory = activation_per_layer * num_layers
+    else:
+        activation_memory = params * precision_bytes * 0.5
 
- if sharding == "fsdp" or sharding == "zero3":
- weight_memory /= num_gpus
- optimizer_memory /= num_gpus
- gradient_memory /= num_gpus
- elif sharding == "zero2":
- optimizer_memory /= num_gpus
- gradient_memory /= num_gpus
- elif sharding == "zero1":
- optimizer_memory /= num_gpus
+    if sharding == "fsdp" or sharding == "zero3":
+        weight_memory /= num_gpus
+        optimizer_memory /= num_gpus
+        gradient_memory /= num_gpus
+    elif sharding == "zero2":
+        optimizer_memory /= num_gpus
+        gradient_memory /= num_gpus
+    elif sharding == "zero1":
+        optimizer_memory /= num_gpus
 
- per_gpu_total = weight_memory + optimizer_memory + gradient_memory + activation_memory
+    per_gpu_total = weight_memory + optimizer_memory + gradient_memory + activation_memory
 
- return {
- "params_billions": params_billions,
- "weights_gb": weight_memory / 1e9,
- "optimizer_gb": optimizer_memory / 1e9,
- "gradients_gb": gradient_memory / 1e9,
- "activations_gb": activation_memory / 1e9,
- "per_gpu_total_gb": per_gpu_total / 1e9,
- "total_across_gpus_gb": per_gpu_total * num_gpus / 1e9,
- "fits_on_80gb": per_gpu_total / 1e9 <= 80,
- "num_gpus": num_gpus,
- "sharding": sharding,
- }
+    return {
+        "params_billions": params_billions,
+        "weights_gb": weight_memory / 1e9,
+        "optimizer_gb": optimizer_memory / 1e9,
+        "gradients_gb": gradient_memory / 1e9,
+        "activations_gb": activation_memory / 1e9,
+        "per_gpu_total_gb": per_gpu_total / 1e9,
+        "total_across_gpus_gb": per_gpu_total * num_gpus / 1e9,
+        "fits_on_80gb": per_gpu_total / 1e9 <= 80,
+        "num_gpus": num_gpus,
+        "sharding": sharding,
+    }
 ```
 
 This calculator answers the question every ML engineer asks: "How many GPUs do I need?" Feed it the model size and see whether it fits. Adjust sharding strategy until the per-GPU total drops below 80GB.
@@ -420,30 +420,30 @@ Compare memory usage between FP32, FP16, and mixed precision training.
 
 ```python
 def mixed_precision_comparison(params_billions):
- params = params_billions * 1e9
+    params = params_billions * 1e9
 
- fp32_weights = params * 4
- fp32_optimizer = params * 4 * 2
- fp32_gradients = params * 4
- fp32_total = fp32_weights + fp32_optimizer + fp32_gradients
+    fp32_weights = params * 4
+    fp32_optimizer = params * 4 * 2
+    fp32_gradients = params * 4
+    fp32_total = fp32_weights + fp32_optimizer + fp32_gradients
 
- fp16_weights = params * 2
- fp16_master = params * 4
- fp16_optimizer = params * 4 * 2
- fp16_gradients = params * 2
- fp16_total = fp16_weights + fp16_master + fp16_optimizer + fp16_gradients
+    fp16_weights = params * 2
+    fp16_master = params * 4
+    fp16_optimizer = params * 4 * 2
+    fp16_gradients = params * 2
+    fp16_total = fp16_weights + fp16_master + fp16_optimizer + fp16_gradients
 
- mixed_weights = params * 2
- mixed_optimizer = params * 4 * 2
- mixed_gradients = params * 2
- mixed_total = mixed_weights + mixed_optimizer + mixed_gradients
+    mixed_weights = params * 2
+    mixed_optimizer = params * 4 * 2
+    mixed_gradients = params * 2
+    mixed_total = mixed_weights + mixed_optimizer + mixed_gradients
 
- return {
- "fp32_total_gb": fp32_total / 1e9,
- "fp16_with_master_gb": fp16_total / 1e9,
- "mixed_bf16_gb": mixed_total / 1e9,
- "savings_vs_fp32": 1 - mixed_total / fp32_total,
- }
+    return {
+        "fp32_total_gb": fp32_total / 1e9,
+        "fp16_with_master_gb": fp16_total / 1e9,
+        "mixed_bf16_gb": mixed_total / 1e9,
+        "savings_vs_fp32": 1 - mixed_total / fp32_total,
+    }
 ```
 
 The biggest surprise for most people: mixed precision does not halve the memory. The optimizer states (Adam's m and v) stay in FP32 regardless of precision. For a 7B model, FP32 training uses 112GB. Mixed precision uses 84GB. That is a 25% reduction, not 50%. The optimizer dominates.
@@ -454,77 +454,77 @@ The biggest surprise for most people: mixed precision does not halve the memory.
 
 ```python
 def run_all_demos():
- print("=" * 70)
- print("DATA PARALLELISM SIMULATION")
- print("=" * 70)
+    print("=" * 70)
+    print("DATA PARALLELISM SIMULATION")
+    print("=" * 70)
 
- np.random.seed(42)
- data = np.random.randn(64, 32)
- weight = np.random.randn(32, 16)
+    np.random.seed(42)
+    data = np.random.randn(64, 32)
+    weight = np.random.randn(32, 16)
 
- def model_fn(batch):
- output = batch @ weight
- loss = np.mean(output ** 2)
- grad = 2 * batch.T @ (batch @ weight) / len(batch)
- return loss, grad
+    def model_fn(batch):
+        output = batch @ weight
+        loss = np.mean(output ** 2)
+        grad = 2 * batch.T @ (batch @ weight) / len(batch)
+        return loss, grad
 
- for n_gpus in [1, 2, 4, 8]:
- loss, grad = simulate_data_parallelism(data, n_gpus, model_fn)
- print(f" {n_gpus} GPUs: loss={loss:.4f}, grad_norm={np.linalg.norm(grad):.4f}")
+    for n_gpus in [1, 2, 4, 8]:
+        loss, grad = simulate_data_parallelism(data, n_gpus, model_fn)
+        print(f"  {n_gpus} GPUs: loss={loss:.4f}, grad_norm={np.linalg.norm(grad):.4f}")
 
- print()
- print("=" * 70)
- print("TENSOR PARALLELISM SIMULATION")
- print("=" * 70)
+    print()
+    print("=" * 70)
+    print("TENSOR PARALLELISM SIMULATION")
+    print("=" * 70)
 
- x = np.random.randn(4, 8192)
- W = np.random.randn(8192, 8192)
+    x = np.random.randn(4, 8192)
+    W = np.random.randn(8192, 8192)
 
- for n_gpus in [1, 2, 4, 8]:
- output, error = simulate_tensor_parallelism(x, W, n_gpus)
- print(f" {n_gpus} GPUs: output_shape={output.shape}, max_error={error:.2e}")
+    for n_gpus in [1, 2, 4, 8]:
+        output, error = simulate_tensor_parallelism(x, W, n_gpus)
+        print(f"  {n_gpus} GPUs: output_shape={output.shape}, max_error={error:.2e}")
 
- print()
- print("=" * 70)
- print("PIPELINE PARALLELISM SIMULATION")
- print("=" * 70)
+    print()
+    print("=" * 70)
+    print("PIPELINE PARALLELISM SIMULATION")
+    print("=" * 70)
 
- for n_mb in [1, 4, 8, 16, 32]:
- _, total_t, bubble = simulate_pipeline_parallelism(32, 4, n_mb)
- print(f" {n_mb:2d} micro-batches: total_time={total_t:4d}, bubble={bubble:.1%}")
+    for n_mb in [1, 4, 8, 16, 32]:
+        _, total_t, bubble = simulate_pipeline_parallelism(32, 4, n_mb)
+        print(f"  {n_mb:2d} micro-batches: total_time={total_t:4d}, bubble={bubble:.1%}")
 
- print()
- print("=" * 70)
- print("MEMORY CALCULATOR")
- print("=" * 70)
+    print()
+    print("=" * 70)
+    print("MEMORY CALCULATOR")
+    print("=" * 70)
 
- configs = [
- (7, "none", 1),
- (7, "fsdp", 8),
- (70, "none", 1),
- (70, "fsdp", 8),
- (70, "fsdp", 16),
- (405, "fsdp", 64),
- (405, "fsdp", 128),
- ]
+    configs = [
+        (7, "none", 1),
+        (7, "fsdp", 8),
+        (70, "none", 1),
+        (70, "fsdp", 8),
+        (70, "fsdp", 16),
+        (405, "fsdp", 64),
+        (405, "fsdp", 128),
+    ]
 
- print(f" {'Model':>8} {'Sharding':>8} {'GPUs':>5} {'Per-GPU':>10} {'Fits 80GB':>10}")
- print(" " + "-" * 50)
- for params, shard, gpus in configs:
- result = memory_calculator(params, num_gpus=gpus, sharding=shard)
- fits = "Yes" if result["fits_on_80gb"] else "No"
- print(f" {params:>6}B {shard:>8} {gpus:>5} {result['per_gpu_total_gb']:>8.1f}GB {fits:>10}")
+    print(f"  {'Model':>8} {'Sharding':>8} {'GPUs':>5} {'Per-GPU':>10} {'Fits 80GB':>10}")
+    print("  " + "-" * 50)
+    for params, shard, gpus in configs:
+        result = memory_calculator(params, num_gpus=gpus, sharding=shard)
+        fits = "Yes" if result["fits_on_80gb"] else "No"
+        print(f"  {params:>6}B {shard:>8} {gpus:>5} {result['per_gpu_total_gb']:>8.1f}GB {fits:>10}")
 
- print()
- print("=" * 70)
- print("MIXED PRECISION COMPARISON")
- print("=" * 70)
+    print()
+    print("=" * 70)
+    print("MIXED PRECISION COMPARISON")
+    print("=" * 70)
 
- for params_b in [7, 13, 70, 405]:
- result = mixed_precision_comparison(params_b)
- print(f" {params_b}B: FP32={result['fp32_total_gb']:.0f}GB, "
- f"Mixed BF16={result['mixed_bf16_gb']:.0f}GB, "
- f"Savings={result['savings_vs_fp32']:.0%}")
+    for params_b in [7, 13, 70, 405]:
+        result = mixed_precision_comparison(params_b)
+        print(f"  {params_b}B: FP32={result['fp32_total_gb']:.0f}GB, "
+              f"Mixed BF16={result['mixed_bf16_gb']:.0f}GB, "
+              f"Savings={result['savings_vs_fp32']:.0%}")
 ```
 
 ## Ship It

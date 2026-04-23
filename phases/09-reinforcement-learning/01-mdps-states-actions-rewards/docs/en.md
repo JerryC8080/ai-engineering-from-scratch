@@ -50,13 +50,13 @@ TERMINAL = (3, 3)
 ACTIONS = {"up": (-1, 0), "down": (1, 0), "left": (0, -1), "right": (0, 1)}
 
 def step(state, action):
- if state == TERMINAL:
- return state, 0.0, True
- dr, dc = ACTIONS[action]
- r, c = state
- nr = min(max(r + dr, 0), GRID - 1)
- nc = min(max(c + dc, 0), GRID - 1)
- return (nr, nc), -1.0, (nr, nc) == TERMINAL
+    if state == TERMINAL:
+        return state, 0.0, True
+    dr, dc = ACTIONS[action]
+    r, c = state
+    nr = min(max(r + dr, 0), GRID - 1)
+    nc = min(max(c + dc, 0), GRID - 1)
+    return (nr, nc), -1.0, (nr, nc) == TERMINAL
 ```
 
 Five lines. That is the entire environment. Deterministic transitions, constant step penalty, absorbing terminal state.
@@ -67,18 +67,18 @@ A policy is a function from state to action distribution. The simplest: uniform 
 
 ```python
 def uniform_policy(state):
- return {a: 0.25 for a in ACTIONS}
+    return {a: 0.25 for a in ACTIONS}
 
 def rollout(policy, max_steps=200):
- s, total, steps = (0, 0), 0.0, 0
- for _ in range(max_steps):
- a = sample(policy(s))
- s, r, done = step(s, a)
- total += r
- steps += 1
- if done:
- break
- return total, steps
+    s, total, steps = (0, 0), 0.0, 0
+    for _ in range(max_steps):
+        a = sample(policy(s))
+        s, r, done = step(s, a)
+        total += r
+        steps += 1
+        if done:
+            break
+    return total, steps
 ```
 
 Run the random policy 1000 times. Average return is around -60 to -80 for this 4×4 board. The optimal return is -6 (straight-line path down-right). Closing that gap is everything in Phase 9.
@@ -89,20 +89,20 @@ For small MDPs the Bellman equation is a linear system. Enumerate states, apply 
 
 ```python
 def policy_evaluation(policy, gamma=0.99, tol=1e-6):
- V = {s: 0.0 for s in all_states()}
- while True:
- delta = 0.0
- for s in all_states():
- if s == TERMINAL:
- continue
- v = 0.0
- for a, pi_a in policy(s).items():
- s_next, r, _ = step(s, a)
- v += pi_a * (r + gamma * V[s_next])
- delta = max(delta, abs(v - V[s]))
- V[s] = v
- if delta < tol:
- return V
+    V = {s: 0.0 for s in all_states()}
+    while True:
+        delta = 0.0
+        for s in all_states():
+            if s == TERMINAL:
+                continue
+            v = 0.0
+            for a, pi_a in policy(s).items():
+                s_next, r, _ = step(s, a)
+                v += pi_a * (r + gamma * V[s_next])
+            delta = max(delta, abs(v - V[s]))
+            V[s] = v
+        if delta < tol:
+            return V
 ```
 
 This is iterative policy evaluation. It is the first algorithm in Sutton & Barto and the theoretical foundation of every RL method that follows.

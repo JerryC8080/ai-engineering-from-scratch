@@ -55,20 +55,20 @@ This lesson uses a 6×6 GridWorld with two cooperative agents. They start in opp
 
 ```python
 class CoopGridWorld:
- def __init__(self):
- self.size = 6
- self.goal = (5, 5)
+    def __init__(self):
+        self.size = 6
+        self.goal = (5, 5)
 
- def reset(self):
- return ((0, 0), (5, 0)) # two agents
+    def reset(self):
+        return ((0, 0), (5, 0))  # two agents
 
- def step(self, state, actions):
- a1, a2 = state
- new1 = move(a1, actions[0])
- new2 = move(a2, actions[1])
- done = (new1 == self.goal) and (new2 == self.goal)
- reward = 10.0 if done else -1.0
- return (new1, new2), reward, done
+    def step(self, state, actions):
+        a1, a2 = state
+        new1 = move(a1, actions[0])
+        new2 = move(a2, actions[1])
+        done = (new1 == self.goal) and (new2 == self.goal)
+        reward = 10.0 if done else -1.0
+        return (new1, new2), reward, done
 ```
 
 The *joint* action space is `|A|² = 16`. The global state is two positions.
@@ -79,18 +79,18 @@ Each agent runs its own Q-table keyed on joint state. At each step: both pick ε
 
 ```python
 def independent_q(env, episodes, alpha, gamma, epsilon):
- Q1, Q2 = defaultdict(default_q), defaultdict(default_q)
- for _ in range(episodes):
- s = env.reset()
- while not done:
- a1 = epsilon_greedy(Q1, s, epsilon)
- a2 = epsilon_greedy(Q2, s, epsilon)
- s_next, r, done = env.step(s, (a1, a2))
- target1 = r + gamma * max(Q1[s_next].values())
- target2 = r + gamma * max(Q2[s_next].values())
- Q1[s][a1] += alpha * (target1 - Q1[s][a1])
- Q2[s][a2] += alpha * (target2 - Q2[s][a2])
- s = s_next
+    Q1, Q2 = defaultdict(default_q), defaultdict(default_q)
+    for _ in range(episodes):
+        s = env.reset()
+        while not done:
+            a1 = epsilon_greedy(Q1, s, epsilon)
+            a2 = epsilon_greedy(Q2, s, epsilon)
+            s_next, r, done = env.step(s, (a1, a2))
+            target1 = r + gamma * max(Q1[s_next].values())
+            target2 = r + gamma * max(Q2[s_next].values())
+            Q1[s][a1] += alpha * (target1 - Q1[s][a1])
+            Q2[s][a2] += alpha * (target2 - Q2[s][a2])
+            s = s_next
 ```
 
 Works on this task because rewards are dense and aligned. Fails on tightly-coupled tasks (e.g., where one agent has to *wait* for the other).

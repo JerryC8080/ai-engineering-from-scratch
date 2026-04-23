@@ -22,17 +22,18 @@ This lesson walks the classical path (rule-based, HMM, CRF) into the modern one 
 **BIO tagging** (or BILOU) turns entity extraction into a sequence-labeling problem. Label each token with `B-TYPE` (beginning of entity), `I-TYPE` (inside entity), or `O` (outside any entity).
 
 ```
-Apple B-ORG
-sued O
-Google B-ORG
-over O
-its O
-iPhone B-PRODUCT
-search O
-deal O
-in O
-the O
-US B-GPE. O
+Apple    B-ORG
+sued     O
+Google   B-ORG
+over     O
+its      O
+iPhone   B-PRODUCT
+search   O
+deal     O
+in       O
+the      O
+US       B-GPE
+.        O
 ```
 
 Multi-token entities chain: `New B-GPE`, `York I-GPE`, `City I-GPE`. A model that understands BIO can extract arbitrary spans.
@@ -51,31 +52,31 @@ The architecture progression:
 
 ```python
 def spans_to_bio(tokens, spans):
- labels = ["O"] * len(tokens)
- for start, end, label in spans:
- labels[start] = f"B-{label}"
- for i in range(start + 1, end):
- labels[i] = f"I-{label}"
- return labels
+    labels = ["O"] * len(tokens)
+    for start, end, label in spans:
+        labels[start] = f"B-{label}"
+        for i in range(start + 1, end):
+            labels[i] = f"I-{label}"
+    return labels
 
 
 def bio_to_spans(tokens, labels):
- spans = []
- current = None
- for i, label in enumerate(labels):
- if label.startswith("B-"):
- if current:
- spans.append(current)
- current = (i, i + 1, label[2:])
- elif label.startswith("I-") and current and current[2] == label[2:]:
- current = (current[0], i + 1, current[2])
- else:
- if current:
- spans.append(current)
- current = None
- if current:
- spans.append(current)
- return spans
+    spans = []
+    current = None
+    for i, label in enumerate(labels):
+        if label.startswith("B-"):
+            if current:
+                spans.append(current)
+            current = (i, i + 1, label[2:])
+        elif label.startswith("I-") and current and current[2] == label[2:]:
+            current = (current[0], i + 1, current[2])
+        else:
+            if current:
+                spans.append(current)
+                current = None
+    if current:
+        spans.append(current)
+    return spans
 ```
 
 ```python
@@ -91,30 +92,30 @@ For classical (non-neural) NER, features are the game. Useful ones:
 
 ```python
 def token_features(token, prev_token, next_token):
- return {
- "lower": token.lower(),
- "is_upper": token.isupper(),
- "is_title": token.istitle(),
- "has_digit": any(c.isdigit() for c in token),
- "suffix_3": token[-3:].lower(),
- "shape": word_shape(token),
- "prev_lower": prev_token.lower() if prev_token else "<BOS>",
- "next_lower": next_token.lower() if next_token else "<EOS>",
- }
+    return {
+        "lower": token.lower(),
+        "is_upper": token.isupper(),
+        "is_title": token.istitle(),
+        "has_digit": any(c.isdigit() for c in token),
+        "suffix_3": token[-3:].lower(),
+        "shape": word_shape(token),
+        "prev_lower": prev_token.lower() if prev_token else "<BOS>",
+        "next_lower": next_token.lower() if next_token else "<EOS>",
+    }
 
 
 def word_shape(word):
- out = []
- for c in word:
- if c.isupper():
- out.append("X")
- elif c.islower():
- out.append("x")
- elif c.isdigit():
- out.append("d")
- else:
- out.append(c)
- return "".join(out)
+    out = []
+    for c in word:
+        if c.isupper():
+            out.append("X")
+        elif c.islower():
+            out.append("x")
+        elif c.isdigit():
+            out.append("d")
+        else:
+            out.append(c)
+    return "".join(out)
 ```
 
 `word_shape("iPhone")` returns `xXxxxx`. `word_shape("USA-2024")` returns `XXX-dddd`. Capitalization patterns are high-signal for proper nouns.
@@ -128,17 +129,17 @@ PRODUCT_GAZETTEER = {"iPhone", "Android", "Windows", "ChatGPT", "Claude"}
 
 
 def rule_based_ner(tokens):
- labels = []
- for token in tokens:
- if token in ORG_GAZETTEER:
- labels.append("B-ORG")
- elif token in GPE_GAZETTEER:
- labels.append("B-GPE")
- elif token in PRODUCT_GAZETTEER:
- labels.append("B-PRODUCT")
- else:
- labels.append("O")
- return labels
+    labels = []
+    for token in tokens:
+        if token in ORG_GAZETTEER:
+            labels.append("B-ORG")
+        elif token in GPE_GAZETTEER:
+            labels.append("B-GPE")
+        elif token in PRODUCT_GAZETTEER:
+            labels.append("B-PRODUCT")
+        else:
+            labels.append("O")
+    return labels
 ```
 
 Production gazetteers have millions of entries scraped from Wikipedia and DBpedia. Coverage is good. Disambiguation (`Apple` the company vs the fruit) is terrible. That is why statistical models won.
@@ -151,23 +152,23 @@ Full CRF from scratch in 50 lines is not enlightening without the probability-th
 import sklearn_crfsuite
 
 def to_features(tokens):
- out = []
- for i, tok in enumerate(tokens):
- prev = tokens[i - 1] if i > 0 else ""
- nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
- out.append({
- "word.lower()": tok.lower(),
- "word.isupper()": tok.isupper(),
- "word.istitle()": tok.istitle(),
- "word.isdigit()": tok.isdigit(),
- "word.suffix3": tok[-3:].lower(),
- "word.shape": word_shape(tok),
- "prev.word.lower()": prev.lower(),
- "next.word.lower()": nxt.lower(),
- "BOS": i == 0,
- "EOS": i == len(tokens) - 1,
- })
- return out
+    out = []
+    for i, tok in enumerate(tokens):
+        prev = tokens[i - 1] if i > 0 else ""
+        nxt = tokens[i + 1] if i + 1 < len(tokens) else ""
+        out.append({
+            "word.lower()": tok.lower(),
+            "word.isupper()": tok.isupper(),
+            "word.istitle()": tok.istitle(),
+            "word.isdigit()": tok.isdigit(),
+            "word.suffix3": tok[-3:].lower(),
+            "word.shape": word_shape(tok),
+            "prev.word.lower()": prev.lower(),
+            "next.word.lower()": nxt.lower(),
+            "BOS": i == 0,
+            "EOS": i == len(tokens) - 1,
+        })
+    return out
 
 
 crf = sklearn_crfsuite.CRF(algorithm="lbfgs", c1=0.1, c2=0.1, max_iterations=100, all_possible_transitions=True)
@@ -187,17 +188,17 @@ import torch.nn as nn
 
 
 class BiLSTM_CRF_Head(nn.Module):
- def __init__(self, vocab_size, embed_dim, hidden_dim, n_labels):
- super().__init__()
- self.embed = nn.Embedding(vocab_size, embed_dim)
- self.lstm = nn.LSTM(embed_dim, hidden_dim, bidirectional=True, batch_first=True)
- self.fc = nn.Linear(hidden_dim * 2, n_labels)
+    def __init__(self, vocab_size, embed_dim, hidden_dim, n_labels):
+        super().__init__()
+        self.embed = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, bidirectional=True, batch_first=True)
+        self.fc = nn.Linear(hidden_dim * 2, n_labels)
 
- def forward(self, token_ids):
- e = self.embed(token_ids)
- h, _ = self.lstm(e)
- emissions = self.fc(h)
- return emissions
+    def forward(self, token_ids):
+        e = self.embed(token_ids)
+        h, _ = self.lstm(e)
+        emissions = self.fc(h)
+        return emissions
 ```
 
 For the CRF layer, use `torchcrf.CRF` (pip install pytorch-crf). The gain over hand-crafted CRF is measurable but smaller than you expect unless you have tens of thousands of labeled sentences.
@@ -212,14 +213,14 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 doc = nlp("Apple sued Google over its iPhone search deal in the US.")
 for ent in doc.ents:
- print(f"{ent.text:20s} {ent.label_}")
+    print(f"{ent.text:20s} {ent.label_}")
 ```
 
 ```
-Apple ORG
-Google ORG
-iPhone ORG
-US GPE
+Apple                ORG
+Google               ORG
+iPhone               ORG
+US                   GPE
 ```
 
 Notice `iPhone` labeled `ORG` rather than `PRODUCT` — spaCy's small model has weak product-entity coverage. The large model (`en_core_web_lg`) does better. The transformer model (`en_core_web_trf`) does better still.
@@ -234,10 +235,10 @@ print(ner("Apple sued Google over its iPhone in the US."))
 ```
 
 ```
-[{'entity_group': 'ORG', 'word': 'Apple',...},
- {'entity_group': 'ORG', 'word': 'Google',...},
- {'entity_group': 'MISC', 'word': 'iPhone',...},
- {'entity_group': 'LOC', 'word': 'US',...}]
+[{'entity_group': 'ORG', 'word': 'Apple', ...},
+ {'entity_group': 'ORG', 'word': 'Google', ...},
+ {'entity_group': 'MISC', 'word': 'iPhone', ...},
+ {'entity_group': 'LOC', 'word': 'US', ...}]
 ```
 
 `aggregation_strategy="simple"` merges contiguous B-X, I-X tokens into a span. Without it, you get token-level labels and have to merge yourself.
@@ -303,7 +304,7 @@ Refuse to recommend fine-tuning a transformer for under 500 labeled examples unl
 
 | Term | What people say | What it actually means |
 |------|-----------------|-----------------------|
-| NER | Extract names | Label token spans with types (PERSON, ORG, GPE, DATE,...). |
+| NER | Extract names | Label token spans with types (PERSON, ORG, GPE, DATE, ...). |
 | BIO | Tagging scheme | `B-X` begins, `I-X` continues, `O` outside. |
 | BILOU | Better BIO | Adds `L-X` (last), `U-X` (unit) for cleaner boundaries. |
 | CRF | Structured classifier | Models transitions between labels, not just emissions. Enforces valid sequences. |

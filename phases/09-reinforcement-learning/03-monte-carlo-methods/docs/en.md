@@ -50,16 +50,16 @@ Converges to `Q*` and `π*` with probability 1 under mild conditions (every pair
 
 ```python
 def rollout(env, policy, max_steps=200):
- trajectory = []
- s = env.reset()
- for _ in range(max_steps):
- a = policy(s)
- s_next, r, done = env.step(s, a)
- trajectory.append((s, a, r))
- s = s_next
- if done:
- break
- return trajectory
+    trajectory = []
+    s = env.reset()
+    for _ in range(max_steps):
+        a = policy(s)
+        s_next, r, done = env.step(s, a)
+        trajectory.append((s, a, r))
+        s = s_next
+        if done:
+            break
+    return trajectory
 ```
 
 No model, only `env.reset()` and `env.step(s, a)`. Same interface as a gym environment but stripped down.
@@ -68,12 +68,12 @@ No model, only `env.reset()` and `env.step(s, a)`. Same interface as a gym envir
 
 ```python
 def returns_from(trajectory, gamma):
- returns = []
- G = 0.0
- for _, _, r in reversed(trajectory):
- G = r + gamma * G
- returns.append(G)
- return list(reversed(returns))
+    returns = []
+    G = 0.0
+    for _, _, r in reversed(trajectory):
+        G = r + gamma * G
+        returns.append(G)
+    return list(reversed(returns))
 ```
 
 One pass, `O(T)`. The backward recurrence `G_t = r_{t+1} + γ G_{t+1}` avoids re-summing.
@@ -82,19 +82,19 @@ One pass, `O(T)`. The backward recurrence `G_t = r_{t+1} + γ G_{t+1}` avoids re
 
 ```python
 def mc_policy_evaluation(env, policy, episodes, gamma=0.99):
- V = defaultdict(float)
- counts = defaultdict(int)
- for _ in range(episodes):
- trajectory = rollout(env, policy)
- returns = returns_from(trajectory, gamma)
- seen = set()
- for t, ((s, _, _), G) in enumerate(zip(trajectory, returns)):
- if s in seen:
- continue
- seen.add(s)
- counts[s] += 1
- V[s] += (G - V[s]) / counts[s]
- return V
+    V = defaultdict(float)
+    counts = defaultdict(int)
+    for _ in range(episodes):
+        trajectory = rollout(env, policy)
+        returns = returns_from(trajectory, gamma)
+        seen = set()
+        for t, ((s, _, _), G) in enumerate(zip(trajectory, returns)):
+            if s in seen:
+                continue
+            seen.add(s)
+            counts[s] += 1
+            V[s] += (G - V[s]) / counts[s]
+    return V
 ```
 
 Three lines do the work: mark state as seen on first visit, increment count, update running mean.
@@ -103,25 +103,25 @@ Three lines do the work: mark state as seen on first visit, increment count, upd
 
 ```python
 def mc_control(env, episodes, gamma=0.99, epsilon=0.1):
- Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
- counts = defaultdict(lambda: {a: 0 for a in ACTIONS})
+    Q = defaultdict(lambda: {a: 0.0 for a in ACTIONS})
+    counts = defaultdict(lambda: {a: 0 for a in ACTIONS})
 
- def policy(s):
- if random() < epsilon:
- return choice(ACTIONS)
- return max(Q[s], key=Q[s].get)
+    def policy(s):
+        if random() < epsilon:
+            return choice(ACTIONS)
+        return max(Q[s], key=Q[s].get)
 
- for _ in range(episodes):
- trajectory = rollout(env, policy)
- returns = returns_from(trajectory, gamma)
- seen = set()
- for (s, a, _), G in zip(trajectory, returns):
- if (s, a) in seen:
- continue
- seen.add((s, a))
- counts[s][a] += 1
- Q[s][a] += (G - Q[s][a]) / counts[s][a]
- return Q, policy
+    for _ in range(episodes):
+        trajectory = rollout(env, policy)
+        returns = returns_from(trajectory, gamma)
+        seen = set()
+        for (s, a, _), G in zip(trajectory, returns):
+            if (s, a) in seen:
+                continue
+            seen.add((s, a))
+            counts[s][a] += 1
+            Q[s][a] += (G - Q[s][a]) / counts[s][a]
+    return Q, policy
 ```
 
 ### Step 5: compare to DP gold standard

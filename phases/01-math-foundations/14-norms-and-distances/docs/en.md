@@ -35,7 +35,7 @@ A norm measures the "size" of a vector. Every distance function between two vect
 The L1 norm sums the absolute values of all components.
 
 ```
-||x||_1 = |x_1| + |x_2| +... + |x_n|
+||x||_1 = |x_1| + |x_2| + ... + |x_n|
 ```
 
 It is called Manhattan distance because it measures how far you walk on a city grid where you can only move along axes. No diagonals.
@@ -63,7 +63,7 @@ Connection to loss functions: Mean Absolute Error (MAE) is the average L1 distan
 The L2 norm is the straight-line distance. Square root of the sum of squared components.
 
 ```
-||x||_2 = sqrt(x_1^2 + x_2^2 +... + x_n^2)
+||x||_2 = sqrt(x_1^2 + x_2^2 + ... + x_n^2)
 ```
 
 This is the distance you learned in geometry class. Pythagoras in n dimensions.
@@ -88,8 +88,8 @@ Connection to L2 regularization (Ridge): adding ||w||_2^2 to your loss function 
 Connection to loss functions: Mean Squared Error (MSE) is the average of L2 distances squared. Squaring penalizes large errors more heavily than small ones.
 
 ```
-MAE (L1 loss): |y - y_hat| Linear penalty. Robust to outliers.
-MSE (L2 loss): (y - y_hat)^2 Quadratic penalty. Sensitive to outliers.
+MAE (L1 loss):  |y - y_hat|         Linear penalty. Robust to outliers.
+MSE (L2 loss):  (y - y_hat)^2       Quadratic penalty. Sensitive to outliers.
 ```
 
 ### Lp Norms: the general family
@@ -97,16 +97,16 @@ MSE (L2 loss): (y - y_hat)^2 Quadratic penalty. Sensitive to outliers.
 L1 and L2 are special cases of the Lp norm:
 
 ```
-||x||_p = (|x_1|^p + |x_2|^p +... + |x_n|^p)^(1/p)
+||x||_p = (|x_1|^p + |x_2|^p + ... + |x_n|^p)^(1/p)
 ```
 
 Different values of p produce different shaped "unit balls" (the set of all points at distance 1 from the origin):
 
 ```
-p=1: Diamond shape (corners on axes)
-p=2: Circle/sphere (the usual round ball)
-p=3: Superellipse (rounded square)
-p=inf: Square/hypercube (flat sides along axes)
+p=1:    Diamond shape      (corners on axes)
+p=2:    Circle/sphere      (the usual round ball)
+p=3:    Superellipse       (rounded square)
+p=inf:  Square/hypercube   (flat sides along axes)
 ```
 
 ### L-infinity Norm (Chebyshev distance)
@@ -114,7 +114,7 @@ p=inf: Square/hypercube (flat sides along axes)
 As p approaches infinity, the Lp norm converges to the maximum absolute component.
 
 ```
-||x||_inf = max(|x_1|, |x_2|,..., |x_n|)
+||x||_inf = max(|x_1|, |x_2|, ..., |x_n|)
 ```
 
 The distance between two points is determined by the single dimension where they differ the most. All other dimensions are ignored.
@@ -136,7 +136,7 @@ When to use L-infinity:
 Cosine similarity measures the angle between two vectors, ignoring their magnitudes.
 
 ```
-cos_sim(a, b) = (a. b) / (||a||_2 * ||b||_2)
+cos_sim(a, b) = (a . b) / (||a||_2 * ||b||_2)
 ```
 
 It ranges from -1 (opposite directions) to +1 (same direction). Perpendicular vectors have cosine similarity 0.
@@ -144,7 +144,7 @@ It ranges from -1 (opposite directions) to +1 (same direction). Perpendicular ve
 Cosine distance converts it to a distance: cosine_distance = 1 - cosine_similarity. This ranges from 0 (identical direction) to 2 (opposite direction).
 
 ```
-a = (1, 0) b = (1, 1)
+a = (1, 0)    b = (1, 1)
 
 cos_sim = (1*1 + 0*1) / (1 * sqrt(2)) = 1/sqrt(2) = 0.707
 cos_dist = 1 - 0.707 = 0.293
@@ -163,24 +163,24 @@ When to use cosine similarity:
 The dot product of two vectors is:
 
 ```
-a. b = a_1*b_1 + a_2*b_2 +... + a_n*b_n
- = ||a|| * ||b|| * cos(angle)
+a . b = a_1*b_1 + a_2*b_2 + ... + a_n*b_n
+      = ||a|| * ||b|| * cos(angle)
 ```
 
 Cosine similarity is the dot product normalized by both magnitudes. When both vectors are already unit-normalized (magnitude = 1), dot product and cosine similarity are identical.
 
 ```
 If ||a|| = 1 and ||b|| = 1:
- a. b = cos(angle between a and b)
+    a . b = cos(angle between a and b)
 ```
 
 When they differ: dot product includes magnitude information. A vector with larger magnitude gets a higher dot product score. This matters in some retrieval systems where you want "popular" items to rank higher. The magnitude acts as an implicit quality or importance signal.
 
 ```
-a = (3, 0) b = (1, 0) c = (0, 1)
+a = (3, 0)    b = (1, 0)    c = (0, 1)
 
-dot(a, b) = 3 dot(a, c) = 0
-cos(a, b) = 1.0 cos(a, c) = 0.0
+dot(a, b) = 3     dot(a, c) = 0
+cos(a, b) = 1.0   cos(a, c) = 0.0
 
 Both agree on direction, but dot product also reflects magnitude.
 ```
@@ -235,8 +235,8 @@ It ranges from 0 (no overlap) to 1 (identical sets). Jaccard distance = 1 - Jacc
 A = {cat, dog, fish}
 B = {cat, bird, fish, snake}
 
-Intersection = {cat, fish} size = 2
-Union = {cat, dog, fish, bird, snake} size = 5
+Intersection = {cat, fish}         size = 2
+Union = {cat, dog, fish, bird, snake}  size = 5
 
 Jaccard similarity = 2/5 = 0.4
 Jaccard distance = 0.6
@@ -256,8 +256,8 @@ Edit distance counts the minimum number of single-character operations needed to
 ```
 "kitten" -> "sitting"
 
-kitten -> sitten (substitute k -> s)
-sitten -> sittin (substitute e -> i)
+kitten -> sitten  (substitute k -> s)
+sitten -> sittin  (substitute e -> i)
 sittin -> sitting (insert g)
 
 Edit distance = 3
@@ -266,14 +266,14 @@ Edit distance = 3
 Computed using dynamic programming. Fill a matrix where entry (i, j) is the edit distance between the first i characters of string A and the first j characters of string B.
 
 ```
- "" s i t t i n g
- "" 0 1 2 3 4 5 6 7
- k 1 1 2 3 4 5 6 7
- i 2 2 1 2 3 4 5 6
- t 3 3 2 1 2 3 4 5
- t 4 4 3 2 1 2 3 4
- e 5 5 4 3 2 2 3 4
- n 6 6 5 4 3 3 2 3
+        ""  s  i  t  t  i  n  g
+    ""   0  1  2  3  4  5  6  7
+    k    1  1  2  3  4  5  6  7
+    i    2  2  1  2  3  4  5  6
+    t    3  3  2  1  2  3  4  5
+    t    4  4  3  2  1  2  3  4
+    e    5  5  4  3  2  2  3  4
+    n    6  6  5  4  3  3  2  3
 ```
 
 When to use edit distance:
@@ -329,7 +329,7 @@ Why Wasserstein matters:
 ```
 Distributions with no overlap:
 
-P: [1, 0, 0, 0, 0] Q: [0, 0, 0, 0, 1]
+P: [1, 0, 0, 0, 0]    Q: [0, 0, 0, 0, 1]
 
 KL divergence: infinity (log of zero)
 Wasserstein: 4 (move all mass 4 bins)
@@ -365,17 +365,17 @@ When to use Wasserstein:
 Loss functions are distance functions applied to predictions vs targets.
 
 ```
-Loss function Distance it uses Behavior
-MSE L2 squared Penalizes large errors heavily
-MAE L1 Penalizes all errors equally
-Huber loss L1 for large errors, Best of both: robust to outliers,
- L2 for small errors smooth gradient near zero
-Cross-entropy KL divergence Measures distribution mismatch
-Hinge loss max(0, margin - d) Only penalizes below margin
-Triplet loss L2 (typically) Pulls positives close, pushes
- negatives away
-Contrastive loss L2 Similar pairs close, dissimilar
- pairs beyond margin
+Loss function       Distance it uses       Behavior
+MSE                 L2 squared             Penalizes large errors heavily
+MAE                 L1                     Penalizes all errors equally
+Huber loss          L1 for large errors,   Best of both: robust to outliers,
+                    L2 for small errors    smooth gradient near zero
+Cross-entropy       KL divergence          Measures distribution mismatch
+Hinge loss          max(0, margin - d)     Only penalizes below margin
+Triplet loss        L2 (typically)         Pulls positives close, pushes
+                                           negatives away
+Contrastive loss    L2                     Similar pairs close, dissimilar
+                                           pairs beyond margin
 ```
 
 ### Connection to Regularization
@@ -383,19 +383,19 @@ Contrastive loss L2 Similar pairs close, dissimilar
 Regularization adds a norm penalty on the weights to the loss function.
 
 ```
-L1 regularization (Lasso): loss + lambda * ||w||_1
- -> Sparse weights. Some weights become exactly zero.
- -> Automatic feature selection.
- -> Solution has corners (non-differentiable at zero).
+L1 regularization (Lasso):   loss + lambda * ||w||_1
+  -> Sparse weights. Some weights become exactly zero.
+  -> Automatic feature selection.
+  -> Solution has corners (non-differentiable at zero).
 
-L2 regularization (Ridge): loss + lambda * ||w||_2^2
- -> Small weights. All weights shrink toward zero.
- -> No feature selection (nothing goes to exactly zero).
- -> Smooth solution everywhere.
+L2 regularization (Ridge):   loss + lambda * ||w||_2^2
+  -> Small weights. All weights shrink toward zero.
+  -> No feature selection (nothing goes to exactly zero).
+  -> Smooth solution everywhere.
 
-Elastic Net: loss + lambda_1 * ||w||_1 + lambda_2 * ||w||_2^2
- -> Combines sparsity of L1 with stability of L2.
- -> Groups of correlated features are kept or dropped together.
+Elastic Net:                  loss + lambda_1 * ||w||_1 + lambda_2 * ||w||_2^2
+  -> Combines sparsity of L1 with stability of L2.
+  -> Groups of correlated features are kept or dropped together.
 ```
 
 Why L1 produces sparsity but L2 does not: picture the constraint region in 2D weight space. L1 is a diamond, L2 is a circle. The loss function's contours (ellipses) are most likely to touch the diamond at a corner, where one weight is zero. They touch the circle at a smooth point, where both weights are nonzero.
@@ -409,16 +409,16 @@ Exact nearest neighbor search is O(n * d) per query in a dataset of n points wit
 Approximate Nearest Neighbor (ANN) algorithms trade a small amount of accuracy for massive speed gains:
 
 ```
-Algorithm Approach Used by
-KD-trees Axis-aligned space partition scikit-learn (low-dim)
-Ball trees Nested hyperspheres scikit-learn (medium-dim)
-LSH Random hash projections Near-duplicate detection
-HNSW Hierarchical navigable FAISS, Qdrant, Weaviate
- small-world graph
-IVF Inverted file index with FAISS (billion-scale)
- cluster-based search
-Product quant. Compress vectors, search FAISS (memory-constrained)
- in compressed space
+Algorithm         Approach                      Used by
+KD-trees          Axis-aligned space partition   scikit-learn (low-dim)
+Ball trees        Nested hyperspheres            scikit-learn (medium-dim)
+LSH               Random hash projections        Near-duplicate detection
+HNSW              Hierarchical navigable         FAISS, Qdrant, Weaviate
+                  small-world graph
+IVF               Inverted file index with       FAISS (billion-scale)
+                  cluster-based search
+Product quant.    Compress vectors, search       FAISS (memory-constrained)
+                  in compressed space
 ```
 
 HNSW (Hierarchical Navigable Small World) is the dominant algorithm in modern vector databases. It builds a multi-layer graph where each node connects to its approximate nearest neighbors. Search starts at the top layer (sparse, long jumps) and descends to the bottom layer (dense, short jumps).
@@ -445,10 +445,10 @@ The most common practical use: finding similar items in a vector database.
 import numpy as np
 
 def cosine_similarity_matrix(X):
- norms = np.linalg.norm(X, axis=1, keepdims=True)
- norms = np.where(norms == 0, 1, norms)
- X_normalized = X / norms
- return X_normalized @ X_normalized.T
+    norms = np.linalg.norm(X, axis=1, keepdims=True)
+    norms = np.where(norms == 0, 1, norms)
+    X_normalized = X / norms
+    return X_normalized @ X_normalized.T
 
 embeddings = np.random.randn(1000, 768)
 

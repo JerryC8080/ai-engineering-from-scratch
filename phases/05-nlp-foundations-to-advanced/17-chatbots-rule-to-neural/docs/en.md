@@ -38,25 +38,25 @@ import re
 
 
 class RulePattern:
- def __init__(self, pattern, response_template):
- self.regex = re.compile(pattern, re.IGNORECASE)
- self.template = response_template
+    def __init__(self, pattern, response_template):
+        self.regex = re.compile(pattern, re.IGNORECASE)
+        self.template = response_template
 
 
 PATTERNS = [
- RulePattern(r"my name is (\w+)", "Nice to meet you, {0}."),
- RulePattern(r"i (need|want) (.+)", "Why do you {0} {1}?"),
- RulePattern(r"i feel (.+)", "Why do you feel {0}?"),
- RulePattern(r"(.*)", "Tell me more about that."),
+    RulePattern(r"my name is (\w+)", "Nice to meet you, {0}."),
+    RulePattern(r"i (need|want) (.+)", "Why do you {0} {1}?"),
+    RulePattern(r"i feel (.+)", "Why do you feel {0}?"),
+    RulePattern(r"(.*)", "Tell me more about that."),
 ]
 
 
 def rule_based_respond(user_input):
- for pattern in PATTERNS:
- m = pattern.regex.match(user_input.strip())
- if m:
- return pattern.template.format(*m.groups())
- return "I don't understand."
+    for pattern in PATTERNS:
+        m = pattern.regex.match(user_input.strip())
+        if m:
+            return pattern.template.format(*m.groups())
+    return "I don't understand."
 ```
 
 ELIZA in 20 lines. The reflection trick ("I feel sad" → "Why do you feel sad") is the canonical psychotherapist demo from Weizenbaum 1966. Still instructive.
@@ -71,9 +71,9 @@ import numpy as np
 
 
 FAQ = [
- ("how do i reset my password", "Go to Settings > Security > Reset Password."),
- ("how do i cancel my order", "Go to Orders, find the order, click Cancel."),
- ("what is your return policy", "30-day returns on unused items, original packaging."),
+    ("how do i reset my password", "Go to Settings > Security > Reset Password."),
+    ("how do i cancel my order", "Go to Orders, find the order, click Cancel."),
+    ("what is your return policy", "30-day returns on unused items, original packaging."),
 ]
 
 
@@ -83,12 +83,12 @@ faq_embeddings = encoder.encode(faq_questions, normalize_embeddings=True)
 
 
 def faq_respond(user_input, threshold=0.5):
- q_emb = encoder.encode([user_input], normalize_embeddings=True)[0]
- sims = faq_embeddings @ q_emb
- best = int(np.argmax(sims))
- if sims[best] < threshold:
- return None
- return FAQ[best][1]
+    q_emb = encoder.encode([user_input], normalize_embeddings=True)[0]
+    sims = faq_embeddings @ q_emb
+    best = int(np.argmax(sims))
+    if sims[best] < threshold:
+        return None
+    return FAQ[best][1]
 ```
 
 Threshold-based refusal is the key design choice. If the best match is not close enough, return `None` and let the system escalate.
@@ -112,27 +112,27 @@ The 2026 production shape:
 
 ```python
 def agent_loop(user_message, tools, llm, max_steps=5):
- history = [{"role": "user", "content": user_message}]
- for _ in range(max_steps):
- response = llm(history, tools=tools)
- tool_call = response.get("tool_call")
- if tool_call:
- tool_name = tool_call.get("name")
- args = tool_call.get("arguments")
- if not isinstance(tool_name, str) or tool_name not in tools:
- history.append({"role": "assistant", "tool_call": tool_call})
- history.append({"role": "tool", "name": str(tool_name), "content": f"error: unknown tool {tool_name!r}"})
- continue
- if not isinstance(args, dict):
- history.append({"role": "assistant", "tool_call": tool_call})
- history.append({"role": "tool", "name": tool_name, "content": f"error: arguments must be a dict, got {type(args).__name__}"})
- continue
- result = tools[tool_name](**args)
- history.append({"role": "assistant", "tool_call": tool_call})
- history.append({"role": "tool", "name": tool_name, "content": result})
- else:
- return response["content"]
- return "I could not complete the task in the step budget."
+    history = [{"role": "user", "content": user_message}]
+    for _ in range(max_steps):
+        response = llm(history, tools=tools)
+        tool_call = response.get("tool_call")
+        if tool_call:
+            tool_name = tool_call.get("name")
+            args = tool_call.get("arguments")
+            if not isinstance(tool_name, str) or tool_name not in tools:
+                history.append({"role": "assistant", "tool_call": tool_call})
+                history.append({"role": "tool", "name": str(tool_name), "content": f"error: unknown tool {tool_name!r}"})
+                continue
+            if not isinstance(args, dict):
+                history.append({"role": "assistant", "tool_call": tool_call})
+                history.append({"role": "tool", "name": tool_name, "content": f"error: arguments must be a dict, got {type(args).__name__}"})
+                continue
+            result = tools[tool_name](**args)
+            history.append({"role": "assistant", "tool_call": tool_call})
+            history.append({"role": "tool", "name": tool_name, "content": result})
+        else:
+            return response["content"]
+    return "I could not complete the task in the step budget."
 ```
 
 Three things to name. Tools are callable functions the LLM can invoke. The loop terminates when the LLM returns a final answer instead of a tool call. The step budget prevents infinite loops on ambiguous tasks.
@@ -143,19 +143,19 @@ Real production adds: retrieval-first grounding (inject relevant docs before eac
 
 ```python
 def hybrid_chat(user_input):
- if is_destructive_action(user_input):
- return structured_flow(user_input)
+    if is_destructive_action(user_input):
+        return structured_flow(user_input)
 
- faq_answer = faq_respond(user_input, threshold=0.6)
- if faq_answer:
- return faq_answer
+    faq_answer = faq_respond(user_input, threshold=0.6)
+    if faq_answer:
+        return faq_answer
 
- return agent_loop(user_input, tools, llm)
+    return agent_loop(user_input, tools, llm)
 
 
 def is_destructive_action(text):
- danger_words = ["delete", "cancel", "charge", "refund", "transfer"]
- return any(w in text.lower() for w in danger_words)
+    danger_words = ["delete", "cancel", "charge", "refund", "transfer"]
+    return any(w in text.lower() for w in danger_words)
 ```
 
 The pattern: deterministic rules for anything destructive, retrieval for canned FAQs, LLM agents for everything else. This is what ships in 2026 customer-support systems.
@@ -179,11 +179,11 @@ Always use hybrid routing in production. No single architecture handles every re
 - **Confident fabrication.** LLM agent claims it completed an action it did not. Mitigation: verify outcomes, log tool calls, never let the LLM claim to have done something without a successful tool return.
 - **Prompt injection.** User inserts text that overrides the system prompt. Ranked LLM01 in the OWASP Top 10 for LLM Applications 2025. Two flavors: direct injection (pasted into the chat) and indirect injection (hidden in documents, emails, or tool outputs the agent reads).
 
- Attack rates vary by scenario. Measured success rates range ~0.5-8.5% across frontier models in general tool-use and coding benchmarks. Specific high-risk setups (adaptive attacks against AI coding agents, vulnerable orchestration) have reached ~84%. Production CVEs include EchoLeak (CVE-2025-32711, CVSS 9.3) — a zero-click data-exfiltration flaw in Microsoft 365 Copilot triggered by an attacker-controlled email.
+  Attack rates vary by scenario. Measured success rates range ~0.5-8.5% across frontier models in general tool-use and coding benchmarks. Specific high-risk setups (adaptive attacks against AI coding agents, vulnerable orchestration) have reached ~84%. Production CVEs include EchoLeak (CVE-2025-32711, CVSS 9.3) — a zero-click data-exfiltration flaw in Microsoft 365 Copilot triggered by an attacker-controlled email.
 
- Mitigations: treat user input as untrusted throughout the loop; sanitize before tool calls; isolate tool outputs from the main prompt; use the Plan-Verify-Execute (PVE) pattern where the agent plans first, then verifies each action against that plan before executing (this stops tool results from injecting new unplanned actions); require user confirmation for destructive actions; apply least-privilege to tool scopes.
+  Mitigations: treat user input as untrusted throughout the loop; sanitize before tool calls; isolate tool outputs from the main prompt; use the Plan-Verify-Execute (PVE) pattern where the agent plans first, then verifies each action against that plan before executing (this stops tool results from injecting new unplanned actions); require user confirmation for destructive actions; apply least-privilege to tool scopes.
 
- No amount of prompt engineering fully eliminates this risk. External runtime defense layers (LLM Guard, allowlist validation, semantic anomaly detection) are required.
+  No amount of prompt engineering fully eliminates this risk. External runtime defense layers (LLM Guard, allowlist validation, semantic anomaly detection) are required.
 - **Scope creep.** Agent goes off-task because a tool call returned tangentially related info. Mitigation: narrow tool contracts; keep the system prompt focused; add evaluations for off-task rate.
 - **Infinite loops.** Agent keeps calling the same tool. Mitigation: step budget, tool-call deduplication, LLM judge on "are we making progress."
 - **Context window exhaustion.** Long conversations push the earliest turns out of context. Mitigation: summarize older turns, retrieve relevant past turns by similarity, or use a long-context model.

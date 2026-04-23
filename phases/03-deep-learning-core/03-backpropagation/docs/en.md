@@ -36,13 +36,13 @@ Every forward pass builds a graph. Each node is an operation (multiply, add, sig
 
 ```mermaid
 graph LR
- x["x"] --> mul["*"]
- w["w"] --> mul
- mul -- "z1 = w*x" --> add["+"]
- b["b"] --> add
- add -- "z2 = z1 + b" --> sig["sigmoid"]
- sig -- "a = sigmoid(z2)" --> loss["Loss"]
- y["target"] --> loss
+    x["x"] --> mul["*"]
+    w["w"] --> mul
+    mul -- "z1 = w*x" --> add["+"]
+    b["b"] --> add
+    add -- "z2 = z1 + b" --> sig["sigmoid"]
+    sig -- "a = sigmoid(z2)" --> loss["Loss"]
+    y["target"] --> loss
 ```
 
 Forward pass: values flow left to right. x and w produce z1 = w*x. Add b to get z2. Sigmoid gives activation a. Compare a to target y using the loss function.
@@ -55,19 +55,19 @@ Every node in the graph has one job during the backward pass: take the gradient 
 
 ```mermaid
 graph TB
- subgraph Forward["Forward Pass"]
- direction LR
- f1["Input x"] --> f2["z = Wx + b"]
- f2 --> f3["a = sigmoid(z)"]
- f3 --> f4["Loss = (a - y)^2"]
- end
- subgraph Backward["Backward Pass"]
- direction RL
- b4["dL/dL = 1"] --> b3["dL/da = 2(a-y)"]
- b3 --> b2["dL/dz = dL/da * a(1-a)"]
- b2 --> b1["dL/dW = dL/dz * x\ndL/db = dL/dz"]
- end
- Forward --> Backward
+    subgraph Forward["Forward Pass"]
+        direction LR
+        f1["Input x"] --> f2["z = Wx + b"]
+        f2 --> f3["a = sigmoid(z)"]
+        f3 --> f4["Loss = (a - y)^2"]
+    end
+    subgraph Backward["Backward Pass"]
+        direction RL
+        b4["dL/dL = 1"] --> b3["dL/da = 2(a-y)"]
+        b3 --> b2["dL/dz = dL/da * a(1-a)"]
+        b2 --> b1["dL/dW = dL/dz * x\ndL/db = dL/dz"]
+    end
+    Forward --> Backward
 ```
 
 The forward pass stores every intermediate value: z, a, the inputs to each layer. The backward pass needs these stored values to compute gradients. This is the memory-computation tradeoff at the heart of backprop. You trade memory (storing activations) for speed (one pass instead of millions).
@@ -78,10 +78,10 @@ For a 3-layer network, gradients chain through every layer:
 
 ```mermaid
 graph RL
- L["Loss"] -- "dL/da3" --> L3["Layer 3\na3 = sigmoid(z3)"]
- L3 -- "dL/dz3 = dL/da3 * sigmoid'(z3)" --> L2["Layer 2\na2 = sigmoid(z2)"]
- L2 -- "dL/dz2 = dL/da2 * sigmoid'(z2)" --> L1["Layer 1\na1 = sigmoid(z1)"]
- L1 -- "dL/dz1 = dL/da1 * sigmoid'(z1)" --> I["Input"]
+    L["Loss"] -- "dL/da3" --> L3["Layer 3\na3 = sigmoid(z3)"]
+    L3 -- "dL/dz3 = dL/da3 * sigmoid'(z3)" --> L2["Layer 2\na2 = sigmoid(z2)"]
+    L2 -- "dL/dz2 = dL/da2 * sigmoid'(z2)" --> L1["Layer 1\na1 = sigmoid(z1)"]
+    L1 -- "dL/dz1 = dL/da1 * sigmoid'(z1)" --> I["Input"]
 ```
 
 At each layer, the gradient gets multiplied by the sigmoid derivative. The sigmoid derivative is a * (1 - a), which maxes out at 0.25 (when a = 0.5). Three layers deep, the gradient has been multiplied by at most 0.25^3 = 0.0156. Ten layers deep: 0.25^10 = 0.000001.
@@ -91,11 +91,11 @@ At each layer, the gradient gets multiplied by the sigmoid derivative. The sigmo
 This is the vanishing gradient problem. Sigmoid squashes its output between 0 and 1. Its derivative is always less than 0.25. Stack enough sigmoid layers and gradients shrink to nothing. Early layers barely learn because they receive near-zero gradients.
 
 ```
-sigmoid(z): Output range [0, 1]
-sigmoid'(z): Max value 0.25 (at z = 0)
+sigmoid(z):     Output range [0, 1]
+sigmoid'(z):    Max value 0.25 (at z = 0)
 
-After 5 layers: gradient * 0.25^5 = 0.001x original
-After 10 layers: gradient * 0.25^10 = 0.000001x original
+After 5 layers:   gradient * 0.25^5 = 0.001x original
+After 10 layers:  gradient * 0.25^10 = 0.000001x original
 ```
 
 This is why deep sigmoid networks are nearly impossible to train. The fix -- ReLU and its variants -- is the subject of Lesson 04. For now, understand that backprop works perfectly. The problem is what it's working through.
@@ -140,15 +140,15 @@ Every number in our computation becomes a Value. It stores its data, its gradien
 
 ```python
 class Value:
- def __init__(self, data, children=(), op=''):
- self.data = data
- self.grad = 0.0
- self._backward = lambda: None
- self._children = set(children)
- self._op = op
+    def __init__(self, data, children=(), op=''):
+        self.data = data
+        self.grad = 0.0
+        self._backward = lambda: None
+        self._children = set(children)
+        self._op = op
 
- def __repr__(self):
- return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
+    def __repr__(self):
+        return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
 ```
 
 No gradient yet (0.0). No backward function yet (no-op). The `_children` track which Values produced this one, so we can topologically sort the graph later.
@@ -159,26 +159,26 @@ Each operation creates a new Value and defines how gradients flow backward throu
 
 ```python
 def __add__(self, other):
- other = other if isinstance(other, Value) else Value(other)
- out = Value(self.data + other.data, (self, other), '+')
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data + other.data, (self, other), '+')
 
- def _backward():
- self.grad += out.grad
- other.grad += out.grad
+    def _backward():
+        self.grad += out.grad
+        other.grad += out.grad
 
- out._backward = _backward
- return out
+    out._backward = _backward
+    return out
 
 def __mul__(self, other):
- other = other if isinstance(other, Value) else Value(other)
- out = Value(self.data * other.data, (self, other), '*')
+    other = other if isinstance(other, Value) else Value(other)
+    out = Value(self.data * other.data, (self, other), '*')
 
- def _backward():
- self.grad += other.data * out.grad
- other.grad += self.data * out.grad
+    def _backward():
+        self.grad += other.data * out.grad
+        other.grad += self.data * out.grad
 
- out._backward = _backward
- return out
+    out._backward = _backward
+    return out
 ```
 
 For addition: d(a+b)/da = 1, d(a+b)/db = 1. So both inputs get the output's gradient directly.
@@ -193,24 +193,24 @@ The `+=` is critical. A Value might be used in multiple operations. Its gradient
 import math
 
 def sigmoid(self):
- x = self.data
- x = max(-500, min(500, x))
- s = 1.0 / (1.0 + math.exp(-x))
- out = Value(s, (self,), 'sigmoid')
+    x = self.data
+    x = max(-500, min(500, x))
+    s = 1.0 / (1.0 + math.exp(-x))
+    out = Value(s, (self,), 'sigmoid')
 
- def _backward():
- self.grad += (s * (1 - s)) * out.grad
+    def _backward():
+        self.grad += (s * (1 - s)) * out.grad
 
- out._backward = _backward
- return out
+    out._backward = _backward
+    return out
 ```
 
 Sigmoid derivative: sigmoid(x) * (1 - sigmoid(x)). We computed sigmoid(x) = s during the forward pass. Reuse it. No extra work.
 
 ```python
 def mse_loss(predicted, target):
- diff = predicted + Value(-target)
- return diff * diff
+    diff = predicted + Value(-target)
+    return diff * diff
 ```
 
 MSE for a single output: (predicted - target)^2. We express subtraction as addition with a negated Value.
@@ -221,20 +221,20 @@ Topological sort ensures we process nodes in the right order -- a node's gradien
 
 ```python
 def backward(self):
- topo = []
- visited = set()
+    topo = []
+    visited = set()
 
- def build_topo(v):
- if v not in visited:
- visited.add(v)
- for child in v._children:
- build_topo(child)
- topo.append(v)
+    def build_topo(v):
+        if v not in visited:
+            visited.add(v)
+            for child in v._children:
+                build_topo(child)
+            topo.append(v)
 
- build_topo(self)
- self.grad = 1.0
- for v in reversed(topo):
- v._backward()
+    build_topo(self)
+    self.grad = 1.0
+    for v in reversed(topo):
+        v._backward()
 ```
 
 Start at the loss (gradient = 1.0, since dL/dL = 1). Walk backward through the sorted graph. Each node's `_backward` pushes gradients to its children.
@@ -245,56 +245,56 @@ Start at the loss (gradient = 1.0, since dL/dL = 1). Walk backward through the s
 import random
 
 class Neuron:
- def __init__(self, n_inputs):
- scale = (2.0 / n_inputs) ** 0.5
- self.weights = [Value(random.uniform(-scale, scale)) for _ in range(n_inputs)]
- self.bias = Value(0.0)
+    def __init__(self, n_inputs):
+        scale = (2.0 / n_inputs) ** 0.5
+        self.weights = [Value(random.uniform(-scale, scale)) for _ in range(n_inputs)]
+        self.bias = Value(0.0)
 
- def __call__(self, x):
- act = sum((wi * xi for wi, xi in zip(self.weights, x)), self.bias)
- return act.sigmoid()
+    def __call__(self, x):
+        act = sum((wi * xi for wi, xi in zip(self.weights, x)), self.bias)
+        return act.sigmoid()
 
- def parameters(self):
- return self.weights + [self.bias]
+    def parameters(self):
+        return self.weights + [self.bias]
 
 
 class Layer:
- def __init__(self, n_inputs, n_outputs):
- self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
+    def __init__(self, n_inputs, n_outputs):
+        self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
 
- def __call__(self, x):
- out = [n(x) for n in self.neurons]
- return out[0] if len(out) == 1 else out
+    def __call__(self, x):
+        out = [n(x) for n in self.neurons]
+        return out[0] if len(out) == 1 else out
 
- def parameters(self):
- params = []
- for n in self.neurons:
- params.extend(n.parameters())
- return params
+    def parameters(self):
+        params = []
+        for n in self.neurons:
+            params.extend(n.parameters())
+        return params
 
 
 class Network:
- def __init__(self, sizes):
- self.layers = []
- for i in range(len(sizes) - 1):
- self.layers.append(Layer(sizes[i], sizes[i + 1]))
+    def __init__(self, sizes):
+        self.layers = []
+        for i in range(len(sizes) - 1):
+            self.layers.append(Layer(sizes[i], sizes[i + 1]))
 
- def __call__(self, x):
- for layer in self.layers:
- x = layer(x)
- if not isinstance(x, list):
- x = [x]
- return x[0] if len(x) == 1 else x
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+            if not isinstance(x, list):
+                x = [x]
+        return x[0] if len(x) == 1 else x
 
- def parameters(self):
- params = []
- for layer in self.layers:
- params.extend(layer.parameters())
- return params
+    def parameters(self):
+        params = []
+        for layer in self.layers:
+            params.extend(layer.parameters())
+        return params
 
- def zero_grad(self):
- for p in self.parameters():
- p.grad = 0.0
+    def zero_grad(self):
+        for p in self.parameters():
+            p.grad = 0.0
 ```
 
 A Neuron takes inputs, computes weighted sum + bias, and applies sigmoid. Weight initialization scales by sqrt(2/n_inputs) to prevent sigmoid saturation in deeper networks. A Layer is a list of Neurons. A Network is a list of Layers. The `parameters()` method collects all learnable Values so we can update them.
@@ -306,36 +306,36 @@ random.seed(42)
 net = Network([2, 4, 1])
 
 xor_data = [
- ([0.0, 0.0], 0.0),
- ([0.0, 1.0], 1.0),
- ([1.0, 0.0], 1.0),
- ([1.0, 1.0], 0.0),
+    ([0.0, 0.0], 0.0),
+    ([0.0, 1.0], 1.0),
+    ([1.0, 0.0], 1.0),
+    ([1.0, 1.0], 0.0),
 ]
 
 learning_rate = 1.0
 
 for epoch in range(1000):
- total_loss = Value(0.0)
- for inputs, target in xor_data:
- x = [Value(i) for i in inputs]
- pred = net(x)
- loss = mse_loss(pred, target)
- total_loss = total_loss + loss
+    total_loss = Value(0.0)
+    for inputs, target in xor_data:
+        x = [Value(i) for i in inputs]
+        pred = net(x)
+        loss = mse_loss(pred, target)
+        total_loss = total_loss + loss
 
- net.zero_grad()
- total_loss.backward()
+    net.zero_grad()
+    total_loss.backward()
 
- for p in net.parameters():
- p.data -= learning_rate * p.grad
+    for p in net.parameters():
+        p.data -= learning_rate * p.grad
 
- if epoch % 100 == 0:
- print(f"Epoch {epoch:4d} | Loss: {total_loss.data:.6f}")
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch:4d} | Loss: {total_loss.data:.6f}")
 
 print("\nXOR Results:")
 for inputs, target in xor_data:
- x = [Value(i) for i in inputs]
- pred = net(x)
- print(f" {inputs} -> {pred.data:.4f} (expected {target})")
+    x = [Value(i) for i in inputs]
+    pred = net(x)
+    print(f"  {inputs} -> {pred.data:.4f} (expected {target})")
 ```
 
 Watch the loss decrease. From random predictions to correct XOR outputs, driven entirely by backpropagation computing gradients and nudging weights in the right direction.
@@ -348,13 +348,13 @@ In Lesson 02, you hand-tuned weights for circle classification. Now let the netw
 random.seed(7)
 
 def generate_circle_data(n=100):
- data = []
- for _ in range(n):
- x1 = random.uniform(-1.5, 1.5)
- x2 = random.uniform(-1.5, 1.5)
- label = 1.0 if x1 * x1 + x2 * x2 < 1.0 else 0.0
- data.append(([x1, x2], label))
- return data
+    data = []
+    for _ in range(n):
+        x1 = random.uniform(-1.5, 1.5)
+        x2 = random.uniform(-1.5, 1.5)
+        label = 1.0 if x1 * x1 + x2 * x2 < 1.0 else 0.0
+        data.append(([x1, x2], label))
+    return data
 
 circle_data = generate_circle_data(80)
 
@@ -362,28 +362,28 @@ circle_net = Network([2, 8, 1])
 learning_rate = 0.5
 
 for epoch in range(2000):
- random.shuffle(circle_data)
- total_loss_val = 0.0
- for inputs, target in circle_data:
- x = [Value(i) for i in inputs]
- pred = circle_net(x)
- loss = mse_loss(pred, target)
- circle_net.zero_grad()
- loss.backward()
- for p in circle_net.parameters():
- p.data -= learning_rate * p.grad
- total_loss_val += loss.data
+    random.shuffle(circle_data)
+    total_loss_val = 0.0
+    for inputs, target in circle_data:
+        x = [Value(i) for i in inputs]
+        pred = circle_net(x)
+        loss = mse_loss(pred, target)
+        circle_net.zero_grad()
+        loss.backward()
+        for p in circle_net.parameters():
+            p.data -= learning_rate * p.grad
+        total_loss_val += loss.data
 
- if epoch % 200 == 0:
- correct = 0
- for inputs, target in circle_data:
- x = [Value(i) for i in inputs]
- pred = circle_net(x)
- predicted_class = 1.0 if pred.data > 0.5 else 0.0
- if predicted_class == target:
- correct += 1
- accuracy = correct / len(circle_data) * 100
- print(f"Epoch {epoch:4d} | Loss: {total_loss_val:.4f} | Accuracy: {accuracy:.1f}%")
+    if epoch % 200 == 0:
+        correct = 0
+        for inputs, target in circle_data:
+            x = [Value(i) for i in inputs]
+            pred = circle_net(x)
+            predicted_class = 1.0 if pred.data > 0.5 else 0.0
+            if predicted_class == target:
+                correct += 1
+        accuracy = correct / len(circle_data) * 100
+        print(f"Epoch {epoch:4d} | Loss: {total_loss_val:.4f} | Accuracy: {accuracy:.1f}%")
 ```
 
 We use online SGD here -- update weights after each sample instead of accumulating the full batch. This breaks symmetry faster and avoids sigmoid saturation on the full loss landscape. Shuffling the data each epoch prevents the network from memorizing the order.
@@ -399,10 +399,10 @@ import torch
 import torch.nn as nn
 
 model = nn.Sequential(
- nn.Linear(2, 4),
- nn.Sigmoid(),
- nn.Linear(4, 1),
- nn.Sigmoid(),
+    nn.Linear(2, 4),
+    nn.Sigmoid(),
+    nn.Linear(4, 1),
+    nn.Sigmoid(),
 )
 optimizer = torch.optim.SGD(model.parameters(), lr=1.0)
 criterion = nn.MSELoss()
@@ -411,17 +411,17 @@ X = torch.tensor([[0,0],[0,1],[1,0],[1,1]], dtype=torch.float32)
 y = torch.tensor([[0],[1],[1],[0]], dtype=torch.float32)
 
 for epoch in range(1000):
- pred = model(X)
- loss = criterion(pred, y)
- optimizer.zero_grad()
- loss.backward()
- optimizer.step()
+    pred = model(X)
+    loss = criterion(pred, y)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 
 print("PyTorch XOR Results:")
 with torch.no_grad():
- for i in range(4):
- pred = model(X[i])
- print(f" {X[i].tolist()} -> {pred.item():.4f} (expected {y[i].item()})")
+    for i in range(4):
+        pred = model(X[i])
+        print(f"  {X[i].tolist()} -> {pred.item():.4f} (expected {y[i].item()})")
 ```
 
 `loss.backward()` is your `total_loss.backward()`. `optimizer.step()` is your manual `p.data -= lr * p.grad`. `optimizer.zero_grad()` is your `net.zero_grad()`. Same algorithm, industrial-strength implementation. PyTorch handles GPU acceleration, mixed precision, gradient checkpointing, and hundreds of layer types. But the backward pass is the same chain rule applied to the same computational graph.

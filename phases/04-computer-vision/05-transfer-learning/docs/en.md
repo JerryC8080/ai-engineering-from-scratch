@@ -30,17 +30,17 @@ Two regimes, picked by how much you trust the pretrained features and how much d
 
 ```mermaid
 flowchart TB
- subgraph FE["Feature extraction — backbone frozen"]
- FE1["Pretrained backbone<br/>(no gradient)"] --> FE2["New head<br/>(trained)"]
- end
- subgraph FT["Fine-tuning — end-to-end"]
- FT1["Pretrained backbone<br/>(tiny LR)"] --> FT2["New head<br/>(normal LR)"]
- end
+    subgraph FE["Feature extraction — backbone frozen"]
+        FE1["Pretrained backbone<br/>(no gradient)"] --> FE2["New head<br/>(trained)"]
+    end
+    subgraph FT["Fine-tuning — end-to-end"]
+        FT1["Pretrained backbone<br/>(tiny LR)"] --> FT2["New head<br/>(normal LR)"]
+    end
 
- style FE1 fill:#e5e7eb,stroke:#6b7280
- style FE2 fill:#dcfce7,stroke:#16a34a
- style FT1 fill:#fef3c7,stroke:#d97706
- style FT2 fill:#dcfce7,stroke:#16a34a
+    style FE1 fill:#e5e7eb,stroke:#6b7280
+    style FE2 fill:#dcfce7,stroke:#16a34a
+    style FT1 fill:#fef3c7,stroke:#d97706
+    style FT2 fill:#dcfce7,stroke:#16a34a
 ```
 
 Rules of thumb:
@@ -65,11 +65,11 @@ When you do unfreeze, early layers should train slower than late layers. Early l
 ```
 Typical recipe:
 
- stage 0 (stem + first group): lr = base_lr / 100 (mostly fixed)
- stage 1: lr = base_lr / 10
- stage 2: lr = base_lr / 3
- stage 3 (last backbone group): lr = base_lr
- head: lr = base_lr (or slightly higher)
+  stage 0 (stem + first group): lr = base_lr / 100    (mostly fixed)
+  stage 1:                       lr = base_lr / 10
+  stage 2:                       lr = base_lr / 3
+  stage 3 (last backbone group): lr = base_lr
+  head:                          lr = base_lr  (or slightly higher)
 ```
 
 In PyTorch this is just a list of parameter groups passed to the optimizer. One model, five learning rates, zero extra code.
@@ -89,9 +89,9 @@ Getting this wrong silently tanks accuracy by 5-15%.
 The classifier head is 1-3 linear layers plus an optional dropout. Every torchvision backbone ships a default head that you replace:
 
 ```
-backbone.fc = nn.Linear(backbone.fc.in_features, num_classes) # ResNet
-backbone.classifier[1] = nn.Linear(..., num_classes) # EfficientNet, MobileNet
-backbone.heads.head = nn.Linear(..., num_classes) # torchvision ViT
+backbone.fc = nn.Linear(backbone.fc.in_features, num_classes)          # ResNet
+backbone.classifier[1] = nn.Linear(..., num_classes)                    # EfficientNet, MobileNet
+backbone.heads.head = nn.Linear(..., num_classes)                       # torchvision ViT
 ```
 
 For small datasets, a single linear layer is usually enough. Adding a hidden layer (Linear -> ReLU -> Dropout -> Linear) helps when the task distribution is farther from the backbone's training distribution.
@@ -137,17 +137,17 @@ print("feature dim:", backbone.fc.in_features)
 
 ```python
 def make_feature_extractor(num_classes=10):
- model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
- for p in model.parameters():
- p.requires_grad = False
- model.fc = nn.Linear(model.fc.in_features, num_classes)
- return model
+    model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    for p in model.parameters():
+        p.requires_grad = False
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
+    return model
 
 model = make_feature_extractor(num_classes=10)
 trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
 frozen = sum(p.numel() for p in model.parameters() if not p.requires_grad)
 print(f"trainable: {trainable:>10,}")
-print(f"frozen: {frozen:>10,}")
+print(f"frozen:    {frozen:>10,}")
 ```
 
 Only `model.fc` is trainable. The backbone is a frozen feature extractor.
@@ -158,31 +158,31 @@ A utility that builds parameter groups with stage-specific learning rates.
 
 ```python
 def discriminative_param_groups(model, base_lr=1e-3, decay=0.3):
- stages = [
- ["conv1", "bn1"],
- ["layer1"],
- ["layer2"],
- ["layer3"],
- ["layer4"],
- ["fc"],
- ]
- groups = []
- for i, names in enumerate(stages):
- lr = base_lr * (decay ** (len(stages) - 1 - i))
- params = [p for n, p in model.named_parameters()
- if any(n.startswith(k) for k in names)]
- if params:
- groups.append({"params": params, "lr": lr, "name": "_".join(names)})
- return groups
+    stages = [
+        ["conv1", "bn1"],
+        ["layer1"],
+        ["layer2"],
+        ["layer3"],
+        ["layer4"],
+        ["fc"],
+    ]
+    groups = []
+    for i, names in enumerate(stages):
+        lr = base_lr * (decay ** (len(stages) - 1 - i))
+        params = [p for n, p in model.named_parameters()
+                  if any(n.startswith(k) for k in names)]
+        if params:
+            groups.append({"params": params, "lr": lr, "name": "_".join(names)})
+    return groups
 
 model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
 model.fc = nn.Linear(model.fc.in_features, 10)
 for p in model.parameters():
- p.requires_grad = True
+    p.requires_grad = True
 
 groups = discriminative_param_groups(model)
 for g in groups:
- print(f"{g['name']:>10s} lr={g['lr']:.2e} params={sum(p.numel() for p in g['params']):>8,}")
+    print(f"{g['name']:>10s}  lr={g['lr']:.2e}  params={sum(p.numel() for p in g['params']):>8,}")
 ```
 
 `decay=0.3` means each stage trains at 30% of the rate of the next one. `fc` gets `base_lr`, `layer4` gets `0.3 * base_lr`, `conv1` gets `0.3^5 * base_lr ≈ 0.00243 * base_lr`. Extreme sounding; empirically it works.
@@ -193,12 +193,12 @@ Helper to freeze BN running statistics without freezing its weights.
 
 ```python
 def freeze_bn_stats(model):
- for m in model.modules():
- if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
- m.eval()
- for p in m.parameters():
- p.requires_grad = False
- return model
+    for m in model.modules():
+        if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d)):
+            m.eval()
+            for p in m.parameters():
+                p.requires_grad = False
+    return model
 ```
 
 Call it after you set `model.train()` at the start of every epoch. `model.train()` flips everything to training mode; this reverses it only for BN layers.
@@ -212,39 +212,39 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import torch.nn.functional as F
 
 def fine_tune(model, train_loader, val_loader, device, epochs=5, base_lr=1e-3, freeze_bn=False):
- model = model.to(device)
- groups = discriminative_param_groups(model, base_lr=base_lr)
- optimizer = SGD(groups, momentum=0.9, weight_decay=1e-4, nesterov=True)
- scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
+    model = model.to(device)
+    groups = discriminative_param_groups(model, base_lr=base_lr)
+    optimizer = SGD(groups, momentum=0.9, weight_decay=1e-4, nesterov=True)
+    scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
 
- for epoch in range(epochs):
- model.train()
- if freeze_bn:
- freeze_bn_stats(model)
- tr_loss, tr_correct, tr_total = 0.0, 0, 0
- for x, y in train_loader:
- x, y = x.to(device), y.to(device)
- logits = model(x)
- loss = F.cross_entropy(logits, y, label_smoothing=0.1)
- optimizer.zero_grad()
- loss.backward()
- optimizer.step()
- tr_loss += loss.item() * x.size(0)
- tr_total += x.size(0)
- tr_correct += (logits.argmax(-1) == y).sum().item()
- scheduler.step()
+    for epoch in range(epochs):
+        model.train()
+        if freeze_bn:
+            freeze_bn_stats(model)
+        tr_loss, tr_correct, tr_total = 0.0, 0, 0
+        for x, y in train_loader:
+            x, y = x.to(device), y.to(device)
+            logits = model(x)
+            loss = F.cross_entropy(logits, y, label_smoothing=0.1)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            tr_loss += loss.item() * x.size(0)
+            tr_total += x.size(0)
+            tr_correct += (logits.argmax(-1) == y).sum().item()
+        scheduler.step()
 
- model.eval()
- va_total, va_correct = 0, 0
- with torch.no_grad():
- for x, y in val_loader:
- x, y = x.to(device), y.to(device)
- pred = model(x).argmax(-1)
- va_total += x.size(0)
- va_correct += (pred == y).sum().item()
- print(f"epoch {epoch} train {tr_loss/tr_total:.3f}/{tr_correct/tr_total:.3f} "
- f"val {va_correct/va_total:.3f}")
- return model
+        model.eval()
+        va_total, va_correct = 0, 0
+        with torch.no_grad():
+            for x, y in val_loader:
+                x, y = x.to(device), y.to(device)
+                pred = model(x).argmax(-1)
+                va_total += x.size(0)
+                va_correct += (pred == y).sum().item()
+        print(f"epoch {epoch}  train {tr_loss/tr_total:.3f}/{tr_correct/tr_total:.3f}  "
+              f"val {va_correct/va_total:.3f}")
+    return model
 ```
 
 Five epochs with the above recipe on CIFAR-10 takes `ResNet18-IMAGENET1K_V1` from ~70% zero-shot linear-probe accuracy to ~93% fine-tuned accuracy. The head alone would plateau around 86% without ever touching the backbone.
@@ -255,26 +255,26 @@ A schedule that unfreezes one stage per epoch from the end toward the beginning.
 
 ```python
 def progressive_unfreeze_schedule(model):
- stages = ["layer4", "layer3", "layer2", "layer1"]
- yielded = set()
+    stages = ["layer4", "layer3", "layer2", "layer1"]
+    yielded = set()
 
- def start():
- for p in model.parameters():
- p.requires_grad = False
- for p in model.fc.parameters():
- p.requires_grad = True
+    def start():
+        for p in model.parameters():
+            p.requires_grad = False
+        for p in model.fc.parameters():
+            p.requires_grad = True
 
- def unfreeze(epoch):
- if epoch < len(stages):
- name = stages[epoch]
- yielded.add(name)
- for n, p in model.named_parameters():
- if n.startswith(name):
- p.requires_grad = True
- return name
- return None
+    def unfreeze(epoch):
+        if epoch < len(stages):
+            name = stages[epoch]
+            yielded.add(name)
+            for n, p in model.named_parameters():
+                if n.startswith(name):
+                    p.requires_grad = True
+            return name
+        return None
 
- return start, unfreeze
+    return start, unfreeze
 ```
 
 Call `start()` once before the first epoch. Call `unfreeze(epoch)` at the start of each epoch. Rebuild the optimizer whenever the set of trainable parameters changes, otherwise the frozen params still hold cached moments that confuse it.

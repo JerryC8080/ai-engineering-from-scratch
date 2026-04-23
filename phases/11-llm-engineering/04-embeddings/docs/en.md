@@ -30,7 +30,7 @@ That representation is an embedding.
 
 An embedding is a dense vector of floating-point numbers that represents the meaning of text. The word "dense" matters -- every dimension carries information, unlike sparse representations (bag-of-words, TF-IDF) where most dimensions are zero.
 
-"The cat sat on the mat" becomes something like `[0.023, -0.041, 0.087,..., 0.012]` -- a list of 768 to 3072 numbers depending on the model. These numbers encode meaning. You never inspect them directly. You compare them.
+"The cat sat on the mat" becomes something like `[0.023, -0.041, 0.087, ..., 0.012]` -- a list of 768 to 3072 numbers depending on the model. These numbers encode meaning. You never inspect them directly. You compare them.
 
 ### The Word2Vec Breakthrough
 
@@ -60,20 +60,20 @@ Word embeddings represent single tokens. Production systems need to embed entire
 
 ```mermaid
 graph LR
- subgraph "2013: Word2Vec"
- W1["king"] --> V1["[0.2, -0.1,...]"]
- W2["queen"] --> V2["[0.3, -0.2,...]"]
- end
+    subgraph "2013: Word2Vec"
+        W1["king"] --> V1["[0.2, -0.1, ...]"]
+        W2["queen"] --> V2["[0.3, -0.2, ...]"]
+    end
 
- subgraph "2019: Sentence-BERT"
- S1["How do I reset my password?"] --> E1["[0.04, 0.12,...]"]
- S2["I need to change my password"] --> E2["[0.05, 0.11,...]"]
- end
+    subgraph "2019: Sentence-BERT"
+        S1["How do I reset my password?"] --> E1["[0.04, 0.12, ...]"]
+        S2["I need to change my password"] --> E2["[0.05, 0.11, ...]"]
+    end
 
- subgraph "2024: Instruction-Tuned"
- I1["search_query: password reset"] --> T1["[0.08, 0.09,...]"]
- I2["search_document: To reset your password, click..."] --> T2["[0.07, 0.10,...]"]
- end
+    subgraph "2024: Instruction-Tuned"
+        I1["search_query: password reset"] --> T1["[0.08, 0.09, ...]"]
+        I2["search_document: To reset your password, click..."] --> T2["[0.07, 0.10, ...]"]
+    end
 ```
 
 ### Modern Embedding Models
@@ -138,13 +138,13 @@ HNSW trades a small accuracy loss (typically 95-99% recall) for massive speed ga
 
 ```mermaid
 graph TD
- subgraph "HNSW Layers"
- L2["Layer 2 (sparse)"] -->|"long jumps"| L1["Layer 1 (medium)"]
- L1 -->|"shorter jumps"| L0["Layer 0 (dense, all vectors)"]
- end
+    subgraph "HNSW Layers"
+        L2["Layer 2 (sparse)"] -->|"long jumps"| L1["Layer 1 (medium)"]
+        L1 -->|"shorter jumps"| L0["Layer 0 (dense, all vectors)"]
+    end
 
- Q["Query vector"] -->|"enter at top"| L2
- L0 -->|"nearest neighbors"| R["Top-k results"]
+    Q["Query vector"] -->|"enter at top"| L2
+    L0 -->|"nearest neighbors"| R["Top-k results"]
 ```
 
 Production options:
@@ -189,10 +189,10 @@ The production pattern: bi-encoder retrieves top-100 candidates, cross-encoder r
 
 ```mermaid
 graph LR
- Q["Query"] --> BE["Bi-Encoder: embed query"]
- BE --> VS["Vector search: top 100"]
- VS --> CE["Cross-Encoder: rerank"]
- CE --> R["Top 10 results"]
+    Q["Query"] --> BE["Bi-Encoder: embed query"]
+    BE --> VS["Vector search: top 100"]
+    VS --> CE["Cross-Encoder: rerank"]
+    CE --> R["Top 10 results"]
 ```
 
 Reranking models: Cohere Rerank 3.5 ($2 per 1000 queries), BGE-reranker-v2 (free, open source), Jina Reranker v2 (free, open source).
@@ -221,34 +221,34 @@ We build a semantic search engine from scratch. No vector database. No external 
 
 ```python
 def chunk_text(text, chunk_size=200, overlap=50):
- words = text.split()
- chunks = []
- start = 0
- while start < len(words):
- end = start + chunk_size
- chunk = " ".join(words[start:end])
- chunks.append(chunk)
- start += chunk_size - overlap
- return chunks
+    words = text.split()
+    chunks = []
+    start = 0
+    while start < len(words):
+        end = start + chunk_size
+        chunk = " ".join(words[start:end])
+        chunks.append(chunk)
+        start += chunk_size - overlap
+    return chunks
 
 
 def chunk_by_sentences(text, max_chunk_tokens=200):
- sentences = text.replace("\n", " ").split(".")
- sentences = [s.strip() + "." for s in sentences if s.strip()]
- chunks = []
- current_chunk = []
- current_length = 0
- for sentence in sentences:
- sentence_length = len(sentence.split())
- if current_length + sentence_length > max_chunk_tokens and current_chunk:
- chunks.append(" ".join(current_chunk))
- current_chunk = []
- current_length = 0
- current_chunk.append(sentence)
- current_length += sentence_length
- if current_chunk:
- chunks.append(" ".join(current_chunk))
- return chunks
+    sentences = text.replace("\n", " ").split(".")
+    sentences = [s.strip() + "." for s in sentences if s.strip()]
+    chunks = []
+    current_chunk = []
+    current_length = 0
+    for sentence in sentences:
+        sentence_length = len(sentence.split())
+        if current_length + sentence_length > max_chunk_tokens and current_chunk:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = []
+            current_length = 0
+        current_chunk.append(sentence)
+        current_length += sentence_length
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+    return chunks
 ```
 
 ### Step 2: Building Embeddings from Scratch
@@ -261,151 +261,151 @@ import numpy as np
 from collections import Counter
 
 class SimpleEmbedder:
- def __init__(self):
- self.vocab = []
- self.idf = []
- self.word_to_idx = {}
+    def __init__(self):
+        self.vocab = []
+        self.idf = []
+        self.word_to_idx = {}
 
- def fit(self, documents):
- vocab_set = set()
- for doc in documents:
- vocab_set.update(doc.lower().split())
- self.vocab = sorted(vocab_set)
- self.word_to_idx = {w: i for i, w in enumerate(self.vocab)}
- n = len(documents)
- self.idf = np.zeros(len(self.vocab))
- for i, word in enumerate(self.vocab):
- doc_count = sum(1 for doc in documents if word in doc.lower().split())
- self.idf[i] = math.log((n + 1) / (doc_count + 1)) + 1
+    def fit(self, documents):
+        vocab_set = set()
+        for doc in documents:
+            vocab_set.update(doc.lower().split())
+        self.vocab = sorted(vocab_set)
+        self.word_to_idx = {w: i for i, w in enumerate(self.vocab)}
+        n = len(documents)
+        self.idf = np.zeros(len(self.vocab))
+        for i, word in enumerate(self.vocab):
+            doc_count = sum(1 for doc in documents if word in doc.lower().split())
+            self.idf[i] = math.log((n + 1) / (doc_count + 1)) + 1
 
- def embed(self, text):
- words = text.lower().split()
- count = Counter(words)
- total = len(words) if words else 1
- vec = np.zeros(len(self.vocab))
- for word, freq in count.items():
- if word in self.word_to_idx:
- tf = freq / total
- vec[self.word_to_idx[word]] = tf * self.idf[self.word_to_idx[word]]
- norm = np.linalg.norm(vec)
- if norm > 0:
- vec = vec / norm
- return vec
+    def embed(self, text):
+        words = text.lower().split()
+        count = Counter(words)
+        total = len(words) if words else 1
+        vec = np.zeros(len(self.vocab))
+        for word, freq in count.items():
+            if word in self.word_to_idx:
+                tf = freq / total
+                vec[self.word_to_idx[word]] = tf * self.idf[self.word_to_idx[word]]
+        norm = np.linalg.norm(vec)
+        if norm > 0:
+            vec = vec / norm
+        return vec
 ```
 
 ### Step 3: Similarity Functions
 
 ```python
 def cosine_similarity(a, b):
- dot = np.dot(a, b)
- norm_a = np.linalg.norm(a)
- norm_b = np.linalg.norm(b)
- if norm_a == 0 or norm_b == 0:
- return 0.0
- return float(dot / (norm_a * norm_b))
+    dot = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return float(dot / (norm_a * norm_b))
 
 
 def dot_product(a, b):
- return float(np.dot(a, b))
+    return float(np.dot(a, b))
 
 
 def euclidean_distance(a, b):
- return float(np.linalg.norm(a - b))
+    return float(np.linalg.norm(a - b))
 ```
 
 ### Step 4: Vector Index with Brute-Force Search
 
 ```python
 class VectorIndex:
- def __init__(self):
- self.vectors = []
- self.texts = []
- self.metadata = []
+    def __init__(self):
+        self.vectors = []
+        self.texts = []
+        self.metadata = []
 
- def add(self, vector, text, meta=None):
- self.vectors.append(vector)
- self.texts.append(text)
- self.metadata.append(meta or {})
+    def add(self, vector, text, meta=None):
+        self.vectors.append(vector)
+        self.texts.append(text)
+        self.metadata.append(meta or {})
 
- def search(self, query_vector, top_k=5, metric="cosine"):
- scores = []
- for i, vec in enumerate(self.vectors):
- if metric == "cosine":
- score = cosine_similarity(query_vector, vec)
- elif metric == "dot":
- score = dot_product(query_vector, vec)
- elif metric == "euclidean":
- score = -euclidean_distance(query_vector, vec)
- else:
- raise ValueError(f"Unknown metric: {metric}")
- scores.append((i, score))
- scores.sort(key=lambda x: x[1], reverse=True)
- results = []
- for idx, score in scores[:top_k]:
- results.append({
- "text": self.texts[idx],
- "score": score,
- "metadata": self.metadata[idx],
- "index": idx
- })
- return results
+    def search(self, query_vector, top_k=5, metric="cosine"):
+        scores = []
+        for i, vec in enumerate(self.vectors):
+            if metric == "cosine":
+                score = cosine_similarity(query_vector, vec)
+            elif metric == "dot":
+                score = dot_product(query_vector, vec)
+            elif metric == "euclidean":
+                score = -euclidean_distance(query_vector, vec)
+            else:
+                raise ValueError(f"Unknown metric: {metric}")
+            scores.append((i, score))
+        scores.sort(key=lambda x: x[1], reverse=True)
+        results = []
+        for idx, score in scores[:top_k]:
+            results.append({
+                "text": self.texts[idx],
+                "score": score,
+                "metadata": self.metadata[idx],
+                "index": idx
+            })
+        return results
 
- def size(self):
- return len(self.vectors)
+    def size(self):
+        return len(self.vectors)
 ```
 
 ### Step 5: The Semantic Search Engine
 
 ```python
 class SemanticSearchEngine:
- def __init__(self, chunk_size=200, overlap=50):
- self.embedder = SimpleEmbedder()
- self.index = VectorIndex()
- self.chunk_size = chunk_size
- self.overlap = overlap
+    def __init__(self, chunk_size=200, overlap=50):
+        self.embedder = SimpleEmbedder()
+        self.index = VectorIndex()
+        self.chunk_size = chunk_size
+        self.overlap = overlap
 
- def index_documents(self, documents, source_names=None):
- all_chunks = []
- all_sources = []
- for i, doc in enumerate(documents):
- chunks = chunk_text(doc, self.chunk_size, self.overlap)
- all_chunks.extend(chunks)
- name = source_names[i] if source_names else f"doc_{i}"
- all_sources.extend([name] * len(chunks))
- self.embedder.fit(all_chunks)
- for chunk, source in zip(all_chunks, all_sources):
- vec = self.embedder.embed(chunk)
- self.index.add(vec, chunk, {"source": source})
- return len(all_chunks)
+    def index_documents(self, documents, source_names=None):
+        all_chunks = []
+        all_sources = []
+        for i, doc in enumerate(documents):
+            chunks = chunk_text(doc, self.chunk_size, self.overlap)
+            all_chunks.extend(chunks)
+            name = source_names[i] if source_names else f"doc_{i}"
+            all_sources.extend([name] * len(chunks))
+        self.embedder.fit(all_chunks)
+        for chunk, source in zip(all_chunks, all_sources):
+            vec = self.embedder.embed(chunk)
+            self.index.add(vec, chunk, {"source": source})
+        return len(all_chunks)
 
- def search(self, query, top_k=5, metric="cosine"):
- query_vec = self.embedder.embed(query)
- return self.index.search(query_vec, top_k, metric)
+    def search(self, query, top_k=5, metric="cosine"):
+        query_vec = self.embedder.embed(query)
+        return self.index.search(query_vec, top_k, metric)
 
- def search_with_scores(self, query, top_k=5):
- results = self.search(query, top_k)
- return [
- {
- "text": r["text"][:200],
- "source": r["metadata"].get("source", "unknown"),
- "score": round(r["score"], 4)
- }
- for r in results
- ]
+    def search_with_scores(self, query, top_k=5):
+        results = self.search(query, top_k)
+        return [
+            {
+                "text": r["text"][:200],
+                "source": r["metadata"].get("source", "unknown"),
+                "score": round(r["score"], 4)
+            }
+            for r in results
+        ]
 ```
 
 ### Step 6: Comparing Similarity Metrics
 
 ```python
 def compare_metrics(engine, query, top_k=3):
- results = {}
- for metric in ["cosine", "dot", "euclidean"]:
- hits = engine.search(query, top_k=top_k, metric=metric)
- results[metric] = [
- {"score": round(h["score"], 4), "preview": h["text"][:80]}
- for h in hits
- ]
- return results
+    results = {}
+    for metric in ["cosine", "dot", "euclidean"]:
+        hits = engine.search(query, top_k=top_k, metric=metric)
+        results[metric] = [
+            {"score": round(h["score"], 4), "preview": h["text"][:80]}
+            for h in hits
+        ]
+    return results
 ```
 
 ## Use It
@@ -418,11 +418,11 @@ from openai import OpenAI
 client = OpenAI()
 
 def openai_embed(texts, model="text-embedding-3-small", dimensions=None):
- kwargs = {"model": model, "input": texts}
- if dimensions:
- kwargs["dimensions"] = dimensions
- response = client.embeddings.create(**kwargs)
- return [item.embedding for item in response.data]
+    kwargs = {"model": model, "input": texts}
+    if dimensions:
+        kwargs["dimensions"] = dimensions
+    response = client.embeddings.create(**kwargs)
+    return [item.embedding for item in response.data]
 ```
 
 Matryoshka truncation with OpenAI -- same model, fewer dimensions, lower storage:
@@ -442,10 +442,10 @@ import cohere
 co = cohere.ClientV2()
 
 results = co.rerank(
- model="rerank-v3.5",
- query="What is the refund policy?",
- documents=["Full refund within 30 days...", "No refunds after 90 days..."],
- top_n=3
+    model="rerank-v3.5",
+    query="What is the refund policy?",
+    documents=["Full refund within 30 days...", "No refunds after 90 days..."],
+    top_n=3
 )
 ```
 

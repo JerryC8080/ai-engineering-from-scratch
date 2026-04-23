@@ -38,14 +38,14 @@ Given a dataset of labeled points and a new query point:
 
 ```mermaid
 graph TD
- Q["Query point ?"] --> D["Compute distances<br>to all training points"]
- D --> S["Sort by distance"]
- S --> K["Select K nearest"]
- K --> C{"Classification<br>or Regression?"}
- C -->|Classification| V["Majority vote"]
- C -->|Regression| A["Average values"]
- V --> P["Prediction"]
- A --> P
+    Q["Query point ?"] --> D["Compute distances<br>to all training points"]
+    D --> S["Sort by distance"]
+    S --> K["Select K nearest"]
+    K --> C{"Classification<br>or Regression?"}
+    C -->|Classification| V["Majority vote"]
+    C -->|Regression| A["Average values"]
+    V --> P["Prediction"]
+    A --> P
 ```
 
 That is the entire algorithm. No fitting. No gradient descent. No epochs.
@@ -65,16 +65,16 @@ A common starting point is K = sqrt(N) for a dataset of N points. Use odd K for 
 
 ```mermaid
 graph LR
- subgraph "K=1 (overfitting)"
- A["Jagged boundary<br>follows every point"]
- end
- subgraph "K=15 (good)"
- B["Smooth boundary<br>captures true pattern"]
- end
- subgraph "K=N (underfitting)"
- C["Flat boundary<br>predicts majority class"]
- end
- A -->|"increase K"| B -->|"increase K"| C
+    subgraph "K=1 (overfitting)"
+        A["Jagged boundary<br>follows every point"]
+    end
+    subgraph "K=15 (good)"
+        B["Smooth boundary<br>captures true pattern"]
+    end
+    subgraph "K=N (underfitting)"
+        C["Flat boundary<br>predicts majority class"]
+    end
+    A -->|"increase K"| B -->|"increase K"| C
 ```
 
 ### Distance metrics
@@ -98,7 +98,7 @@ d(a, b) = sum(|a_i - b_i|)
 **Cosine distance** measures the angle between vectors, ignoring magnitude. Essential for text and embedding data.
 
 ```
-d(a, b) = 1 - (a. b) / (||a|| * ||b||)
+d(a, b) = 1 - (a . b) / (||a|| * ||b||)
 ```
 
 **Minkowski** generalizes L1 and L2 with parameter p.
@@ -131,7 +131,7 @@ Standard KNN gives equal weight to all K neighbors. But a neighbor at distance 0
 weight_i = 1 / (distance_i + epsilon)
 
 For classification: weighted vote
-For regression: weighted average = sum(w_i * y_i) / sum(w_i)
+For regression:     weighted average = sum(w_i * y_i) / sum(w_i)
 ```
 
 The epsilon prevents division by zero when a query point exactly matches a training point.
@@ -147,8 +147,8 @@ KNN performance degrades in high dimensions. This is not a vague concern. It is 
 ```
 In d dimensions, for random uniform points:
 
-d=2: max_dist / min_dist = varies widely
-d=100: max_dist / min_dist ~ 1.01
+d=2:    max_dist / min_dist = varies widely
+d=100:  max_dist / min_dist ~ 1.01
 d=1000: max_dist / min_dist ~ 1.001
 
 When all distances are nearly equal, "nearest" is meaningless.
@@ -168,12 +168,12 @@ A KD-tree recursively partitions the space along feature axes. At each level, it
 
 ```mermaid
 graph TD
- R["Split on x1 at 5.0"] -->|"x1 <= 5.0"| L["Split on x2 at 3.0"]
- R -->|"x1 > 5.0"| RR["Split on x2 at 7.0"]
- L -->|"x2 <= 3.0"| LL["Leaf: 3 points"]
- L -->|"x2 > 3.0"| LR["Leaf: 4 points"]
- RR -->|"x2 <= 7.0"| RL["Leaf: 2 points"]
- RR -->|"x2 > 7.0"| RRR["Leaf: 5 points"]
+    R["Split on x1 at 5.0"] -->|"x1 <= 5.0"| L["Split on x2 at 3.0"]
+    R -->|"x1 > 5.0"| RR["Split on x2 at 7.0"]
+    L -->|"x2 <= 3.0"| LL["Leaf: 3 points"]
+    L -->|"x2 > 3.0"| LR["Leaf: 4 points"]
+    RR -->|"x2 <= 7.0"| RL["Leaf: 2 points"]
+    RR -->|"x2 > 7.0"| RRR["Leaf: 5 points"]
 ```
 
 To find the nearest neighbor, traverse the tree to the leaf containing the query, then backtrack and check neighboring partitions only if they could contain closer points.
@@ -233,23 +233,23 @@ Implement L1, L2, cosine, and Minkowski distances. These connect directly to Pha
 import math
 
 def l2_distance(a, b):
- return math.sqrt(sum((ai - bi) ** 2 for ai, bi in zip(a, b)))
+    return math.sqrt(sum((ai - bi) ** 2 for ai, bi in zip(a, b)))
 
 def l1_distance(a, b):
- return sum(abs(ai - bi) for ai, bi in zip(a, b))
+    return sum(abs(ai - bi) for ai, bi in zip(a, b))
 
 def cosine_distance(a, b):
- dot_val = sum(ai * bi for ai, bi in zip(a, b))
- norm_a = math.sqrt(sum(ai ** 2 for ai in a))
- norm_b = math.sqrt(sum(bi ** 2 for bi in b))
- if norm_a == 0 or norm_b == 0:
- return 1.0
- return 1.0 - dot_val / (norm_a * norm_b)
+    dot_val = sum(ai * bi for ai, bi in zip(a, b))
+    norm_a = math.sqrt(sum(ai ** 2 for ai in a))
+    norm_b = math.sqrt(sum(bi ** 2 for bi in b))
+    if norm_a == 0 or norm_b == 0:
+        return 1.0
+    return 1.0 - dot_val / (norm_a * norm_b)
 
 def minkowski_distance(a, b, p=2):
- if p == float('inf'):
- return max(abs(ai - bi) for ai, bi in zip(a, b))
- return sum(abs(ai - bi) ** p for ai, bi in zip(a, b)) ** (1 / p)
+    if p == float('inf'):
+        return max(abs(ai - bi) for ai, bi in zip(a, b))
+    return sum(abs(ai - bi) ** p for ai, bi in zip(a, b)) ** (1 / p)
 ```
 
 ### Step 2: KNN classifier and regressor
@@ -258,21 +258,21 @@ Build the full KNN with configurable K, distance metric, and optional distance w
 
 ```python
 class KNN:
- def __init__(self, k=5, distance_fn=l2_distance, weighted=False,
- task="classification"):
- self.k = k
- self.distance_fn = distance_fn
- self.weighted = weighted
- self.task = task
- self.X_train = None
- self.y_train = None
+    def __init__(self, k=5, distance_fn=l2_distance, weighted=False,
+                 task="classification"):
+        self.k = k
+        self.distance_fn = distance_fn
+        self.weighted = weighted
+        self.task = task
+        self.X_train = None
+        self.y_train = None
 
- def fit(self, X, y):
- self.X_train = X
- self.y_train = y
+    def fit(self, X, y):
+        self.X_train = X
+        self.y_train = y
 
- def predict(self, X):
- return [self._predict_one(x) for x in X]
+    def predict(self, X):
+        return [self._predict_one(x) for x in X]
 ```
 
 ### Step 3: KD-tree for efficient search
@@ -281,13 +281,15 @@ Build a KD-tree from scratch that recursively splits on the median of each dimen
 
 ```python
 class KDTree:
- def __init__(self, X, indices=None, depth=0):
- # Recursively partition the data
- self.axis = depth % len(X[0])
- # Split on median of the current axis...
+    def __init__(self, X, indices=None, depth=0):
+        # Recursively partition the data
+        self.axis = depth % len(X[0])
+        # Split on median of the current axis
+        ...
 
- def query(self, point, k=1):
- # Traverse to leaf, then backtrack...
+    def query(self, point, k=1):
+        # Traverse to leaf, then backtrack
+        ...
 ```
 
 See `code/knn.py` for the complete implementation with all helper methods and demos.
@@ -298,14 +300,14 @@ KNN requires feature scaling because distances are sensitive to feature magnitud
 
 ```python
 def standardize(X):
- n = len(X)
- d = len(X[0])
- means = [sum(X[i][j] for i in range(n)) / n for j in range(d)]
- stds = [
- max(1e-10, (sum((X[i][j] - means[j]) ** 2 for i in range(n)) / n) ** 0.5)
- for j in range(d)
- ]
- return [[((X[i][j] - means[j]) / stds[j]) for j in range(d)] for i in range(n)], means, stds
+    n = len(X)
+    d = len(X[0])
+    means = [sum(X[i][j] for i in range(n)) / n for j in range(d)]
+    stds = [
+        max(1e-10, (sum((X[i][j] - means[j]) ** 2 for i in range(n)) / n) ** 0.5)
+        for j in range(d)
+    ]
+    return [[((X[i][j] - means[j]) / stds[j]) for j in range(d)] for i in range(n)], means, stds
 ```
 
 ## Use It
@@ -318,8 +320,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 clf = Pipeline([
- ("scaler", StandardScaler()),
- ("knn", KNeighborsClassifier(n_neighbors=5, metric="euclidean")),
+    ("scaler", StandardScaler()),
+    ("knn", KNeighborsClassifier(n_neighbors=5, metric="euclidean")),
 ])
 clf.fit(X_train, y_train)
 print(f"Accuracy: {clf.score(X_test, y_test):.4f}")

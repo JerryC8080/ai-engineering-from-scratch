@@ -23,9 +23,9 @@ This capstone surveys the three landmark architectures — AlphaZero, MuZero, an
 
 ```
 while True:
- trajectory = self_play(current_policy, search) # play game against self
- policy_target = search.improved_policy(trajectory) # search improves raw policy
- policy_net.update(policy_target, value_target) # supervised on search output
+    trajectory = self_play(current_policy, search)     # play game against self
+    policy_target = search.improved_policy(trajectory) # search improves raw policy
+    policy_net.update(policy_target, value_target)     # supervised on search output
 ```
 
 **AlphaZero (2017).** Silver et al. Given a game (chess, shogi, Go) with known rules:
@@ -40,9 +40,9 @@ Zero human knowledge. Zero handcrafted heuristics. A single recipe that mastered
 **MuZero (2019).** Schrittwieser et al. Removes the requirement that the rules are known.
 
 - Instead of a fixed environment, learn a *latent dynamics model* `(h, g, f)`:
- - `h(s)`: encode observation to latent state.
- - `g(s_latent, a)`: predict next latent state + reward.
- - `f(s_latent)`: predict policy prior + value.
+  - `h(s)`: encode observation to latent state.
+  - `g(s_latent, a)`: predict next latent state + reward.
+  - `f(s_latent)`: predict policy prior + value.
 - MCTS runs in the *learned latent space*. Same search, same training loop.
 - Works on Go, chess, shogi *and* Atari — one algorithm, no rule knowledge.
 
@@ -58,7 +58,7 @@ Zero human knowledge. Zero handcrafted heuristics. A single recipe that mastered
 - KL penalty to reference policy to prevent drift (like RLHF).
 - Full loss:
 
- `L_GRPO(θ) = -E_{q, {o_i}} [ (1/G) Σ_i A_i · log π_θ(o_i | q) ] + β · KL(π_θ || π_ref)`
+  `L_GRPO(θ) = -E_{q, {o_i}} [ (1/G) Σ_i A_i · log π_θ(o_i | q) ] + β · KL(π_θ || π_ref)`
 
 No reward model, no critic, no MCTS. Group-relative baseline replaces all three. Matches or exceeds PPO-RLHF quality on reasoning benchmarks at a fraction of the compute.
 
@@ -66,10 +66,10 @@ No reward model, no critic, no MCTS. Group-relative baseline replaces all three.
 
 - **R1-Zero.** Start from the DeepSeek-V3 base model. No SFT. Apply GRPO directly with two reward components: *accuracy reward* (rule-based — did the final answer parse to the correct number / did the code pass unit tests) and *format reward* (did the completion wrap its chain-of-thought in `<think>…</think>` tags). Over thousands of steps, average response length grows from ~100 to ~10,000 tokens and math benchmark scores climb to near-o1-preview levels. The model learns to reason from scratch. The downside: its chains of thought are often unreadable, mix languages, and lack stylistic polish.
 - **R1.** Fix R1-Zero's readability problems with a four-stage pipeline:
- 1. **Cold-start SFT.** Collect a few thousand long-CoT demonstrations with clean formatting. Supervised-finetune the base model on them. This gives a readable starting point.
- 2. **Reasoning-oriented GRPO.** Apply GRPO with the accuracy+format rewards plus a *language-consistency* reward to prevent code-switching.
- 3. **Rejection sampling + SFT round 2.** Sample ~600K reasoning trajectories from the RL checkpoint, keep only those with correct final answers and readable CoT, and combine with ~200K non-reasoning SFT examples (writing, QA, self-cognition). Fine-tune the base again.
- 4. **Full-spectrum GRPO.** One more RL round covering both reasoning (rule-based rewards) and general alignment (helpfulness/harmlessness preference-based rewards).
+  1. **Cold-start SFT.** Collect a few thousand long-CoT demonstrations with clean formatting. Supervised-finetune the base model on them. This gives a readable starting point.
+  2. **Reasoning-oriented GRPO.** Apply GRPO with the accuracy+format rewards plus a *language-consistency* reward to prevent code-switching.
+  3. **Rejection sampling + SFT round 2.** Sample ~600K reasoning trajectories from the RL checkpoint, keep only those with correct final answers and readable CoT, and combine with ~200K non-reasoning SFT examples (writing, QA, self-cognition). Fine-tune the base again.
+  4. **Full-spectrum GRPO.** One more RL round covering both reasoning (rule-based rewards) and general alignment (helpfulness/harmlessness preference-based rewards).
 
 The result matches o1 on AIME and MATH-500 at open weights, and is small enough to distill. The same paper also releases six distilled dense models (Qwen-1.5B through Llama-70B) by SFT'ing on R1's reasoning traces — no RL at the student. Distillation of a strong RL teacher consistently beats RL from scratch at the student's scale.
 
@@ -88,12 +88,12 @@ The code in `code/main.py` implements **GRPO in miniature** — a bandit with mu
 
 ```python
 QUESTIONS = [
- {"prompt": "q1", "correct": 3},
- {"prompt": "q2", "correct": 1},
+    {"prompt": "q1", "correct": 3},
+    {"prompt": "q2", "correct": 1},
 ]
 
 def verify(prompt_idx, answer_token):
- return 1.0 if answer_token == QUESTIONS[prompt_idx]["correct"] else 0.0
+    return 1.0 if answer_token == QUESTIONS[prompt_idx]["correct"] else 0.0
 ```
 
 In real GRPO the verifier runs unit tests or checks math equality.
@@ -102,7 +102,7 @@ In real GRPO the verifier runs unit tests or checks math equality.
 
 ```python
 def policy_probs(theta, p_idx):
- return softmax(theta[p_idx])
+    return softmax(theta[p_idx])
 ```
 
 Equivalent to the final-layer output of an LLM conditioned on a prompt.
@@ -111,20 +111,20 @@ Equivalent to the final-layer output of an LLM conditioned on a prompt.
 
 ```python
 def grpo_step(theta, p_idx, G=8, beta=0.01, lr=0.1, rng=None):
- probs = policy_probs(theta, p_idx)
- samples = [sample(probs, rng) for _ in range(G)]
- rewards = [verify(p_idx, s) for s in samples]
- mean_r = sum(rewards) / G
- std_r = stddev(rewards) + 1e-8
- advs = [(r - mean_r) / std_r for r in rewards]
+    probs = policy_probs(theta, p_idx)
+    samples = [sample(probs, rng) for _ in range(G)]
+    rewards = [verify(p_idx, s) for s in samples]
+    mean_r = sum(rewards) / G
+    std_r = stddev(rewards) + 1e-8
+    advs = [(r - mean_r) / std_r for r in rewards]
 
- for a, A in zip(samples, advs):
- grad = onehot(a) - probs
- for i in range(len(probs)):
- theta[p_idx][i] += lr * A * grad[i]
- # KL penalty: pull theta toward reference
- for i in range(len(probs)):
- theta[p_idx][i] -= beta * (theta[p_idx][i] - reference[p_idx][i])
+    for a, A in zip(samples, advs):
+        grad = onehot(a) - probs
+        for i in range(len(probs)):
+            theta[p_idx][i] += lr * A * grad[i]
+    # KL penalty: pull theta toward reference
+    for i in range(len(probs)):
+        theta[p_idx][i] -= beta * (theta[p_idx][i] - reference[p_idx][i])
 ```
 
 The group-relative advantage is the 2024 DeepSeek trick. No critic needed. The "baseline" is the group mean, and normalization uses group std.

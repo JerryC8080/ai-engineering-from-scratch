@@ -36,21 +36,21 @@ The NVIDIA GPU Operator installs on the cluster and exposes each GPU as a schedu
 
 ```mermaid
 flowchart TB
- subgraph Cluster["Kubernetes Cluster"]
- subgraph Node1["Node A (2x A100)"]
- G1[GPU 0 - allocated]
- G2[GPU 1 - free]
- end
- subgraph Node2["Node B (4x L4)"]
- G3[GPU 0 - allocated]
- G4[GPU 1 - free]
- G5[GPU 2 - free]
- G6[GPU 3 - allocated]
- end
- end
+    subgraph Cluster["Kubernetes Cluster"]
+        subgraph Node1["Node A (2x A100)"]
+            G1[GPU 0 - allocated]
+            G2[GPU 1 - free]
+        end
+        subgraph Node2["Node B (4x L4)"]
+            G3[GPU 0 - allocated]
+            G4[GPU 1 - free]
+            G5[GPU 2 - free]
+            G6[GPU 3 - allocated]
+        end
+    end
 
- P[New Pod\nnvidia.com/gpu: 1] -->|scheduler| G2
- P2[New Pod\nnvidia.com/gpu: 2] -->|scheduler| Node2
+    P[New Pod\nnvidia.com/gpu: 1] -->|scheduler| G2
+    P2[New Pod\nnvidia.com/gpu: 2] -->|scheduler| Node2
 ```
 
 Key constraints:
@@ -63,10 +63,10 @@ Key constraints:
 
 ```yaml
 resources:
- requests:
- nvidia.com/gpu: 1
- limits:
- nvidia.com/gpu: 1
+  requests:
+    nvidia.com/gpu: 1
+  limits:
+    nvidia.com/gpu: 1
 ```
 
 ### Cold Start: The 3-5 Minute Problem
@@ -90,21 +90,21 @@ For web services, cold start is 2-5 seconds. For AI workloads, it is 100x worse.
 
 ```mermaid
 gantt
- title Pod Cold Start Timeline
- dateFormat X
- axisFormat %s
+    title Pod Cold Start Timeline
+    dateFormat X
+    axisFormat %s
 
- section Web App
- Pull image :0, 3
- Start process :3, 5
- Ready :5, 6
+    section Web App
+    Pull image      :0, 3
+    Start process   :3, 5
+    Ready           :5, 6
 
- section AI Model
- Pull image :0, 60
- Download weights :60, 180
- Load to GPU :180, 270
- Warm-up inference :270, 280
- Ready :280, 285
+    section AI Model
+    Pull image           :0, 60
+    Download weights     :60, 180
+    Load to GPU          :180, 270
+    Warm-up inference    :270, 280
+    Ready                :280, 285
 ```
 
 ### Autoscaling on Queue Depth
@@ -115,24 +115,24 @@ The right metric for AI autoscaling is **queue depth**: how many requests are wa
 
 ```mermaid
 flowchart LR
- subgraph Metrics["Metrics Pipeline"]
- Q[Request Queue] -->|depth| P[Prometheus]
- P -->|query| A[KEDA / Custom HPA]
- end
+    subgraph Metrics["Metrics Pipeline"]
+        Q[Request Queue] -->|depth| P[Prometheus]
+        P -->|query| A[KEDA / Custom HPA]
+    end
 
- A -->|scale up| D[Deployment\nreplicas: 1 -> 3]
- A -->|scale down| D
+    A -->|scale up| D[Deployment\nreplicas: 1 -> 3]
+    A -->|scale down| D
 ```
 
 KEDA (Kubernetes Event-Driven Autoscaling) integrates with Prometheus, RabbitMQ, and other metric sources to drive scaling decisions based on custom metrics like queue depth. A basic configuration:
 
 ```yaml
 triggers:
- - type: prometheus
- metadata:
- serverAddress: http://prometheus:9090
- query: sum(model_server_queue_depth)
- threshold: "10"
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus:9090
+      query: sum(model_server_queue_depth)
+      threshold: "10"
 ```
 
 When the queue exceeds 10 pending requests, KEDA adds replicas. When it drops below, KEDA removes them. The cooldown period prevents thrashing.
@@ -145,14 +145,14 @@ A warm pool keeps a minimum number of pods running with models loaded into GPU m
 
 ```mermaid
 flowchart TB
- subgraph Pool["Model Serving Pool"]
- W1[Warm Pod 1\nModel loaded\nIdle]
- W2[Warm Pod 2\nModel loaded\nIdle]
- C1[Cold Pod 3\nScaled to zero]
- end
+    subgraph Pool["Model Serving Pool"]
+        W1[Warm Pod 1\nModel loaded\nIdle]
+        W2[Warm Pod 2\nModel loaded\nIdle]
+        C1[Cold Pod 3\nScaled to zero]
+    end
 
- R[Request arrives] --> W1
- Note["No cold start.\nWarm pod responds immediately."]
+    R[Request arrives] --> W1
+    Note["No cold start.\nWarm pod responds immediately."]
 ```
 
 The tradeoff is explicit: warm pool size is a bet on traffic patterns. Two warm pods cost $4/hour in GPU time even when idle. If your minimum traffic always justifies two pods, this is efficient. If your service has hours of zero traffic, you are paying for idle GPUs.
@@ -171,13 +171,13 @@ The pattern for spot GPU inference:
 
 ```yaml
 nodeAffinity:
- preferredDuringSchedulingIgnoredDuringExecution:
- - weight: 80
- preference:
- matchExpressions:
- - key: cloud.google.com/gke-spot
- operator: In
- values: ["true"]
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 80
+      preference:
+        matchExpressions:
+          - key: cloud.google.com/gke-spot
+            operator: In
+            values: ["true"]
 ```
 
 This tells the scheduler to prefer spot nodes but allows on-demand as a fallback.
@@ -210,26 +210,26 @@ A complete AI serving deployment on Kubernetes looks like this:
 
 ```mermaid
 flowchart TB
- LB[Ingress / Load Balancer] --> S1[Service]
+    LB[Ingress / Load Balancer] --> S1[Service]
 
- S1 --> D[Deployment\nreplicas: 2-10]
+    S1 --> D[Deployment\nreplicas: 2-10]
 
- D --> P1[Pod 1\nGPU: A100\nModel: llama-7b]
- D --> P2[Pod 2\nGPU: A100\nModel: llama-7b]
- D --> P3[Pod 3\nGPU: L4\nModel: llama-7b-int4]
+    D --> P1[Pod 1\nGPU: A100\nModel: llama-7b]
+    D --> P2[Pod 2\nGPU: A100\nModel: llama-7b]
+    D --> P3[Pod 3\nGPU: L4\nModel: llama-7b-int4]
 
- KEDA[KEDA Autoscaler] -->|queue depth| D
- PROM[Prometheus] --> KEDA
+    KEDA[KEDA Autoscaler] -->|queue depth| D
+    PROM[Prometheus] --> KEDA
 
- P1 --> PVC1[PVC\nModel Weights]
- P2 --> PVC1
- P3 --> PVC1
+    P1 --> PVC1[PVC\nModel Weights]
+    P2 --> PVC1
+    P3 --> PVC1
 
- subgraph Monitoring
- PROM
- GRAF[Grafana Dashboard]
- PROM --> GRAF
- end
+    subgraph Monitoring
+        PROM
+        GRAF[Grafana Dashboard]
+        PROM --> GRAF
+    end
 ```
 
 The deployment uses:

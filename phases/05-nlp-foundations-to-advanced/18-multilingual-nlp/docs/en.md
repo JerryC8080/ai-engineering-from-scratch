@@ -62,15 +62,15 @@ model = AutoModelForSequenceClassification.from_pretrained("joeddav/xlm-roberta-
 
 
 def classify(text, candidate_labels, hypothesis_template="This text is about {}."):
- scores = {}
- for label in candidate_labels:
- hypothesis = hypothesis_template.format(label)
- inputs = tok(text, hypothesis, return_tensors="pt", truncation=True)
- with torch.no_grad():
- logits = model(**inputs).logits[0]
- entail_score = torch.softmax(logits, dim=-1)[2].item()
- scores[label] = entail_score
- return dict(sorted(scores.items(), key=lambda x: -x[1]))
+    scores = {}
+    for label in candidate_labels:
+        hypothesis = hypothesis_template.format(label)
+        inputs = tok(text, hypothesis, return_tensors="pt", truncation=True)
+        with torch.no_grad():
+            logits = model(**inputs).logits[0]
+        entail_score = torch.softmax(logits, dim=-1)[2].item()
+        scores[label] = entail_score
+    return dict(sorted(scores.items(), key=lambda x: -x[1]))
 
 
 print(classify("I love this product!", ["positive", "negative", "neutral"]))
@@ -89,17 +89,17 @@ import numpy as np
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
 pairs = [
- ("The cat is sleeping.", "Le chat dort."),
- ("The cat is sleeping.", "El gato está durmiendo."),
- ("The cat is sleeping.", "Die Katze schläft."),
- ("The cat is sleeping.", "The dog is barking."),
+    ("The cat is sleeping.", "Le chat dort."),
+    ("The cat is sleeping.", "El gato está durmiendo."),
+    ("The cat is sleeping.", "Die Katze schläft."),
+    ("The cat is sleeping.", "The dog is barking."),
 ]
 
 for eng, other in pairs:
- emb_eng = model.encode([eng], normalize_embeddings=True)[0]
- emb_other = model.encode([other], normalize_embeddings=True)[0]
- sim = float(np.dot(emb_eng, emb_other))
- print(f" {eng!r} <-> {other!r}: cos={sim:.3f}")
+    emb_eng = model.encode([eng], normalize_embeddings=True)[0]
+    emb_other = model.encode([other], normalize_embeddings=True)[0]
+    sim = float(np.dot(emb_eng, emb_other))
+    print(f"  {eng!r} <-> {other!r}: cos={sim:.3f}")
 ```
 
 Translations land close in embedding space. A different English sentence lands further. This is what makes cross-lingual retrieval, clustering, and similarity work.
@@ -112,24 +112,24 @@ from datasets import Dataset
 
 
 def few_shot_finetune(base_model, base_tokenizer, examples):
- ds = Dataset.from_list(examples)
+    ds = Dataset.from_list(examples)
 
- def tokenize_fn(ex):
- out = base_tokenizer(ex["text"], truncation=True, max_length=128)
- out["labels"] = ex["label"]
- return out
+    def tokenize_fn(ex):
+        out = base_tokenizer(ex["text"], truncation=True, max_length=128)
+        out["labels"] = ex["label"]
+        return out
 
- ds = ds.map(tokenize_fn)
- args = TrainingArguments(
- output_dir="out",
- per_device_train_batch_size=8,
- num_train_epochs=5,
- learning_rate=2e-5,
- save_strategy="no",
- )
- trainer = Trainer(model=base_model, args=args, train_dataset=ds)
- trainer.train()
- return base_model
+    ds = ds.map(tokenize_fn)
+    args = TrainingArguments(
+        output_dir="out",
+        per_device_train_batch_size=8,
+        num_train_epochs=5,
+        learning_rate=2e-5,
+        save_strategy="no",
+    )
+    trainer = Trainer(model=base_model, args=args, train_dataset=ds)
+    trainer.train()
+    return base_model
 ```
 
 For 100-500 target-language examples, `num_train_epochs=5` and `learning_rate=2e-5` are the safe defaults. Higher learning rates cause the multilingual alignment to collapse and you get an English-only model.

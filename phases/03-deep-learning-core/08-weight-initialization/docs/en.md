@@ -39,7 +39,7 @@ But "random" is not enough. The *scale* of the randomness determines whether the
 Consider a single layer with fan_in inputs:
 
 ```
-z = w1*x1 + w2*x2 +... + w_n*x_n
+z = w1*x1 + w2*x2 + ... + w_n*x_n
 ```
 
 If each weight wi is drawn from a distribution with variance Var(w) and each input xi has variance Var(x), the output variance is:
@@ -65,7 +65,7 @@ Var(w) = 2 / (fan_in + fan_out)
 In practice, weights are drawn from:
 
 ```
-w ~ Uniform(-limit, limit) where limit = sqrt(6 / (fan_in + fan_out))
+w ~ Uniform(-limit, limit)  where limit = sqrt(6 / (fan_in + fan_out))
 ```
 
 or:
@@ -108,57 +108,57 @@ Llama 3 (405B parameters, 126 layers) uses a similar scheme. Without this scalin
 
 ```mermaid
 flowchart TD
- subgraph "Zero Init"
- Z1["Layer 1<br/>All weights = 0"] --> Z2["Layer 2<br/>All neurons identical"]
- Z2 --> Z3["Layer 3<br/>Still identical"]
- Z3 --> ZR["Result: 1 effective neuron<br/>regardless of width"]
- end
+    subgraph "Zero Init"
+        Z1["Layer 1<br/>All weights = 0"] --> Z2["Layer 2<br/>All neurons identical"]
+        Z2 --> Z3["Layer 3<br/>Still identical"]
+        Z3 --> ZR["Result: 1 effective neuron<br/>regardless of width"]
+    end
 
- subgraph "Xavier Init"
- X1["Layer 1<br/>Var = 2/(fan_in+fan_out)"] --> X2["Layer 2<br/>Signal stable"]
- X2 --> X3["Layer 50<br/>Signal stable"]
- X3 --> XR["Result: Trains with<br/>sigmoid/tanh"]
- end
+    subgraph "Xavier Init"
+        X1["Layer 1<br/>Var = 2/(fan_in+fan_out)"] --> X2["Layer 2<br/>Signal stable"]
+        X2 --> X3["Layer 50<br/>Signal stable"]
+        X3 --> XR["Result: Trains with<br/>sigmoid/tanh"]
+    end
 
- subgraph "Kaiming Init"
- K1["Layer 1<br/>Var = 2/fan_in"] --> K2["Layer 2<br/>Signal stable"]
- K2 --> K3["Layer 50<br/>Signal stable"]
- K3 --> KR["Result: Trains with<br/>ReLU/GELU"]
- end
+    subgraph "Kaiming Init"
+        K1["Layer 1<br/>Var = 2/fan_in"] --> K2["Layer 2<br/>Signal stable"]
+        K2 --> K3["Layer 50<br/>Signal stable"]
+        K3 --> KR["Result: Trains with<br/>ReLU/GELU"]
+    end
 ```
 
 ### Activation Magnitude Through 50 Layers
 
 ```mermaid
 graph LR
- subgraph "Mean Activation Magnitude"
- direction LR
- L1["Layer 1"] --> L10["Layer 10"] --> L25["Layer 25"] --> L50["Layer 50"]
- end
+    subgraph "Mean Activation Magnitude"
+        direction LR
+        L1["Layer 1"] --> L10["Layer 10"] --> L25["Layer 25"] --> L50["Layer 50"]
+    end
 
- subgraph "Results"
- R1["Random N(0,1): EXPLODES by layer 5"]
- R2["Random N(0,0.01): Vanishes by layer 10"]
- R3["Xavier + Sigmoid: ~1.0 at layer 50"]
- R4["Kaiming + ReLU: ~1.0 at layer 50"]
- end
+    subgraph "Results"
+        R1["Random N(0,1): EXPLODES by layer 5"]
+        R2["Random N(0,0.01): Vanishes by layer 10"]
+        R3["Xavier + Sigmoid: ~1.0 at layer 50"]
+        R4["Kaiming + ReLU: ~1.0 at layer 50"]
+    end
 ```
 
 ### Choosing the Right Init
 
 ```mermaid
 flowchart TD
- Start["What activation?"] --> Act{"Activation type?"}
+    Start["What activation?"] --> Act{"Activation type?"}
 
- Act -->|"Sigmoid / Tanh"| Xavier["Xavier/Glorot<br/>Var = 2/(fan_in + fan_out)"]
- Act -->|"ReLU / Leaky ReLU"| Kaiming["Kaiming/He<br/>Var = 2/fan_in"]
- Act -->|"GELU / Swish"| Kaiming2["Kaiming/He<br/>(same as ReLU)"]
- Act -->|"Transformer residual"| GPT["Scale by 1/sqrt(2N)<br/>N = num layers"]
+    Act -->|"Sigmoid / Tanh"| Xavier["Xavier/Glorot<br/>Var = 2/(fan_in + fan_out)"]
+    Act -->|"ReLU / Leaky ReLU"| Kaiming["Kaiming/He<br/>Var = 2/fan_in"]
+    Act -->|"GELU / Swish"| Kaiming2["Kaiming/He<br/>(same as ReLU)"]
+    Act -->|"Transformer residual"| GPT["Scale by 1/sqrt(2N)<br/>N = num layers"]
 
- Xavier --> Check["Verify: activation magnitudes<br/>stay between 0.5 and 2.0<br/>through all layers"]
- Kaiming --> Check
- Kaiming2 --> Check
- GPT --> Check
+    Xavier --> Check["Verify: activation magnitudes<br/>stay between 0.5 and 2.0<br/>through all layers"]
+    Kaiming --> Check
+    Kaiming2 --> Check
+    GPT --> Check
 ```
 
 ## Build It
@@ -173,21 +173,21 @@ import random
 
 
 def zero_init(fan_in, fan_out):
- return [[0.0 for _ in range(fan_in)] for _ in range(fan_out)]
+    return [[0.0 for _ in range(fan_in)] for _ in range(fan_out)]
 
 
 def random_init(fan_in, fan_out, scale=1.0):
- return [[random.gauss(0, scale) for _ in range(fan_in)] for _ in range(fan_out)]
+    return [[random.gauss(0, scale) for _ in range(fan_in)] for _ in range(fan_out)]
 
 
 def xavier_init(fan_in, fan_out):
- std = math.sqrt(2.0 / (fan_in + fan_out))
- return [[random.gauss(0, std) for _ in range(fan_in)] for _ in range(fan_out)]
+    std = math.sqrt(2.0 / (fan_in + fan_out))
+    return [[random.gauss(0, std) for _ in range(fan_in)] for _ in range(fan_out)]
 
 
 def kaiming_init(fan_in, fan_out):
- std = math.sqrt(2.0 / fan_in)
- return [[random.gauss(0, std) for _ in range(fan_in)] for _ in range(fan_out)]
+    std = math.sqrt(2.0 / fan_in)
+    return [[random.gauss(0, std) for _ in range(fan_in)] for _ in range(fan_out)]
 ```
 
 ### Step 2: Activation Functions
@@ -196,16 +196,16 @@ We need sigmoid, tanh, and ReLU to test each init strategy with its intended act
 
 ```python
 def sigmoid(x):
- x = max(-500, min(500, x))
- return 1.0 / (1.0 + math.exp(-x))
+    x = max(-500, min(500, x))
+    return 1.0 / (1.0 + math.exp(-x))
 
 
 def tanh_act(x):
- return math.tanh(x)
+    return math.tanh(x)
 
 
 def relu(x):
- return max(0.0, x)
+    return max(0.0, x)
 ```
 
 ### Step 3: Forward Pass Through 50 Layers
@@ -214,31 +214,31 @@ Pass random data through a deep network and measure mean activation magnitude at
 
 ```python
 def forward_deep(init_fn, activation_fn, n_layers=50, width=64, n_samples=100):
- random.seed(42)
- layer_magnitudes = []
+    random.seed(42)
+    layer_magnitudes = []
 
- inputs = [[random.gauss(0, 1) for _ in range(width)] for _ in range(n_samples)]
+    inputs = [[random.gauss(0, 1) for _ in range(width)] for _ in range(n_samples)]
 
- for layer_idx in range(n_layers):
- weights = init_fn(width, width)
- biases = [0.0] * width
+    for layer_idx in range(n_layers):
+        weights = init_fn(width, width)
+        biases = [0.0] * width
 
- new_inputs = []
- for sample in inputs:
- output = []
- for neuron_idx in range(width):
- z = sum(weights[neuron_idx][j] * sample[j] for j in range(width)) + biases[neuron_idx]
- output.append(activation_fn(z))
- new_inputs.append(output)
- inputs = new_inputs
+        new_inputs = []
+        for sample in inputs:
+            output = []
+            for neuron_idx in range(width):
+                z = sum(weights[neuron_idx][j] * sample[j] for j in range(width)) + biases[neuron_idx]
+                output.append(activation_fn(z))
+            new_inputs.append(output)
+        inputs = new_inputs
 
- magnitudes = []
- for sample in inputs:
- magnitudes.append(sum(abs(v) for v in sample) / width)
- mean_mag = sum(magnitudes) / len(magnitudes)
- layer_magnitudes.append(mean_mag)
+        magnitudes = []
+        for sample in inputs:
+            magnitudes.append(sum(abs(v) for v in sample) / width)
+        mean_mag = sum(magnitudes) / len(magnitudes)
+        layer_magnitudes.append(mean_mag)
 
- return layer_magnitudes
+    return layer_magnitudes
 ```
 
 ### Step 4: The Experiment
@@ -247,30 +247,30 @@ Run all combinations: zero init, random N(0,1), random N(0,0.01), Xavier with si
 
 ```python
 def run_experiment():
- configs = [
- ("Zero init + Sigmoid", lambda fi, fo: zero_init(fi, fo), sigmoid),
- ("Random N(0,1) + ReLU", lambda fi, fo: random_init(fi, fo, 1.0), relu),
- ("Random N(0,0.01) + ReLU", lambda fi, fo: random_init(fi, fo, 0.01), relu),
- ("Xavier + Sigmoid", xavier_init, sigmoid),
- ("Xavier + Tanh", xavier_init, tanh_act),
- ("Kaiming + ReLU", kaiming_init, relu),
- ]
+    configs = [
+        ("Zero init + Sigmoid", lambda fi, fo: zero_init(fi, fo), sigmoid),
+        ("Random N(0,1) + ReLU", lambda fi, fo: random_init(fi, fo, 1.0), relu),
+        ("Random N(0,0.01) + ReLU", lambda fi, fo: random_init(fi, fo, 0.01), relu),
+        ("Xavier + Sigmoid", xavier_init, sigmoid),
+        ("Xavier + Tanh", xavier_init, tanh_act),
+        ("Kaiming + ReLU", kaiming_init, relu),
+    ]
 
- print(f"{'Strategy':<30} {'L1':>10} {'L5':>10} {'L10':>10} {'L25':>10} {'L50':>10}")
- print("-" * 80)
+    print(f"{'Strategy':<30} {'L1':>10} {'L5':>10} {'L10':>10} {'L25':>10} {'L50':>10}")
+    print("-" * 80)
 
- for name, init_fn, act_fn in configs:
- mags = forward_deep(init_fn, act_fn)
- row = f"{name:<30}"
- for idx in [0, 4, 9, 24, 49]:
- val = mags[idx]
- if val > 1e6:
- row += f" {'EXPLODED':>10}"
- elif val < 1e-6:
- row += f" {'VANISHED':>10}"
- else:
- row += f" {val:>10.4f}"
- print(row)
+    for name, init_fn, act_fn in configs:
+        mags = forward_deep(init_fn, act_fn)
+        row = f"{name:<30}"
+        for idx in [0, 4, 9, 24, 49]:
+            val = mags[idx]
+            if val > 1e6:
+                row += f" {'EXPLODED':>10}"
+            elif val < 1e-6:
+                row += f" {'VANISHED':>10}"
+            else:
+                row += f" {val:>10.4f}"
+        print(row)
 ```
 
 ### Step 5: Symmetry Demonstration
@@ -279,22 +279,22 @@ Show that zero init produces identical neurons.
 
 ```python
 def symmetry_demo():
- random.seed(42)
- weights = zero_init(2, 4)
- biases = [0.0] * 4
+    random.seed(42)
+    weights = zero_init(2, 4)
+    biases = [0.0] * 4
 
- inputs = [0.5, -0.3]
- outputs = []
- for neuron_idx in range(4):
- z = sum(weights[neuron_idx][j] * inputs[j] for j in range(2)) + biases[neuron_idx]
- outputs.append(sigmoid(z))
+    inputs = [0.5, -0.3]
+    outputs = []
+    for neuron_idx in range(4):
+        z = sum(weights[neuron_idx][j] * inputs[j] for j in range(2)) + biases[neuron_idx]
+        outputs.append(sigmoid(z))
 
- print("\nSymmetry Demo (4 neurons, zero init):")
- for i, out in enumerate(outputs):
- print(f" Neuron {i}: output = {out:.6f}")
- all_same = all(abs(outputs[i] - outputs[0]) < 1e-10 for i in range(len(outputs)))
- print(f" All identical: {all_same}")
- print(f" Effective parameters: 1 (not {len(weights) * len(weights[0])})")
+    print("\nSymmetry Demo (4 neurons, zero init):")
+    for i, out in enumerate(outputs):
+        print(f"  Neuron {i}: output = {out:.6f}")
+    all_same = all(abs(outputs[i] - outputs[0]) < 1e-10 for i in range(len(outputs)))
+    print(f"  All identical: {all_same}")
+    print(f"  Effective parameters: 1 (not {len(weights) * len(weights[0])})")
 ```
 
 ### Step 6: Layer-by-Layer Magnitude Report
@@ -303,17 +303,17 @@ Print a visual bar chart of activation magnitudes through 50 layers.
 
 ```python
 def magnitude_report(name, magnitudes):
- print(f"\n{name}:")
- for i, mag in enumerate(magnitudes):
- if i % 5 == 0 or i == len(magnitudes) - 1:
- if mag > 1e6:
- bar = "X" * 50 + " EXPLODED"
- elif mag < 1e-6:
- bar = "." + " VANISHED"
- else:
- bar_len = min(50, max(1, int(mag * 10)))
- bar = "#" * bar_len
- print(f" Layer {i+1:3d}: {bar} ({mag:.6f})")
+    print(f"\n{name}:")
+    for i, mag in enumerate(magnitudes):
+        if i % 5 == 0 or i == len(magnitudes) - 1:
+            if mag > 1e6:
+                bar = "X" * 50 + " EXPLODED"
+            elif mag < 1e-6:
+                bar = "." + " VANISHED"
+            else:
+                bar_len = min(50, max(1, int(mag * 10)))
+                bar = "#" * bar_len
+            print(f"  Layer {i+1:3d}: {bar} ({mag:.6f})")
 ```
 
 ## Use It

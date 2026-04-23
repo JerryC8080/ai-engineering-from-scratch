@@ -54,8 +54,9 @@ This lesson's code is a tiny demonstration of domain randomization on a GridWorl
 
 ```python
 def step(state, action, slip):
- if rng.random() < slip:
- action = random_perpendicular(action)...
+    if rng.random() < slip:
+        action = random_perpendicular(action)
+    ...
 ```
 
 `slip` is a parameter the simulator exposes. In real robotics it could be friction, mass, motor gain — anything that shifts between sim and real.

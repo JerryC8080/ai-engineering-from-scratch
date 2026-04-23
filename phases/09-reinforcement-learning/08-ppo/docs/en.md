@@ -52,9 +52,9 @@ Same actor-critic structure as A2C. Three coefficients, usually `c_v = 0.5`, `c_
 2. Compute advantages (GAE), freeze them as constants.
 3. Freeze `π_{θ_old}` as a snapshot of current `π_θ`.
 4. For `K` epochs, for each minibatch of `(s, a, A, V_target, log π_old(a|s))`:
- - Compute `r_t(θ) = exp(log π_θ(a|s) - log π_old(a|s))`.
- - Apply `L^{CLIP}` + value loss + entropy.
- - Gradient step.
+   - Compute `r_t(θ) = exp(log π_θ(a|s) - log π_old(a|s))`.
+   - Apply `L^{CLIP}` + value loss + entropy.
+   - Gradient step.
 5. Discard the rollout. Return to step 1.
 
 `K = 10` and minibatches of 64 is a standard hyperparameter set. PPO is robust: the exact numbers rarely matter within ±50%.
@@ -67,15 +67,15 @@ Same actor-critic structure as A2C. Three coefficients, usually `c_v = 0.5`, `c_
 
 ```python
 for step in range(T):
- probs = softmax(logits(theta, state_features(s)))
- a = sample(probs, rng)
- s_next, r, done = env.step(s, a)
- buffer.append({
- "s": s, "a": a, "r": r, "done": done,
- "v_old": value(w, state_features(s)),
- "log_pi_old": log(probs[a] + 1e-12),
- })
- s = s_next
+    probs = softmax(logits(theta, state_features(s)))
+    a = sample(probs, rng)
+    s_next, r, done = env.step(s, a)
+    buffer.append({
+        "s": s, "a": a, "r": r, "done": done,
+        "v_old": value(w, state_features(s)),
+        "log_pi_old": log(probs[a] + 1e-12),
+    })
+    s = s_next
 ```
 
 The snapshot is taken once, at rollout time. It does not change during the update epochs.
@@ -88,26 +88,26 @@ Same as A2C. Normalize across the batch.
 
 ```python
 for _ in range(K_EPOCHS):
- for mb in minibatches(buffer, size=64):
- for rec in mb:
- x = state_features(rec["s"])
- probs = softmax(logits(theta, x))
- logp = log(probs[rec["a"]] + 1e-12)
- ratio = exp(logp - rec["log_pi_old"])
- adv = rec["advantage"]
- surrogate = min(
- ratio * adv,
- clamp(ratio, 1 - EPS, 1 + EPS) * adv,
- )
- # backprop -surrogate, add value loss, subtract entropy
- grad_logpi = onehot(rec["a"]) - probs
- if (adv > 0 and ratio >= 1 + EPS) or (adv < 0 and ratio <= 1 - EPS):
- pg_grad = 0.0 # clipped
- else:
- pg_grad = ratio * adv
- for i in range(N_ACTIONS):
- for j in range(N_FEAT):
- theta[i][j] += LR * pg_grad * grad_logpi[i] * x[j]
+    for mb in minibatches(buffer, size=64):
+        for rec in mb:
+            x = state_features(rec["s"])
+            probs = softmax(logits(theta, x))
+            logp = log(probs[rec["a"]] + 1e-12)
+            ratio = exp(logp - rec["log_pi_old"])
+            adv = rec["advantage"]
+            surrogate = min(
+                ratio * adv,
+                clamp(ratio, 1 - EPS, 1 + EPS) * adv,
+            )
+            # backprop -surrogate, add value loss, subtract entropy
+            grad_logpi = onehot(rec["a"]) - probs
+            if (adv > 0 and ratio >= 1 + EPS) or (adv < 0 and ratio <= 1 - EPS):
+                pg_grad = 0.0  # clipped
+            else:
+                pg_grad = ratio * adv
+            for i in range(N_ACTIONS):
+                for j in range(N_FEAT):
+                    theta[i][j] += LR * pg_grad * grad_logpi[i] * x[j]
 ```
 
 The "clipped → zero gradient" pattern is the heart of PPO. If the new policy has already drifted too far in the beneficial direction, the update stops.

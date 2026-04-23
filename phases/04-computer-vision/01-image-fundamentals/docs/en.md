@@ -30,20 +30,20 @@ Every production vision system is the same sequence of reversible transforms. Ge
 
 ```mermaid
 flowchart LR
- A["Image file<br/>(JPEG/PNG)"] --> B["Decode<br/>uint8 HWC"]
- B --> C["Convert<br/>colorspace<br/>(RGB/BGR/YCbCr)"]
- C --> D["Resize<br/>shorter side"]
- D --> E["Center crop<br/>model size"]
- E --> F["Divide by 255<br/>float32 [0,1]"]
- F --> G["Subtract mean<br/>Divide by std"]
- G --> H["Transpose<br/>HWC → CHW"]
- H --> I["Batch<br/>CHW → NCHW"]
- I --> J["Model"]
+    A["Image file<br/>(JPEG/PNG)"] --> B["Decode<br/>uint8 HWC"]
+    B --> C["Convert<br/>colorspace<br/>(RGB/BGR/YCbCr)"]
+    C --> D["Resize<br/>shorter side"]
+    D --> E["Center crop<br/>model size"]
+    E --> F["Divide by 255<br/>float32 [0,1]"]
+    F --> G["Subtract mean<br/>Divide by std"]
+    G --> H["Transpose<br/>HWC → CHW"]
+    H --> I["Batch<br/>CHW → NCHW"]
+    I --> J["Model"]
 
- style A fill:#fef3c7,stroke:#d97706
- style J fill:#ddd6fe,stroke:#7c3aed
- style G fill:#fecaca,stroke:#dc2626
- style H fill:#bfdbfe,stroke:#2563eb
+    style A fill:#fef3c7,stroke:#d97706
+    style J fill:#ddd6fe,stroke:#7c3aed
+    style G fill:#fecaca,stroke:#dc2626
+    style H fill:#bfdbfe,stroke:#2563eb
 ```
 
 The two red and blue boxes are where 80% of silent failures live: missing standardization and wrong layout.
@@ -53,14 +53,14 @@ The two red and blue boxes are where 80% of silent failures live: missing standa
 A camera sensor counts photons that land on a grid of tiny detectors. Each detector integrates light for a fraction of a second and emits a voltage proportional to how many photons hit it. The sensor then discretizes that voltage into an integer. One detector becomes one pixel.
 
 ```
-Continuous scene Sensor grid Digital image
-(infinite detail) (H x W detectors) (H x W integers)
+Continuous scene                 Sensor grid                     Digital image
+(infinite detail)                (H x W detectors)               (H x W integers)
 
- ~~~~~ +--+--+--+--+--+ 210 198 180 155 120
- ~ ~ ~ | | | | | | 205 195 178 152 118
- ~ light ~ ----> +--+--+--+--+--+ ----> 200 190 175 150 115
- ~~~~~ | | | | | | 195 185 170 148 112
- +--+--+--+--+--+ 188 180 165 145 108
+    ~~~~~                        +--+--+--+--+--+                 210 198 180 155 120
+   ~   ~   ~                     |  |  |  |  |  |                 205 195 178 152 118
+  ~ light ~      ---->           +--+--+--+--+--+     ---->       200 190 175 150 115
+   ~~~~~                         |  |  |  |  |  |                 195 185 170 148 112
+                                 +--+--+--+--+--+                 188 180 165 145 108
 ```
 
 Two choices happen at this step and they fix the ceiling on everything downstream:
@@ -77,12 +77,12 @@ One detector counts photons across the whole visible spectrum — that is graysc
 ```
 One pixel in memory:
 
- (R, G, B) = (210, 140, 30) <- reddish-orange
+    (R, G, B) = (210, 140, 30)   <- reddish-orange
 
 An H x W RGB image:
 
- shape (H, W, 3) stored as H rows of W pixels of 3 values
- each in [0, 255] for uint8
+    shape (H, W, 3)     stored as   H rows of W pixels of 3 values
+                                    each in [0, 255] for uint8
 ```
 
 Three is not magic. Depth cameras add a Z channel. Satellites add infrared and ultraviolet bands. Medical scans often have one channel (X-ray, CT) or many (hyperspectral). The number of channels is the last axis; conv layers learn to mix across it.
@@ -92,19 +92,19 @@ Three is not magic. Depth cameras add a Z channel. Satellites add infrared and u
 Same tensor, two orderings. Every library picks one.
 
 ```
-HWC (height, width, channels) CHW (channels, height, width)
+HWC (height, width, channels)           CHW (channels, height, width)
 
- W -> H ->
- +-----+-----+-----+ +-----+-----+
-H |R G B|R G B|R G B| C |R R R R R R|
-| +-----+-----+-----+ | +-----+-----+
-v |R G B|R G B|R G B| v |G G G G G G|
- +-----+-----+-----+ +-----+-----+
- |B B B B B B|
- +-----+-----+
+   W ->                                    H ->
+  +-----+-----+-----+                     +-----+-----+
+H |R G B|R G B|R G B|                   C |R R R R R R|
+| +-----+-----+-----+                   | +-----+-----+
+v |R G B|R G B|R G B|                   v |G G G G G G|
+  +-----+-----+-----+                     +-----+-----+
+                                          |B B B B B B|
+                                          +-----+-----+
 
- PIL, OpenCV, matplotlib, PyTorch, most deep learning
- almost every image file on disk frameworks, cuDNN kernels
+   PIL, OpenCV, matplotlib,              PyTorch, most deep learning
+   almost every image file on disk       frameworks, cuDNN kernels
 ```
 
 CHW exists because convolution kernels slide across H and W. Keeping the channel axis first means each kernel sees a contiguous 2D plane per channel, which vectorizes cleanly. Disk formats keep HWC because that matches how scanlines come out of a sensor.
@@ -112,26 +112,26 @@ CHW exists because convolution kernels slide across H and W. Keeping the channel
 The one-line conversion you will type a thousand times:
 
 ```
-img_chw = img_hwc.transpose(2, 0, 1) # NumPy
-img_chw = img_hwc.permute(2, 0, 1) # PyTorch tensor
+img_chw = img_hwc.transpose(2, 0, 1)      # NumPy
+img_chw = img_hwc.permute(2, 0, 1)        # PyTorch tensor
 ```
 
 Memory layout, visualised:
 
 ```mermaid
 flowchart TB
- subgraph HWC["HWC — pixels stored interleaved (PIL, OpenCV, JPEG)"]
- H1["row 0: R G B | R G B | R G B..."]
- H2["row 1: R G B | R G B | R G B..."]
- H3["row 2: R G B | R G B | R G B..."]
- end
- subgraph CHW["CHW — channels stored as stacked planes (PyTorch, cuDNN)"]
- C1["plane R: entire H x W of red values"]
- C2["plane G: entire H x W of green values"]
- C3["plane B: entire H x W of blue values"]
- end
- HWC -->|"transpose(2, 0, 1)"| CHW
- CHW -->|"transpose(1, 2, 0)"| HWC
+    subgraph HWC["HWC — pixels stored interleaved (PIL, OpenCV, JPEG)"]
+        H1["row 0: R G B | R G B | R G B ..."]
+        H2["row 1: R G B | R G B | R G B ..."]
+        H3["row 2: R G B | R G B | R G B ..."]
+    end
+    subgraph CHW["CHW — channels stored as stacked planes (PyTorch, cuDNN)"]
+        C1["plane R: entire H x W of red values"]
+        C2["plane G: entire H x W of green values"]
+        C3["plane B: entire H x W of blue values"]
+    end
+    HWC -->|"transpose(2, 0, 1)"| CHW
+    CHW -->|"transpose(1, 2, 0)"| HWC
 ```
 
 ### Byte ranges and dtype
@@ -151,18 +151,18 @@ Convolutional networks were trained on standardized inputs. ImageNet stats `mean
 RGB is the capture format but it is not always the most useful representation for a model.
 
 ```
- RGB HSV YCbCr / YUV
+ RGB               HSV                       YCbCr / YUV
 
- R red H hue (angle 0-360) Y luminance (brightness)
- G green S saturation (0-1) Cb chroma blue-yellow
- B blue V value/brightness (0-1) Cr chroma red-green
+ R red             H hue (angle 0-360)       Y luminance (brightness)
+ G green           S saturation (0-1)        Cb chroma blue-yellow
+ B blue            V value/brightness (0-1)  Cr chroma red-green
 
- Linear to Separates color from Separates brightness from
- sensor output brightness. Useful for color. JPEG and most video
- color thresholding, UI codecs compress the chroma
- sliders, simple filters channels harder because the
- human eye is less sensitive
- to chroma detail than to Y.
+ Linear to         Separates color from      Separates brightness from
+ sensor output     brightness. Useful for    color. JPEG and most video
+                   color thresholding, UI    codecs compress the chroma
+                   sliders, simple filters   channels harder because the
+                                             human eye is less sensitive
+                                             to chroma detail than to Y.
 ```
 
 For most modern CNNs you feed RGB. You meet other spaces when:
@@ -174,7 +174,7 @@ For most modern CNNs you feed RGB. You meet other spaces when:
 Grayscale from RGB is a weighted sum, not an average, because the human eye is more sensitive to green than to red or blue:
 
 ```
-Y = 0.299 R + 0.587 G + 0.114 B (ITU-R BT.601, the classic weights)
+Y = 0.299 R + 0.587 G + 0.114 B       (ITU-R BT.601, the classic weights)
 ```
 
 ### Aspect ratio, resizing, and interpolation
@@ -188,10 +188,10 @@ Every model has a fixed input size (224x224 for most ImageNet classifiers, 384x3
 The interpolation method decides how intermediate pixels are computed when the new grid does not align with the old one:
 
 ```
-Nearest neighbour fastest, blocky, only choice for masks/labels
-Bilinear fast, smooth, default for most image resizing
-Bicubic slower, sharper on upscaling
-Lanczos slowest, best quality, used for final display
+Nearest neighbour     fastest, blocky, only choice for masks/labels
+Bilinear              fast, smooth, default for most image resizing
+Bicubic               slower, sharper on upscaling
+Lanczos               slowest, best quality, used for final display
 ```
 
 Rule of thumb: bilinear for training, bicubic or lanczos for assets you will look at, nearest for anything containing integer class IDs.
@@ -207,23 +207,23 @@ import numpy as np
 from PIL import Image
 
 def synthetic_rgb(h=128, w=192, seed=0):
- rng = np.random.default_rng(seed)
- yy, xx = np.meshgrid(np.linspace(0, 1, h), np.linspace(0, 1, w), indexing="ij")
- r = (np.sin(xx * 6) * 0.5 + 0.5) * 255
- g = yy * 255
- b = (1 - yy) * xx * 255
- rgb = np.stack([r, g, b], axis=-1) + rng.normal(0, 6, (h, w, 3))
- return np.clip(rgb, 0, 255).astype(np.uint8)
+    rng = np.random.default_rng(seed)
+    yy, xx = np.meshgrid(np.linspace(0, 1, h), np.linspace(0, 1, w), indexing="ij")
+    r = (np.sin(xx * 6) * 0.5 + 0.5) * 255
+    g = yy * 255
+    b = (1 - yy) * xx * 255
+    rgb = np.stack([r, g, b], axis=-1) + rng.normal(0, 6, (h, w, 3))
+    return np.clip(rgb, 0, 255).astype(np.uint8)
 
 arr = synthetic_rgb()
 # Or load from disk:
 # arr = np.asarray(Image.open("your_image.jpg").convert("RGB"))
 
-print(f"type: {type(arr).__name__}")
-print(f"dtype: {arr.dtype}")
-print(f"shape: {arr.shape} # (H, W, C)")
-print(f"min: {arr.min()}")
-print(f"max: {arr.max()}")
+print(f"type:   {type(arr).__name__}")
+print(f"dtype:  {arr.dtype}")
+print(f"shape:  {arr.shape}     # (H, W, C)")
+print(f"min:    {arr.min()}")
+print(f"max:    {arr.max()}")
 print(f"pixel at (0, 0): {arr[0, 0]}")
 ```
 
@@ -254,34 +254,34 @@ Weighted-sum grayscale, then a manual RGB-to-HSV.
 
 ```python
 def rgb_to_grayscale(rgb):
- weights = np.array([0.299, 0.587, 0.114], dtype=np.float32)
- return (rgb.astype(np.float32) @ weights).astype(np.uint8)
+    weights = np.array([0.299, 0.587, 0.114], dtype=np.float32)
+    return (rgb.astype(np.float32) @ weights).astype(np.uint8)
 
 def rgb_to_hsv(rgb):
- rgb_f = rgb.astype(np.float32) / 255.0
- r, g, b = rgb_f[..., 0], rgb_f[..., 1], rgb_f[..., 2]
- cmax = np.max(rgb_f, axis=-1)
- cmin = np.min(rgb_f, axis=-1)
- delta = cmax - cmin
+    rgb_f = rgb.astype(np.float32) / 255.0
+    r, g, b = rgb_f[..., 0], rgb_f[..., 1], rgb_f[..., 2]
+    cmax = np.max(rgb_f, axis=-1)
+    cmin = np.min(rgb_f, axis=-1)
+    delta = cmax - cmin
 
- h = np.zeros_like(cmax)
- mask = delta > 0
- rmax = mask & (cmax == r)
- gmax = mask & (cmax == g)
- bmax = mask & (cmax == b)
- h[rmax] = ((g[rmax] - b[rmax]) / delta[rmax]) % 6
- h[gmax] = ((b[gmax] - r[gmax]) / delta[gmax]) + 2
- h[bmax] = ((r[bmax] - g[bmax]) / delta[bmax]) + 4
- h = h * 60.0
+    h = np.zeros_like(cmax)
+    mask = delta > 0
+    rmax = mask & (cmax == r)
+    gmax = mask & (cmax == g)
+    bmax = mask & (cmax == b)
+    h[rmax] = ((g[rmax] - b[rmax]) / delta[rmax]) % 6
+    h[gmax] = ((b[gmax] - r[gmax]) / delta[gmax]) + 2
+    h[bmax] = ((r[bmax] - g[bmax]) / delta[bmax]) + 4
+    h = h * 60.0
 
- s = np.where(cmax > 0, delta / cmax, 0)
- v = cmax
- return np.stack([h, s, v], axis=-1)
+    s = np.where(cmax > 0, delta / cmax, 0)
+    v = cmax
+    return np.stack([h, s, v], axis=-1)
 
 gray = rgb_to_grayscale(arr)
 hsv = rgb_to_hsv(arr)
 print(f"gray shape: {gray.shape}, range: [{gray.min()}, {gray.max()}]")
-print(f"hsv shape: {hsv.shape}")
+print(f"hsv   shape: {hsv.shape}")
 print(f"hue range: [{hsv[..., 0].min():.1f}, {hsv[..., 0].max():.1f}] degrees")
 print(f"sat range: [{hsv[..., 1].min():.2f}, {hsv[..., 1].max():.2f}]")
 print(f"val range: [{hsv[..., 2].min():.2f}, {hsv[..., 2].max():.2f}]")
@@ -298,26 +298,26 @@ mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 def preprocess_imagenet(rgb_uint8):
- x = rgb_uint8.astype(np.float32) / 255.0
- x = (x - mean) / std
- x = x.transpose(2, 0, 1)
- return x
+    x = rgb_uint8.astype(np.float32) / 255.0
+    x = (x - mean) / std
+    x = x.transpose(2, 0, 1)
+    return x
 
 def deprocess_imagenet(chw_float32):
- x = chw_float32.transpose(1, 2, 0)
- x = x * std + mean
- x = np.clip(x * 255.0, 0, 255).astype(np.uint8)
- return x
+    x = chw_float32.transpose(1, 2, 0)
+    x = x * std + mean
+    x = np.clip(x * 255.0, 0, 255).astype(np.uint8)
+    return x
 
 x = preprocess_imagenet(arr)
-print(f"preprocessed shape: {x.shape} # (C, H, W)")
+print(f"preprocessed shape: {x.shape}     # (C, H, W)")
 print(f"preprocessed dtype: {x.dtype}")
-print(f"preprocessed mean per channel: {x.mean(axis=(1, 2)).round(3)}")
-print(f"preprocessed std per channel: {x.std(axis=(1, 2)).round(3)}")
+print(f"preprocessed mean per channel:  {x.mean(axis=(1, 2)).round(3)}")
+print(f"preprocessed std  per channel:  {x.std(axis=(1, 2)).round(3)}")
 
 roundtrip = deprocess_imagenet(x)
 max_diff = np.abs(roundtrip.astype(int) - arr.astype(int)).max()
-print(f"roundtrip max pixel diff: {max_diff} # should be 0 or 1")
+print(f"roundtrip max pixel diff: {max_diff}    # should be 0 or 1")
 ```
 
 Per-channel mean should be close to zero, std close to one. The preprocess/deprocess pair is exactly what every torchvision `transforms.Normalize` call is doing under the hood.
@@ -334,12 +334,12 @@ bilinear = np.asarray(Image.fromarray(arr).resize(target[::-1], Image.BILINEAR))
 bicubic = np.asarray(Image.fromarray(arr).resize(target[::-1], Image.BICUBIC))
 
 def local_roughness(x):
- gy = np.diff(x.astype(float), axis=0)
- gx = np.diff(x.astype(float), axis=1)
- return float(np.abs(gy).mean() + np.abs(gx).mean())
+    gy = np.diff(x.astype(float), axis=0)
+    gx = np.diff(x.astype(float), axis=1)
+    return float(np.abs(gy).mean() + np.abs(gx).mean())
 
 for name, out in [("nearest", nearest), ("bilinear", bilinear), ("bicubic", bicubic)]:
- print(f"{name:>8} shape={out.shape} roughness={local_roughness(out):6.2f}")
+    print(f"{name:>8}  shape={out.shape}  roughness={local_roughness(out):6.2f}")
 ```
 
 Nearest scores highest on roughness because it keeps hard edges. Bilinear is the smoothest. Bicubic sits in between, preserving perceived sharpness without the stair-step artifacts.
@@ -356,21 +356,21 @@ from PIL import Image
 img = Image.fromarray(synthetic_rgb(256, 256))
 
 pipeline = transforms.Compose([
- transforms.Resize(256),
- transforms.CenterCrop(224),
- transforms.ToTensor(),
- transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
 x = pipeline(img)
-print(f"tensor type: {type(x).__name__}")
+print(f"tensor type:  {type(x).__name__}")
 print(f"tensor dtype: {x.dtype}")
-print(f"tensor shape: {tuple(x.shape)} # (C, H, W)")
+print(f"tensor shape: {tuple(x.shape)}      # (C, H, W)")
 print(f"per-channel mean: {x.mean(dim=(1, 2)).tolist()}")
-print(f"per-channel std: {x.std(dim=(1, 2)).tolist()}")
+print(f"per-channel std:  {x.std(dim=(1, 2)).tolist()}")
 
 batch = x.unsqueeze(0)
-print(f"\nbatched shape: {tuple(batch.shape)} # (N, C, H, W) — ready for a model")
+print(f"\nbatched shape: {tuple(batch.shape)}   # (N, C, H, W) — ready for a model")
 ```
 
 Four steps, in this exact order: `Resize(256)` scales the shorter side to 256; `CenterCrop(224)` takes a 224x224 patch from the middle; `ToTensor()` divides by 255 and swaps HWC to CHW; `Normalize` subtracts the ImageNet mean and divides by std. Reversing that order silently changes what reaches the model.

@@ -34,25 +34,25 @@ A single agent is one loop, one context window, one system prompt. Picture it:
 
 ```
 ┌─────────────────────────────────────────┐
-│ SINGLE AGENT │
-│ │
-│ ┌───────────────────────────────────┐ │
-│ │ Context Window │ │
-│ │ │ │
-│ │ research notes │ │
-│ │ + code files │ │
-│ │ + test output │ │
-│ │ + review feedback │ │
-│ │ + API docs │ │
-│ │ +... │ │
-│ │ │ │
-│ │ ██████████████████████ FULL ███ │ │
-│ └───────────────────────────────────┘ │
-│ │
-│ One system prompt tries to cover │
-│ research + coding + review + testing │
-│ │
-│ Result: mediocre at everything │
+│            SINGLE AGENT                 │
+│                                         │
+│  ┌───────────────────────────────────┐  │
+│  │         Context Window            │  │
+│  │                                   │  │
+│  │  research notes                   │  │
+│  │  + code files                     │  │
+│  │  + test output                    │  │
+│  │  + review feedback                │  │
+│  │  + API docs                       │  │
+│  │  + ...                            │  │
+│  │                                   │  │
+│  │  ██████████████████████ FULL ███  │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  One system prompt tries to cover       │
+│  research + coding + review + testing   │
+│                                         │
+│  Result: mediocre at everything         │
 └─────────────────────────────────────────┘
 ```
 
@@ -70,26 +70,26 @@ Split the work. Give each agent one job, one context window, and one system prom
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ ORCHESTRATOR │
-│ │
-│ "Build a REST API for user management" │
-│ │
-│ ┌──────────┬──────────┬──────────┐ │
-│ │ │ │ │ │
-│ ▼ ▼ ▼ ▼ │
-│ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│ │RESEARCHER│ │ CODER │ │ REVIEWER │ │ TESTER │ │
-│ │ │ │ │ │ │ │ │ │
-│ │ Reads │ │ Writes │ │ Checks │ │ Runs │ │
-│ │ docs, │ │ code │ │ code │ │ tests, │ │
-│ │ finds │ │ based on │ │ quality, │ │ reports │ │
-│ │ patterns │ │ research │ │ finds │ │ results │ │
-│ │ │ │ + spec │ │ bugs │ │ │ │
-│ └─────┬────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘ │
-│ │ │ │ │ │
-│ └───────────┴────────────┴─────────────┘ │
-│ │ │
-│ Merge results │
+│                    ORCHESTRATOR                          │
+│                                                          │
+│  "Build a REST API for user management"                  │
+│                                                          │
+│         ┌──────────┬──────────┬──────────┐               │
+│         │          │          │          │               │
+│         ▼          ▼          ▼          ▼               │
+│   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
+│   │RESEARCHER│ │  CODER   │ │ REVIEWER │ │  TESTER  │  │
+│   │          │ │          │ │          │ │          │  │
+│   │ Reads    │ │ Writes   │ │ Checks   │ │ Runs     │  │
+│   │ docs,    │ │ code     │ │ code     │ │ tests,   │  │
+│   │ finds    │ │ based on │ │ quality, │ │ reports  │  │
+│   │ patterns │ │ research │ │ finds    │ │ results  │  │
+│   │          │ │ + spec   │ │ bugs     │ │          │  │
+│   └─────┬────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘  │
+│         │           │            │             │         │
+│         └───────────┴────────────┴─────────────┘         │
+│                          │                               │
+│                     Merge results                        │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -115,21 +115,21 @@ Multi-agent is not binary. It is a spectrum:
 ```
 SIMPLE ──────────────────────────────────────────── COMPLEX
 
- Single Sub- Pipeline Team Swarm
- Agent agents
+ Single        Sub-         Pipeline      Team         Swarm
+ Agent         agents
 
- ┌───┐ ┌───┐ ┌───┐───┐ ┌───┐───┐ ┌─┐┌─┐┌─┐
- │ A │ │ A │ │ A │ B │ │ A │ B │ │ ││ ││ │
- └───┘ └─┬─┘ └───┘─┬─┘ └─┬─┘─┬─┘ └┬┘└┬┘└┬┘
- │ │ │ │ ┌┴──┴──┴┐
- ┌─┴─┐ ┌───┘───┐ │ │ │shared │
- │ a │ │ C │ D │ ┌─┴───┴─┐ │ state │
- └───┘ └───┘───┘ │ msg │ └───────┘
- │ bus │
- 1 loop Parent + Stage by │ │ N peers,
- 1 context child tasks stage └───────┘ emergent
- Explicit behavior
- roles
+ ┌───┐       ┌───┐        ┌───┐───┐    ┌───┐───┐    ┌─┐┌─┐┌─┐
+ │ A │       │ A │        │ A │ B │    │ A │ B │    │ ││ ││ │
+ └───┘       └─┬─┘        └───┘─┬─┘    └─┬─┘─┬─┘    └┬┘└┬┘└┬┘
+               │                │        │   │       ┌┴──┴──┴┐
+             ┌─┴─┐          ┌───┘───┐    │   │       │shared │
+             │ a │          │ C │ D │  ┌─┴───┴─┐    │ state │
+             └───┘          └───┘───┘  │  msg   │    └───────┘
+                                       │  bus   │
+ 1 loop      Parent +      Stage by    │       │    N peers,
+ 1 context   child tasks   stage       └───────┘    emergent
+                                       Explicit      behavior
+                                       roles
 ```
 
 **Single agent** - one loop, one prompt. Good for simple tasks.
@@ -148,7 +148,7 @@ SIMPLE ────────────────────────�
 
 ```
 Input ──▶ Agent A ──▶ Agent B ──▶ Agent C ──▶ Output
- (research) (code) (review)
+          (research)  (code)      (review)
 ```
 
 Each agent transforms the data and passes it forward. Simple to reason about. Failure in one stage blocks the rest.
@@ -156,11 +156,11 @@ Each agent transforms the data and passes it forward. Simple to reason about. Fa
 #### Pattern 2: Fan-out / Fan-in
 
 ```
- ┌──▶ Agent A ──┐
- │ │
+                ┌──▶ Agent A ──┐
+                │              │
 Input ──▶ Split ├──▶ Agent B ──├──▶ Merge ──▶ Output
- │ │
- └──▶ Agent C ──┘
+                │              │
+                └──▶ Agent C ──┘
 ```
 
 Split work across parallel agents, then merge results. Good for tasks that decompose into independent subtasks.
@@ -168,15 +168,15 @@ Split work across parallel agents, then merge results. Good for tasks that decom
 #### Pattern 3: Orchestrator-Worker
 
 ```
- ┌──────────┐
- │ Orch. │
- └──┬───┬───┘
- task │ │ task
- ┌─────┘ └─────┐
- ▼ ▼
- ┌──────────┐ ┌──────────┐
- │ Worker A │ │ Worker B │
- └──────────┘ └──────────┘
+                    ┌──────────┐
+                    │  Orch.   │
+                    └──┬───┬───┘
+                  task │   │ task
+                 ┌─────┘   └─────┐
+                 ▼               ▼
+           ┌──────────┐   ┌──────────┐
+           │ Worker A │   │ Worker B │
+           └──────────┘   └──────────┘
 ```
 
 A smart orchestrator decides what to do, delegates to workers, and synthesizes results. The orchestrator is itself an agent with tools for spawning workers.
@@ -184,19 +184,19 @@ A smart orchestrator decides what to do, delegates to workers, and synthesizes r
 #### Pattern 4: Peer Swarm
 
 ```
- ┌───┐ ◄──── msg ────▶ ┌───┐
- │ A │ │ B │
- └─┬─┘ └─┬─┘
- │ │
- msg │ ┌───────────┐ │ msg
- └───▶│ Shared │◄────┘
- │ State │
- ┌───▶│ / Queue │◄────┐
- │ └───────────┘ │
- msg │ │ msg
- ┌─┴─┐ ┌─┴─┐
- │ C │ ◄──── msg ────▶ │ D │
- └───┘ └───┘
+         ┌───┐ ◄──── msg ────▶ ┌───┐
+         │ A │                  │ B │
+         └─┬─┘                  └─┬─┘
+           │                      │
+      msg  │    ┌───────────┐     │ msg
+           └───▶│  Shared   │◄────┘
+                │  State    │
+           ┌───▶│  / Queue  │◄────┐
+           │    └───────────┘     │
+      msg  │                      │ msg
+         ┌─┴─┐                  ┌─┴─┐
+         │ C │ ◄──── msg ────▶ │ D │
+         └───┘                  └───┘
 ```
 
 No central orchestrator. Agents communicate peer-to-peer. Decisions emerge from interaction. Harder to debug, but scales to many agents.
@@ -227,49 +227,49 @@ Here is a single agent trying to do everything. It has one massive system prompt
 
 ```typescript
 type AgentResult = {
- content: string;
- tokensUsed: number;
- toolCalls: number;
+  content: string;
+  tokensUsed: number;
+  toolCalls: number;
 };
 
 async function singleAgentApproach(task: string): Promise<AgentResult> {
- const systemPrompt = `You are a full-stack developer. You must:
+  const systemPrompt = `You are a full-stack developer. You must:
 1. Research the requirements
 2. Write the code
 3. Review the code for bugs
 4. Write tests
 Do ALL of these in a single conversation.`;
 
- const contextWindow: string[] = [];
- let totalTokens = 0;
- let totalToolCalls = 0;
+  const contextWindow: string[] = [];
+  let totalTokens = 0;
+  let totalToolCalls = 0;
 
- const research = await fakeLLMCall(systemPrompt, `Research: ${task}`);
- contextWindow.push(research.output);
- totalTokens += research.tokens;
- totalToolCalls += research.calls;
+  const research = await fakeLLMCall(systemPrompt, `Research: ${task}`);
+  contextWindow.push(research.output);
+  totalTokens += research.tokens;
+  totalToolCalls += research.calls;
 
- const code = await fakeLLMCall(
- systemPrompt,
- `Given this research:\n${contextWindow.join("\n")}\n\nNow write code for: ${task}`
- );
- contextWindow.push(code.output);
- totalTokens += code.tokens;
- totalToolCalls += code.calls;
+  const code = await fakeLLMCall(
+    systemPrompt,
+    `Given this research:\n${contextWindow.join("\n")}\n\nNow write code for: ${task}`
+  );
+  contextWindow.push(code.output);
+  totalTokens += code.tokens;
+  totalToolCalls += code.calls;
 
- const review = await fakeLLMCall(
- systemPrompt,
- `Given all previous context:\n${contextWindow.join("\n")}\n\nReview the code.`
- );
- contextWindow.push(review.output);
- totalTokens += review.tokens;
- totalToolCalls += review.calls;
+  const review = await fakeLLMCall(
+    systemPrompt,
+    `Given all previous context:\n${contextWindow.join("\n")}\n\nReview the code.`
+  );
+  contextWindow.push(review.output);
+  totalTokens += review.tokens;
+  totalToolCalls += review.calls;
 
- return {
- content: contextWindow.join("\n---\n"),
- tokensUsed: totalTokens,
- toolCalls: totalToolCalls,
- };
+  return {
+    content: contextWindow.join("\n---\n"),
+    tokensUsed: totalTokens,
+    toolCalls: totalToolCalls,
+  };
 }
 ```
 
@@ -284,39 +284,39 @@ Now split it. Each agent gets one job:
 
 ```typescript
 type SpecialistAgent = {
- name: string;
- systemPrompt: string;
- run: (input: string) => Promise<AgentResult>;
+  name: string;
+  systemPrompt: string;
+  run: (input: string) => Promise<AgentResult>;
 };
 
 function createSpecialist(name: string, systemPrompt: string): SpecialistAgent {
- return {
- name,
- systemPrompt,
- run: async (input: string) => {
- const result = await fakeLLMCall(systemPrompt, input);
- return {
- content: result.output,
- tokensUsed: result.tokens,
- toolCalls: result.calls,
- };
- },
- };
+  return {
+    name,
+    systemPrompt,
+    run: async (input: string) => {
+      const result = await fakeLLMCall(systemPrompt, input);
+      return {
+        content: result.output,
+        tokensUsed: result.tokens,
+        toolCalls: result.calls,
+      };
+    },
+  };
 }
 
 const researcher = createSpecialist(
- "researcher",
- "You are a technical researcher. Read documentation, find patterns, and summarize findings. Output only the facts needed for implementation."
+  "researcher",
+  "You are a technical researcher. Read documentation, find patterns, and summarize findings. Output only the facts needed for implementation."
 );
 
 const coder = createSpecialist(
- "coder",
- "You are a senior TypeScript developer. Given requirements and research notes, write clean, tested code. Nothing else."
+  "coder",
+  "You are a senior TypeScript developer. Given requirements and research notes, write clean, tested code. Nothing else."
 );
 
 const reviewer = createSpecialist(
- "reviewer",
- "You are a code reviewer. Find bugs, security issues, and logic errors. Be specific. Cite line numbers."
+  "reviewer",
+  "You are a code reviewer. Find bugs, security issues, and logic errors. Be specific. Cite line numbers."
 );
 ```
 
@@ -328,56 +328,62 @@ Wire the specialists together with explicit message passing:
 
 ```typescript
 type AgentMessage = {
- from: string;
- to: string;
- content: string;
- timestamp: number;
+  from: string;
+  to: string;
+  content: string;
+  timestamp: number;
 };
 
 async function multiAgentApproach(task: string): Promise<AgentResult> {
- const messages: AgentMessage[] = [];
- let totalTokens = 0;
- let totalToolCalls = 0;
+  const messages: AgentMessage[] = [];
+  let totalTokens = 0;
+  let totalToolCalls = 0;
 
- const researchResult = await researcher.run(task);
- messages.push({
- from: "researcher",
- to: "coder",
- content: researchResult.content,
- timestamp: Date.now(),
- });
- totalTokens += researchResult.tokensUsed;
- totalToolCalls += researchResult.toolCalls;
+  const researchResult = await researcher.run(task);
+  messages.push({
+    from: "researcher",
+    to: "coder",
+    content: researchResult.content,
+    timestamp: Date.now(),
+  });
+  totalTokens += researchResult.tokensUsed;
+  totalToolCalls += researchResult.toolCalls;
 
- const coderInput = messages.filter((m) => m.to === "coder").map((m) => `[From ${m.from}]: ${m.content}`).join("\n");
+  const coderInput = messages
+    .filter((m) => m.to === "coder")
+    .map((m) => `[From ${m.from}]: ${m.content}`)
+    .join("\n");
 
- const codeResult = await coder.run(coderInput);
- messages.push({
- from: "coder",
- to: "reviewer",
- content: codeResult.content,
- timestamp: Date.now(),
- });
- totalTokens += codeResult.tokensUsed;
- totalToolCalls += codeResult.toolCalls;
+  const codeResult = await coder.run(coderInput);
+  messages.push({
+    from: "coder",
+    to: "reviewer",
+    content: codeResult.content,
+    timestamp: Date.now(),
+  });
+  totalTokens += codeResult.tokensUsed;
+  totalToolCalls += codeResult.toolCalls;
 
- const reviewerInput = messages.filter((m) => m.to === "reviewer").map((m) => `[From ${m.from}]: ${m.content}`).join("\n");
+  const reviewerInput = messages
+    .filter((m) => m.to === "reviewer")
+    .map((m) => `[From ${m.from}]: ${m.content}`)
+    .join("\n");
 
- const reviewResult = await reviewer.run(reviewerInput);
- messages.push({
- from: "reviewer",
- to: "orchestrator",
- content: reviewResult.content,
- timestamp: Date.now(),
- });
- totalTokens += reviewResult.tokensUsed;
- totalToolCalls += reviewResult.toolCalls;
+  const reviewResult = await reviewer.run(reviewerInput);
+  messages.push({
+    from: "reviewer",
+    to: "orchestrator",
+    content: reviewResult.content,
+    timestamp: Date.now(),
+  });
+  totalTokens += reviewResult.tokensUsed;
+  totalToolCalls += reviewResult.toolCalls;
 
- return {
- content: messages.map((m) => `[${m.from} -> ${m.to}]: ${m.content}`).join("\n\n"),
- tokensUsed: totalTokens,
- toolCalls: totalToolCalls,
- };
+  return {
+    content: messages.map((m) => `[${m.from} -> ${m.to}]: ${m.content}`).join("\n\n"),
+    tokensUsed: totalTokens,
+    toolCalls: totalToolCalls,
+  };
 }
 ```
 
@@ -387,17 +393,17 @@ Each agent receives only the messages addressed to it. No context pollution. The
 
 ```typescript
 async function compare() {
- const task = "Build a rate limiter middleware for an Express.js API";
+  const task = "Build a rate limiter middleware for an Express.js API";
 
- console.log("=== Single Agent ===");
- const single = await singleAgentApproach(task);
- console.log(`Tokens: ${single.tokensUsed}`);
- console.log(`Tool calls: ${single.toolCalls}`);
+  console.log("=== Single Agent ===");
+  const single = await singleAgentApproach(task);
+  console.log(`Tokens: ${single.tokensUsed}`);
+  console.log(`Tool calls: ${single.toolCalls}`);
 
- console.log("\n=== Multi-Agent ===");
- const multi = await multiAgentApproach(task);
- console.log(`Tokens: ${multi.tokensUsed}`);
- console.log(`Tool calls: ${multi.toolCalls}`);
+  console.log("\n=== Multi-Agent ===");
+  const multi = await multiAgentApproach(task);
+  console.log(`Tokens: ${multi.tokensUsed}`);
+  console.log(`Tool calls: ${multi.toolCalls}`);
 }
 ```
 

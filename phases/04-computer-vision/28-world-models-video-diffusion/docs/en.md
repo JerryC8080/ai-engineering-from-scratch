@@ -28,21 +28,21 @@ This lesson is the "big picture" lesson for Phase 4. It connects image generatio
 
 ```mermaid
 flowchart LR
- subgraph GEN["Pure video generation"]
- G1["Text / image prompt"] --> G2["Video DiT"] --> G3["Video frames"]
- end
- subgraph ACTION["Action-conditioned world model"]
- A1["Past frames + action"] --> A2["Latent-action video DiT"] --> A3["Next frames"]
- A3 --> A1
- end
- subgraph RL["World models for RL (DreamerV3)"]
- R1["State + action"] --> R2["Latent transition model"] --> R3["Next latent + reward"]
- R3 --> R1
- end
+    subgraph GEN["Pure video generation"]
+        G1["Text / image prompt"] --> G2["Video DiT"] --> G3["Video frames"]
+    end
+    subgraph ACTION["Action-conditioned world model"]
+        A1["Past frames + action"] --> A2["Latent-action video DiT"] --> A3["Next frames"]
+        A3 --> A1
+    end
+    subgraph RL["World models for RL (DreamerV3)"]
+        R1["State + action"] --> R2["Latent transition model"] --> R3["Next latent + reward"]
+        R3 --> R1
+    end
 
- style GEN fill:#dbeafe,stroke:#2563eb
- style ACTION fill:#fef3c7,stroke:#d97706
- style RL fill:#dcfce7,stroke:#16a34a
+    style GEN fill:#dbeafe,stroke:#2563eb
+    style ACTION fill:#fef3c7,stroke:#d97706
+    style RL fill:#dcfce7,stroke:#16a34a
 ```
 
 - **Sora 2** is pure video generation conditioned on prompts. No action interface. You cannot "steer" it mid-rollout.
@@ -52,10 +52,10 @@ flowchart LR
 ### Video DiT architecture
 
 ```
-Video latent: (C, T, H, W)
-Patchify (spatial): grid of P_h x P_w patches per frame
-Patchify (temporal): group P_t frames into a temporal patch
-Resulting tokens: (T / P_t) * (H / P_h) * (W / P_w) tokens
+Video latent:          (C, T, H, W)
+Patchify (spatial):    grid of P_h x P_w patches per frame
+Patchify (temporal):   group P_t frames into a temporal patch
+Resulting tokens:      (T / P_t) * (H / P_h) * (W / P_w) tokens
 ```
 
 Positional encoding is 3D: a rotary or learned embedding per (t, h, w) coordinate. Attention can be:
@@ -129,23 +129,23 @@ import torch.nn as nn
 
 
 class VideoPatch3D(nn.Module):
- def __init__(self, in_channels=4, dim=64, patch_t=2, patch_h=2, patch_w=2):
- super().__init__()
- self.proj = nn.Conv3d(
- in_channels, dim,
- kernel_size=(patch_t, patch_h, patch_w),
- stride=(patch_t, patch_h, patch_w),
- )
- self.patch_t = patch_t
- self.patch_h = patch_h
- self.patch_w = patch_w
+    def __init__(self, in_channels=4, dim=64, patch_t=2, patch_h=2, patch_w=2):
+        super().__init__()
+        self.proj = nn.Conv3d(
+            in_channels, dim,
+            kernel_size=(patch_t, patch_h, patch_w),
+            stride=(patch_t, patch_h, patch_w),
+        )
+        self.patch_t = patch_t
+        self.patch_h = patch_h
+        self.patch_w = patch_w
 
- def forward(self, x):
- # x: (N, C, T, H, W)
- x = self.proj(x)
- n, c, t, h, w = x.shape
- tokens = x.reshape(n, c, t * h * w).transpose(1, 2)
- return tokens, (t, h, w)
+    def forward(self, x):
+        # x: (N, C, T, H, W)
+        x = self.proj(x)
+        n, c, t, h, w = x.shape
+        tokens = x.reshape(n, c, t * h * w).transpose(1, 2)
+        return tokens, (t, h, w)
 ```
 
 A 3D conv with stride equal to kernel acts as the spatio-temporal patchifier. `(T, H, W) -> (T/2, H/2, W/2)` grid of tokens.
@@ -156,27 +156,27 @@ Rotary Position Embeddings (RoPE) separately applied along `t`, `h`, `w` axes:
 
 ```python
 def rope_3d(tokens, t_dim, h_dim, w_dim, grid):
- """
- tokens: (N, T*H*W, D)
- grid: (T, H, W) sizes
- t_dim + h_dim + w_dim == D
- """
- T, H, W = grid
- n, seq, d = tokens.shape
- if t_dim + h_dim + w_dim != d:
- raise ValueError(f"t_dim+h_dim+w_dim ({t_dim}+{h_dim}+{w_dim}) must equal D={d}")
- assert seq == T * H * W
- t_idx = torch.arange(T, device=tokens.device).repeat_interleave(H * W)
- h_idx = torch.arange(H, device=tokens.device).repeat_interleave(W).repeat(T)
- w_idx = torch.arange(W, device=tokens.device).repeat(T * H)
- # Simplified: just scale channels by frequencies. Real RoPE rotates pairs.
- freqs_t = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(t_dim // 2, device=tokens.device) / (t_dim // 2))
- freqs_h = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(h_dim // 2, device=tokens.device) / (h_dim // 2))
- freqs_w = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(w_dim // 2, device=tokens.device) / (w_dim // 2))
- emb_t = torch.cat([torch.sin(t_idx[:, None] * freqs_t), torch.cos(t_idx[:, None] * freqs_t)], dim=-1)
- emb_h = torch.cat([torch.sin(h_idx[:, None] * freqs_h), torch.cos(h_idx[:, None] * freqs_h)], dim=-1)
- emb_w = torch.cat([torch.sin(w_idx[:, None] * freqs_w), torch.cos(w_idx[:, None] * freqs_w)], dim=-1)
- return tokens + torch.cat([emb_t, emb_h, emb_w], dim=-1)
+    """
+    tokens: (N, T*H*W, D)
+    grid: (T, H, W) sizes
+    t_dim + h_dim + w_dim == D
+    """
+    T, H, W = grid
+    n, seq, d = tokens.shape
+    if t_dim + h_dim + w_dim != d:
+        raise ValueError(f"t_dim+h_dim+w_dim ({t_dim}+{h_dim}+{w_dim}) must equal D={d}")
+    assert seq == T * H * W
+    t_idx = torch.arange(T, device=tokens.device).repeat_interleave(H * W)
+    h_idx = torch.arange(H, device=tokens.device).repeat_interleave(W).repeat(T)
+    w_idx = torch.arange(W, device=tokens.device).repeat(T * H)
+    # Simplified: just scale channels by frequencies. Real RoPE rotates pairs.
+    freqs_t = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(t_dim // 2, device=tokens.device) / (t_dim // 2))
+    freqs_h = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(h_dim // 2, device=tokens.device) / (h_dim // 2))
+    freqs_w = torch.exp(-torch.log(torch.tensor(10000.0)) * torch.arange(w_dim // 2, device=tokens.device) / (w_dim // 2))
+    emb_t = torch.cat([torch.sin(t_idx[:, None] * freqs_t), torch.cos(t_idx[:, None] * freqs_t)], dim=-1)
+    emb_h = torch.cat([torch.sin(h_idx[:, None] * freqs_h), torch.cos(h_idx[:, None] * freqs_h)], dim=-1)
+    emb_w = torch.cat([torch.sin(w_idx[:, None] * freqs_w), torch.cos(w_idx[:, None] * freqs_w)], dim=-1)
+    return tokens + torch.cat([emb_t, emb_h, emb_w], dim=-1)
 ```
 
 Simplified additive form. Real RoPE rotates paired channels at frequencies; the positional information is the same.
@@ -185,28 +185,28 @@ Simplified additive form. Real RoPE rotates paired channels at frequencies; the 
 
 ```python
 class DividedAttentionBlock(nn.Module):
- def __init__(self, dim=64, heads=2):
- super().__init__()
- self.time_attn = nn.MultiheadAttention(dim, heads, batch_first=True)
- self.space_attn = nn.MultiheadAttention(dim, heads, batch_first=True)
- self.ln1 = nn.LayerNorm(dim)
- self.ln2 = nn.LayerNorm(dim)
- self.ln3 = nn.LayerNorm(dim)
- self.mlp = nn.Sequential(nn.Linear(dim, 4 * dim), nn.GELU(), nn.Linear(4 * dim, dim))
+    def __init__(self, dim=64, heads=2):
+        super().__init__()
+        self.time_attn = nn.MultiheadAttention(dim, heads, batch_first=True)
+        self.space_attn = nn.MultiheadAttention(dim, heads, batch_first=True)
+        self.ln1 = nn.LayerNorm(dim)
+        self.ln2 = nn.LayerNorm(dim)
+        self.ln3 = nn.LayerNorm(dim)
+        self.mlp = nn.Sequential(nn.Linear(dim, 4 * dim), nn.GELU(), nn.Linear(4 * dim, dim))
 
- def forward(self, x, grid):
- T, H, W = grid
- n, seq, d = x.shape
- # time attention: same (h, w), across t
- xt = x.view(n, T, H * W, d).permute(0, 2, 1, 3).reshape(n * H * W, T, d)
- a, _ = self.time_attn(self.ln1(xt), self.ln1(xt), self.ln1(xt), need_weights=False)
- xt = (xt + a).reshape(n, H * W, T, d).permute(0, 2, 1, 3).reshape(n, seq, d)
- # space attention: same t, across (h, w)
- xs = xt.view(n, T, H * W, d).reshape(n * T, H * W, d)
- a, _ = self.space_attn(self.ln2(xs), self.ln2(xs), self.ln2(xs), need_weights=False)
- xs = (xs + a).reshape(n, T, H * W, d).reshape(n, seq, d)
- xs = xs + self.mlp(self.ln3(xs))
- return xs
+    def forward(self, x, grid):
+        T, H, W = grid
+        n, seq, d = x.shape
+        # time attention: same (h, w), across t
+        xt = x.view(n, T, H * W, d).permute(0, 2, 1, 3).reshape(n * H * W, T, d)
+        a, _ = self.time_attn(self.ln1(xt), self.ln1(xt), self.ln1(xt), need_weights=False)
+        xt = (xt + a).reshape(n, H * W, T, d).permute(0, 2, 1, 3).reshape(n, seq, d)
+        # space attention: same t, across (h, w)
+        xs = xt.view(n, T, H * W, d).reshape(n * T, H * W, d)
+        a, _ = self.space_attn(self.ln2(xs), self.ln2(xs), self.ln2(xs), need_weights=False)
+        xs = (xs + a).reshape(n, T, H * W, d).reshape(n, seq, d)
+        xs = xs + self.mlp(self.ln3(xs))
+        return xs
 ```
 
 The time attention attends within each spatial position across time; the space attention attends within each frame across positions. Two O(T^2 + (HW)^2) operations instead of one O((THW)^2). This is the core of TimeSformer and every modern video DiT.
@@ -215,17 +215,17 @@ The time attention attends within each spatial position across time; the space a
 
 ```python
 class TinyVideoDiT(nn.Module):
- def __init__(self, in_channels=4, dim=64, depth=2, heads=2):
- super().__init__()
- self.patch = VideoPatch3D(in_channels=in_channels, dim=dim, patch_t=2, patch_h=2, patch_w=2)
- self.blocks = nn.ModuleList([DividedAttentionBlock(dim, heads) for _ in range(depth)])
- self.out = nn.Linear(dim, in_channels * 2 * 2 * 2)
+    def __init__(self, in_channels=4, dim=64, depth=2, heads=2):
+        super().__init__()
+        self.patch = VideoPatch3D(in_channels=in_channels, dim=dim, patch_t=2, patch_h=2, patch_w=2)
+        self.blocks = nn.ModuleList([DividedAttentionBlock(dim, heads) for _ in range(depth)])
+        self.out = nn.Linear(dim, in_channels * 2 * 2 * 2)
 
- def forward(self, x):
- tokens, grid = self.patch(x)
- for blk in self.blocks:
- tokens = blk(tokens, grid)
- return self.out(tokens), grid
+    def forward(self, x):
+        tokens, grid = self.patch(x)
+        for blk in self.blocks:
+            tokens = blk(tokens, grid)
+        return self.out(tokens), grid
 ```
 
 Not a working video generator; a structural demo that every piece shapes correctly.
@@ -233,10 +233,10 @@ Not a working video generator; a structural demo that every piece shapes correct
 ### Step 5: Check shapes
 
 ```python
-vid = torch.randn(1, 4, 8, 16, 16) # (N, C, T, H, W)
+vid = torch.randn(1, 4, 8, 16, 16)  # (N, C, T, H, W)
 model = TinyVideoDiT()
 out, grid = model(vid)
-print(f"input {tuple(vid.shape)}")
+print(f"input  {tuple(vid.shape)}")
 print(f"tokens grid {grid}")
 print(f"output {tuple(out.shape)}")
 ```

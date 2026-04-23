@@ -29,9 +29,9 @@ In 2026 the PPO step is mostly replaced by DPO (Phase 10 · 08) because it is ch
 - Train a reward model `R_φ(x, y)` to assign higher scores to `y_+`.
 - Loss: the **Bradley-Terry pairwise logistic**:
 
- `L(φ) = -E[ log σ(R_φ(x, y_+) - R_φ(x, y_-)) ]`
+  `L(φ) = -E[ log σ(R_φ(x, y_+) - R_φ(x, y_-)) ]`
 
- σ is the sigmoid. The difference in reward implies a log-odds of preference. BT has been the standard since 1952 (Bradley-Terry) and is the dominant choice in modern RLHF.
+  σ is the sigmoid. The difference in reward implies a log-odds of preference. BT has been the standard since 1952 (Bradley-Terry) and is the dominant choice in modern RLHF.
 
 - `R_φ` is usually initialized from the SFT model with a scalar head on top. Same transformer backbone; a single linear layer outputs the reward.
 
@@ -40,9 +40,9 @@ In 2026 the PPO step is mostly replaced by DPO (Phase 10 · 08) because it is ch
 - Initialize the trainable policy `π_θ` from `π_SFT`. Keep a frozen *reference* `π_ref = π_SFT`.
 - Reward at the end of a response `y`:
 
- `r_total(x, y) = R_φ(x, y) - β · KL(π_θ(·|x) || π_ref(·|x))`
+  `r_total(x, y) = R_φ(x, y) - β · KL(π_θ(·|x) || π_ref(·|x))`
 
- The KL penalty prevents `π_θ` from drifting arbitrarily from `π_SFT` — it is a *regularizer*, not a hard trust region. `β` typically `0.01`-`0.05`.
+  The KL penalty prevents `π_θ` from drifting arbitrarily from `π_SFT` — it is a *regularizer*, not a hard trust region. `β` typically `0.01`-`0.05`.
 - Run PPO (Lesson 08) with this reward. Advantages are computed on the token-level trajectory, but the RM scores only the full response.
 
 **Why the KL?** Without it, PPO will happily find reward-hacking strategies — the RM was only trained on in-distribution completions. An out-of-distribution response might score higher than any human-written one. The KL keeps `π_θ` near the manifold where the RM was trained. It is the single most important knob in RLHF.
@@ -66,10 +66,10 @@ GOOD_WORDS = {"clear", "specific", "kind", "thorough"}
 BAD_WORDS = {"vague", "rude", "wrong", "short"}
 
 def make_pair(rng):
- x = rng.choice(PROMPTS)
- y_good = rng.choice(list(GOOD_WORDS)) + " " + rng.choice(list(GOOD_WORDS))
- y_bad = rng.choice(list(BAD_WORDS)) + " " + rng.choice(list(BAD_WORDS))
- return (x, y_good, y_bad)
+    x = rng.choice(PROMPTS)
+    y_good = rng.choice(list(GOOD_WORDS)) + " " + rng.choice(list(GOOD_WORDS))
+    y_bad = rng.choice(list(BAD_WORDS)) + " " + rng.choice(list(BAD_WORDS))
+    return (x, y_good, y_bad)
 ```
 
 In real RLHF this is replaced by human labelers. The shape — `(prompt, preferred_response, rejected_response)` — is identical.
@@ -80,13 +80,13 @@ Linear score: `R(x, y) = w · bag(y)`. Train to minimize the BT pairwise log-los
 
 ```python
 def rm_train_step(w, x, y_pos, y_neg, lr):
- r_pos = dot(w, bag(y_pos))
- r_neg = dot(w, bag(y_neg))
- p = sigmoid(r_pos - r_neg)
- for tok, cnt in bag(y_pos).items():
- w[tok] += lr * (1 - p) * cnt
- for tok, cnt in bag(y_neg).items():
- w[tok] -= lr * (1 - p) * cnt
+    r_pos = dot(w, bag(y_pos))
+    r_neg = dot(w, bag(y_neg))
+    p = sigmoid(r_pos - r_neg)
+    for tok, cnt in bag(y_pos).items():
+        w[tok] += lr * (1 - p) * cnt
+    for tok, cnt in bag(y_neg).items():
+        w[tok] -= lr * (1 - p) * cnt
 ```
 
 After a few hundred updates, `w` assigns positive weights to good-word tokens and negative to bad.
@@ -97,13 +97,14 @@ Our toy policy produces a single token from a vocabulary. We score the token und
 
 ```python
 def rlhf_step(theta, ref, w, prompt, rng, eps=0.2, beta=0.1, lr=0.05):
- logits_theta = policy_logits(theta, prompt)
- probs = softmax(logits_theta)
- token = sample(probs, rng)
- logits_ref = policy_logits(ref, prompt)
- probs_ref = softmax(logits_ref)
- reward = dot(w, bag([token])) - beta * kl(probs, probs_ref)
- # ppo-style update on theta, treating reward as the return...
+    logits_theta = policy_logits(theta, prompt)
+    probs = softmax(logits_theta)
+    token = sample(probs, rng)
+    logits_ref = policy_logits(ref, prompt)
+    probs_ref = softmax(logits_ref)
+    reward = dot(w, bag([token])) - beta * kl(probs, probs_ref)
+    # ppo-style update on theta, treating reward as the return
+    ...
 ```
 
 ### Step 4: monitor the KL
@@ -121,15 +122,15 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 tok = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
 rm = AutoModelForSequenceClassification.from_pretrained(
- "meta-llama/Llama-3.1-8B-Instruct", num_labels=1
+    "meta-llama/Llama-3.1-8B-Instruct", num_labels=1
 )
 
 # dataset rows: {"prompt", "chosen", "rejected"} — Bradley-Terry format
 trainer = RewardTrainer(
- model=rm,
- tokenizer=tok,
- train_dataset=preference_data,
- args=RewardConfig(output_dir="./rm", num_train_epochs=1, learning_rate=1e-5),
+    model=rm,
+    tokenizer=tok,
+    train_dataset=preference_data,
+    args=RewardConfig(output_dir="./rm", num_train_epochs=1, learning_rate=1e-5),
 )
 trainer.train()
 ```
@@ -139,19 +140,19 @@ trainer.train()
 from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
 
 policy = AutoModelForCausalLMWithValueHead.from_pretrained("./sft-checkpoint")
-ref = AutoModelForCausalLMWithValueHead.from_pretrained("./sft-checkpoint") # frozen
+ref    = AutoModelForCausalLMWithValueHead.from_pretrained("./sft-checkpoint")  # frozen
 
 ppo = PPOTrainer(
- config=PPOConfig(learning_rate=1.41e-5, batch_size=64, init_kl_coef=0.05,
- target_kl=6.0, adap_kl_ctrl=True),
- model=policy, ref_model=ref, tokenizer=tok,
+    config=PPOConfig(learning_rate=1.41e-5, batch_size=64, init_kl_coef=0.05,
+                     target_kl=6.0, adap_kl_ctrl=True),
+    model=policy, ref_model=ref, tokenizer=tok,
 )
 
 for batch in dataloader:
- responses = ppo.generate(batch["query_ids"], max_new_tokens=128)
- rewards = rm(torch.cat([batch["query_ids"], responses], dim=-1)).logits[:, 0]
- stats = ppo.step(batch["query_ids"], responses, rewards)
- # stats includes: mean_kl, clip_frac, value_loss — the three PPO diagnostics
+    responses = ppo.generate(batch["query_ids"], max_new_tokens=128)
+    rewards   = rm(torch.cat([batch["query_ids"], responses], dim=-1)).logits[:, 0]
+    stats     = ppo.step(batch["query_ids"], responses, rewards)
+    # stats includes: mean_kl, clip_frac, value_loss — the three PPO diagnostics
 ```
 
 Three things the library does for you. `adap_kl_ctrl=True` implements the adaptive-β schedule: if observed KL exceeds `target_kl`, β doubles; if below half, β halves. The reference model is frozen by convention — you must not accidentally share parameters with `policy`. And the value head lives on the same backbone as the policy (`AutoModelForCausalLMWithValueHead` attaches a scalar MLP head), which is why TRL reports `policy/kl` and `value/loss` separately.

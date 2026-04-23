@@ -56,10 +56,10 @@ Why it matters in 2026:
 
 ```python
 import spacy
-nlp = spacy.load("en_coreference_web_trf") # experimental model
+nlp = spacy.load("en_coreference_web_trf")   # experimental model
 doc = nlp("Apple announced new products. The company said they would ship soon.")
 for cluster in doc._.coref_clusters:
- print(cluster, "->", [m.text for m in cluster])
+    print(cluster, "->", [m.text for m in cluster])
 ```
 
 On a longer document, you get something like:
@@ -72,9 +72,9 @@ See `code/main.py` for a stdlib-only implementation:
 
 1. Extract mentions: named entities (capitalized spans), pronouns (dict lookup), definite descriptions ("the X").
 2. For each pronoun, look at the previous K mentions and score them by:
- - gender/number agreement (heuristic)
- - recency (closer wins)
- - syntactic role (subjects preferred)
+   - gender/number agreement (heuristic)
+   - recency (closer wins)
+   - syntactic role (subjects preferred)
 3. Link the highest-scoring antecedent.
 
 Not competitive with neural models. But it shows the search space and the decisions an end-to-end model must make.
@@ -86,7 +86,7 @@ prompt = f"""Text: {text}
 
 List every pronoun and noun phrase that refers to a person or company.
 Cluster them by what they refer to. Output JSON:
-[{{"entity": "Apple", "mentions": ["Apple", "the company", "it"]}},...]
+[{{"entity": "Apple", "mentions": ["Apple", "the company", "it"]}}, ...]
 """
 ```
 

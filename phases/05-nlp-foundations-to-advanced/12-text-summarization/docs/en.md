@@ -38,47 +38,47 @@ from collections import Counter
 
 
 def sentence_split(text):
- return re.split(r"(?<=[.!?])\s+", text.strip())
+    return re.split(r"(?<=[.!?])\s+", text.strip())
 
 
 def similarity(s1, s2):
- w1 = Counter(s1.lower().split())
- w2 = Counter(s2.lower().split())
- intersection = sum((w1 & w2).values())
- denom = math.log(len(w1) + 1) + math.log(len(w2) + 1)
- if denom == 0:
- return 0.0
- return intersection / denom
+    w1 = Counter(s1.lower().split())
+    w2 = Counter(s2.lower().split())
+    intersection = sum((w1 & w2).values())
+    denom = math.log(len(w1) + 1) + math.log(len(w2) + 1)
+    if denom == 0:
+        return 0.0
+    return intersection / denom
 
 
 def textrank(text, top_k=3, damping=0.85, iterations=50, epsilon=1e-4):
- sentences = sentence_split(text)
- n = len(sentences)
- if n <= top_k:
- return sentences
+    sentences = sentence_split(text)
+    n = len(sentences)
+    if n <= top_k:
+        return sentences
 
- sim = [[0.0] * n for _ in range(n)]
- for i in range(n):
- for j in range(n):
- if i != j:
- sim[i][j] = similarity(sentences[i], sentences[j])
+    sim = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if i != j:
+                sim[i][j] = similarity(sentences[i], sentences[j])
 
- scores = [1.0] * n
- for _ in range(iterations):
- new_scores = [1 - damping] * n
- for i in range(n):
- total_out = sum(sim[i]) or 1e-9
- for j in range(n):
- if sim[i][j] > 0:
- new_scores[j] += damping * sim[i][j] / total_out * scores[i]
- if max(abs(s - ns) for s, ns in zip(scores, new_scores)) < epsilon:
- scores = new_scores
- break
- scores = new_scores
+    scores = [1.0] * n
+    for _ in range(iterations):
+        new_scores = [1 - damping] * n
+        for i in range(n):
+            total_out = sum(sim[i]) or 1e-9
+            for j in range(n):
+                if sim[i][j] > 0:
+                    new_scores[j] += damping * sim[i][j] / total_out * scores[i]
+        if max(abs(s - ns) for s, ns in zip(scores, new_scores)) < epsilon:
+            scores = new_scores
+            break
+        scores = new_scores
 
- ranked = sorted(range(n), key=lambda k: scores[k], reverse=True)[:top_k]
- ranked.sort()
- return [sentences[i] for i in ranked]
+    ranked = sorted(range(n), key=lambda k: scores[k], reverse=True)[:top_k]
+    ranked.sort()
+    return [sentences[i] for i in ranked]
 ```
 
 Two things worth naming. The similarity function uses log-normalized word overlap, which is the original TextRank variant. Cosine of TF-IDF vectors works too. The damping factor 0.85 and iteration count are the PageRank defaults.

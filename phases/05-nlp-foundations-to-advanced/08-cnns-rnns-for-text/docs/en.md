@@ -27,7 +27,7 @@ This lesson builds both, then names the failure that motivated attention.
 
 Why it works. A filter is a learnable n-gram. Max-pooling is position-invariant, so "not good" fires the same feature at the start or middle of a review. Three filter widths with 100 filters each gives you 300 learned n-gram detectors. Training is parallel; no sequential dependency.
 
-**RNN.** At each time step `t`, the hidden state `h_t = f(W * x_t + U * h_{t-1} + b)`. Share `W`, `U`, `b` across time. The hidden state at time `T` is a summary of the entire prefix. For classification, pool across `h_1... h_T` (max, mean, or last).
+**RNN.** At each time step `t`, the hidden state `h_t = f(W * x_t + U * h_{t-1} + b)`. Share `W`, `U`, `b` across time. The hidden state at time `T` is a summary of the entire prefix. For classification, pool across `h_1 ... h_T` (max, mean, or last).
 
 Plain RNNs suffer vanishing gradients. The **LSTM** adds gates that decide what to forget, what to store, and what to output, stabilizing gradients through long sequences. The **GRU** simplifies LSTM to two gates; performs similarly with fewer parameters.
 
@@ -44,25 +44,25 @@ import torch.nn.functional as F
 
 
 class TextCNN(nn.Module):
- def __init__(self, vocab_size, embed_dim, n_classes, filter_widths=(2, 3, 4), n_filters=64, dropout=0.3):
- super().__init__()
- self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
- self.convs = nn.ModuleList([
- nn.Conv1d(embed_dim, n_filters, kernel_size=k)
- for k in filter_widths
- ])
- self.dropout = nn.Dropout(dropout)
- self.fc = nn.Linear(n_filters * len(filter_widths), n_classes)
+    def __init__(self, vocab_size, embed_dim, n_classes, filter_widths=(2, 3, 4), n_filters=64, dropout=0.3):
+        super().__init__()
+        self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.convs = nn.ModuleList([
+            nn.Conv1d(embed_dim, n_filters, kernel_size=k)
+            for k in filter_widths
+        ])
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(n_filters * len(filter_widths), n_classes)
 
- def forward(self, token_ids):
- x = self.embed(token_ids).transpose(1, 2)
- pooled = []
- for conv in self.convs:
- c = F.relu(conv(x))
- p = F.max_pool1d(c, c.size(2)).squeeze(2)
- pooled.append(p)
- h = torch.cat(pooled, dim=1)
- return self.fc(self.dropout(h))
+    def forward(self, token_ids):
+        x = self.embed(token_ids).transpose(1, 2)
+        pooled = []
+        for conv in self.convs:
+            c = F.relu(conv(x))
+            p = F.max_pool1d(c, c.size(2)).squeeze(2)
+            pooled.append(p)
+        h = torch.cat(pooled, dim=1)
+        return self.fc(self.dropout(h))
 ```
 
 The `transpose(1, 2)` reshapes `[batch, seq_len, embed_dim]` to `[batch, embed_dim, seq_len]` because `nn.Conv1d` treats the middle axis as channels. The pooled output is fixed-size regardless of input length.
@@ -71,19 +71,19 @@ The `transpose(1, 2)` reshapes `[batch, seq_len, embed_dim]` to `[batch, embed_d
 
 ```python
 class LSTMClassifier(nn.Module):
- def __init__(self, vocab_size, embed_dim, hidden_dim, n_classes, bidirectional=True, dropout=0.3):
- super().__init__()
- self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
- self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True, bidirectional=bidirectional)
- factor = 2 if bidirectional else 1
- self.dropout = nn.Dropout(dropout)
- self.fc = nn.Linear(hidden_dim * factor, n_classes)
+    def __init__(self, vocab_size, embed_dim, hidden_dim, n_classes, bidirectional=True, dropout=0.3):
+        super().__init__()
+        self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True, bidirectional=bidirectional)
+        factor = 2 if bidirectional else 1
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(hidden_dim * factor, n_classes)
 
- def forward(self, token_ids):
- x = self.embed(token_ids)
- out, _ = self.lstm(x)
- pooled = out.max(dim=1).values
- return self.fc(self.dropout(pooled))
+    def forward(self, token_ids):
+        x = self.embed(token_ids)
+        out, _ = self.lstm(x)
+        pooled = out.max(dim=1).values
+        return self.fc(self.dropout(pooled))
 ```
 
 Max-pool over the sequence, not last-state pool. For classification, max-pooling usually beats taking the last hidden state because information at the end of a long sequence tends to dominate the last state.
@@ -94,12 +94,12 @@ A plain RNN without gating cannot learn long-range dependencies. Consider a toy 
 
 ```python
 def vanishing_gradient_sim(seq_len, recurrent_weight=0.9):
- import math
- return math.pow(recurrent_weight, seq_len)
+    import math
+    return math.pow(recurrent_weight, seq_len)
 
 
 # At weight=0.9 over 100 steps:
-# 0.9 ^ 100 ≈ 2.7e-5
+#   0.9 ^ 100 ≈ 2.7e-5
 # The gradient from step 100 to step 1 is effectively zero.
 ```
 
@@ -126,22 +126,22 @@ from transformers import AutoModel
 
 encoder = AutoModel.from_pretrained("bert-base-uncased")
 for param in encoder.parameters():
- param.requires_grad = False
+    param.requires_grad = False
 
 
 class BertCNN(nn.Module):
- def __init__(self, n_classes, filter_widths=(2, 3, 4), n_filters=64):
- super().__init__()
- self.encoder = encoder
- self.convs = nn.ModuleList([nn.Conv1d(768, n_filters, kernel_size=k) for k in filter_widths])
- self.fc = nn.Linear(n_filters * len(filter_widths), n_classes)
+    def __init__(self, n_classes, filter_widths=(2, 3, 4), n_filters=64):
+        super().__init__()
+        self.encoder = encoder
+        self.convs = nn.ModuleList([nn.Conv1d(768, n_filters, kernel_size=k) for k in filter_widths])
+        self.fc = nn.Linear(n_filters * len(filter_widths), n_classes)
 
- def forward(self, input_ids, attention_mask):
- with torch.no_grad():
- out = self.encoder(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
- x = out.transpose(1, 2)
- pooled = [F.max_pool1d(F.relu(conv(x)), kernel_size=conv(x).size(2)).squeeze(2) for conv in self.convs]
- return self.fc(torch.cat(pooled, dim=1))
+    def forward(self, input_ids, attention_mask):
+        with torch.no_grad():
+            out = self.encoder(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
+        x = out.transpose(1, 2)
+        pooled = [F.max_pool1d(F.relu(conv(x)), kernel_size=conv(x).size(2)).squeeze(2) for conv in self.convs]
+        return self.fc(torch.cat(pooled, dim=1))
 ```
 
 Use-when-it-fits-the-constraint checklist.

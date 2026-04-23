@@ -32,21 +32,21 @@ A typical web application Docker image is 100-500MB. An AI application image sta
 
 ```mermaid
 flowchart TB
- subgraph Web["Web App Image (~200MB)"]
- W1[Alpine Linux ~5MB]
- W2[Node.js Runtime ~50MB]
- W3[App Code ~10MB]
- W4[node_modules ~130MB]
- end
+    subgraph Web["Web App Image (~200MB)"]
+        W1[Alpine Linux ~5MB]
+        W2[Node.js Runtime ~50MB]
+        W3[App Code ~10MB]
+        W4[node_modules ~130MB]
+    end
 
- subgraph AI["AI Model Image (~8GB+)"]
- A1[Ubuntu 22.04 ~80MB]
- A2[CUDA Runtime ~2GB]
- A3[cuDNN ~800MB]
- A4[Python + PyTorch ~3GB]
- A5[Model Code ~50MB]
- A6[Model Weights ~2-50GB]
- end
+    subgraph AI["AI Model Image (~8GB+)"]
+        A1[Ubuntu 22.04 ~80MB]
+        A2[CUDA Runtime ~2GB]
+        A3[cuDNN ~800MB]
+        A4[Python + PyTorch ~3GB]
+        A5[Model Code ~50MB]
+        A6[Model Weights ~2-50GB]
+    end
 ```
 
 Three problems emerge:
@@ -62,9 +62,9 @@ Three problems emerge:
 NVIDIA publishes official base images that bundle CUDA, cuDNN, and the NVIDIA runtime. These are the foundation for every AI container.
 
 ```
-nvcr.io/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04 (smaller, inference only)
-nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04 (larger, includes compiler)
-nvcr.io/nvidia/pytorch:24.05-py3 (PyTorch pre-installed)
+nvcr.io/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04  (smaller, inference only)
+nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04    (larger, includes compiler)
+nvcr.io/nvidia/pytorch:24.05-py3                        (PyTorch pre-installed)
 ```
 
 Three variants matter:
@@ -93,27 +93,27 @@ The solution: mount weights from the host filesystem or a network volume.
 
 ```
 docker run --gpus all \
- -v /data/models/llama-7b:/models/llama-7b \
- -p 8000:8000 \
- my-model-server
+  -v /data/models/llama-7b:/models/llama-7b \
+  -p 8000:8000 \
+  my-model-server
 ```
 
 The container code reads from `/models/llama-7b`. The weights live outside the image. Swap models by changing the mount. No rebuild needed.
 
 ```mermaid
 flowchart LR
- subgraph Host["Host Machine"]
- HW["/data/models/llama-7b\n14GB weights"]
- end
+    subgraph Host["Host Machine"]
+        HW["/data/models/llama-7b\n14GB weights"]
+    end
 
- subgraph Container["Docker Container (~5GB)"]
- C1["Model Server Code"]
- C2["Python + PyTorch"]
- CM["/models/llama-7b\n(mount point)"]
- end
+    subgraph Container["Docker Container (~5GB)"]
+        C1["Model Server Code"]
+        C2["Python + PyTorch"]
+        CM["/models/llama-7b\n(mount point)"]
+    end
 
- HW -->|volume mount| CM
- C1 --> CM
+    HW -->|volume mount| CM
+    C1 --> CM
 ```
 
 ### Multi-Stage Builds
@@ -157,26 +157,26 @@ Inside the container, `nvidia-smi` shows available GPUs, and PyTorch's `torch.cu
 
 ```mermaid
 flowchart TB
- subgraph Host["Host"]
- D[NVIDIA Driver]
- G0[GPU 0]
- G1[GPU 1]
- end
+    subgraph Host["Host"]
+        D[NVIDIA Driver]
+        G0[GPU 0]
+        G1[GPU 1]
+    end
 
- subgraph CT["NVIDIA Container Toolkit"]
- R[nvidia-container-runtime]
- end
+    subgraph CT["NVIDIA Container Toolkit"]
+        R[nvidia-container-runtime]
+    end
 
- subgraph C["Container"]
- P[PyTorch]
- CL[CUDA Libraries]
- end
+    subgraph C["Container"]
+        P[PyTorch]
+        CL[CUDA Libraries]
+    end
 
- D --> CT
- G0 --> R
- G1 --> R
- R --> C
- CL --> P
+    D --> CT
+    G0 --> R
+    G1 --> R
+    R --> C
+    CL --> P
 ```
 
 ### Health Checks
@@ -190,7 +190,7 @@ A proper health check verifies that:
 
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
- CMD curl -f http://localhost:8000/health || exit 1
+  CMD curl -f http://localhost:8000/health || exit 1
 ```
 
 The `/health` endpoint should run a minimal inference to confirm the model is operational, not just check that the server process exists.
@@ -201,7 +201,7 @@ NVIDIA NIMs (NVIDIA Inference Microservices) are pre-packaged containers that bu
 
 ```bash
 docker run --gpus all -p 8000:8000 \
- nvcr.io/nim/meta/llama-3.1-8b-instruct:latest
+  nvcr.io/nim/meta/llama-3.1-8b-instruct:latest
 ```
 
 NIMs expose an OpenAI-compatible API, handle quantization, and include performance optimizations for specific GPU architectures. The tradeoff: less control, but zero configuration.
@@ -219,26 +219,26 @@ Docker Compose orchestrates these together:
 
 ```yaml
 services:
- model-server:
- build:.
- deploy:
- resources:
- reservations:
- devices:
- - driver: nvidia
- count: 1
- capabilities: [gpu]
- volumes:
- -./models:/models
- ports:
- - "8000:8000"
+  model-server:
+    build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./models:/models
+    ports:
+      - "8000:8000"
 
- nginx:
- image: nginx:alpine
- ports:
- - "80:80"
- depends_on:
- - model-server
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - model-server
 ```
 
 The `deploy.resources.reservations.devices` section is how Docker Compose allocates GPUs. Without it, the model server gets no GPU access.

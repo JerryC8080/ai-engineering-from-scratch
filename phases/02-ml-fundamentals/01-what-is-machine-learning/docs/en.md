@@ -30,19 +30,19 @@ Traditional programming and machine learning solve problems in opposite directio
 
 ```mermaid
 flowchart LR
- subgraph Traditional["Traditional Programming"]
- direction LR
- R[Rules] --> P1[Program]
- D1[Data] --> P1
- P1 --> O1[Output]
- end
+    subgraph Traditional["Traditional Programming"]
+        direction LR
+        R[Rules] --> P1[Program]
+        D1[Data] --> P1
+        P1 --> O1[Output]
+    end
 
- subgraph ML["Machine Learning"]
- direction LR
- D2[Data] --> P2[Learning Algorithm]
- O2[Expected Output] --> P2
- P2 --> M[Model / Rules]
- end
+    subgraph ML["Machine Learning"]
+        direction LR
+        D2[Data] --> P2[Learning Algorithm]
+        O2[Expected Output] --> P2
+        P2 --> M[Model / Rules]
+    end
 ```
 
 Traditional programming: you write the rules. The program applies them to data to produce output.
@@ -55,18 +55,18 @@ The "model" that comes out of training IS the rules, encoded as numbers (weights
 
 ```mermaid
 flowchart TD
- ML[Machine Learning] --> SL[Supervised Learning]
- ML --> UL[Unsupervised Learning]
- ML --> RL[Reinforcement Learning]
+    ML[Machine Learning] --> SL[Supervised Learning]
+    ML --> UL[Unsupervised Learning]
+    ML --> RL[Reinforcement Learning]
 
- SL --> C[Classification]
- SL --> R[Regression]
+    SL --> C[Classification]
+    SL --> R[Regression]
 
- UL --> CL[Clustering]
- UL --> DR[Dimensionality Reduction]
+    UL --> CL[Clustering]
+    UL --> DR[Dimensionality Reduction]
 
- RL --> PO[Policy Optimization]
- RL --> VL[Value Learning]
+    RL --> PO[Policy Optimization]
+    RL --> VL[Value Learning]
 ```
 
 **Supervised Learning**: You have input-output pairs. The model learns to map inputs to outputs.
@@ -123,15 +123,15 @@ Every machine learning project follows the same pipeline, regardless of the algo
 
 ```mermaid
 flowchart LR
- A[Collect Data] --> B[Clean & Explore]
- B --> C[Feature Engineering]
- C --> D[Split Data]
- D --> E[Train Model]
- E --> F[Evaluate]
- F -->|Not good enough| C
- F -->|Good enough| G[Deploy]
- G --> H[Monitor]
- H -->|Performance drops| A
+    A[Collect Data] --> B[Clean & Explore]
+    B --> C[Feature Engineering]
+    C --> D[Split Data]
+    D --> E[Train Model]
+    E --> F[Evaluate]
+    F -->|Not good enough| C
+    F -->|Good enough| G[Deploy]
+    G --> H[Monitor]
+    H -->|Performance drops| A
 ```
 
 **Collect Data**: Gather raw data. More data is almost always better, but quality matters more than quantity.
@@ -156,16 +156,16 @@ This is the most important concept beginners get wrong. You must evaluate your m
 
 ```mermaid
 flowchart LR
- subgraph Dataset["Full Dataset (100%)"]
- direction LR
- TR["Training Set (70%)"]
- VA["Validation Set (15%)"]
- TE["Test Set (15%)"]
- end
+    subgraph Dataset["Full Dataset (100%)"]
+        direction LR
+        TR["Training Set (70%)"]
+        VA["Validation Set (15%)"]
+        TE["Test Set (15%)"]
+    end
 
- TR -->|Train model| M[Model]
- M -->|Tune hyperparameters| VA
- VA -->|Final evaluation| TE
+    TR -->|Train model| M[Model]
+    M -->|Tune hyperparameters| VA
+    VA -->|Final evaluation| TE
 ```
 
 | Split | Purpose | When used | Typical size |
@@ -182,26 +182,26 @@ For small datasets, use k-fold cross-validation: split data into k parts, train 
 
 ```mermaid
 flowchart LR
- subgraph UF["Underfitting"]
- U1["Model too simple"]
- U2["High bias"]
- U3["Misses patterns"]
- end
+    subgraph UF["Underfitting"]
+        U1["Model too simple"]
+        U2["High bias"]
+        U3["Misses patterns"]
+    end
 
- subgraph GF["Good Fit"]
- G1["Right complexity"]
- G2["Balanced"]
- G3["Generalizes well"]
- end
+    subgraph GF["Good Fit"]
+        G1["Right complexity"]
+        G2["Balanced"]
+        G3["Generalizes well"]
+    end
 
- subgraph OF["Overfitting"]
- O1["Model too complex"]
- O2["High variance"]
- O3["Memorizes noise"]
- end
+    subgraph OF["Overfitting"]
+        O1["Model too complex"]
+        O2["High variance"]
+        O3["Memorizes noise"]
+    end
 
- UF -->|Increase complexity| GF
- GF -->|Too much complexity| OF
+    UF -->|Increase complexity| GF
+    GF -->|Too much complexity| OF
 ```
 
 **Underfitting**: The model is too simple to capture the patterns in the data. A straight line trying to fit a curved relationship. Training error is high. Test error is high.
@@ -274,18 +274,18 @@ Use this decision flowchart:
 
 ```mermaid
 flowchart TD
- A["Do you have data?"] -->|No| B["Collect data first or use rules"]
- A -->|Yes| C["Can you write the rules explicitly?"]
- C -->|"Yes, and they are simple"| D["Use rules. Skip ML."]
- C -->|"No, or they are too complex"| E["Is the cost of errors acceptable?"]
- E -->|"No, need guaranteed correctness"| F["Use deterministic methods"]
- E -->|Yes| G["Do you need explainability?"]
- G -->|"Yes, strictly"| H["Use interpretable models only"]
- G -->|"No, or partially"| I["Use ML"]
- I --> J["Do you have enough labeled data?"]
- J -->|Yes| K["Supervised learning"]
- J -->|"Some labels"| L["Semi-supervised learning"]
- J -->|"No labels"| M["Unsupervised or self-supervised"]
+    A["Do you have data?"] -->|No| B["Collect data first or use rules"]
+    A -->|Yes| C["Can you write the rules explicitly?"]
+    C -->|"Yes, and they are simple"| D["Use rules. Skip ML."]
+    C -->|"No, or they are too complex"| E["Is the cost of errors acceptable?"]
+    E -->|"No, need guaranteed correctness"| F["Use deterministic methods"]
+    E -->|Yes| G["Do you need explainability?"]
+    G -->|"Yes, strictly"| H["Use interpretable models only"]
+    G -->|"No, or partially"| I["Use ML"]
+    I --> J["Do you have enough labeled data?"]
+    J -->|Yes| K["Supervised learning"]
+    J -->|"Some labels"| L["Semi-supervised learning"]
+    J -->|"No labels"| M["Unsupervised or self-supervised"]
 ```
 
 ## Build It
@@ -298,18 +298,18 @@ The nearest centroid classifier computes the center (mean) of each class in the 
 
 ```python
 class NearestCentroid:
- def fit(self, X, y):
- self.classes = np.unique(y)
- self.centroids = np.array([
- X[y == c].mean(axis=0) for c in self.classes
- ])
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        self.centroids = np.array([
+            X[y == c].mean(axis=0) for c in self.classes
+        ])
 
- def predict(self, X):
- distances = np.array([
- np.sqrt(((X - c) ** 2).sum(axis=1))
- for c in self.centroids
- ])
- return self.classes[distances.argmin(axis=0)]
+    def predict(self, X):
+        distances = np.array([
+            np.sqrt(((X - c) ** 2).sum(axis=1))
+            for c in self.centroids
+        ])
+        return self.classes[distances.argmin(axis=0)]
 ```
 
 That is the entire algorithm. Fit computes two means. Predict computes distances. No gradient descent, no iteration, no hyperparameters.
@@ -367,8 +367,8 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
 X, y = make_classification(
- n_samples=500, n_features=2, n_redundant=0,
- n_clusters_per_class=1, random_state=42
+    n_samples=500, n_features=2, n_redundant=0,
+    n_clusters_per_class=1, random_state=42
 )
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 

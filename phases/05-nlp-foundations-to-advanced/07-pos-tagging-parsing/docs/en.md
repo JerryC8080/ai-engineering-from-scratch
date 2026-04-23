@@ -24,7 +24,7 @@ Worth knowing. This lesson introduces the tagsets, the baselines, and the point 
 **POS tagging** labels each token with a grammatical category. The **Penn Treebank (PTB)** tagset is the English default. 36 tags with distinctions the casual reader finds fussy: `NN` singular noun, `NNS` plural noun, `NNP` proper noun singular, `VBD` verb past tense, `VBZ` verb 3rd person singular present, and so on. The **Universal Dependencies (UD)** tagset is coarser (17 tags) and language-agnostic; it became the default for cross-lingual work.
 
 ```
-The/DET cats/NOUN were/AUX running/VERB at/ADP 3pm/NOUN./PUNCT
+The/DET cats/NOUN were/AUX running/VERB at/ADP 3pm/NOUN ./PUNCT
 ```
 
 **Syntactic parsing** produces a tree. Two major styles:
@@ -53,19 +53,19 @@ from collections import Counter, defaultdict
 
 
 def train_mft(train_examples):
- word_tag_counts = defaultdict(Counter)
- all_tags = Counter()
- for tokens, tags in train_examples:
- for token, tag in zip(tokens, tags):
- word_tag_counts[token.lower()][tag] += 1
- all_tags[tag] += 1
- word_best = {w: c.most_common(1)[0][0] for w, c in word_tag_counts.items()}
- default_tag = all_tags.most_common(1)[0][0]
- return word_best, default_tag
+    word_tag_counts = defaultdict(Counter)
+    all_tags = Counter()
+    for tokens, tags in train_examples:
+        for token, tag in zip(tokens, tags):
+            word_tag_counts[token.lower()][tag] += 1
+            all_tags[tag] += 1
+    word_best = {w: c.most_common(1)[0][0] for w, c in word_tag_counts.items()}
+    default_tag = all_tags.most_common(1)[0][0]
+    return word_best, default_tag
 
 
 def predict_mft(tokens, word_best, default_tag):
- return [word_best.get(t.lower(), default_tag) for t in tokens]
+    return [word_best.get(t.lower(), default_tag) for t in tokens]
 ```
 
 On the Brown corpus, this baseline hits ~85% accuracy. Not good, but the floor below which no serious model should fall.
@@ -85,63 +85,63 @@ import math
 
 
 def train_hmm(train_examples, alpha=0.01):
- transitions = defaultdict(Counter)
- emissions = defaultdict(Counter)
- tags = set()
- vocab = set()
+    transitions = defaultdict(Counter)
+    emissions = defaultdict(Counter)
+    tags = set()
+    vocab = set()
 
- for tokens, ts in train_examples:
- prev = "<BOS>"
- for token, tag in zip(tokens, ts):
- transitions[prev][tag] += 1
- emissions[tag][token.lower()] += 1
- tags.add(tag)
- vocab.add(token.lower())
- prev = tag
- transitions[prev]["<EOS>"] += 1
+    for tokens, ts in train_examples:
+        prev = "<BOS>"
+        for token, tag in zip(tokens, ts):
+            transitions[prev][tag] += 1
+            emissions[tag][token.lower()] += 1
+            tags.add(tag)
+            vocab.add(token.lower())
+            prev = tag
+        transitions[prev]["<EOS>"] += 1
 
- return transitions, emissions, tags, vocab
+    return transitions, emissions, tags, vocab
 
 
 def log_prob(table, given, key, smooth_denom, alpha):
- return math.log((table[given].get(key, 0) + alpha) / smooth_denom)
+    return math.log((table[given].get(key, 0) + alpha) / smooth_denom)
 
 
 def viterbi(tokens, transitions, emissions, tags, vocab, alpha=0.01):
- tags_list = list(tags)
- n = len(tokens)
- V = [[0.0] * len(tags_list) for _ in range(n)]
- back = [[0] * len(tags_list) for _ in range(n)]
+    tags_list = list(tags)
+    n = len(tokens)
+    V = [[0.0] * len(tags_list) for _ in range(n)]
+    back = [[0] * len(tags_list) for _ in range(n)]
 
- for j, tag in enumerate(tags_list):
- em_denom = sum(emissions[tag].values()) + alpha * (len(vocab) + 1)
- tr_denom = sum(transitions["<BOS>"].values()) + alpha * (len(tags_list) + 1)
- tr = log_prob(transitions, "<BOS>", tag, tr_denom, alpha)
- em = log_prob(emissions, tag, tokens[0].lower(), em_denom, alpha)
- V[0][j] = tr + em
- back[0][j] = 0
+    for j, tag in enumerate(tags_list):
+        em_denom = sum(emissions[tag].values()) + alpha * (len(vocab) + 1)
+        tr_denom = sum(transitions["<BOS>"].values()) + alpha * (len(tags_list) + 1)
+        tr = log_prob(transitions, "<BOS>", tag, tr_denom, alpha)
+        em = log_prob(emissions, tag, tokens[0].lower(), em_denom, alpha)
+        V[0][j] = tr + em
+        back[0][j] = 0
 
- for i in range(1, n):
- for j, tag in enumerate(tags_list):
- em_denom = sum(emissions[tag].values()) + alpha * (len(vocab) + 1)
- em = log_prob(emissions, tag, tokens[i].lower(), em_denom, alpha)
- best_prev = 0
- best_score = -1e30
- for k, prev_tag in enumerate(tags_list):
- tr_denom = sum(transitions[prev_tag].values()) + alpha * (len(tags_list) + 1)
- tr = log_prob(transitions, prev_tag, tag, tr_denom, alpha)
- score = V[i - 1][k] + tr + em
- if score > best_score:
- best_score = score
- best_prev = k
- V[i][j] = best_score
- back[i][j] = best_prev
+    for i in range(1, n):
+        for j, tag in enumerate(tags_list):
+            em_denom = sum(emissions[tag].values()) + alpha * (len(vocab) + 1)
+            em = log_prob(emissions, tag, tokens[i].lower(), em_denom, alpha)
+            best_prev = 0
+            best_score = -1e30
+            for k, prev_tag in enumerate(tags_list):
+                tr_denom = sum(transitions[prev_tag].values()) + alpha * (len(tags_list) + 1)
+                tr = log_prob(transitions, prev_tag, tag, tr_denom, alpha)
+                score = V[i - 1][k] + tr + em
+                if score > best_score:
+                    best_score = score
+                    best_prev = k
+            V[i][j] = best_score
+            back[i][j] = best_prev
 
- last_best = max(range(len(tags_list)), key=lambda j: V[n - 1][j])
- path = [last_best]
- for i in range(n - 1, 0, -1):
- path.append(back[i][path[-1]])
- return [tags_list[j] for j in reversed(path)]
+    last_best = max(range(len(tags_list)), key=lambda j: V[n - 1][j])
+    path = [last_best]
+    for i in range(n - 1, 0, -1):
+        path.append(back[i][path[-1]])
+    return [tags_list[j] for j in reversed(path)]
 ```
 
 Bigram HMM on Brown hits ~93% accuracy. The jump from 85% to 93% is mostly transition probabilities — the model learns `DET NOUN` is common and `NOUN DET` is rare.
@@ -167,16 +167,17 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 doc = nlp("The cats were running at 3pm.")
 for token in doc:
- print(f"{token.text:10s} tag={token.tag_:5s} pos={token.pos_:6s} dep={token.dep_:10s} head={token.head.text}")
+    print(f"{token.text:10s} tag={token.tag_:5s} pos={token.pos_:6s} dep={token.dep_:10s} head={token.head.text}")
 ```
 
 ```
-The tag=DT pos=DET dep=det head=cats
-cats tag=NNS pos=NOUN dep=nsubj head=running
-were tag=VBD pos=AUX dep=aux head=running
-running tag=VBG pos=VERB dep=ROOT head=running
-at tag=IN pos=ADP dep=prep head=running
-3pm tag=NN pos=NOUN dep=pobj head=at. tag=. pos=PUNCT dep=punct head=running
+The        tag=DT    pos=DET    dep=det        head=cats
+cats       tag=NNS   pos=NOUN   dep=nsubj      head=running
+were       tag=VBD   pos=AUX    dep=aux        head=running
+running    tag=VBG   pos=VERB   dep=ROOT       head=running
+at         tag=IN    pos=ADP    dep=prep       head=running
+3pm        tag=NN    pos=NOUN   dep=pobj       head=at
+.          tag=.     pos=PUNCT  dep=punct      head=running
 ```
 
 Read the `dep` column bottom to top and the sentence's grammatical structure falls out.

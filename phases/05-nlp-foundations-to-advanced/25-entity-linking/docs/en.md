@@ -51,9 +51,9 @@ Always report both. A system with 99% disambiguation on 80% candidate recall is 
 
 ```python
 alias_to_entities = {
- "jordan": ["Q41421 (Michael Jordan)", "Q810 (Jordan, country)", "Q254110 (Michael B. Jordan)"],
- "paris": ["Q90 (Paris, France)", "Q663094 (Paris, Texas)", "Q55411 (Paris Hilton)"],
- "apple": ["Q312 (Apple Inc.)", "Q89 (apple, fruit)"],
+    "jordan": ["Q41421 (Michael Jordan)", "Q810 (Jordan, country)", "Q254110 (Michael B. Jordan)"],
+    "paris":  ["Q90 (Paris, France)", "Q663094 (Paris, Texas)", "Q55411 (Paris Hilton)"],
+    "apple":  ["Q312 (Apple Inc.)", "Q89 (apple, fruit)"],
 }
 ```
 
@@ -63,18 +63,18 @@ Wikipedia alias data: ~18M (alias, entity) pairs. Download from Wikidata dumps. 
 
 ```python
 def disambiguate(mention, context, alias_index, entity_desc):
- candidates = alias_index.get(mention.lower(), [])
- if not candidates:
- return None, 0.0
- context_words = set(tokenize(context))
- best, best_score = None, -1
- for entity_id in candidates:
- desc_words = set(tokenize(entity_desc[entity_id]))
- union = len(context_words | desc_words)
- score = len(context_words & desc_words) / union if union else 0.0
- if score > best_score:
- best, best_score = entity_id, score
- return best, best_score
+    candidates = alias_index.get(mention.lower(), [])
+    if not candidates:
+        return None, 0.0
+    context_words = set(tokenize(context))
+    best, best_score = None, -1
+    for entity_id in candidates:
+        desc_words = set(tokenize(entity_desc[entity_id]))
+        union = len(context_words | desc_words)
+        score = len(context_words & desc_words) / union if union else 0.0
+        if score > best_score:
+            best, best_score = entity_id, score
+    return best, best_score
 ```
 
 The Jaccard overlap is a toy. Replace with cosine similarity on embeddings (see `code/main.py` step-2 for the transformer version).
@@ -86,12 +86,12 @@ from sentence_transformers import SentenceTransformer
 encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 def embed_mention(text, mention_span):
- start, end = mention_span
- marked = f"{text[:start]} [MENTION] {text[start:end]} [/MENTION] {text[end:]}"
- return encoder.encode([marked], normalize_embeddings=True)[0]
+    start, end = mention_span
+    marked = f"{text[:start]} [MENTION] {text[start:end]} [/MENTION] {text[end:]}"
+    return encoder.encode([marked], normalize_embeddings=True)[0]
 
 def embed_entity(entity_id, description):
- return encoder.encode([f"{entity_id}: {description}"], normalize_embeddings=True)[0]
+    return encoder.encode([f"{entity_id}: {description}"], normalize_embeddings=True)[0]
 ```
 
 At index time, embed every KB entity once. At query time, embed the mention + context once, dot-product against the candidate pool, pick max.

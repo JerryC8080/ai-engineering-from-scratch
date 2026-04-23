@@ -72,19 +72,19 @@ P(B) = P(B|A) * P(A) + P(B|not A) * P(not A)
 A disease affects 1 in 10,000 people. The test is 99% accurate (catches 99% of sick people, gives false positives 1% of the time).
 
 ```
-P(sick) = 0.0001 (prior: disease is rare)
-P(positive|sick) = 0.99 (likelihood: test catches it)
-P(positive|healthy) = 0.01 (false positive rate)
+P(sick)          = 0.0001     (prior: disease is rare)
+P(positive|sick) = 0.99       (likelihood: test catches it)
+P(positive|healthy) = 0.01    (false positive rate)
 
 P(positive) = P(positive|sick) * P(sick) + P(positive|healthy) * P(healthy)
- = 0.99 * 0.0001 + 0.01 * 0.9999
- = 0.000099 + 0.009999
- = 0.010098
+            = 0.99 * 0.0001 + 0.01 * 0.9999
+            = 0.000099 + 0.009999
+            = 0.010098
 
 P(sick|positive) = P(positive|sick) * P(sick) / P(positive)
- = 0.99 * 0.0001 / 0.010098
- = 0.0098
- = 0.98%
+                 = 0.99 * 0.0001 / 0.010098
+                 = 0.0098
+                 = 0.98%
 ```
 
 Less than 1%. The prior dominates. When a condition is rare, even accurate tests produce mostly false positives. This is why doctors order confirmation tests.
@@ -94,17 +94,17 @@ Less than 1%. The prior dominates. When a condition is rare, even accurate tests
 You receive an email containing the word "lottery". Is it spam?
 
 ```
-P(spam) = 0.3 (30% of email is spam)
-P("lottery"|spam) = 0.05 (5% of spam emails contain "lottery")
-P("lottery"|not spam) = 0.001 (0.1% of legitimate emails contain "lottery")
+P(spam)                = 0.3      (30% of email is spam)
+P("lottery"|spam)      = 0.05     (5% of spam emails contain "lottery")
+P("lottery"|not spam)  = 0.001    (0.1% of legitimate emails contain "lottery")
 
 P("lottery") = 0.05 * 0.3 + 0.001 * 0.7
- = 0.015 + 0.0007
- = 0.0157
+             = 0.015 + 0.0007
+             = 0.0157
 
 P(spam|"lottery") = 0.05 * 0.3 / 0.0157
- = 0.955
- = 95.5%
+                  = 0.955
+                  = 95.5%
 ```
 
 One word shifts the probability from 30% to 95.5%. A real spam filter applies Bayes across hundreds of words simultaneously.
@@ -114,9 +114,9 @@ One word shifts the probability from 30% to 95.5%. A real spam filter applies Ba
 Naive Bayes extends this to multiple features by assuming all features are conditionally independent given the class:
 
 ```
-P(class | feature_1, feature_2,..., feature_n)
- = P(class) * P(feature_1|class) * P(feature_2|class) *... * P(feature_n|class)
- / P(feature_1, feature_2,..., feature_n)
+P(class | feature_1, feature_2, ..., feature_n)
+  = P(class) * P(feature_1|class) * P(feature_2|class) * ... * P(feature_n|class)
+    / P(feature_1, feature_2, ..., feature_n)
 ```
 
 The "naive" part is the independence assumption. In text, word occurrences are not independent ("New" and "York" are correlated). But the assumption works surprisingly well in practice because the classifier only needs to rank classes, not produce calibrated probabilities.
@@ -201,9 +201,9 @@ The connection is deeper than analogy:
 
 ```python
 def bayes(prior, likelihood, false_positive_rate):
- evidence = likelihood * prior + false_positive_rate * (1 - prior)
- posterior = likelihood * prior / evidence
- return posterior
+    evidence = likelihood * prior + false_positive_rate * (1 - prior)
+    posterior = likelihood * prior / evidence
+    return posterior
 
 result = bayes(prior=0.0001, likelihood=0.99, false_positive_rate=0.01)
 print(f"P(sick|positive) = {result:.4f}")
@@ -216,38 +216,38 @@ import math
 from collections import defaultdict
 
 class NaiveBayes:
- def __init__(self, smoothing=1.0):
- self.smoothing = smoothing
- self.class_counts = defaultdict(int)
- self.word_counts = defaultdict(lambda: defaultdict(int))
- self.class_word_totals = defaultdict(int)
- self.vocab = set()
+    def __init__(self, smoothing=1.0):
+        self.smoothing = smoothing
+        self.class_counts = defaultdict(int)
+        self.word_counts = defaultdict(lambda: defaultdict(int))
+        self.class_word_totals = defaultdict(int)
+        self.vocab = set()
 
- def train(self, documents, labels):
- for doc, label in zip(documents, labels):
- self.class_counts[label] += 1
- words = doc.lower().split()
- for word in words:
- self.word_counts[label][word] += 1
- self.class_word_totals[label] += 1
- self.vocab.add(word)
+    def train(self, documents, labels):
+        for doc, label in zip(documents, labels):
+            self.class_counts[label] += 1
+            words = doc.lower().split()
+            for word in words:
+                self.word_counts[label][word] += 1
+                self.class_word_totals[label] += 1
+                self.vocab.add(word)
 
- def predict(self, document):
- words = document.lower().split()
- total_docs = sum(self.class_counts.values())
- vocab_size = len(self.vocab)
- best_class = None
- best_score = float("-inf")
- for cls in self.class_counts:
- score = math.log(self.class_counts[cls] / total_docs)
- for word in words:
- count = self.word_counts[cls].get(word, 0)
- total = self.class_word_totals[cls]
- score += math.log((count + self.smoothing) / (total + self.smoothing * vocab_size))
- if score > best_score:
- best_score = score
- best_class = cls
- return best_class
+    def predict(self, document):
+        words = document.lower().split()
+        total_docs = sum(self.class_counts.values())
+        vocab_size = len(self.vocab)
+        best_class = None
+        best_score = float("-inf")
+        for cls in self.class_counts:
+            score = math.log(self.class_counts[cls] / total_docs)
+            for word in words:
+                count = self.word_counts[cls].get(word, 0)
+                total = self.class_word_totals[cls]
+                score += math.log((count + self.smoothing) / (total + self.smoothing * vocab_size))
+            if score > best_score:
+                best_score = score
+                best_class = cls
+        return best_class
 ```
 
 Log probabilities prevent underflow. Multiplying many small probabilities produces numbers too tiny for floating point. Summing log-probabilities is numerically stable and mathematically equivalent.
@@ -256,52 +256,52 @@ Log probabilities prevent underflow. Multiplying many small probabilities produc
 
 ```python
 train_docs = [
- "win free money now",
- "free lottery ticket winner",
- "claim your prize today free",
- "urgent offer free cash",
- "congratulations you won free",
- "meeting tomorrow at noon",
- "project update attached",
- "can we schedule a call",
- "quarterly report review",
- "lunch on thursday sounds good",
- "team standup notes attached",
- "please review the pull request",
+    "win free money now",
+    "free lottery ticket winner",
+    "claim your prize today free",
+    "urgent offer free cash",
+    "congratulations you won free",
+    "meeting tomorrow at noon",
+    "project update attached",
+    "can we schedule a call",
+    "quarterly report review",
+    "lunch on thursday sounds good",
+    "team standup notes attached",
+    "please review the pull request",
 ]
 
 train_labels = [
- "spam", "spam", "spam", "spam", "spam",
- "ham", "ham", "ham", "ham", "ham", "ham", "ham",
+    "spam", "spam", "spam", "spam", "spam",
+    "ham", "ham", "ham", "ham", "ham", "ham", "ham",
 ]
 
 classifier = NaiveBayes()
 classifier.train(train_docs, train_labels)
 
 test_messages = [
- "free money waiting for you",
- "meeting rescheduled to friday",
- "you won a free prize",
- "please review the attached report",
+    "free money waiting for you",
+    "meeting rescheduled to friday",
+    "you won a free prize",
+    "please review the attached report",
 ]
 
 for msg in test_messages:
- print(f" '{msg}' -> {classifier.predict(msg)}")
+    print(f"  '{msg}' -> {classifier.predict(msg)}")
 ```
 
 ### Step 4: Inspect the learned probabilities
 
 ```python
 def show_top_words(classifier, cls, n=5):
- vocab_size = len(classifier.vocab)
- total = classifier.class_word_totals[cls]
- probs = {}
- for word in classifier.vocab:
- count = classifier.word_counts[cls].get(word, 0)
- probs[word] = (count + classifier.smoothing) / (total + classifier.smoothing * vocab_size)
- sorted_words = sorted(probs.items(), key=lambda x: x[1], reverse=True)
- for word, prob in sorted_words[:n]:
- print(f" {word}: {prob:.4f}")
+    vocab_size = len(classifier.vocab)
+    total = classifier.class_word_totals[cls]
+    probs = {}
+    for word in classifier.vocab:
+        count = classifier.word_counts[cls].get(word, 0)
+        probs[word] = (count + classifier.smoothing) / (total + classifier.smoothing * vocab_size)
+    sorted_words = sorted(probs.items(), key=lambda x: x[1], reverse=True)
+    for word, prob in sorted_words[:n]:
+        print(f"    {word}: {prob:.4f}")
 
 print("\nTop spam words:")
 show_top_words(classifier, "spam")
@@ -326,7 +326,7 @@ clf.fit(X_train, train_labels)
 X_test = vectorizer.transform(test_messages)
 predictions = clf.predict(X_test)
 for msg, pred in zip(test_messages, predictions):
- print(f" '{msg}' -> {pred}")
+    print(f"  '{msg}' -> {pred}")
 ```
 
 Same algorithm. CountVectorizer handles tokenization and vocabulary building. MultinomialNB handles smoothing and log-probabilities internally. Your from-scratch version does the same thing in 40 lines.
@@ -358,8 +358,8 @@ Special cases of the Beta prior:
 The update rule is dead simple:
 
 ```
-Prior: Beta(a, b)
-Data: s successes, f failures
+Prior:     Beta(a, b)
+Data:      s successes, f failures
 Posterior: Beta(a + s, b + f)
 ```
 
@@ -389,9 +389,9 @@ Posterior = Beta(8 + 5, 4 + 5) = Beta(13, 9)
 
 ```mermaid
 graph LR
- A["Prior<br/>Beta(1,1)<br/>mean = 0.50"] -->|"7H, 3T"| B["Posterior 1<br/>Beta(8,4)<br/>mean = 0.67"]
- B -->|"becomes prior"| C["Prior 2<br/>Beta(8,4)"]
- C -->|"5H, 5T"| D["Posterior 2<br/>Beta(13,9)<br/>mean = 0.59"]
+    A["Prior<br/>Beta(1,1)<br/>mean = 0.50"] -->|"7H, 3T"| B["Posterior 1<br/>Beta(8,4)<br/>mean = 0.67"]
+    B -->|"becomes prior"| C["Prior 2<br/>Beta(8,4)"]
+    C -->|"5H, 5T"| D["Posterior 2<br/>Beta(13,9)<br/>mean = 0.59"]
 ```
 
 The order of observations does not matter. Beta(1,1) updated with all 12 heads and 8 tails at once gives Beta(13, 9) -- the same result. Sequential updating and batch updating are mathematically equivalent. But sequential updating lets you make decisions at each step without storing raw data.
@@ -409,15 +409,15 @@ The Bayesian A/B test:
 1. **Prior.** Start with Beta(1, 1) for both variants. No prior preference.
 2. **Data.** Variant A: 50 clicks out of 1000 views. Variant B: 65 clicks out of 1000 views.
 3. **Posteriors.**
- - A: Beta(1 + 50, 1 + 950) = Beta(51, 951). Mean = 0.051
- - B: Beta(1 + 65, 1 + 935) = Beta(66, 936). Mean = 0.066
+   - A: Beta(1 + 50, 1 + 950) = Beta(51, 951). Mean = 0.051
+   - B: Beta(1 + 65, 1 + 935) = Beta(66, 936). Mean = 0.066
 4. **Decision.** Compute P(B > A) -- the probability that B's true conversion rate is higher than A's.
 
 Computing P(B > A) analytically is hard. But Monte Carlo makes it trivial:
 
 ```
-1. Draw 100,000 samples from Beta(51, 951) -> samples_A
-2. Draw 100,000 samples from Beta(66, 936) -> samples_B
+1. Draw 100,000 samples from Beta(51, 951)  -> samples_A
+2. Draw 100,000 samples from Beta(66, 936)  -> samples_B
 3. P(B > A) = fraction of samples where B > A
 ```
 
