@@ -180,24 +180,24 @@ Progress tracking for every phase and lesson.
 | 16 | [Voice Anti-Spoofing & Audio Watermarking](phases/06-speech-and-audio/16-anti-spoofing-audio-watermarking) | ✅ | ~75 min |
 | 17 | [Audio Evaluation — WER, MOS, MMAU, Leaderboards](phases/06-speech-and-audio/17-audio-evaluation-metrics) | ✅ | ~60 min |
 
-## Phase 7: Transformers Deep Dive — 🚧 (~14 hours)
+## Phase 7: Transformers Deep Dive — ✅ (~14 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Why Transformers — The Problems with RNNs | ⬚ | ~45 min |
-| 02 | Self-Attention from Scratch | ✅ | ~75 min |
-| 03 | Multi-Head Attention | ⬚ | ~75 min |
-| 04 | Positional Encoding — Sinusoidal, RoPE, ALiBi | ⬚ | ~45 min |
-| 05 | The Full Transformer — Encoder + Decoder | ⬚ | ~75 min |
-| 06 | BERT — Masked Language Modeling | ⬚ | ~45 min |
-| 07 | GPT — Causal Language Modeling | ⬚ | ~75 min |
-| 08 | T5, BART — Encoder-Decoder Models | ⬚ | ~45 min |
-| 09 | Vision Transformers (ViT) | ⬚ | ~45 min |
-| 10 | Audio Transformers — Whisper Architecture | ⬚ | ~45 min |
-| 11 | Mixture of Experts (MoE) | ⬚ | ~45 min |
-| 12 | KV Cache, Flash Attention & Inference Optimization | ⬚ | ~75 min |
-| 13 | Scaling Laws | ⬚ | ~45 min |
-| 14 | Build a Transformer from Scratch — The Capstone | ⬚ | ~120 min |
+| 01 | [Why Transformers — The Problems with RNNs](phases/07-transformers-deep-dive/01-why-transformers) | ✅ | ~45 min |
+| 02 | [Self-Attention from Scratch](phases/07-transformers-deep-dive/02-self-attention-from-scratch) | ✅ | ~75 min |
+| 03 | [Multi-Head Attention](phases/07-transformers-deep-dive/03-multi-head-attention) | ✅ | ~75 min |
+| 04 | [Positional Encoding — Sinusoidal, RoPE, ALiBi](phases/07-transformers-deep-dive/04-positional-encoding) | ✅ | ~45 min |
+| 05 | [The Full Transformer — Encoder + Decoder](phases/07-transformers-deep-dive/05-full-transformer) | ✅ | ~75 min |
+| 06 | [BERT — Masked Language Modeling](phases/07-transformers-deep-dive/06-bert-masked-language-modeling) | ✅ | ~45 min |
+| 07 | [GPT — Causal Language Modeling](phases/07-transformers-deep-dive/07-gpt-causal-language-modeling) | ✅ | ~75 min |
+| 08 | [T5, BART — Encoder-Decoder Models](phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder) | ✅ | ~45 min |
+| 09 | [Vision Transformers (ViT)](phases/07-transformers-deep-dive/09-vision-transformers) | ✅ | ~45 min |
+| 10 | [Audio Transformers — Whisper Architecture](phases/07-transformers-deep-dive/10-audio-transformers-whisper) | ✅ | ~45 min |
+| 11 | [Mixture of Experts (MoE)](phases/07-transformers-deep-dive/11-mixture-of-experts) | ✅ | ~45 min |
+| 12 | [KV Cache, Flash Attention & Inference Optimization](phases/07-transformers-deep-dive/12-kv-cache-flash-attention) | ✅ | ~75 min |
+| 13 | [Scaling Laws](phases/07-transformers-deep-dive/13-scaling-laws) | ✅ | ~45 min |
+| 14 | [Build a Transformer from Scratch — The Capstone](phases/07-transformers-deep-dive/14-build-a-transformer-capstone) | ✅ | ~120 min |
 
 ## Phase 8: Generative AI — ⬚ (~14 hours)
 
@@ -397,6 +397,6 @@ Progress tracking for every phase and lesson.
 
 ---
 
-**Total: 20 phases, 272+ lessons | 127 complete | ~306 hours estimated**
+**Total: 20 phases, 300+ lessons | 191 complete | ~340 hours estimated**
 
 Want to help? Pick any ⬚ lesson and submit a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
