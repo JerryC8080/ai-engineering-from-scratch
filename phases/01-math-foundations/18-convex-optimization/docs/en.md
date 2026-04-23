@@ -95,15 +95,15 @@ This means gradient descent cannot get trapped. Any downhill path leads to the s
 
 ```mermaid
 graph LR
-    subgraph "Convex: ONE answer"
-        direction TB
-        C1["Loss surface has a single valley"] --> C2["Gradient descent ALWAYS finds the global minimum"]
-    end
-    subgraph "Non-convex: MANY traps"
-        direction TB
-        N1["Loss surface has multiple valleys and peaks"] --> N2["Gradient descent may get stuck in a local minimum"]
-        N2 --> N3["Global minimum might be missed"]
-    end
+ subgraph "Convex: ONE answer"
+ direction TB
+ C1["Loss surface has a single valley"] --> C2["Gradient descent ALWAYS finds the global minimum"]
+ end
+ subgraph "Non-convex: MANY traps"
+ direction TB
+ N1["Loss surface has multiple valleys and peaks"] --> N2["Gradient descent may get stuck in a local minimum"]
+ N2 --> N3["Global minimum might be missed"]
+ end
 ```
 
 Consequences:
@@ -138,11 +138,11 @@ H[i][j] = d^2 f / (dx_i dx_j)
 For f(x, y) = x^2 + 3xy + y^2:
 
 ```
-df/dx = 2x + 3y       d^2f/dx^2 = 2      d^2f/dxdy = 3
-df/dy = 3x + 2y       d^2f/dydx = 3      d^2f/dy^2 = 2
+df/dx = 2x + 3y d^2f/dx^2 = 2 d^2f/dxdy = 3
+df/dy = 3x + 2y d^2f/dydx = 3 d^2f/dy^2 = 2
 
-H = [ 2  3 ]
-    [ 3  2 ]
+H = [ 2 3 ]
+ [ 3 2 ]
 ```
 
 The Hessian tells you about curvature:
@@ -159,29 +159,29 @@ Gradient descent uses first-order information (the gradient). Newton's method us
 
 ```
 Update rule:
-  x_new = x - H^(-1) * gradient
+ x_new = x - H^(-1) * gradient
 
 Compare to gradient descent:
-  x_new = x - lr * gradient
+ x_new = x - lr * gradient
 ```
 
 Newton's method replaces the scalar learning rate with the inverse Hessian. This automatically adjusts the step size and direction based on local curvature.
 
 ```mermaid
 graph TD
-    subgraph "Gradient Descent"
-        GD1["Start"] --> GD2["Step 1"]
-        GD2 --> GD3["Step 2"]
-        GD3 --> GD4["..."]
-        GD4 --> GD5["Step ~500: Converged"]
-        GD_note["Follows gradient blindly — many small steps"]
-    end
-    subgraph "Newton's Method"
-        NM1["Start"] --> NM2["Step 1"]
-        NM2 --> NM3["..."]
-        NM3 --> NM4["Step ~5: Converged"]
-        NM_note["Uses curvature for optimal steps"]
-    end
+ subgraph "Gradient Descent"
+ GD1["Start"] --> GD2["Step 1"]
+ GD2 --> GD3["Step 2"]
+ GD3 --> GD4["..."]
+ GD4 --> GD5["Step ~500: Converged"]
+ GD_note["Follows gradient blindly — many small steps"]
+ end
+ subgraph "Newton's Method"
+ NM1["Start"] --> NM2["Step 1"]
+ NM2 --> NM3["..."]
+ NM3 --> NM4["Step ~5: Converged"]
+ NM_note["Uses curvature for optimal steps"]
+ end
 ```
 
 Advantages:
@@ -203,13 +203,13 @@ Real problems have constraints. You want to minimize cost but your budget is lim
 
 ```mermaid
 graph LR
-    subgraph "Unconstrained"
-        U1["Loss function"] --> U2["Free minimum: lowest point of the loss surface"]
-    end
-    subgraph "Constrained"
-        C1["Loss function"] --> C2["Constrained minimum: lowest point within the feasible region"]
-        C3["Constraint boundary limits the search space"]
-    end
+ subgraph "Unconstrained"
+ U1["Loss function"] --> U2["Free minimum: lowest point of the loss surface"]
+ end
+ subgraph "Constrained"
+ C1["Loss function"] --> C2["Constrained minimum: lowest point within the feasible region"]
+ C3["Constraint boundary limits the search space"]
+ end
 ```
 
 ### Lagrange multipliers
@@ -235,9 +235,9 @@ Geometric intuition: at the constrained minimum, the gradient of f must be paral
 
 ```mermaid
 graph LR
-    A["Contours of f(x,y): concentric ellipses"] --- S["Solution point"]
-    B["Constraint curve g(x,y) = 0"] --- S
-    S --- C["At the solution, gradient of f is parallel to gradient of g"]
+ A["Contours of f(x,y): concentric ellipses"] --- S["Solution point"]
+ B["Constraint curve g(x,y) = 0"] --- S
+ S --- C["At the solution, gradient of f is parallel to gradient of g"]
 ```
 
 Example: minimize f(x,y) = x^2 + y^2 subject to x + y = 1.
@@ -245,8 +245,8 @@ Example: minimize f(x,y) = x^2 + y^2 subject to x + y = 1.
 ```
 L = x^2 + y^2 + lambda(x + y - 1)
 
-dL/dx = 2x + lambda = 0  =>  x = -lambda/2
-dL/dy = 2y + lambda = 0  =>  y = -lambda/2
+dL/dx = 2x + lambda = 0 => x = -lambda/2
+dL/dy = 2y + lambda = 0 => y = -lambda/2
 dL/dlambda = x + y - 1 = 0
 
 From first two: x = y
@@ -259,15 +259,15 @@ The closest point on the line x + y = 1 to the origin is (0.5, 0.5).
 
 The Karush-Kuhn-Tucker conditions extend Lagrange multipliers to inequality constraints.
 
-Problem: minimize f(x) subject to g_i(x) <= 0 for i = 1, ..., m.
+Problem: minimize f(x) subject to g_i(x) <= 0 for i = 1,..., m.
 
 The KKT conditions (necessary for optimality):
 
 ```
-1. Stationarity:    df/dx + sum(lambda_i * dg_i/dx) = 0
-2. Primal feasibility:  g_i(x) <= 0  for all i
-3. Dual feasibility:    lambda_i >= 0  for all i
-4. Complementary slackness:  lambda_i * g_i(x) = 0  for all i
+1. Stationarity: df/dx + sum(lambda_i * dg_i/dx) = 0
+2. Primal feasibility: g_i(x) <= 0 for all i
+3. Dual feasibility: lambda_i >= 0 for all i
+4. Complementary slackness: lambda_i * g_i(x) = 0 for all i
 ```
 
 Complementary slackness is the key insight: either the constraint is active (g_i = 0, the solution sits on the boundary) or the multiplier is zero (the constraint does not matter). A constraint that does not affect the solution has lambda = 0.
@@ -281,10 +281,10 @@ L1 and L2 regularization are not arbitrary tricks. They are constrained optimiza
 **L2 regularization (Ridge):**
 
 ```
-minimize  Loss(w)  subject to  ||w||^2 <= t
+minimize Loss(w) subject to ||w||^2 <= t
 
 Equivalent unconstrained form:
-minimize  Loss(w) + lambda * ||w||^2
+minimize Loss(w) + lambda * ||w||^2
 ```
 
 The constraint ||w||^2 <= t defines a ball (circle in 2D, sphere in 3D). The solution is where the loss contours first touch this ball.
@@ -292,10 +292,10 @@ The constraint ||w||^2 <= t defines a ball (circle in 2D, sphere in 3D). The sol
 **L1 regularization (LASSO):**
 
 ```
-minimize  Loss(w)  subject to  ||w||_1 <= t
+minimize Loss(w) subject to ||w||_1 <= t
 
 Equivalent unconstrained form:
-minimize  Loss(w) + lambda * ||w||_1
+minimize Loss(w) + lambda * ||w||_1
 ```
 
 The constraint ||w||_1 <= t defines a diamond (rotated square in 2D).
@@ -331,10 +331,10 @@ For SVMs specifically:
 
 ```
 Primal: find w, b that maximize the margin 2/||w|| subject to
-        y_i(w^T x_i + b) >= 1 for all i
+ y_i(w^T x_i + b) >= 1 for all i
 
-Dual:   maximize sum(alpha_i) - 0.5 * sum_ij(alpha_i * alpha_j * y_i * y_j * x_i^T x_j)
-        subject to alpha_i >= 0 and sum(alpha_i * y_i) = 0
+Dual: maximize sum(alpha_i) - 0.5 * sum_ij(alpha_i * alpha_j * y_i * y_j * x_i^T x_j)
+ subject to alpha_i >= 0 and sum(alpha_i * y_i) = 0
 
 The dual only involves dot products x_i^T x_j.
 Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.
@@ -392,17 +392,17 @@ import random
 import math
 
 def check_convexity(f, dim, bounds=(-5, 5), samples=1000):
-    violations = 0
-    for _ in range(samples):
-        x = [random.uniform(*bounds) for _ in range(dim)]
-        y = [random.uniform(*bounds) for _ in range(dim)]
-        t = random.uniform(0, 1)
-        mid = [t * xi + (1 - t) * yi for xi, yi in zip(x, y)]
-        lhs = f(mid)
-        rhs = t * f(x) + (1 - t) * f(y)
-        if lhs > rhs + 1e-10:
-            violations += 1
-    return violations == 0, violations
+ violations = 0
+ for _ in range(samples):
+ x = [random.uniform(*bounds) for _ in range(dim)]
+ y = [random.uniform(*bounds) for _ in range(dim)]
+ t = random.uniform(0, 1)
+ mid = [t * xi + (1 - t) * yi for xi, yi in zip(x, y)]
+ lhs = f(mid)
+ rhs = t * f(x) + (1 - t) * f(y)
+ if lhs > rhs + 1e-10:
+ violations += 1
+ return violations == 0, violations
 ```
 
 ### Step 2: Newton's method for 2D
@@ -411,27 +411,27 @@ Implement Newton's method using an explicit Hessian. Compare convergence speed a
 
 ```python
 def newtons_method(f, grad_f, hessian_f, x0, steps=50, tol=1e-12):
-    x = list(x0)
-    history = [x[:]]
-    for _ in range(steps):
-        g = grad_f(x)
-        H = hessian_f(x)
-        det = H[0][0] * H[1][1] - H[0][1] * H[1][0]
-        if abs(det) < 1e-15:
-            break
-        H_inv = [
-            [H[1][1] / det, -H[0][1] / det],
-            [-H[1][0] / det, H[0][0] / det],
-        ]
-        dx = [
-            H_inv[0][0] * g[0] + H_inv[0][1] * g[1],
-            H_inv[1][0] * g[0] + H_inv[1][1] * g[1],
-        ]
-        x = [x[0] - dx[0], x[1] - dx[1]]
-        history.append(x[:])
-        if sum(gi ** 2 for gi in g) < tol:
-            break
-    return history
+ x = list(x0)
+ history = [x[:]]
+ for _ in range(steps):
+ g = grad_f(x)
+ H = hessian_f(x)
+ det = H[0][0] * H[1][1] - H[0][1] * H[1][0]
+ if abs(det) < 1e-15:
+ break
+ H_inv = [
+ [H[1][1] / det, -H[0][1] / det],
+ [-H[1][0] / det, H[0][0] / det],
+ ]
+ dx = [
+ H_inv[0][0] * g[0] + H_inv[0][1] * g[1],
+ H_inv[1][0] * g[0] + H_inv[1][1] * g[1],
+ ]
+ x = [x[0] - dx[0], x[1] - dx[1]]
+ history.append(x[:])
+ if sum(gi ** 2 for gi in g) < tol:
+ break
+ return history
 ```
 
 ### Step 3: Lagrange multiplier solver
@@ -440,21 +440,21 @@ Solve constrained optimization using gradient descent on the Lagrangian.
 
 ```python
 def lagrange_solve(f_grad, g_val, g_grad, x0, lr=0.01,
-                   lr_lambda=0.01, steps=5000):
-    x = list(x0)
-    lam = 0.0
-    history = []
-    for _ in range(steps):
-        fg = f_grad(x)
-        gv = g_val(x)
-        gg = g_grad(x)
-        x = [
-            xi - lr * (fgi + lam * ggi)
-            for xi, fgi, ggi in zip(x, fg, gg)
-        ]
-        lam = lam + lr_lambda * gv
-        history.append((x[:], lam, gv))
-    return history
+ lr_lambda=0.01, steps=5000):
+ x = list(x0)
+ lam = 0.0
+ history = []
+ for _ in range(steps):
+ fg = f_grad(x)
+ gv = g_val(x)
+ gg = g_grad(x)
+ x = [
+ xi - lr * (fgi + lam * ggi)
+ for xi, fgi, ggi in zip(x, fg, gg)
+ ]
+ lam = lam + lr_lambda * gv
+ history.append((x[:], lam, gv))
+ return history
 ```
 
 ### Step 4: Compare first-order vs second-order
@@ -463,13 +463,13 @@ Run gradient descent and Newton's method on the same quadratic function. Count t
 
 ```python
 def quadratic(x):
-    return 5 * x[0] ** 2 + x[1] ** 2
+ return 5 * x[0] ** 2 + x[1] ** 2
 
 def quadratic_grad(x):
-    return [10 * x[0], 2 * x[1]]
+ return [10 * x[0], 2 * x[1]]
 
 def quadratic_hessian(x):
-    return [[10, 0], [0, 2]]
+ return [[10, 0], [0, 2]]
 ```
 
 Newton's method will converge in 1 step (it is exact for quadratics). Gradient descent will take hundreds of steps because the eigenvalues of the Hessian differ by a factor of 5, creating an elongated valley.
@@ -493,10 +493,10 @@ For non-convex problems (neural networks):
 from scipy.optimize import minimize
 
 result = minimize(
-    fun=lambda w: sum((y - X @ w) ** 2) + 0.1 * sum(w ** 2),
-    x0=np.zeros(d),
-    method='L-BFGS-B',
-    jac=lambda w: -2 * X.T @ (y - X @ w) + 0.2 * w,
+ fun=lambda w: sum((y - X @ w) ** 2) + 0.1 * sum(w ** 2),
+ x0=np.zeros(d),
+ method='L-BFGS-B',
+ jac=lambda w: -2 * X.T @ (y - X @ w) + 0.2 * w,
 )
 ```
 

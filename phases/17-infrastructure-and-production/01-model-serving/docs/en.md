@@ -32,15 +32,15 @@ Serving a model means wrapping it in a service that accepts requests over a netw
 
 ```mermaid
 flowchart LR
-    A[Client] -->|HTTP POST /v1/completions| B[Load Balancer]
-    B --> C[Server Instance 1]
-    B --> D[Server Instance 2]
-    C --> E[GPU 0]
-    D --> F[GPU 1]
-    E -->|tokens| C
-    F -->|tokens| D
-    C -->|SSE stream| A
-    D -->|SSE stream| A
+ A[Client] -->|HTTP POST /v1/completions| B[Load Balancer]
+ B --> C[Server Instance 1]
+ B --> D[Server Instance 2]
+ C --> E[GPU 0]
+ D --> F[GPU 1]
+ E -->|tokens| C
+ F -->|tokens| D
+ C -->|SSE stream| A
+ D -->|SSE stream| A
 ```
 
 A model sitting in memory on a GPU does nothing until a request arrives. The serving layer is everything between the network and the forward pass: parsing the request, tokenizing the input, scheduling it onto hardware, running the computation, decoding the output, and streaming it back.
@@ -55,19 +55,19 @@ There are two deployment models for serving.
 
 ```mermaid
 flowchart TB
-    subgraph Shared["Shared Inference"]
-        U1[User A] --> S1[Model Instance]
-        U2[User B] --> S1
-        U3[User C] --> S1
-        S1 --> G1[GPU - batched]
-    end
+ subgraph Shared["Shared Inference"]
+ U1[User A] --> S1[Model Instance]
+ U2[User B] --> S1
+ U3[User C] --> S1
+ S1 --> G1[GPU - batched]
+ end
 
-    subgraph Dedicated["Dedicated Inference"]
-        U4[User D] --> S2[Model Instance A]
-        U5[User E] --> S3[Model Instance B]
-        S2 --> G2[GPU 0]
-        S3 --> G3[GPU 1]
-    end
+ subgraph Dedicated["Dedicated Inference"]
+ U4[User D] --> S2[Model Instance A]
+ U5[User E] --> S3[Model Instance B]
+ S2 --> G2[GPU 0]
+ S3 --> G3[GPU 1]
+ end
 ```
 
 Most production systems use shared inference with batching. The economics are simple: an A100 GPU costs ~$2/hour. If it serves one user at a time, that user pays the full cost. If it serves 50 users simultaneously via batching, each pays 1/50th. Batching is why API inference is cheap.
@@ -102,26 +102,26 @@ Four numbers define model serving performance:
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Server
-    participant GPU
+ participant User
+ participant Server
+ participant GPU
 
-    User->>Server: POST /generate (prompt)
-    Note over Server: Queue wait time
-    Server->>GPU: Prefill (process full prompt)
-    Note over GPU: TTFT measured here
-    GPU-->>Server: First token
-    Server-->>User: SSE: token 1
+ User->>Server: POST /generate (prompt)
+ Note over Server: Queue wait time
+ Server->>GPU: Prefill (process full prompt)
+ Note over GPU: TTFT measured here
+ GPU-->>Server: First token
+ Server-->>User: SSE: token 1
 
-    loop Decode loop
-        GPU-->>Server: Next token
-        Server-->>User: SSE: next token
-        Note over User: TPS measured here
-    end
+ loop Decode loop
+ GPU-->>Server: Next token
+ Server-->>User: SSE: next token
+ Note over User: TPS measured here
+ end
 
-    GPU-->>Server: [DONE]
-    Server-->>User: SSE: [DONE]
-    Note over User: Total latency = P99 target
+ GPU-->>Server: [DONE]
+ Server-->>User: SSE: [DONE]
+ Note over User: Total latency = P99 target
 ```
 
 ### The Serving Frameworks
@@ -150,11 +150,11 @@ The OpenAI chat completions API has become the de facto standard for LLM serving
 ```
 POST /v1/chat/completions
 {
-  "model": "my-model",
-  "messages": [{"role": "user", "content": "Hello"}],
-  "stream": true,
-  "max_tokens": 256,
-  "temperature": 0.7
+ "model": "my-model",
+ "messages": [{"role": "user", "content": "Hello"}],
+ "stream": true,
+ "max_tokens": 256,
+ "temperature": 0.7
 }
 ```
 
@@ -174,18 +174,18 @@ A single request flows through multiple stages:
 
 ```mermaid
 flowchart TD
-    A[HTTP Request] --> B[Parse + Validate]
-    B --> C[Tokenize Input]
-    C --> D{Queue Full?}
-    D -->|Yes| E[Return 429]
-    D -->|No| F[Add to Queue]
-    F --> G[Batch Scheduler]
-    G --> H[Prefill on GPU]
-    H --> I[Generate Token]
-    I --> J{EOS or Max?}
-    J -->|No| K[Stream Token]
-    K --> I
-    J -->|Yes| L[Return Response]
+ A[HTTP Request] --> B[Parse + Validate]
+ B --> C[Tokenize Input]
+ C --> D{Queue Full?}
+ D -->|Yes| E[Return 429]
+ D -->|No| F[Add to Queue]
+ F --> G[Batch Scheduler]
+ G --> H[Prefill on GPU]
+ H --> I[Generate Token]
+ I --> J{EOS or Max?}
+ J -->|No| K[Stream Token]
+ K --> I
+ J -->|Yes| L[Return Response]
 ```
 
 1. **Parse and validate** the incoming JSON. Check for required fields, enforce token limits.
@@ -208,14 +208,14 @@ Batching fixes this by processing multiple requests simultaneously. Instead of r
 
 ```
 Static Batching:
-  Request 1: [====]................  (done early, GPU idle)
-  Request 2: [====================]  (long generation)
-  Request 3: .....................[==]  (waits for batch to finish)
+ Request 1: [====]................ (done early, GPU idle)
+ Request 2: [====================] (long generation)
+ Request 3:.....................[==] (waits for batch to finish)
 
 Continuous Batching:
-  Request 1: [====]
-  Request 3: .....[========]         (fills slot immediately)
-  Request 2: [====================]
+ Request 1: [====]
+ Request 3:.....[========] (fills slot immediately)
+ Request 2: [====================]
 ```
 
 vLLM's continuous batching is why it achieves 2-4x higher throughput than naive serving.

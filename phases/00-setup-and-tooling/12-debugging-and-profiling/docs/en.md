@@ -26,9 +26,9 @@ AI debugging operates at three levels:
 
 ```mermaid
 graph TD
-    L3["3. Training Dynamics<br/>Loss curves, gradient norms, activations"] --> L2
-    L2["2. Tensor Operations<br/>Shapes, dtypes, devices, NaN/Inf values"] --> L1
-    L1["1. Standard Python<br/>Breakpoints, logging, profiling, memory"]
+ L3["3. Training Dynamics<br/>Loss curves, gradient norms, activations"] --> L2
+ L2["2. Tensor Operations<br/>Shapes, dtypes, devices, NaN/Inf values"] --> L1
+ L1["1. Standard Python<br/>Breakpoints, logging, profiling, memory"]
 ```
 
 Most people jump straight to level 3 (staring at TensorBoard). But 80% of AI bugs live at levels 1 and 2.
@@ -41,11 +41,11 @@ Print debugging gets dismissed. It shouldn't. For tensor code, a targeted print 
 
 ```python
 def debug_print(name, tensor):
-    print(f"{name}: shape={tensor.shape}, dtype={tensor.dtype}, "
-          f"device={tensor.device}, "
-          f"min={tensor.min().item():.4f}, max={tensor.max().item():.4f}, "
-          f"mean={tensor.mean().item():.4f}, "
-          f"has_nan={tensor.isnan().any().item()}")
+ print(f"{name}: shape={tensor.shape}, dtype={tensor.dtype}, "
+ f"device={tensor.device}, "
+ f"min={tensor.min().item():.4f}, max={tensor.max().item():.4f}, "
+ f"mean={tensor.mean().item():.4f}, "
+ f"has_nan={tensor.isnan().any().item()}")
 ```
 
 Call this after every suspicious operation. When the bug is found, remove the prints. Simple.
@@ -56,15 +56,15 @@ The built-in debugger is underrated for AI work. Drop `breakpoint()` into your t
 
 ```python
 def training_step(model, batch, criterion, optimizer):
-    inputs, labels = batch
-    outputs = model(inputs)
-    loss = criterion(outputs, labels)
+ inputs, labels = batch
+ outputs = model(inputs)
+ loss = criterion(outputs, labels)
 
-    if loss.item() > 100 or torch.isnan(loss):
-        breakpoint()
+ if loss.item() > 100 or torch.isnan(loss):
+ breakpoint()
 
-    loss.backward()
-    optimizer.step()
+ loss.backward()
+ optimizer.step()
 ```
 
 When the debugger drops you in, useful commands:
@@ -85,12 +85,12 @@ Replace print statements with logging when your debugging goes beyond a quick ch
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("training.log"),
-        logging.StreamHandler()
-    ]
+ level=logging.INFO,
+ format="%(asctime)s [%(levelname)s] %(message)s",
+ handlers=[
+ logging.FileHandler("training.log"),
+ logging.StreamHandler()
+ ]
 )
 logger = logging.getLogger(__name__)
 
@@ -109,25 +109,25 @@ Knowing where time goes is the first step to optimization.
 import time
 
 class Timer:
-    def __init__(self, name=""):
-        self.name = name
+ def __init__(self, name=""):
+ self.name = name
 
-    def __enter__(self):
-        self.start = time.perf_counter()
-        return self
+ def __enter__(self):
+ self.start = time.perf_counter()
+ return self
 
-    def __exit__(self, *args):
-        elapsed = time.perf_counter() - self.start
-        print(f"[{self.name}] {elapsed:.4f}s")
+ def __exit__(self, *args):
+ elapsed = time.perf_counter() - self.start
+ print(f"[{self.name}] {elapsed:.4f}s")
 
 with Timer("data loading"):
-    batch = next(dataloader_iter)
+ batch = next(dataloader_iter)
 
 with Timer("forward pass"):
-    outputs = model(batch)
+ outputs = model(batch)
 
 with Timer("backward pass"):
-    loss.backward()
+ loss.backward()
 ```
 
 Common finding: data loading takes 60% of training time. The fix is `num_workers > 0` in your DataLoader, not a faster GPU.
@@ -149,10 +149,10 @@ pip install line_profiler
 ```python
 @profile
 def train_step(model, data, target):
-    output = model(data)
-    loss = F.cross_entropy(output, target)
-    loss.backward()
-    return loss
+ output = model(data)
+ loss = F.cross_entropy(output, target)
+ loss.backward()
+ return loss
 
 # Run with: kernprof -l -v train.py
 ```
@@ -173,7 +173,7 @@ data = load_dataset()
 snapshot = tracemalloc.take_snapshot()
 top_stats = snapshot.statistics("lineno")
 for stat in top_stats[:10]:
-    print(stat)
+ print(stat)
 ```
 
 #### CPU Memory with memory_profiler
@@ -187,9 +187,9 @@ from memory_profiler import profile
 
 @profile
 def load_data():
-    raw = read_csv("data.csv")       # watch memory jump here
-    processed = preprocess(raw)       # and here
-    return processed
+ raw = read_csv("data.csv") # watch memory jump here
+ processed = preprocess(raw) # and here
+ return processed
 ```
 
 Run with `python -m memory_profiler your_script.py` to see line-by-line memory usage.
@@ -200,10 +200,10 @@ Run with `python -m memory_profiler your_script.py` to see line-by-line memory u
 import torch
 
 if torch.cuda.is_available():
-    print(torch.cuda.memory_summary())
+ print(torch.cuda.memory_summary())
 
-    print(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB")
-    print(f"Cached: {torch.cuda.memory_reserved() / 1e9:.2f} GB")
+ print(f"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB")
+ print(f"Cached: {torch.cuda.memory_reserved() / 1e9:.2f} GB")
 ```
 
 When you hit OOM (Out of Memory):
@@ -222,24 +222,24 @@ The most frequent bug. A tensor has shape `[batch, features]` when the model exp
 
 ```python
 def check_shapes(model, sample_input):
-    print(f"Input: {sample_input.shape}")
-    hooks = []
+ print(f"Input: {sample_input.shape}")
+ hooks = []
 
-    def make_hook(name):
-        def hook(module, inp, out):
-            in_shape = inp[0].shape if isinstance(inp, tuple) else inp.shape
-            out_shape = out.shape if hasattr(out, "shape") else type(out)
-            print(f"  {name}: {in_shape} -> {out_shape}")
-        return hook
+ def make_hook(name):
+ def hook(module, inp, out):
+ in_shape = inp[0].shape if isinstance(inp, tuple) else inp.shape
+ out_shape = out.shape if hasattr(out, "shape") else type(out)
+ print(f" {name}: {in_shape} -> {out_shape}")
+ return hook
 
-    for name, module in model.named_modules():
-        hooks.append(module.register_forward_hook(make_hook(name)))
+ for name, module in model.named_modules():
+ hooks.append(module.register_forward_hook(make_hook(name)))
 
-    with torch.no_grad():
-        model(sample_input)
+ with torch.no_grad():
+ model(sample_input)
 
-    for h in hooks:
-        h.remove()
+ for h in hooks:
+ h.remove()
 ```
 
 Run this once with a sample batch. It maps every shape transformation in your model.
@@ -255,16 +255,16 @@ NaN loss means something exploded. Common causes:
 
 ```python
 def detect_nan(model, loss, step):
-    if torch.isnan(loss):
-        print(f"NaN loss at step {step}")
-        for name, param in model.named_parameters():
-            if param.grad is not None:
-                if torch.isnan(param.grad).any():
-                    print(f"  NaN gradient in {name}")
-                if torch.isinf(param.grad).any():
-                    print(f"  Inf gradient in {name}")
-        return True
-    return False
+ if torch.isnan(loss):
+ print(f"NaN loss at step {step}")
+ for name, param in model.named_parameters():
+ if param.grad is not None:
+ if torch.isnan(param.grad).any():
+ print(f" NaN gradient in {name}")
+ if torch.isinf(param.grad).any():
+ print(f" Inf gradient in {name}")
+ return True
+ return False
 ```
 
 #### Data Leakage
@@ -273,13 +273,13 @@ Your model gets 99% accuracy on the test set. Sounds great. It's a bug.
 
 ```python
 def check_data_leakage(train_set, test_set, id_column="id"):
-    train_ids = set(train_set[id_column].tolist())
-    test_ids = set(test_set[id_column].tolist())
-    overlap = train_ids & test_ids
-    if overlap:
-        print(f"DATA LEAKAGE: {len(overlap)} samples in both train and test")
-        return True
-    return False
+ train_ids = set(train_set[id_column].tolist())
+ test_ids = set(test_set[id_column].tolist())
+ overlap = train_ids & test_ids
+ if overlap:
+ print(f"DATA LEAKAGE: {len(overlap)} samples in both train and test")
+ return True
+ return False
 ```
 
 Also check for temporal leakage: using future data to predict the past. Sort by timestamp before splitting.
@@ -290,11 +290,11 @@ Tensors on different devices (CPU vs GPU) cause runtime errors. But sometimes a 
 
 ```python
 def check_devices(model, *tensors):
-    model_device = next(model.parameters()).device
-    print(f"Model device: {model_device}")
-    for i, t in enumerate(tensors):
-        if t.device != model_device:
-            print(f"  WARNING: tensor {i} on {t.device}, model on {model_device}")
+ model_device = next(model.parameters()).device
+ print(f"Model device: {model_device}")
+ for i, t in enumerate(tensors):
+ if t.device != model_device:
+ print(f" WARNING: tensor {i} on {t.device}, model on {model_device}")
 ```
 
 ### Part 8: TensorBoard Basics
@@ -311,16 +311,16 @@ from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter("runs/experiment_1")
 
 for step in range(num_steps):
-    loss = train_step(model, batch)
+ loss = train_step(model, batch)
 
-    writer.add_scalar("loss/train", loss.item(), step)
-    writer.add_scalar("lr", optimizer.param_groups[0]["lr"], step)
+ writer.add_scalar("loss/train", loss.item(), step)
+ writer.add_scalar("lr", optimizer.param_groups[0]["lr"], step)
 
-    if step % 100 == 0:
-        for name, param in model.named_parameters():
-            writer.add_histogram(f"weights/{name}", param, step)
-            if param.grad is not None:
-                writer.add_histogram(f"grads/{name}", param.grad, step)
+ if step % 100 == 0:
+ for name, param in model.named_parameters():
+ writer.add_histogram(f"weights/{name}", param, step)
+ if param.grad is not None:
+ writer.add_histogram(f"grads/{name}", param.grad, step)
 
 writer.close()
 ```
@@ -346,17 +346,17 @@ For interactive debugging, configure VS Code with a `launch.json`:
 
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug Training",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": false
-        }
-    ]
+ "version": "0.2.0",
+ "configurations": [
+ {
+ "name": "Debug Training",
+ "type": "debugpy",
+ "request": "launch",
+ "program": "${file}",
+ "console": "integratedTerminal",
+ "justMyCode": false
+ }
+ ]
 }
 ```
 

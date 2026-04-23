@@ -57,64 +57,64 @@ NVIDIA's 2026 benchmark. The chunk should be big enough to contain the answer pl
 
 ```python
 def chunk_fixed(text, size=512, overlap=0):
-    step = size - overlap
-    return [text[i:i + size] for i in range(0, len(text), step)]
+ step = size - overlap
+ return [text[i:i + size] for i in range(0, len(text), step)]
 
 
 def chunk_recursive(text, size=512, seps=("\n\n", "\n", ". ", " ")):
-    if len(text) <= size:
-        return [text]
-    for sep in seps:
-        if sep not in text:
-            continue
-        parts = text.split(sep)
-        chunks = []
-        buf = ""
-        for p in parts:
-            if len(p) > size:
-                if buf:
-                    chunks.append(buf)
-                    buf = ""
-                chunks.extend(chunk_recursive(p, size=size, seps=seps[1:] or (" ",)))
-                continue
-            candidate = buf + sep + p if buf else p
-            if len(candidate) <= size:
-                buf = candidate
-            else:
-                if buf:
-                    chunks.append(buf)
-                buf = p
-        if buf:
-            chunks.append(buf)
-        return [c for c in chunks if c.strip()]
-    return chunk_fixed(text, size)
+ if len(text) <= size:
+ return [text]
+ for sep in seps:
+ if sep not in text:
+ continue
+ parts = text.split(sep)
+ chunks = []
+ buf = ""
+ for p in parts:
+ if len(p) > size:
+ if buf:
+ chunks.append(buf)
+ buf = ""
+ chunks.extend(chunk_recursive(p, size=size, seps=seps[1:] or (" ",)))
+ continue
+ candidate = buf + sep + p if buf else p
+ if len(candidate) <= size:
+ buf = candidate
+ else:
+ if buf:
+ chunks.append(buf)
+ buf = p
+ if buf:
+ chunks.append(buf)
+ return [c for c in chunks if c.strip()]
+ return chunk_fixed(text, size)
 ```
 
 ### Step 2: semantic chunking
 
 ```python
 def chunk_semantic(text, encoder, threshold=0.6, min_chars=200, max_chars=2048):
-    sentences = split_sentences(text)
-    if not sentences:
-        return []
-    embs = encoder.encode(sentences, normalize_embeddings=True)
-    chunks = [[sentences[0]]]
-    for i in range(1, len(sentences)):
-        sim = float(embs[i] @ embs[i - 1])
-        current_len = sum(len(s) for s in chunks[-1])
-        if sim < threshold and current_len >= min_chars:
-            chunks.append([sentences[i]])
-        else:
-            chunks[-1].append(sentences[i])
+ sentences = split_sentences(text)
+ if not sentences:
+ return []
+ embs = encoder.encode(sentences, normalize_embeddings=True)
+ chunks = [[sentences[0]]]
+ for i in range(1, len(sentences)):
+ sim = float(embs[i] @ embs[i - 1])
+ current_len = sum(len(s) for s in chunks[-1])
+ if sim < threshold and current_len >= min_chars:
+ chunks.append([sentences[i]])
+ else:
+ chunks[-1].append(sentences[i])
 
-    result = []
-    for group in chunks:
-        text_group = " ".join(group)
-        if len(text_group) > max_chars:
-            result.extend(chunk_recursive(text_group, size=max_chars))
-        else:
-            result.append(text_group)
-    return result
+ result = []
+ for group in chunks:
+ text_group = " ".join(group)
+ if len(text_group) > max_chars:
+ result.extend(chunk_recursive(text_group, size=max_chars))
+ else:
+ result.append(text_group)
+ return result
 ```
 
 Tune `threshold` on your domain. Too high → fragments. Too low → one giant chunk.
@@ -123,26 +123,26 @@ Tune `threshold` on your domain. Too high → fragments. Too low → one giant c
 
 ```python
 def chunk_parent_child(text, parent_size=2048, child_size=256):
-    parents = chunk_recursive(text, size=parent_size)
-    mapping = []
-    for p_idx, parent in enumerate(parents):
-        children = chunk_recursive(parent, size=child_size)
-        for child in children:
-            mapping.append({"child": child, "parent_idx": p_idx, "parent": parent})
-    return mapping
+ parents = chunk_recursive(text, size=parent_size)
+ mapping = []
+ for p_idx, parent in enumerate(parents):
+ children = chunk_recursive(parent, size=child_size)
+ for child in children:
+ mapping.append({"child": child, "parent_idx": p_idx, "parent": parent})
+ return mapping
 
 
 def retrieve_parent(child_query, mapping, encoder, top_k=3):
-    child_embs = encoder.encode([m["child"] for m in mapping], normalize_embeddings=True)
-    q_emb = encoder.encode([child_query], normalize_embeddings=True)[0]
-    scores = child_embs @ q_emb
-    top = np.argsort(-scores)[:top_k]
-    seen, parents = set(), []
-    for i in top:
-        if mapping[i]["parent_idx"] not in seen:
-            parents.append(mapping[i]["parent"])
-            seen.add(mapping[i]["parent_idx"])
-    return parents
+ child_embs = encoder.encode([m["child"] for m in mapping], normalize_embeddings=True)
+ q_emb = encoder.encode([child_query], normalize_embeddings=True)[0]
+ scores = child_embs @ q_emb
+ top = np.argsort(-scores)[:top_k]
+ seen, parents = set(), []
+ for i in top:
+ if mapping[i]["parent_idx"] not in seen:
+ parents.append(mapping[i]["parent"])
+ seen.add(mapping[i]["parent_idx"])
+ return parents
 ```
 
 Key insight: dedupe parents. Multiple children can map to the same parent; returning all would waste context.
@@ -151,14 +151,14 @@ Key insight: dedupe parents. Multiple children can map to the same parent; retur
 
 ```python
 def contextualize_chunks(document, chunks, llm):
-    context_prompts = [
-        f"""<document>{document}</document>
+ context_prompts = [
+ f"""<document>{document}</document>
 Here is the chunk to situate: <chunk>{c}</chunk>
 Write 50-100 words placing this chunk in the document's context."""
-        for c in chunks
-    ]
-    contexts = llm.batch(context_prompts)
-    return [f"{ctx}\n\n{c}" for ctx, c in zip(contexts, chunks)]
+ for c in chunks
+ ]
+ contexts = llm.batch(context_prompts)
+ return [f"{ctx}\n\n{c}" for ctx, c in zip(contexts, chunks)]
 ```
 
 Index the contextualized chunks. At query time, retrieval benefits from the extra surrounding signal.
@@ -167,14 +167,14 @@ Index the contextualized chunks. At query time, retrieval benefits from the extr
 
 ```python
 def recall_at_k(queries, corpus_chunks, encoder, k=5):
-    chunk_embs = encoder.encode(corpus_chunks, normalize_embeddings=True)
-    hits = 0
-    for q_text, gold_idxs in queries:
-        q_emb = encoder.encode([q_text], normalize_embeddings=True)[0]
-        top = np.argsort(-(chunk_embs @ q_emb))[:k]
-        if any(i in gold_idxs for i in top):
-            hits += 1
-    return hits / len(queries)
+ chunk_embs = encoder.encode(corpus_chunks, normalize_embeddings=True)
+ hits = 0
+ for q_text, gold_idxs in queries:
+ q_emb = encoder.encode([q_text], normalize_embeddings=True)[0]
+ top = np.argsort(-(chunk_embs @ q_emb))[:k]
+ if any(i in gold_idxs for i in top):
+ hits += 1
+ return hits / len(queries)
 ```
 
 Always benchmark. The "best" strategy for your corpus may not match any blog post.

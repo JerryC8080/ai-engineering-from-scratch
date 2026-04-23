@@ -28,17 +28,17 @@ By 2026, pure CNNs are still competitive on edge devices (ConvNeXt is the strong
 
 ```mermaid
 flowchart LR
-    IMG["Image<br/>(3, 224, 224)"] --> PATCH["Patch embedding<br/>conv 16x16 s=16<br/>-> (768, 14, 14)"]
-    PATCH --> FLAT["Flatten to<br/>(196, 768) tokens"]
-    FLAT --> CAT["Prepend<br/>[CLS] token"]
-    CAT --> POS["Add learned<br/>positional embed"]
-    POS --> ENC["N transformer<br/>encoder blocks"]
-    ENC --> CLS["Take [CLS]<br/>token output"]
-    CLS --> HEAD["MLP classifier"]
+ IMG["Image<br/>(3, 224, 224)"] --> PATCH["Patch embedding<br/>conv 16x16 s=16<br/>-> (768, 14, 14)"]
+ PATCH --> FLAT["Flatten to<br/>(196, 768) tokens"]
+ FLAT --> CAT["Prepend<br/>[CLS] token"]
+ CAT --> POS["Add learned<br/>positional embed"]
+ POS --> ENC["N transformer<br/>encoder blocks"]
+ ENC --> CLS["Take [CLS]<br/>token output"]
+ CLS --> HEAD["MLP classifier"]
 
-    style PATCH fill:#dbeafe,stroke:#2563eb
-    style ENC fill:#fef3c7,stroke:#d97706
-    style HEAD fill:#dcfce7,stroke:#16a34a
+ style PATCH fill:#dbeafe,stroke:#2563eb
+ style ENC fill:#fef3c7,stroke:#d97706
+ style HEAD fill:#dcfce7,stroke:#16a34a
 ```
 
 Seven steps. Patches -> tokens -> attention -> classifier. Every variant (DeiT, Swin, ConvNeXt, MAE pretraining) changes one or two of the seven and leaves the rest alone.
@@ -48,7 +48,7 @@ Seven steps. Patches -> tokens -> attention -> classifier. Every variant (DeiT, 
 The first conv is the secret. Kernel size 16, stride 16, so a 224x224 image becomes a 14x14 grid of 16x16 patches, each projected to a 768-dim embedding. That single conv both patchifies and linearly projects.
 
 ```
-Input:  (3, 224, 224)
+Input: (3, 224, 224)
 Conv (3 -> 768, k=16, s=16, no padding):
 Output: (768, 14, 14)
 Flatten spatial: (196, 768)
@@ -61,7 +61,7 @@ Flatten spatial: (196, 768)
 A single learned vector prepended to the sequence:
 
 ```
-tokens = [CLS; patch_1; patch_2; ...; patch_196]   shape (197, 768)
+tokens = [CLS; patch_1; patch_2;...; patch_196] shape (197, 768)
 ```
 
 After N transformer blocks, the `[CLS]` output is the global image representation. Classification head reads only this one vector.
@@ -71,7 +71,7 @@ After N transformer blocks, the `[CLS]` output is the global image representatio
 Transformers have no built-in notion of spatial position. Add a learned vector to every token:
 
 ```
-tokens = tokens + learned_pos_embedding   (also shape (197, 768))
+tokens = tokens + learned_pos_embedding (also shape (197, 768))
 ```
 
 The embedding is a parameter of the model; gradient-based training adapts it to 2D image structure. Sinusoidal 2D alternatives exist but are rarely used in practice.
@@ -134,16 +134,16 @@ import torch
 import torch.nn as nn
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, in_channels=3, patch_size=16, dim=192, image_size=64):
-        super().__init__()
-        assert image_size % patch_size == 0
-        self.proj = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
-        num_patches = (image_size // patch_size) ** 2
-        self.num_patches = num_patches
+ def __init__(self, in_channels=3, patch_size=16, dim=192, image_size=64):
+ super().__init__()
+ assert image_size % patch_size == 0
+ self.proj = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
+ num_patches = (image_size // patch_size) ** 2
+ self.num_patches = num_patches
 
-    def forward(self, x):
-        x = self.proj(x)
-        return x.flatten(2).transpose(1, 2)
+ def forward(self, x):
+ x = self.proj(x)
+ return x.flatten(2).transpose(1, 2)
 ```
 
 One conv, one flatten, one transpose. That is the entire image-to-tokens step.
@@ -154,24 +154,24 @@ Pre-LN, multi-head self-attention, MLP with GELU, residual connections.
 
 ```python
 class Block(nn.Module):
-    def __init__(self, dim, num_heads, mlp_ratio=4, dropout=0.0):
-        super().__init__()
-        self.ln1 = nn.LayerNorm(dim)
-        self.attn = nn.MultiheadAttention(dim, num_heads, dropout=dropout, batch_first=True)
-        self.ln2 = nn.LayerNorm(dim)
-        self.mlp = nn.Sequential(
-            nn.Linear(dim, dim * mlp_ratio),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(dim * mlp_ratio, dim),
-            nn.Dropout(dropout),
-        )
+ def __init__(self, dim, num_heads, mlp_ratio=4, dropout=0.0):
+ super().__init__()
+ self.ln1 = nn.LayerNorm(dim)
+ self.attn = nn.MultiheadAttention(dim, num_heads, dropout=dropout, batch_first=True)
+ self.ln2 = nn.LayerNorm(dim)
+ self.mlp = nn.Sequential(
+ nn.Linear(dim, dim * mlp_ratio),
+ nn.GELU(),
+ nn.Dropout(dropout),
+ nn.Linear(dim * mlp_ratio, dim),
+ nn.Dropout(dropout),
+ )
 
-    def forward(self, x):
-        a, _ = self.attn(self.ln1(x), self.ln1(x), self.ln1(x), need_weights=False)
-        x = x + a
-        x = x + self.mlp(self.ln2(x))
-        return x
+ def forward(self, x):
+ a, _ = self.attn(self.ln1(x), self.ln1(x), self.ln1(x), need_weights=False)
+ x = x + a
+ x = x + self.mlp(self.ln2(x))
+ return x
 ```
 
 `nn.MultiheadAttention` handles the splitting into heads, the scaled dot-product, and the output projection. `batch_first=True` so shapes are `(N, seq, dim)`.
@@ -180,30 +180,30 @@ class Block(nn.Module):
 
 ```python
 class ViT(nn.Module):
-    def __init__(self, image_size=64, patch_size=16, in_channels=3,
-                 num_classes=10, dim=192, depth=6, num_heads=3, mlp_ratio=4):
-        super().__init__()
-        self.patch = PatchEmbedding(in_channels, patch_size, dim, image_size)
-        num_patches = self.patch.num_patches
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, dim))
-        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, dim))
-        self.blocks = nn.ModuleList([
-            Block(dim, num_heads, mlp_ratio) for _ in range(depth)
-        ])
-        self.ln = nn.LayerNorm(dim)
-        self.head = nn.Linear(dim, num_classes)
-        nn.init.trunc_normal_(self.pos_embed, std=0.02)
-        nn.init.trunc_normal_(self.cls_token, std=0.02)
+ def __init__(self, image_size=64, patch_size=16, in_channels=3,
+ num_classes=10, dim=192, depth=6, num_heads=3, mlp_ratio=4):
+ super().__init__()
+ self.patch = PatchEmbedding(in_channels, patch_size, dim, image_size)
+ num_patches = self.patch.num_patches
+ self.cls_token = nn.Parameter(torch.zeros(1, 1, dim))
+ self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, dim))
+ self.blocks = nn.ModuleList([
+ Block(dim, num_heads, mlp_ratio) for _ in range(depth)
+ ])
+ self.ln = nn.LayerNorm(dim)
+ self.head = nn.Linear(dim, num_classes)
+ nn.init.trunc_normal_(self.pos_embed, std=0.02)
+ nn.init.trunc_normal_(self.cls_token, std=0.02)
 
-    def forward(self, x):
-        x = self.patch(x)
-        cls = self.cls_token.expand(x.size(0), -1, -1)
-        x = torch.cat([cls, x], dim=1)
-        x = x + self.pos_embed
-        for blk in self.blocks:
-            x = blk(x)
-        x = self.ln(x[:, 0])
-        return self.head(x)
+ def forward(self, x):
+ x = self.patch(x)
+ cls = self.cls_token.expand(x.size(0), -1, -1)
+ x = torch.cat([cls, x], dim=1)
+ x = x + self.pos_embed
+ for blk in self.blocks:
+ x = blk(x)
+ x = self.ln(x[:, 0])
+ return self.head(x)
 
 vit = ViT(image_size=64, patch_size=16, num_classes=10, dim=192, depth=6, num_heads=3)
 x = torch.randn(2, 3, 64, 64)
@@ -218,7 +218,7 @@ About 2.8M parameters — a tiny ViT tractable on CPU. Real ViT-B is 86M; same c
 ```python
 logits = vit(torch.randn(1, 3, 64, 64))
 print(f"logits: {logits}")
-print(f"probs:  {logits.softmax(-1)}")
+print(f"probs: {logits.softmax(-1)}")
 ```
 
 Should run without error. Probabilities sum to 1.

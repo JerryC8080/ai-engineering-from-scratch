@@ -30,42 +30,41 @@ A 2D convolution takes a small weight matrix called the kernel (or filter), slid
 
 ```mermaid
 flowchart LR
-    subgraph IN["Input (H x W)"]
-        direction LR
-        I1["5 x 5 image"]
-    end
-    subgraph K["Kernel (3 x 3)"]
-        K1["learned<br/>weights"]
-    end
-    subgraph OUT["Output (H-2 x W-2)"]
-        O1["3 x 3 map"]
-    end
-    I1 --> |"slide kernel<br/>compute dot product<br/>at each position"| O1
-    K1 --> O1
+ subgraph IN["Input (H x W)"]
+ direction LR
+ I1["5 x 5 image"]
+ end
+ subgraph K["Kernel (3 x 3)"]
+ K1["learned<br/>weights"]
+ end
+ subgraph OUT["Output (H-2 x W-2)"]
+ O1["3 x 3 map"]
+ end
+ I1 --> |"slide kernel<br/>compute dot product<br/>at each position"| O1
+ K1 --> O1
 
-    style IN fill:#dbeafe,stroke:#2563eb
-    style K fill:#fef3c7,stroke:#d97706
-    style OUT fill:#dcfce7,stroke:#16a34a
+ style IN fill:#dbeafe,stroke:#2563eb
+ style K fill:#fef3c7,stroke:#d97706
+ style OUT fill:#dcfce7,stroke:#16a34a
 ```
 
 A concrete 3x3 example on a 5x5 input (no padding, stride 1):
 
 ```
-Input X (5 x 5):                Kernel W (3 x 3):
+Input X (5 x 5): Kernel W (3 x 3):
 
-  1  2  0  1  2                   1  0 -1
-  0  1  3  1  0                   2  0 -2
-  2  1  0  2  1                   1  0 -1
-  1  0  2  1  3
-  2  1  1  0  1
+ 1 2 0 1 2 1 0 -1
+ 0 1 3 1 0 2 0 -2
+ 2 1 0 2 1 1 0 -1
+ 1 0 2 1 3
+ 2 1 1 0 1
 
 The kernel slides across every valid 3 x 3 window. Output Y is 3 x 3:
 
  Y[0,0] = sum( W * X[0:3, 0:3] )
  Y[0,1] = sum( W * X[0:3, 1:4] )
  Y[0,2] = sum( W * X[0:3, 2:5] )
- Y[1,0] = sum( W * X[1:4, 0:3] )
- ... and so on
+ Y[1,0] = sum( W * X[1:4, 0:3] )... and so on
 ```
 
 That one formula — **shared weights, locality, sliding window** — is the entire idea. Everything else is bookkeeping.
@@ -97,13 +96,13 @@ Without padding, every convolution shrinks the feature map. Stack 20 of them and
 ```
 Zero padding (P = 1) on a 5 x 5 input:
 
-  0  0  0  0  0  0  0
-  0  1  2  0  1  2  0
-  0  0  1  3  1  0  0
-  0  2  1  0  2  1  0       Now the kernel can centre on pixel
-  0  1  0  2  1  3  0       (0, 0) and still have three rows and
-  0  2  1  1  0  1  0       three columns of values to multiply.
-  0  0  0  0  0  0  0
+ 0 0 0 0 0 0 0
+ 0 1 2 0 1 2 0
+ 0 0 1 3 1 0 0
+ 0 2 1 0 2 1 0 Now the kernel can centre on pixel
+ 0 1 0 2 1 3 0 (0, 0) and still have three rows and
+ 0 2 1 1 0 1 0 three columns of values to multiply.
+ 0 0 0 0 0 0 0
 ```
 
 Modes you meet in practice: `zero` (most common), `reflect` (mirror the edge, avoids hard borders in generative models), `replicate` (copy the edge), `circular` (wrap around, used in toroidal problems).
@@ -115,18 +114,18 @@ Stride is the step size of the slide. `stride=1` is the default. `stride=2` halv
 ```
 Stride 1 on a 5 x 5 input, 3 x 3 kernel:
 
-  starts: (0,0) (0,1) (0,2)        -> output row 0
-          (1,0) (1,1) (1,2)        -> output row 1
-          (2,0) (2,1) (2,2)        -> output row 2
+ starts: (0,0) (0,1) (0,2) -> output row 0
+ (1,0) (1,1) (1,2) -> output row 1
+ (2,0) (2,1) (2,2) -> output row 2
 
-  Output: 3 x 3
+ Output: 3 x 3
 
 Stride 2 on the same input:
 
-  starts: (0,0) (0,2)              -> output row 0
-          (2,0) (2,2)              -> output row 1
+ starts: (0,0) (0,2) -> output row 0
+ (2,0) (2,2) -> output row 1
 
-  Output: 2 x 2
+ Output: 2 x 2
 ```
 
 ### Multiple input channels
@@ -134,16 +133,16 @@ Stride 2 on the same input:
 Real images have three channels. A 3x3 convolution on an RGB input is actually a 3x3x3 volume: one 3x3 slice per input channel. At each spatial position, you multiply and sum across all three slices and add a bias.
 
 ```
-Input:   (C_in,  H,  W)        3 x 5 x 5
-Kernel:  (C_in,  K,  K)        3 x 3 x 3 (one kernel)
-Output:  (1,     H', W')       2D map
+Input: (C_in, H, W) 3 x 5 x 5
+Kernel: (C_in, K, K) 3 x 3 x 3 (one kernel)
+Output: (1, H', W') 2D map
 
 For a layer that produces C_out output channels, you stack C_out kernels:
 
-Weight:  (C_out, C_in, K, K)   e.g. 64 x 3 x 3 x 3
-Output:  (C_out, H', W')       64 x 3 x 3
+Weight: (C_out, C_in, K, K) e.g. 64 x 3 x 3 x 3
+Output: (C_out, H', W') 64 x 3 x 3
 
-Parameter count: C_out * C_in * K * K + C_out   (the + C_out is biases)
+Parameter count: C_out * C_in * K * K + C_out (the + C_out is biases)
 ```
 
 That last line is the one you will calculate when planning a model. A 64-channel 3x3 conv on a 3-channel input has `64 * 3 * 3 * 3 + 64 = 1,792` parameters. Cheap.
@@ -154,16 +153,16 @@ Nested loops are easy to read but slow. GPUs want big matrix multiplies. The tri
 
 ```mermaid
 flowchart LR
-    X["Input<br/>(C_in, H, W)"] --> IM2COL["im2col<br/>(extract patches)"]
-    IM2COL --> COLS["Cols matrix<br/>(C_in * K * K, H_out * W_out)"]
-    W["Weight<br/>(C_out, C_in, K, K)"] --> FLAT["Flatten<br/>(C_out, C_in * K * K)"]
-    FLAT --> MM["matmul"]
-    COLS --> MM
-    MM --> OUT["Output<br/>(C_out, H_out * W_out)<br/>reshape to (C_out, H_out, W_out)"]
+ X["Input<br/>(C_in, H, W)"] --> IM2COL["im2col<br/>(extract patches)"]
+ IM2COL --> COLS["Cols matrix<br/>(C_in * K * K, H_out * W_out)"]
+ W["Weight<br/>(C_out, C_in, K, K)"] --> FLAT["Flatten<br/>(C_out, C_in * K * K)"]
+ FLAT --> MM["matmul"]
+ COLS --> MM
+ MM --> OUT["Output<br/>(C_out, H_out * W_out)<br/>reshape to (C_out, H_out, W_out)"]
 
-    style X fill:#dbeafe,stroke:#2563eb
-    style W fill:#fef3c7,stroke:#d97706
-    style OUT fill:#dcfce7,stroke:#16a34a
+ style X fill:#dbeafe,stroke:#2563eb
+ style W fill:#fef3c7,stroke:#d97706
+ style OUT fill:#dcfce7,stroke:#16a34a
 ```
 
 Every production conv implementation is some variant of this plus cache-tiling tricks (direct conv, Winograd, FFT conv for large kernels). Understand im2col and you understand the core.
@@ -175,7 +174,7 @@ A single 3x3 conv looks at 9 input pixels. Stack two 3x3 convs and a neuron in t
 ```
 RF after L stacked K x K convs (stride 1) = 1 + L * (K - 1)
 
-With strides:   RF grows multiplicatively with stride along each layer.
+With strides: RF grows multiplicatively with stride along each layer.
 ```
 
 The entire reason "3x3 all the way down" works (VGG, ResNet, ConvNeXt) is that two 3x3 convs see the same input area as one 5x5 conv but with fewer parameters and an extra non-linearity in between.
@@ -190,12 +189,12 @@ Start with the smallest primitive: a function that pads with zeros around an H x
 import numpy as np
 
 def pad2d(x, p):
-    if p == 0:
-        return x
-    h, w = x.shape[-2:]
-    out = np.zeros(x.shape[:-2] + (h + 2 * p, w + 2 * p), dtype=x.dtype)
-    out[..., p:p + h, p:p + w] = x
-    return out
+ if p == 0:
+ return x
+ h, w = x.shape[-2:]
+ out = np.zeros(x.shape[:-2] + (h + 2 * p, w + 2 * p), dtype=x.dtype)
+ out[..., p:p + h, p:p + w] = x
+ return out
 
 x = np.arange(9).reshape(3, 3)
 print(x)
@@ -211,25 +210,25 @@ The reference implementation — slow, but unambiguous. This is what `torch.nn.f
 
 ```python
 def conv2d_naive(x, w, b=None, stride=1, padding=0):
-    c_in, h, w_in = x.shape
-    c_out, c_in_w, kh, kw = w.shape
-    assert c_in == c_in_w
+ c_in, h, w_in = x.shape
+ c_out, c_in_w, kh, kw = w.shape
+ assert c_in == c_in_w
 
-    x_pad = pad2d(x, padding)
-    h_out = (h + 2 * padding - kh) // stride + 1
-    w_out = (w_in + 2 * padding - kw) // stride + 1
+ x_pad = pad2d(x, padding)
+ h_out = (h + 2 * padding - kh) // stride + 1
+ w_out = (w_in + 2 * padding - kw) // stride + 1
 
-    out = np.zeros((c_out, h_out, w_out), dtype=np.float32)
-    for oc in range(c_out):
-        for i in range(h_out):
-            for j in range(w_out):
-                hs = i * stride
-                ws = j * stride
-                patch = x_pad[:, hs:hs + kh, ws:ws + kw]
-                out[oc, i, j] = np.sum(patch * w[oc])
-        if b is not None:
-            out[oc] += b[oc]
-    return out
+ out = np.zeros((c_out, h_out, w_out), dtype=np.float32)
+ for oc in range(c_out):
+ for i in range(h_out):
+ for j in range(w_out):
+ hs = i * stride
+ ws = j * stride
+ patch = x_pad[:, hs:hs + kh, ws:ws + kw]
+ out[oc, i, j] = np.sum(patch * w[oc])
+ if b is not None:
+ out[oc] += b[oc]
+ return out
 ```
 
 Four nested loops (output channel, row, column, plus the implicit sum over C_in, kh, kw). This is the ground truth you will check every faster implementation against.
@@ -240,14 +239,14 @@ Build a vertical Sobel kernel, apply it to a synthetic step image, and watch the
 
 ```python
 def synthetic_step_image():
-    img = np.zeros((1, 16, 16), dtype=np.float32)
-    img[:, :, 8:] = 1.0
-    return img
+ img = np.zeros((1, 16, 16), dtype=np.float32)
+ img[:, :, 8:] = 1.0
+ return img
 
 sobel_x = np.array([
-    [[-1, 0, 1],
-     [-2, 0, 2],
-     [-1, 0, 1]]
+ [[-1, 0, 1],
+ [-2, 0, 2],
+ [-1, 0, 1]]
 ], dtype=np.float32)[None]
 
 x = synthetic_step_image()
@@ -263,21 +262,21 @@ Convert every kernel-sized window in the input into a column of a matrix. For `C
 
 ```python
 def im2col(x, kh, kw, stride=1, padding=0):
-    c_in, h, w = x.shape
-    x_pad = pad2d(x, padding)
-    h_out = (h + 2 * padding - kh) // stride + 1
-    w_out = (w + 2 * padding - kw) // stride + 1
+ c_in, h, w = x.shape
+ x_pad = pad2d(x, padding)
+ h_out = (h + 2 * padding - kh) // stride + 1
+ w_out = (w + 2 * padding - kw) // stride + 1
 
-    cols = np.zeros((c_in * kh * kw, h_out * w_out), dtype=x.dtype)
-    col = 0
-    for i in range(h_out):
-        for j in range(w_out):
-            hs = i * stride
-            ws = j * stride
-            patch = x_pad[:, hs:hs + kh, ws:ws + kw]
-            cols[:, col] = patch.reshape(-1)
-            col += 1
-    return cols, h_out, w_out
+ cols = np.zeros((c_in * kh * kw, h_out * w_out), dtype=x.dtype)
+ col = 0
+ for i in range(h_out):
+ for j in range(w_out):
+ hs = i * stride
+ ws = j * stride
+ patch = x_pad[:, hs:hs + kh, ws:ws + kw]
+ cols[:, col] = patch.reshape(-1)
+ col += 1
+ return cols, h_out, w_out
 ```
 
 It is still a Python loop, but now the heavy lifting will be a single vectorised matmul.
@@ -288,13 +287,13 @@ Replace the quadruple loop with one matrix multiplication.
 
 ```python
 def conv2d_im2col(x, w, b=None, stride=1, padding=0):
-    c_out, c_in, kh, kw = w.shape
-    cols, h_out, w_out = im2col(x, kh, kw, stride, padding)
-    w_flat = w.reshape(c_out, -1)
-    out = w_flat @ cols
-    if b is not None:
-        out += b[:, None]
-    return out.reshape(c_out, h_out, w_out)
+ c_out, c_in, kh, kw = w.shape
+ cols, h_out, w_out = im2col(x, kh, kw, stride, padding)
+ w_flat = w.reshape(c_out, -1)
+ out = w_flat @ cols
+ if b is not None:
+ out += b[:, None]
+ return out.reshape(c_out, h_out, w_out)
 ```
 
 Correctness check: run both implementations and compare.
@@ -319,17 +318,17 @@ Five filters that show what a single conv layer can express before any training.
 
 ```python
 KERNELS = {
-    "identity": np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=np.float32),
-    "blur_3x3": np.ones((3, 3), dtype=np.float32) / 9.0,
-    "sharpen": np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32),
-    "sobel_x": np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32),
-    "sobel_y": np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32),
+ "identity": np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=np.float32),
+ "blur_3x3": np.ones((3, 3), dtype=np.float32) / 9.0,
+ "sharpen": np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32),
+ "sobel_x": np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32),
+ "sobel_y": np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32),
 }
 
 def apply_kernel(img2d, kernel):
-    x = img2d[None].astype(np.float32)
-    w = kernel[None, None]
-    return conv2d_im2col(x, w, padding=1)[0]
+ x = img2d[None].astype(np.float32)
+ w = kernel[None, None]
+ return conv2d_im2col(x, w, padding=1)[0]
 ```
 
 Applied to any grayscale image, blur softens, sharpen crisps up edges, Sobel-x lights up vertical edges, Sobel-y lights up horizontal edges. These are exactly the patterns that the *first* trained conv layer in AlexNet and VGG ended up learning — because a good image model needs edge and blob detectors no matter what task comes later.
@@ -344,13 +343,13 @@ import torch.nn as nn
 
 conv = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=1)
 print(conv)
-print(f"weight shape: {tuple(conv.weight.shape)}   # (C_out, C_in, K, K)")
-print(f"bias shape:   {tuple(conv.bias.shape)}")
-print(f"param count:  {sum(p.numel() for p in conv.parameters())}")
+print(f"weight shape: {tuple(conv.weight.shape)} # (C_out, C_in, K, K)")
+print(f"bias shape: {tuple(conv.bias.shape)}")
+print(f"param count: {sum(p.numel() for p in conv.parameters())}")
 
 x = torch.randn(8, 3, 224, 224)
 y = conv(x)
-print(f"\ninput  shape: {tuple(x.shape)}")
+print(f"\ninput shape: {tuple(x.shape)}")
 print(f"output shape: {tuple(y.shape)}")
 ```
 

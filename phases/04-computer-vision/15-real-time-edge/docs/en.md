@@ -28,17 +28,17 @@ This lesson sets up the measurement discipline first (you cannot optimise what y
 
 ```mermaid
 flowchart LR
-    M["Model"] --> LAT["Latency<br/>ms per image"]
-    M --> MEM["Memory<br/>peak MB"]
-    M --> PWR["Power<br/>mJ per inference"]
+ M["Model"] --> LAT["Latency<br/>ms per image"]
+ M --> MEM["Memory<br/>peak MB"]
+ M --> PWR["Power<br/>mJ per inference"]
 
-    LAT --> SHIP["Ship / no-ship<br/>decision"]
-    MEM --> SHIP
-    PWR --> SHIP
+ LAT --> SHIP["Ship / no-ship<br/>decision"]
+ MEM --> SHIP
+ PWR --> SHIP
 
-    style LAT fill:#fecaca,stroke:#dc2626
-    style MEM fill:#fef3c7,stroke:#d97706
-    style PWR fill:#dbeafe,stroke:#2563eb
+ style LAT fill:#fecaca,stroke:#dc2626
+ style MEM fill:#fef3c7,stroke:#d97706
+ style PWR fill:#dbeafe,stroke:#2563eb
 ```
 
 - **Latency**: p50, p95, p99. Averaging only p50 hides tail behaviour that matters for real-time systems.
@@ -111,29 +111,29 @@ import time
 import torch
 
 def measure_latency(model, input_shape, device="cpu", warmup=10, iters=50):
-    model = model.to(device).eval()
-    x = torch.randn(input_shape, device=device)
-    with torch.no_grad():
-        for _ in range(warmup):
-            model(x)
-        if device == "cuda":
-            torch.cuda.synchronize()
-        times = []
-        for _ in range(iters):
-            if device == "cuda":
-                torch.cuda.synchronize()
-            t0 = time.perf_counter()
-            model(x)
-            if device == "cuda":
-                torch.cuda.synchronize()
-            times.append((time.perf_counter() - t0) * 1000)
-    times.sort()
-    return {
-        "p50_ms": times[len(times) // 2],
-        "p95_ms": times[int(len(times) * 0.95)],
-        "p99_ms": times[int(len(times) * 0.99)],
-        "mean_ms": sum(times) / len(times),
-    }
+ model = model.to(device).eval()
+ x = torch.randn(input_shape, device=device)
+ with torch.no_grad():
+ for _ in range(warmup):
+ model(x)
+ if device == "cuda":
+ torch.cuda.synchronize()
+ times = []
+ for _ in range(iters):
+ if device == "cuda":
+ torch.cuda.synchronize()
+ t0 = time.perf_counter()
+ model(x)
+ if device == "cuda":
+ torch.cuda.synchronize()
+ times.append((time.perf_counter() - t0) * 1000)
+ times.sort()
+ return {
+ "p50_ms": times[len(times) // 2],
+ "p95_ms": times[int(len(times) * 0.95)],
+ "p99_ms": times[int(len(times) * 0.99)],
+ "mean_ms": sum(times) / len(times),
+ }
 ```
 
 Warm up, synchronise, use `time.perf_counter()`. Report percentiles, not just mean.
@@ -142,33 +142,33 @@ Warm up, synchronise, use `time.perf_counter()`. Report percentiles, not just me
 
 ```python
 def parameter_count(model):
-    return sum(p.numel() for p in model.parameters())
+ return sum(p.numel() for p in model.parameters())
 
 def flops_estimate(model, input_shape):
-    """
-    Rough FLOP count for a conv/linear-only model. For production use `fvcore` or `ptflops`.
-    """
-    total = 0
-    def conv_hook(m, inp, out):
-        nonlocal total
-        c_out, c_in, kh, kw = m.weight.shape
-        h, w = out.shape[-2:]
-        total += 2 * c_in * c_out * kh * kw * h * w
-    def linear_hook(m, inp, out):
-        nonlocal total
-        total += 2 * m.in_features * m.out_features
-    hooks = []
-    for m in model.modules():
-        if isinstance(m, torch.nn.Conv2d):
-            hooks.append(m.register_forward_hook(conv_hook))
-        elif isinstance(m, torch.nn.Linear):
-            hooks.append(m.register_forward_hook(linear_hook))
-    model.eval()
-    with torch.no_grad():
-        model(torch.randn(input_shape))
-    for h in hooks:
-        h.remove()
-    return total
+ """
+ Rough FLOP count for a conv/linear-only model. For production use `fvcore` or `ptflops`.
+ """
+ total = 0
+ def conv_hook(m, inp, out):
+ nonlocal total
+ c_out, c_in, kh, kw = m.weight.shape
+ h, w = out.shape[-2:]
+ total += 2 * c_in * c_out * kh * kw * h * w
+ def linear_hook(m, inp, out):
+ nonlocal total
+ total += 2 * m.in_features * m.out_features
+ hooks = []
+ for m in model.modules():
+ if isinstance(m, torch.nn.Conv2d):
+ hooks.append(m.register_forward_hook(conv_hook))
+ elif isinstance(m, torch.nn.Linear):
+ hooks.append(m.register_forward_hook(linear_hook))
+ model.eval()
+ with torch.no_grad():
+ model(torch.randn(input_shape))
+ for h in hooks:
+ h.remove()
+ return total
 ```
 
 For real projects use `fvcore.nn.FlopCountAnalysis` or `ptflops`; they handle every module type correctly.
@@ -177,15 +177,15 @@ For real projects use `fvcore.nn.FlopCountAnalysis` or `ptflops`; they handle ev
 
 ```python
 def quantise_ptq(model, calibration_loader, backend="x86"):
-    import torch.ao.quantization as tq
-    model = model.eval().cpu()
-    model.qconfig = tq.get_default_qconfig(backend)
-    tq.prepare(model, inplace=True)
-    with torch.no_grad():
-        for x, _ in calibration_loader:
-            model(x)
-    tq.convert(model, inplace=True)
-    return model
+ import torch.ao.quantization as tq
+ model = model.eval().cpu()
+ model.qconfig = tq.get_default_qconfig(backend)
+ tq.prepare(model, inplace=True)
+ with torch.no_grad():
+ for x, _ in calibration_loader:
+ model(x)
+ tq.convert(model, inplace=True)
+ return model
 ```
 
 Three steps: configure, prepare (insert observers), calibrate with real data, convert (fuse + quantise). Requires the model to be fused (`Conv -> BN -> ReLU` -> `ConvBnReLU`), which `torch.ao.quantization.fuse_modules` handles.
@@ -194,17 +194,17 @@ Three steps: configure, prepare (insert observers), calibrate with real data, co
 
 ```python
 def export_onnx(model, sample_input, path="model.onnx"):
-    model = model.eval()
-    torch.onnx.export(
-        model,
-        sample_input,
-        path,
-        input_names=["input"],
-        output_names=["output"],
-        dynamic_axes={"input": {0: "batch"}, "output": {0: "batch"}},
-        opset_version=17,
-    )
-    return path
+ model = model.eval()
+ torch.onnx.export(
+ model,
+ sample_input,
+ path,
+ input_names=["input"],
+ output_names=["output"],
+ dynamic_axes={"input": {0: "batch"}, "output": {0: "batch"}},
+ opset_version=17,
+ )
+ return path
 ```
 
 `opset_version=17` is the safe default in 2026. `dynamic_axes` lets you run the ONNX model with arbitrary batch size.
@@ -216,12 +216,12 @@ import torch.nn as nn
 from torchvision.models import mobilenet_v3_small
 
 def compare_regimes():
-    model = mobilenet_v3_small(weights=None, num_classes=10)
-    params = parameter_count(model)
-    flops = flops_estimate(model, (1, 3, 224, 224))
-    lat_fp32 = measure_latency(model, (1, 3, 224, 224), device="cpu")
-    print(f"FP32 MobileNetV3-Small: {params:,} params  {flops/1e9:.2f} GFLOPs  "
-          f"p50={lat_fp32['p50_ms']:.2f}ms  p95={lat_fp32['p95_ms']:.2f}ms")
+ model = mobilenet_v3_small(weights=None, num_classes=10)
+ params = parameter_count(model)
+ flops = flops_estimate(model, (1, 3, 224, 224))
+ lat_fp32 = measure_latency(model, (1, 3, 224, 224), device="cpu")
+ print(f"FP32 MobileNetV3-Small: {params:,} params {flops/1e9:.2f} GFLOPs "
+ f"p50={lat_fp32['p50_ms']:.2f}ms p95={lat_fp32['p95_ms']:.2f}ms")
 ```
 
 Run the same function for `resnet50`, `efficientnet_v2_s`, and `convnext_tiny` and you have the comparison table you need for a deployment decision.

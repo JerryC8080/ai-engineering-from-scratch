@@ -22,12 +22,12 @@ Every AI project starts with data. You need to find datasets, download them, con
 
 ```mermaid
 graph TD
-    A["Hugging Face Hub"] --> B["datasets library"]
-    B --> C["Load / Stream"]
-    C --> D["Local Cache<br/>~/.cache/huggingface/"]
-    B --> E["Format Conversion<br/>CSV, JSON, Parquet, Arrow"]
-    E --> F["Data Splits<br/>train / val / test"]
-    F --> G["Your Training Pipeline"]
+ A["Hugging Face Hub"] --> B["datasets library"]
+ B --> C["Load / Stream"]
+ C --> D["Local Cache<br/>~/.cache/huggingface/"]
+ B --> E["Format Conversion<br/>CSV, JSON, Parquet, Arrow"]
+ E --> F["Data Splits<br/>train / val / test"]
+ F --> G["Your Training Pipeline"]
 ```
 
 The Hugging Face `datasets` library is the standard way to load data for AI work. It handles downloading, caching, format conversion, and streaming out of the box.
@@ -60,9 +60,9 @@ Some datasets are too large to fit on disk. Streaming loads them row by row with
 dataset = load_dataset("wikipedia", "20220301.en", split="train", streaming=True)
 
 for i, example in enumerate(dataset):
-    print(example["title"])
-    if i >= 4:
-        break
+ print(example["title"])
+ if i >= 4:
+ break
 ```
 
 Streaming gives you an `IterableDataset`. You process rows as they arrive. Memory usage stays constant regardless of dataset size.
@@ -123,8 +123,8 @@ Models are large files. The `huggingface_hub` library handles downloading and ca
 from huggingface_hub import hf_hub_download, snapshot_download
 
 model_path = hf_hub_download(
-    repo_id="sentence-transformers/all-MiniLM-L6-v2",
-    filename="config.json"
+ repo_id="sentence-transformers/all-MiniLM-L6-v2",
+ filename="config.json"
 )
 print(f"Cached at: {model_path}")
 
@@ -138,7 +138,7 @@ Models cache to `~/.cache/huggingface/hub/`. Once downloaded, they load instantl
 
 Model weights and large datasets should not go into git. Three options:
 
-**Option A: .gitignore (simplest)**
+**Option A:.gitignore (simplest)**
 
 ```
 *.bin
@@ -156,7 +156,7 @@ models/
 git lfs install
 git lfs track "*.bin"
 git lfs track "*.safetensors"
-git add .gitattributes
+git add.gitattributes
 ```
 
 Git LFS stores pointers in your repo and the actual files on a separate server. GitHub gives you 1 GB free.
@@ -175,7 +175,7 @@ DVC creates small `.dvc` files that point to your data. The data itself lives in
 
 | Approach | Complexity | Best For |
 |----------|-----------|----------|
-| .gitignore | Low | Personal projects, downloaded data you can re-fetch |
+|.gitignore | Low | Personal projects, downloaded data you can re-fetch |
 | Git LFS | Medium | Teams sharing model weights via git |
 | DVC | High | Reproducible experiments, large datasets, teams |
 

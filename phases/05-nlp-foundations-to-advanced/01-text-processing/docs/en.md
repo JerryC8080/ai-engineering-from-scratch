@@ -41,7 +41,7 @@ The simplest useful tokenizer splits on non-alphanumeric characters while keepin
 import re
 
 def tokenize(text):
-    return re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?|[0-9]+|[^\sA-Za-z0-9]", text)
+ return re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?|[0-9]+|[^\sA-Za-z0-9]", text)
 ```
 
 Three patterns in order of precedence. Words with optional inner apostrophe (`don't`, `it's`). Pure numbers. Any single non-whitespace non-alphanumeric character as a standalone token (punctuation).
@@ -59,15 +59,15 @@ The full Porter algorithm has five phases of rules. Step 1a alone covers the mos
 
 ```python
 def stem_step_1a(word):
-    if word.endswith("sses"):
-        return word[:-2]
-    if word.endswith("ies"):
-        return word[:-2]
-    if word.endswith("ss"):
-        return word
-    if word.endswith("s") and len(word) > 1:
-        return word[:-1]
-    return word
+ if word.endswith("sses"):
+ return word[:-2]
+ if word.endswith("ies"):
+ return word[:-2]
+ if word.endswith("ss"):
+ return word
+ if word.endswith("s") and len(word) > 1:
+ return word[:-1]
+ return word
 ```
 
 ```python
@@ -83,27 +83,27 @@ Lemmatization proper needs morphology. A tractable teaching version uses a small
 
 ```python
 LEMMA_TABLE = {
-    ("running", "VERB"): "run",
-    ("ran", "VERB"): "run",
-    ("runs", "VERB"): "run",
-    ("better", "ADJ"): "good",
-    ("best", "ADJ"): "good",
-    ("cats", "NOUN"): "cat",
-    ("cat", "NOUN"): "cat",
-    ("were", "VERB"): "be",
-    ("was", "VERB"): "be",
-    ("is", "VERB"): "be",
+ ("running", "VERB"): "run",
+ ("ran", "VERB"): "run",
+ ("runs", "VERB"): "run",
+ ("better", "ADJ"): "good",
+ ("best", "ADJ"): "good",
+ ("cats", "NOUN"): "cat",
+ ("cat", "NOUN"): "cat",
+ ("were", "VERB"): "be",
+ ("was", "VERB"): "be",
+ ("is", "VERB"): "be",
 }
 
 def lemmatize(word, pos):
-    key = (word.lower(), pos)
-    if key in LEMMA_TABLE:
-        return LEMMA_TABLE[key]
-    if pos == "VERB" and word.endswith("ing"):
-        return word[:-3]
-    if pos == "NOUN" and word.endswith("s"):
-        return word[:-1]
-    return word.lower()
+ key = (word.lower(), pos)
+ if key in LEMMA_TABLE:
+ return LEMMA_TABLE[key]
+ if pos == "VERB" and word.endswith("ing"):
+ return word[:-3]
+ if pos == "NOUN" and word.endswith("s"):
+ return word[:-1]
+ return word.lower()
 ```
 
 ```python
@@ -123,11 +123,11 @@ The last case is the key teaching moment. `watched` is not in our table and our 
 
 ```python
 def preprocess(text, pos_tagger=None):
-    tokens = tokenize(text)
-    stems = [stem_step_1a(t.lower()) for t in tokens]
-    tags = pos_tagger(tokens) if pos_tagger else [(t, "NOUN") for t in tokens]
-    lemmas = [lemmatize(word, pos) for word, pos in tags]
-    return {"tokens": tokens, "stems": stems, "lemmas": lemmas}
+ tokens = tokenize(text)
+ stems = [stem_step_1a(t.lower()) for t in tokens]
+ tags = pos_tagger(tokens) if pos_tagger else [(t, "NOUN") for t in tokens]
+ lemmas = [lemmatize(word, pos) for word, pos in tags]
+ return {"tokens": tokens, "stems": stems, "lemmas": lemmas}
 ```
 
 The missing piece is a POS tagger. Phase 5 · 07 (POS Tagging) builds one. For now, default everything to `NOUN` and acknowledge the limitation.
@@ -156,13 +156,13 @@ tagged = pos_tag(tokens)
 
 
 def nltk_pos_to_wordnet(tag):
-    if tag.startswith("V"):
-        return "v"
-    if tag.startswith("J"):
-        return "a"
-    if tag.startswith("R"):
-        return "r"
-    return "n"
+ if tag.startswith("V"):
+ return "v"
+ if tag.startswith("J"):
+ return "a"
+ if tag.startswith("R"):
+ return "r"
+ return "n"
 
 
 lemmas = [lemmatizer.lemmatize(t, nltk_pos_to_wordnet(tag)) for t, tag in tagged]
@@ -179,15 +179,14 @@ nlp = spacy.load("en_core_web_sm")
 doc = nlp("The cats were running.")
 
 for token in doc:
-    print(token.text, token.lemma_, token.pos_)
+ print(token.text, token.lemma_, token.pos_)
 ```
 
 ```
-The      the     DET
-cats     cat     NOUN
-were     be      AUX
-running  run     VERB
-.        .       PUNCT
+The the DET
+cats cat NOUN
+were be AUX
+running run VERB.. PUNCT
 ```
 
 spaCy hides the whole pipeline behind `nlp(text)`. Tokenization, POS tagging, and lemmatization all run. Faster than NLTK at scale. More accurate out of the box. The tradeoff is that you cannot easily swap individual components.

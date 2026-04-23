@@ -58,16 +58,16 @@ See `code/main.py`. Regex + synonym dictionaries cover 70% of canonical utteranc
 
 ```python
 CUISINE_SYNONYMS = {
-    "italian": ["italian", "pasta", "pizza", "italy"],
-    "chinese": ["chinese", "chow mein", "noodles"],
+ "italian": ["italian", "pasta", "pizza", "italy"],
+ "chinese": ["chinese", "chow mein", "noodles"],
 }
 
 
 def extract_cuisine(utterance):
-    for canonical, synonyms in CUISINE_SYNONYMS.items():
-        if any(syn in utterance.lower() for syn in synonyms):
-            return canonical
-    return None
+ for canonical, synonyms in CUISINE_SYNONYMS.items():
+ if any(syn in utterance.lower() for syn in synonyms):
+ return canonical
+ return None
 ```
 
 Brittle outside the canonical vocabulary. Works for deterministic slot confirmations.
@@ -76,15 +76,15 @@ Brittle outside the canonical vocabulary. Works for deterministic slot confirmat
 
 ```python
 def update_state(state, utterance):
-    new_state = dict(state)
-    for slot, extractor in SLOT_EXTRACTORS.items():
-        value = extractor(utterance)
-        if value is not None:
-            new_state[slot] = value
-    for slot in NEGATION_CLEARS:
-        if is_negated(utterance, slot):
-            new_state[slot] = None
-    return new_state
+ new_state = dict(state)
+ for slot, extractor in SLOT_EXTRACTORS.items():
+ value = extractor(utterance)
+ if value is not None:
+ new_state[slot] = value
+ for slot in NEGATION_CLEARS:
+ if is_negated(utterance, slot):
+ new_state[slot] = None
+ return new_state
 ```
 
 Three invariants:
@@ -101,20 +101,20 @@ from typing import Literal, Optional
 import instructor
 
 class RestaurantState(BaseModel):
-    cuisine: Optional[Literal["italian", "chinese", "indian", "thai", "any"]] = None
-    area: Optional[Literal["north", "south", "east", "west", "center"]] = None
-    price: Optional[Literal["cheap", "moderate", "expensive"]] = None
-    people: Optional[int] = None
-    day: Optional[str] = None
+ cuisine: Optional[Literal["italian", "chinese", "indian", "thai", "any"]] = None
+ area: Optional[Literal["north", "south", "east", "west", "center"]] = None
+ price: Optional[Literal["cheap", "moderate", "expensive"]] = None
+ people: Optional[int] = None
+ day: Optional[str] = None
 
 
 def llm_dst(history, llm):
-    prompt = f"""You track the slot values of a restaurant booking across turns.
+ prompt = f"""You track the slot values of a restaurant booking across turns.
 Dialogue so far:
 {render(history)}
 
 Update the state based on the latest user turn. Output only the JSON state."""
-    return llm(prompt, response_model=RestaurantState)
+ return llm(prompt, response_model=RestaurantState)
 ```
 
 Instructor + Pydantic guarantees a valid state object. No regex, no schema mismatches, no hallucinated slots.
@@ -123,8 +123,8 @@ Instructor + Pydantic guarantees a valid state object. No regex, no schema misma
 
 ```python
 def joint_goal_accuracy(predicted_states, gold_states):
-    correct = sum(1 for p, g in zip(predicted_states, gold_states) if p == g)
-    return correct / len(predicted_states)
+ correct = sum(1 for p, g in zip(predicted_states, gold_states) if p == g)
+ return correct / len(predicted_states)
 ```
 
 Calibrate: what fraction of turns does the system get ALL slots right? For MultiWOZ 2.4, top 2026 systems: 80-83%. Your in-domain system should exceed that on your narrow vocabulary or the LLM baseline beats you.
@@ -136,7 +136,7 @@ CORRECTION_CUES = {"actually", "no wait", "on second thought", "change that to"}
 
 
 def is_correction(utterance):
-    return any(cue in utterance.lower() for cue in CORRECTION_CUES)
+ return any(cue in utterance.lower() for cue in CORRECTION_CUES)
 ```
 
 On a detected correction, overwrite the last-updated slot rather than appending. Hard to get right without LLM help. The modern pattern: always let the LLM regenerate the whole state from history rather than incrementally updating — this naturally handles corrections.

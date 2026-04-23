@@ -38,27 +38,27 @@ A multi-layer network has three types of layers:
 
 ```mermaid
 graph LR
-    subgraph Input["Input Layer"]
-        x1["x1"]
-        x2["x2"]
-    end
-    subgraph Hidden["Hidden Layer (3 neurons)"]
-        h1["h1"]
-        h2["h2"]
-        h3["h3"]
-    end
-    subgraph Output["Output Layer"]
-        y["y"]
-    end
-    x1 --> h1
-    x1 --> h2
-    x1 --> h3
-    x2 --> h1
-    x2 --> h2
-    x2 --> h3
-    h1 --> y
-    h2 --> y
-    h3 --> y
+ subgraph Input["Input Layer"]
+ x1["x1"]
+ x2["x2"]
+ end
+ subgraph Hidden["Hidden Layer (3 neurons)"]
+ h1["h1"]
+ h2["h2"]
+ h3["h3"]
+ end
+ subgraph Output["Output Layer"]
+ y["y"]
+ end
+ x1 --> h1
+ x1 --> h2
+ x1 --> h3
+ x2 --> h1
+ x2 --> h2
+ x2 --> h3
+ h1 --> y
+ h2 --> y
+ h3 --> y
 ```
 
 This is a 2-3-1 network. Two inputs, three hidden neurons, one output. Every connection carries a weight. Every neuron (except input) carries a bias.
@@ -87,21 +87,21 @@ The forward pass pushes input data through the network, layer by layer, until it
 
 ```mermaid
 graph TD
-    X["Input: [x1, x2]"] --> WH["Multiply by Weight Matrix W1 (2x3)"]
-    WH --> BH["Add Bias Vector b1 (3,)"]
-    BH --> AH["Apply sigmoid to each element"]
-    AH --> H["Hidden Output: [h1, h2, h3]"]
-    H --> WO["Multiply by Weight Matrix W2 (3x1)"]
-    WO --> BO["Add Bias Vector b2 (1,)"]
-    BO --> AO["Apply sigmoid"]
-    AO --> Y["Output: y"]
+ X["Input: [x1, x2]"] --> WH["Multiply by Weight Matrix W1 (2x3)"]
+ WH --> BH["Add Bias Vector b1 (3,)"]
+ BH --> AH["Apply sigmoid to each element"]
+ AH --> H["Hidden Output: [h1, h2, h3]"]
+ H --> WO["Multiply by Weight Matrix W2 (3x1)"]
+ WO --> BO["Add Bias Vector b2 (1,)"]
+ BO --> AO["Apply sigmoid"]
+ AO --> Y["Output: y"]
 ```
 
 At each layer, three operations happen in sequence:
 
 ```
-z = W * input + b       (linear transformation)
-a = sigmoid(z)           (activation)
+z = W * input + b (linear transformation)
+a = sigmoid(z) (activation)
 ```
 
 The output of one layer becomes the input to the next. That is the entire forward pass.
@@ -130,16 +130,16 @@ The intuition: each neuron in the hidden layer learns one "bump" or feature. Eno
 
 ```mermaid
 graph LR
-    subgraph FewNeurons["4 Hidden Neurons"]
-        A["Rough approximation"]
-    end
-    subgraph MoreNeurons["16 Hidden Neurons"]
-        B["Close approximation"]
-    end
-    subgraph ManyNeurons["64 Hidden Neurons"]
-        C["Near-perfect fit"]
-    end
-    FewNeurons --> MoreNeurons --> ManyNeurons
+ subgraph FewNeurons["4 Hidden Neurons"]
+ A["Rough approximation"]
+ end
+ subgraph MoreNeurons["16 Hidden Neurons"]
+ B["Close approximation"]
+ end
+ subgraph ManyNeurons["64 Hidden Neurons"]
+ C["Near-perfect fit"]
+ end
+ FewNeurons --> MoreNeurons --> ManyNeurons
 ```
 
 ### Composability
@@ -156,8 +156,8 @@ Pure Python. No numpy. Every matrix operation written from scratch.
 import math
 
 def sigmoid(x):
-    x = max(-500.0, min(500.0, x))
-    return 1.0 / (1.0 + math.exp(-x))
+ x = max(-500.0, min(500.0, x))
+ return 1.0 / (1.0 + math.exp(-x))
 ```
 
 The clamp to [-500, 500] prevents overflow. `math.exp(500)` is large but finite. `math.exp(1000)` is infinity.
@@ -170,30 +170,30 @@ A layer holds a weight matrix and a bias vector. Its forward method takes an inp
 
 ```python
 class Layer:
-    def __init__(self, n_inputs, n_neurons, weights=None, biases=None):
-        if weights is not None:
-            self.weights = weights
-        else:
-            import random
-            self.weights = [
-                [random.uniform(-1, 1) for _ in range(n_inputs)]
-                for _ in range(n_neurons)
-            ]
-        if biases is not None:
-            self.biases = biases
-        else:
-            self.biases = [0.0] * n_neurons
+ def __init__(self, n_inputs, n_neurons, weights=None, biases=None):
+ if weights is not None:
+ self.weights = weights
+ else:
+ import random
+ self.weights = [
+ [random.uniform(-1, 1) for _ in range(n_inputs)]
+ for _ in range(n_neurons)
+ ]
+ if biases is not None:
+ self.biases = biases
+ else:
+ self.biases = [0.0] * n_neurons
 
-    def forward(self, inputs):
-        self.last_input = inputs
-        self.last_output = []
-        for neuron_idx in range(len(self.weights)):
-            z = sum(
-                w * x for w, x in zip(self.weights[neuron_idx], inputs)
-            )
-            z += self.biases[neuron_idx]
-            self.last_output.append(sigmoid(z))
-        return self.last_output
+ def forward(self, inputs):
+ self.last_input = inputs
+ self.last_output = []
+ for neuron_idx in range(len(self.weights)):
+ z = sum(
+ w * x for w, x in zip(self.weights[neuron_idx], inputs)
+ )
+ z += self.biases[neuron_idx]
+ self.last_output.append(sigmoid(z))
+ return self.last_output
 ```
 
 The weight matrix has shape (n_neurons, n_inputs). Each row is one neuron's weights across all inputs. The forward method loops through neurons, computes the weighted sum plus bias, applies sigmoid, and collects the results.
@@ -204,14 +204,14 @@ A network is a list of layers. The forward pass chains them: output of layer k f
 
 ```python
 class Network:
-    def __init__(self, layers):
-        self.layers = layers
+ def __init__(self, layers):
+ self.layers = layers
 
-    def forward(self, inputs):
-        current = inputs
-        for layer in self.layers:
-            current = layer.forward(current)
-        return current
+ def forward(self, inputs):
+ current = inputs
+ for layer in self.layers:
+ current = layer.forward(current)
+ return current
 ```
 
 That is the entire forward pass. Four lines of logic. Data goes in, flows through every layer, comes out the other side.
@@ -222,32 +222,32 @@ In Lesson 01, we solved XOR by combining OR, NAND, and AND perceptrons. Now do t
 
 ```python
 hidden = Layer(
-    n_inputs=2,
-    n_neurons=2,
-    weights=[[20.0, 20.0], [-20.0, -20.0]],
-    biases=[-10.0, 30.0],
+ n_inputs=2,
+ n_neurons=2,
+ weights=[[20.0, 20.0], [-20.0, -20.0]],
+ biases=[-10.0, 30.0],
 )
 
 output = Layer(
-    n_inputs=2,
-    n_neurons=1,
-    weights=[[20.0, 20.0]],
-    biases=[-30.0],
+ n_inputs=2,
+ n_neurons=1,
+ weights=[[20.0, 20.0]],
+ biases=[-30.0],
 )
 
 xor_net = Network([hidden, output])
 
 xor_data = [
-    ([0, 0], 0),
-    ([0, 1], 1),
-    ([1, 0], 1),
-    ([1, 1], 0),
+ ([0, 0], 0),
+ ([0, 1], 1),
+ ([1, 0], 1),
+ ([1, 1], 0),
 ]
 
 for inputs, expected in xor_data:
-    result = xor_net.forward(inputs)
-    predicted = 1 if result[0] >= 0.5 else 0
-    print(f"  {inputs} -> {result[0]:.6f} (rounded: {predicted}, expected: {expected})")
+ result = xor_net.forward(inputs)
+ predicted = 1 if result[0] >= 0.5 else 0
+ print(f" {inputs} -> {result[0]:.6f} (rounded: {predicted}, expected: {expected})")
 ```
 
 The large weights (20, -20) make sigmoid act like a step function. The first hidden neuron approximates OR. The second approximates NAND. The output neuron combines them into AND, which is XOR.
@@ -264,14 +264,14 @@ random.seed(42)
 
 data = []
 for _ in range(200):
-    x = random.uniform(-1, 1)
-    y = random.uniform(-1, 1)
-    label = 1 if (x * x + y * y) < 0.25 else 0
-    data.append(([x, y], label))
+ x = random.uniform(-1, 1)
+ y = random.uniform(-1, 1)
+ label = 1 if (x * x + y * y) < 0.25 else 0
+ data.append(([x, y], label))
 
 circle_net = Network([
-    Layer(n_inputs=2, n_neurons=8),
-    Layer(n_inputs=8, n_neurons=1),
+ Layer(n_inputs=2, n_neurons=8),
+ Layer(n_inputs=8, n_neurons=1),
 ])
 ```
 
@@ -280,10 +280,10 @@ With random weights, the network will not classify well. But the forward pass st
 ```python
 correct = 0
 for inputs, expected in data:
-    result = circle_net.forward(inputs)
-    predicted = 1 if result[0] >= 0.5 else 0
-    if predicted == expected:
-        correct += 1
+ result = circle_net.forward(inputs)
+ predicted = 1 if result[0] >= 0.5 else 0
+ if predicted == expected:
+ correct += 1
 
 print(f"Accuracy with random weights: {correct}/{len(data)} ({100*correct/len(data):.1f}%)")
 ```
@@ -299,10 +299,10 @@ import torch
 import torch.nn as nn
 
 model = nn.Sequential(
-    nn.Linear(2, 8),
-    nn.Sigmoid(),
-    nn.Linear(8, 1),
-    nn.Sigmoid(),
+ nn.Linear(2, 8),
+ nn.Sigmoid(),
+ nn.Linear(8, 1),
+ nn.Sigmoid(),
 )
 
 x = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]])

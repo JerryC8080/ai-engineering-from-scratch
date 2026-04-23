@@ -32,8 +32,8 @@ The network has one hidden layer with no nonlinearity. Input is a one-hot vector
 
 ```
 one-hot(center) ── W ──▶ hidden (d-dim) ── W' ──▶ softmax(vocab)
-                          ^
-                          this is the embedding
+ ^
+ this is the embedding
 ```
 
 The trick: softmax over 100k words is prohibitively expensive. Word2Vec uses **negative sampling** to turn it into a binary classification task. Predict "did this context word appear near this center word, yes or no". Sample a handful of negative (non-co-occurring) words per training pair instead of computing softmax over the whole vocabulary.
@@ -44,22 +44,21 @@ The trick: softmax over 100k words is prohibitively expensive. Word2Vec uses **n
 
 ```python
 def skipgram_pairs(docs, window=2):
-    pairs = []
-    for doc in docs:
-        for i, center in enumerate(doc):
-            for j in range(max(0, i - window), min(len(doc), i + window + 1)):
-                if i == j:
-                    continue
-                pairs.append((center, doc[j]))
-    return pairs
+ pairs = []
+ for doc in docs:
+ for i, center in enumerate(doc):
+ for j in range(max(0, i - window), min(len(doc), i + window + 1)):
+ if i == j:
+ continue
+ pairs.append((center, doc[j]))
+ return pairs
 ```
 
 ```python
 >>> skipgram_pairs([["the", "cat", "sat", "on", "mat"]], window=2)
 [('the', 'cat'), ('the', 'sat'),
  ('cat', 'the'), ('cat', 'sat'), ('cat', 'on'),
- ('sat', 'the'), ('sat', 'cat'), ('sat', 'on'), ('sat', 'mat'),
- ...]
+ ('sat', 'the'), ('sat', 'cat'), ('sat', 'on'), ('sat', 'mat'),...]
 ```
 
 Every (center, context) pair in a window is a positive training example.
@@ -73,10 +72,10 @@ import numpy as np
 
 
 def init_embeddings(vocab_size, dim, seed=0):
-    rng = np.random.default_rng(seed)
-    W = rng.normal(0, 0.1, size=(vocab_size, dim))
-    W_prime = rng.normal(0, 0.1, size=(vocab_size, dim))
-    return W, W_prime
+ rng = np.random.default_rng(seed)
+ W = rng.normal(0, 0.1, size=(vocab_size, dim))
+ W_prime = rng.normal(0, 0.1, size=(vocab_size, dim))
+ return W, W_prime
 ```
 
 Small random init. Vocab size 10k and dim 100 is realistic; for teaching, 50 vocab x 16 dim is enough to see the geometry.
@@ -87,26 +86,26 @@ For each positive pair `(center, context)`, sample `k` random words from the voc
 
 ```python
 def sigmoid(x):
-    return 1.0 / (1.0 + np.exp(-np.clip(x, -20, 20)))
+ return 1.0 / (1.0 + np.exp(-np.clip(x, -20, 20)))
 
 
 def train_pair(W, W_prime, center_idx, context_idx, negative_indices, lr):
-    v_c = W[center_idx]
-    u_pos = W_prime[context_idx]
-    u_negs = W_prime[negative_indices]
+ v_c = W[center_idx]
+ u_pos = W_prime[context_idx]
+ u_negs = W_prime[negative_indices]
 
-    pos_score = sigmoid(v_c @ u_pos)
-    neg_scores = sigmoid(u_negs @ v_c)
+ pos_score = sigmoid(v_c @ u_pos)
+ neg_scores = sigmoid(u_negs @ v_c)
 
-    grad_center = (pos_score - 1) * u_pos
-    for i, u in enumerate(u_negs):
-        grad_center += neg_scores[i] * u
+ grad_center = (pos_score - 1) * u_pos
+ for i, u in enumerate(u_negs):
+ grad_center += neg_scores[i] * u
 
-    W[context_idx] = W[context_idx]
-    W_prime[context_idx] -= lr * (pos_score - 1) * v_c
-    for i, neg_idx in enumerate(negative_indices):
-        W_prime[neg_idx] -= lr * neg_scores[i] * v_c
-    W[center_idx] -= lr * grad_center
+ W[context_idx] = W[context_idx]
+ W_prime[context_idx] -= lr * (pos_score - 1) * v_c
+ for i, neg_idx in enumerate(negative_indices):
+ W_prime[neg_idx] -= lr * neg_scores[i] * v_c
+ W[center_idx] -= lr * grad_center
 ```
 
 The magic formula: logistic loss on positive pair (want sigmoid near 1) plus logistic loss on negative pairs (want sigmoid near 0). Gradients flow to both tables. Full derivation is in the original paper; walk through it once with pencil and paper if you want it to stick.
@@ -115,21 +114,21 @@ The magic formula: logistic loss on positive pair (want sigmoid near 1) plus log
 
 ```python
 def train(docs, dim=16, window=2, k_neg=5, epochs=100, lr=0.05, seed=0):
-    vocab = build_vocab(docs)
-    vocab_size = len(vocab)
-    rng = np.random.default_rng(seed)
-    W, W_prime = init_embeddings(vocab_size, dim, seed=seed)
-    pairs = skipgram_pairs(docs, window=window)
+ vocab = build_vocab(docs)
+ vocab_size = len(vocab)
+ rng = np.random.default_rng(seed)
+ W, W_prime = init_embeddings(vocab_size, dim, seed=seed)
+ pairs = skipgram_pairs(docs, window=window)
 
-    for epoch in range(epochs):
-        rng.shuffle(pairs)
-        for center, context in pairs:
-            c_idx = vocab[center]
-            ctx_idx = vocab[context]
-            negs = rng.integers(0, vocab_size, size=k_neg)
-            negs = [n for n in negs if n != ctx_idx and n != c_idx]
-            train_pair(W, W_prime, c_idx, ctx_idx, negs, lr)
-    return vocab, W
+ for epoch in range(epochs):
+ rng.shuffle(pairs)
+ for center, context in pairs:
+ c_idx = vocab[center]
+ ctx_idx = vocab[context]
+ negs = rng.integers(0, vocab_size, size=k_neg)
+ negs = [n for n in negs if n != ctx_idx and n != c_idx]
+ train_pair(W, W_prime, c_idx, ctx_idx, negs, lr)
+ return vocab, W
 ```
 
 After enough epochs on a large corpus, words that share contexts have similar center embeddings. On a toy corpus, you see the effect faintly. On billions of tokens, you see it dramatically.
@@ -138,33 +137,33 @@ After enough epochs on a large corpus, words that share contexts have similar ce
 
 ```python
 def nearest(vocab, W, target_vec, topk=5, exclude=None):
-    exclude = exclude or set()
-    inv_vocab = {i: w for w, i in vocab.items()}
-    norms = np.linalg.norm(W, axis=1, keepdims=True) + 1e-9
-    W_norm = W / norms
-    target = target_vec / (np.linalg.norm(target_vec) + 1e-9)
-    sims = W_norm @ target
-    order = np.argsort(-sims)
-    out = []
-    for i in order:
-        if i in exclude:
-            continue
-        out.append((inv_vocab[i], float(sims[i])))
-        if len(out) == topk:
-            break
-    return out
+ exclude = exclude or set()
+ inv_vocab = {i: w for w, i in vocab.items()}
+ norms = np.linalg.norm(W, axis=1, keepdims=True) + 1e-9
+ W_norm = W / norms
+ target = target_vec / (np.linalg.norm(target_vec) + 1e-9)
+ sims = W_norm @ target
+ order = np.argsort(-sims)
+ out = []
+ for i in order:
+ if i in exclude:
+ continue
+ out.append((inv_vocab[i], float(sims[i])))
+ if len(out) == topk:
+ break
+ return out
 
 
 def analogy(vocab, W, a, b, c, topk=5):
-    v = W[vocab[b]] - W[vocab[a]] + W[vocab[c]]
-    return nearest(vocab, W, v, topk=topk, exclude={vocab[a], vocab[b], vocab[c]})
+ v = W[vocab[b]] - W[vocab[a]] + W[vocab[c]]
+ return nearest(vocab, W, v, topk=topk, exclude={vocab[a], vocab[b], vocab[c]})
 ```
 
 On pre-trained 300d Google News vectors:
 
 ```python
 >>> analogy(vocab, W, "man", "king", "woman")
-[('queen', 0.71), ('monarch', 0.62), ('princess', 0.59), ...]
+[('queen', 0.71), ('monarch', 0.62), ('princess', 0.59),...]
 ```
 
 `king - man + woman = queen`. Not because the model knows what royalty is. Because the vector `(king - man)` captures something like "royal", and adding it to `woman` lands near the royal-female region.
@@ -177,19 +176,19 @@ Writing Word2Vec from scratch is teaching. Production NLP uses `gensim`.
 from gensim.models import Word2Vec
 
 sentences = [
-    ["the", "cat", "sat", "on", "the", "mat"],
-    ["the", "dog", "ran", "across", "the", "room"],
+ ["the", "cat", "sat", "on", "the", "mat"],
+ ["the", "dog", "ran", "across", "the", "room"],
 ]
 
 model = Word2Vec(
-    sentences,
-    vector_size=100,
-    window=5,
-    min_count=1,
-    sg=1,
-    negative=5,
-    workers=4,
-    epochs=30,
+ sentences,
+ vector_size=100,
+ window=5,
+ min_count=1,
+ sg=1,
+ negative=5,
+ workers=4,
+ epochs=30,
 )
 
 print(model.wv["cat"])

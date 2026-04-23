@@ -59,16 +59,16 @@ You're training 0.78% of the parameters and getting 95-100% of the quality.
 
 ```mermaid
 graph LR
-    X["Input x"] --> W["Frozen W (d x d)"]
-    X --> A["A (r x d)"]
-    A --> B["B (d x r)"]
-    W --> Plus["+ (merge)"]
-    B --> Plus
-    Plus --> Y["Output y"]
+ X["Input x"] --> W["Frozen W (d x d)"]
+ X --> A["A (r x d)"]
+ A --> B["B (d x r)"]
+ W --> Plus["+ (merge)"]
+ B --> Plus
+ Plus --> Y["Output y"]
 
-    style W fill:#1a1a2e,stroke:#e94560,color:#fff
-    style A fill:#0f3460,stroke:#16213e,color:#fff
-    style B fill:#0f3460,stroke:#16213e,color:#fff
+ style W fill:#1a1a2e,stroke:#e94560,color:#fff
+ style A fill:#0f3460,stroke:#16213e,color:#fff
+ style B fill:#0f3460,stroke:#16213e,color:#fff
 ```
 
 A is initialized with a random Gaussian. B is initialized to zero. This means the LoRA contribution starts at zero -- the model begins training from its original behavior and gradually learns the adaptation.
@@ -190,17 +190,17 @@ Fine-tuning is the third option, not the first.
 
 ```mermaid
 graph TD
-    Start["Need better model behavior?"] --> PE["Try prompt engineering"]
-    PE -->|"Works"| Done["Ship it"]
-    PE -->|"Not enough"| RAG["Need external knowledge?"]
-    RAG -->|"Yes"| RAGBuild["Build RAG pipeline"]
-    RAG -->|"No, need style/format change"| FT["Fine-tune with LoRA/QLoRA"]
-    RAGBuild -->|"Works"| Done
-    RAGBuild -->|"Also need style change"| FT
-    FT --> Done
+ Start["Need better model behavior?"] --> PE["Try prompt engineering"]
+ PE -->|"Works"| Done["Ship it"]
+ PE -->|"Not enough"| RAG["Need external knowledge?"]
+ RAG -->|"Yes"| RAGBuild["Build RAG pipeline"]
+ RAG -->|"No, need style/format change"| FT["Fine-tune with LoRA/QLoRA"]
+ RAGBuild -->|"Works"| Done
+ RAGBuild -->|"Also need style change"| FT
+ FT --> Done
 
-    style Start fill:#1a1a2e,stroke:#e94560,color:#fff
-    style Done fill:#0f3460,stroke:#16213e,color:#fff
+ style Start fill:#1a1a2e,stroke:#e94560,color:#fff
+ style Done fill:#0f3460,stroke:#16213e,color:#fff
 ```
 
 ## Build It
@@ -215,17 +215,17 @@ import torch.nn as nn
 import math
 
 class LoRALayer(nn.Module):
-    def __init__(self, in_features, out_features, rank=8, alpha=16):
-        super().__init__()
-        self.rank = rank
-        self.alpha = alpha
-        self.scaling = alpha / rank
+ def __init__(self, in_features, out_features, rank=8, alpha=16):
+ super().__init__()
+ self.rank = rank
+ self.alpha = alpha
+ self.scaling = alpha / rank
 
-        self.A = nn.Parameter(torch.randn(in_features, rank) * (1 / math.sqrt(rank)))
-        self.B = nn.Parameter(torch.zeros(rank, out_features))
+ self.A = nn.Parameter(torch.randn(in_features, rank) * (1 / math.sqrt(rank)))
+ self.B = nn.Parameter(torch.zeros(rank, out_features))
 
-    def forward(self, x):
-        return (x @ self.A @ self.B) * self.scaling
+ def forward(self, x):
+ return (x @ self.A @ self.B) * self.scaling
 ```
 
 A is initialized with scaled random values. B is initialized to zero. The product BA starts at zero, so the model begins with its original behavior.
@@ -234,18 +234,18 @@ A is initialized with scaled random values. B is initialized to zero. The produc
 
 ```python
 class LinearWithLoRA(nn.Module):
-    def __init__(self, linear, rank=8, alpha=16):
-        super().__init__()
-        self.linear = linear
-        self.lora = LoRALayer(
-            linear.in_features, linear.out_features, rank, alpha
-        )
+ def __init__(self, linear, rank=8, alpha=16):
+ super().__init__()
+ self.linear = linear
+ self.lora = LoRALayer(
+ linear.in_features, linear.out_features, rank, alpha
+ )
 
-        for param in self.linear.parameters():
-            param.requires_grad = False
+ for param in self.linear.parameters():
+ param.requires_grad = False
 
-    def forward(self, x):
-        return self.linear(x) + self.lora(x)
+ def forward(self, x):
+ return self.linear(x) + self.lora(x)
 ```
 
 The original linear layer is frozen. Only the LoRA parameters (A and B) are trainable.
@@ -254,20 +254,20 @@ The original linear layer is frozen. Only the LoRA parameters (A and B) are trai
 
 ```python
 def inject_lora(model, target_modules, rank=8, alpha=16):
-    for param in model.parameters():
-        param.requires_grad = False
+ for param in model.parameters():
+ param.requires_grad = False
 
-    lora_layers = {}
-    for name, module in model.named_modules():
-        if isinstance(module, nn.Linear):
-            if any(t in name for t in target_modules):
-                parent_name = ".".join(name.split(".")[:-1])
-                child_name = name.split(".")[-1]
-                parent = dict(model.named_modules())[parent_name]
-                lora_linear = LinearWithLoRA(module, rank, alpha)
-                setattr(parent, child_name, lora_linear)
-                lora_layers[name] = lora_linear
-    return lora_layers
+ lora_layers = {}
+ for name, module in model.named_modules():
+ if isinstance(module, nn.Linear):
+ if any(t in name for t in target_modules):
+ parent_name = ".".join(name.split(".")[:-1])
+ child_name = name.split(".")[-1]
+ parent = dict(model.named_modules())[parent_name]
+ lora_linear = LinearWithLoRA(module, rank, alpha)
+ setattr(parent, child_name, lora_linear)
+ lora_layers[name] = lora_linear
+ return lora_layers
 ```
 
 First, freeze every parameter in the model. Then walk the model tree, find linear layers matching your target names, and replace them with LoRA-wrapped versions. The LoRA A and B matrices are the only trainable parameters in the entire model.
@@ -276,35 +276,35 @@ First, freeze every parameter in the model. Then walk the model tree, find linea
 
 ```python
 def count_parameters(model):
-    total = sum(p.numel() for p in model.parameters())
-    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    frozen = total - trainable
-    return {
-        "total": total,
-        "trainable": trainable,
-        "frozen": frozen,
-        "trainable_pct": 100 * trainable / total if total > 0 else 0
-    }
+ total = sum(p.numel() for p in model.parameters())
+ trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+ frozen = total - trainable
+ return {
+ "total": total,
+ "trainable": trainable,
+ "frozen": frozen,
+ "trainable_pct": 100 * trainable / total if total > 0 else 0
+ }
 ```
 
 ### Step 5: Merge Weights Back
 
 ```python
 def merge_lora_weights(model):
-    for name, module in model.named_modules():
-        if isinstance(module, LinearWithLoRA):
-            with torch.no_grad():
-                merged = (
-                    module.lora.A @ module.lora.B
-                ) * module.lora.scaling
-                module.linear.weight.data += merged.T
-            parent_name = ".".join(name.split(".")[:-1])
-            child_name = name.split(".")[-1]
-            if parent_name:
-                parent = dict(model.named_modules())[parent_name]
-            else:
-                parent = model
-            setattr(parent, child_name, module.linear)
+ for name, module in model.named_modules():
+ if isinstance(module, LinearWithLoRA):
+ with torch.no_grad():
+ merged = (
+ module.lora.A @ module.lora.B
+ ) * module.lora.scaling
+ module.linear.weight.data += merged.T
+ parent_name = ".".join(name.split(".")[:-1])
+ child_name = name.split(".")[-1]
+ if parent_name:
+ parent = dict(model.named_modules())[parent_name]
+ else:
+ parent = model
+ setattr(parent, child_name, module.linear)
 ```
 
 After merging, the LoRA layers are gone. The model is the same size as the original with the adaptation baked into the weights. No inference overhead.
@@ -313,15 +313,15 @@ After merging, the LoRA layers are gone. The model is the same size as the origi
 
 ```python
 def quantize_to_nf4(tensor, block_size=64):
-    blocks = tensor.reshape(-1, block_size)
-    scales = blocks.abs().max(dim=1, keepdim=True).values / 7.0
-    scales = torch.clamp(scales, min=1e-8)
-    quantized = torch.round(blocks / scales).clamp(-8, 7).to(torch.int8)
-    return quantized, scales
+ blocks = tensor.reshape(-1, block_size)
+ scales = blocks.abs().max(dim=1, keepdim=True).values / 7.0
+ scales = torch.clamp(scales, min=1e-8)
+ quantized = torch.round(blocks / scales).clamp(-8, 7).to(torch.int8)
+ return quantized, scales
 
 def dequantize_from_nf4(quantized, scales, original_shape):
-    dequantized = quantized.float() * scales
-    return dequantized.reshape(original_shape)
+ dequantized = quantized.float() * scales
+ return dequantized.reshape(original_shape)
 ```
 
 This simulates 4-bit quantization by mapping weights into 16 discrete levels within blocks of 64. Production QLoRA uses the bitsandbytes library for true NF4 on GPU.
@@ -330,80 +330,80 @@ This simulates 4-bit quantization by mapping weights into 16 discrete levels wit
 
 ```python
 def train_lora(model, data, epochs=5, lr=1e-3, batch_size=4):
-    optimizer = torch.optim.AdamW(
-        [p for p in model.parameters() if p.requires_grad], lr=lr
-    )
-    criterion = nn.MSELoss()
+ optimizer = torch.optim.AdamW(
+ [p for p in model.parameters() if p.requires_grad], lr=lr
+ )
+ criterion = nn.MSELoss()
 
-    losses = []
-    for epoch in range(epochs):
-        epoch_loss = 0.0
-        n_batches = 0
-        indices = torch.randperm(len(data["inputs"]))
+ losses = []
+ for epoch in range(epochs):
+ epoch_loss = 0.0
+ n_batches = 0
+ indices = torch.randperm(len(data["inputs"]))
 
-        for i in range(0, len(indices), batch_size):
-            batch_idx = indices[i:i + batch_size]
-            x = data["inputs"][batch_idx]
-            y = data["targets"][batch_idx]
+ for i in range(0, len(indices), batch_size):
+ batch_idx = indices[i:i + batch_size]
+ x = data["inputs"][batch_idx]
+ y = data["targets"][batch_idx]
 
-            output = model(x)
-            loss = criterion(output, y)
+ output = model(x)
+ loss = criterion(output, y)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+ optimizer.zero_grad()
+ loss.backward()
+ optimizer.step()
 
-            epoch_loss += loss.item()
-            n_batches += 1
+ epoch_loss += loss.item()
+ n_batches += 1
 
-        avg_loss = epoch_loss / n_batches
-        losses.append(avg_loss)
+ avg_loss = epoch_loss / n_batches
+ losses.append(avg_loss)
 
-    return losses
+ return losses
 ```
 
 ### Step 8: Full Demo
 
 ```python
 def demo():
-    torch.manual_seed(42)
-    d_model = 256
-    n_classes = 10
+ torch.manual_seed(42)
+ d_model = 256
+ n_classes = 10
 
-    model = nn.Sequential(
-        nn.Linear(d_model, 512),
-        nn.ReLU(),
-        nn.Linear(512, 512),
-        nn.ReLU(),
-        nn.Linear(512, n_classes),
-    )
+ model = nn.Sequential(
+ nn.Linear(d_model, 512),
+ nn.ReLU(),
+ nn.Linear(512, 512),
+ nn.ReLU(),
+ nn.Linear(512, n_classes),
+ )
 
-    n_samples = 500
-    x = torch.randn(n_samples, d_model)
-    y = torch.randint(0, n_classes, (n_samples,))
-    y_onehot = torch.zeros(n_samples, n_classes).scatter_(1, y.unsqueeze(1), 1.0)
+ n_samples = 500
+ x = torch.randn(n_samples, d_model)
+ y = torch.randint(0, n_classes, (n_samples,))
+ y_onehot = torch.zeros(n_samples, n_classes).scatter_(1, y.unsqueeze(1), 1.0)
 
-    data = {"inputs": x, "targets": y_onehot}
+ data = {"inputs": x, "targets": y_onehot}
 
-    params_before = count_parameters(model)
+ params_before = count_parameters(model)
 
-    lora_layers = inject_lora(
-        model, target_modules=["0", "2"], rank=8, alpha=16
-    )
+ lora_layers = inject_lora(
+ model, target_modules=["0", "2"], rank=8, alpha=16
+ )
 
-    params_after = count_parameters(model)
+ params_after = count_parameters(model)
 
-    losses = train_lora(model, data, epochs=20, lr=1e-3)
+ losses = train_lora(model, data, epochs=20, lr=1e-3)
 
-    merge_lora_weights(model)
-    params_merged = count_parameters(model)
+ merge_lora_weights(model)
+ params_merged = count_parameters(model)
 
-    return {
-        "params_before": params_before,
-        "params_after": params_after,
-        "params_merged": params_merged,
-        "losses": losses,
-    }
+ return {
+ "params_before": params_before,
+ "params_after": params_after,
+ "params_merged": params_merged,
+ "losses": losses,
+ }
 ```
 
 The demo creates a small model, injects LoRA into two layers, trains it, and merges the weights back. The parameter count drops from full trainable to ~1% trainable during LoRA training, then returns to the original architecture after merging.
@@ -420,11 +420,11 @@ model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B")
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
 
 lora_config = LoraConfig(
-    task_type=TaskType.CAUSAL_LM,
-    r=16,
-    lora_alpha=32,
-    lora_dropout=0.05,
-    target_modules=["q_proj", "v_proj"],
+ task_type=TaskType.CAUSAL_LM,
+ r=16,
+ lora_alpha=32,
+ lora_dropout=0.05,
+ target_modules=["q_proj", "v_proj"],
 )
 
 model = get_peft_model(model, lora_config)
@@ -437,16 +437,16 @@ For QLoRA, add bitsandbytes quantization:
 from transformers import BitsAndBytesConfig
 
 bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16,
-    bnb_4bit_use_double_quant=True,
+ load_in_4bit=True,
+ bnb_4bit_quant_type="nf4",
+ bnb_4bit_compute_dtype=torch.bfloat16,
+ bnb_4bit_use_double_quant=True,
 )
 
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
-    quantization_config=bnb_config,
-    device_map="auto",
+ "meta-llama/Llama-3.1-8B",
+ quantization_config=bnb_config,
+ device_map="auto",
 )
 
 model = get_peft_model(model, lora_config)
@@ -463,21 +463,21 @@ from datasets import load_dataset
 dataset = load_dataset("tatsu-lab/alpaca", split="train[:5000]")
 
 training_args = TrainingArguments(
-    output_dir="./lora-llama",
-    num_train_epochs=3,
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=4,
-    learning_rate=2e-4,
-    fp16=True,
-    logging_steps=10,
-    save_strategy="epoch",
-    optim="paged_adamw_8bit",
+ output_dir="./lora-llama",
+ num_train_epochs=3,
+ per_device_train_batch_size=4,
+ gradient_accumulation_steps=4,
+ learning_rate=2e-4,
+ fp16=True,
+ logging_steps=10,
+ save_strategy="epoch",
+ optim="paged_adamw_8bit",
 )
 
 trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=dataset,
+ model=model,
+ args=training_args,
+ train_dataset=dataset,
 )
 
 trainer.train()

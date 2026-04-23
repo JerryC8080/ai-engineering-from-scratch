@@ -29,29 +29,29 @@ This lesson builds every major method for solving that equation from scratch. Yo
 A system of linear equations has a geometric interpretation. Each equation defines a hyperplane. The solution is the point (or set of points) where all hyperplanes intersect.
 
 ```
-2x + y = 5          Two lines in 2D.
-x - y  = 1          They intersect at x=2, y=1.
+2x + y = 5 Two lines in 2D.
+x - y = 1 They intersect at x=2, y=1.
 ```
 
 ```mermaid
 graph LR
-    A["2x + y = 5"] --- S["Solution: (2, 1)"]
-    B["x - y = 1"] --- S
+ A["2x + y = 5"] --- S["Solution: (2, 1)"]
+ B["x - y = 1"] --- S
 ```
 
 Three things can happen:
 
 ```mermaid
 graph TD
-    subgraph "One Solution"
-        A1["Lines intersect at a single point"]
-    end
-    subgraph "No Solution"
-        A2["Lines are parallel — no intersection"]
-    end
-    subgraph "Infinite Solutions"
-        A3["Lines are identical — every point is a solution"]
-    end
+ subgraph "One Solution"
+ A1["Lines intersect at a single point"]
+ end
+ subgraph "No Solution"
+ A2["Lines are parallel — no intersection"]
+ end
+ subgraph "Infinite Solutions"
+ A3["Lines are identical — every point is a solution"]
+ end
 ```
 
 In matrix form, "one solution" means A is invertible. "No solution" means the system is inconsistent. "Infinite solutions" means A has a null space. Most ML problems fall in the "no exact solution" category because you have more equations (data points) than unknowns (parameters). That is where least squares comes in.
@@ -65,14 +65,14 @@ There are two ways to read Ax = b.
 **Column picture.** Each column of A is a vector. The question becomes: what linear combination of the columns of A produces b?
 
 ```
-A = | 2  1 |    b = | 5 |
-    | 1 -1 |        | 1 |
+A = | 2 1 | b = | 5 |
+ | 1 -1 | | 1 |
 
 Row picture: solve 2x + y = 5 and x - y = 1 simultaneously.
 
 Column picture: find x1, x2 such that:
-  x1 * [2, 1] + x2 * [1, -1] = [5, 1]
-  2 * [2, 1] + 1 * [1, -1] = [4+1, 2-1] = [5, 1]   check.
+ x1 * [2, 1] + x2 * [1, -1] = [5, 1]
+ 2 * [2, 1] + 1 * [1, -1] = [4+1, 2-1] = [5, 1] check.
 ```
 
 The column picture is more fundamental. If b lies in the column space of A, the system has a solution. If b does not, you find the closest point in the column space. That closest point is the least-squares solution.
@@ -85,11 +85,11 @@ The algorithm:
 
 ```
 1. For each column k (the pivot column):
-   a. Find the largest entry in column k at or below row k (partial pivoting).
-   b. Swap that row with row k.
-   c. For each row i below k:
-      - Compute multiplier m = A[i][k] / A[k][k]
-      - Subtract m times row k from row i.
+ a. Find the largest entry in column k at or below row k (partial pivoting).
+ b. Swap that row with row k.
+ c. For each row i below k:
+ - Compute multiplier m = A[i][k] / A[k][k]
+ - Subtract m times row k from row i.
 2. Back substitute: solve from the last equation upward.
 ```
 
@@ -97,18 +97,18 @@ Example:
 
 ```
 Original:
-| 2  1  1 | 8 |       R2 = R2 - (2)R1     | 2  1   1 |  8 |
-| 4  3  3 |20 |  -->  R3 = R3 - (1)R1 --> | 0  1   1 |  4 |
-| 2  3  1 |12 |                            | 0  2   0 |  4 |
+| 2 1 1 | 8 | R2 = R2 - (2)R1 | 2 1 1 | 8 |
+| 4 3 3 |20 | --> R3 = R3 - (1)R1 --> | 0 1 1 | 4 |
+| 2 3 1 |12 | | 0 2 0 | 4 |
 
-                       R3 = R3 - (2)R2     | 2  1   1 |  8 |
-                                       --> | 0  1   1 |  4 |
-                                           | 0  0  -2 | -4 |
+ R3 = R3 - (2)R2 | 2 1 1 | 8 |
+ --> | 0 1 1 | 4 |
+ | 0 0 -2 | -4 |
 
 Back substitute:
-  -2 * x3 = -4    -->  x3 = 2
-  x2 + 2  = 4     -->  x2 = 2
-  2*x1 + 2 + 2 = 8 --> x1 = 2
+ -2 * x3 = -4 --> x3 = 2
+ x2 + 2 = 4 --> x2 = 2
+ 2*x1 + 2 + 2 = 8 --> x1 = 2
 ```
 
 Gaussian elimination costs O(n^3) operations. For a 1000x1000 system, that is about a billion floating-point operations. Fast, but you can do better if you need to solve multiple systems with the same A.
@@ -118,18 +118,18 @@ Gaussian elimination costs O(n^3) operations. For a 1000x1000 system, that is ab
 Without pivoting, Gaussian elimination can fail or produce garbage. If a pivot element is zero, you divide by zero. If it is small, you amplify rounding errors.
 
 ```
-Bad pivot:                       With partial pivoting:
-| 0.001  1 | 1.001 |            Swap rows first:
-| 1      1 | 2     |            | 1      1 | 2     |
-                                 | 0.001  1 | 1.001 |
-m = 1/0.001 = 1000              m = 0.001/1 = 0.001
-R2 = R2 - 1000*R1               R2 = R2 - 0.001*R1
-| 0.001  1     | 1.001   |      | 1      1     | 2     |
-| 0     -999   | -999.0  |      | 0      0.999 | 0.999 |
+Bad pivot: With partial pivoting:
+| 0.001 1 | 1.001 | Swap rows first:
+| 1 1 | 2 | | 1 1 | 2 |
+ | 0.001 1 | 1.001 |
+m = 1/0.001 = 1000 m = 0.001/1 = 0.001
+R2 = R2 - 1000*R1 R2 = R2 - 0.001*R1
+| 0.001 1 | 1.001 | | 1 1 | 2 |
+| 0 -999 | -999.0 | | 0 0.999 | 0.999 |
 
-x2 = 1.000 (correct)            x2 = 1.000 (correct)
-x1 = (1.001 - 1)/0.001          x1 = (2 - 1)/1 = 1.000 (correct)
-   = 0.001/0.001 = 1.000        Stable because the multiplier is small.
+x2 = 1.000 (correct) x2 = 1.000 (correct)
+x1 = (1.001 - 1)/0.001 x1 = (2 - 1)/1 = 1.000 (correct)
+ = 0.001/0.001 = 1.000 Stable because the multiplier is small.
 ```
 
 In floating-point arithmetic with limited precision, the unpivoted version can lose significant digits. Partial pivoting always selects the largest available pivot to minimize error amplification.
@@ -141,9 +141,9 @@ LU decomposition factors A into a lower triangular matrix L and an upper triangu
 ```
 A = L @ U
 
-| 2  1  1 |   | 1  0  0 |   | 2  1   1 |
-| 4  3  3 | = | 2  1  0 | @ | 0  1   1 |
-| 2  3  1 |   | 1  2  1 |   | 0  0  -2 |
+| 2 1 1 | | 1 0 0 | | 2 1 1 |
+| 4 3 3 | = | 2 1 0 | @ | 0 1 1 |
+| 2 3 1 | | 1 2 1 | | 0 0 -2 |
 ```
 
 Why factor instead of just eliminating? Because once you have L and U, solving Ax = b for any new b costs only O(n^2):
@@ -152,8 +152,8 @@ Why factor instead of just eliminating? Because once you have L and U, solving A
 Ax = b
 LUx = b
 Let y = Ux:
-  Ly = b    (forward substitution, O(n^2))
-  Ux = y    (back substitution, O(n^2))
+ Ly = b (forward substitution, O(n^2))
+ Ux = y (back substitution, O(n^2))
 ```
 
 The O(n^3) cost is paid once during factorization. Every subsequent solve is O(n^2). If you need to solve 1000 systems with the same A but different b vectors, LU saves a factor of 1000/3 in total work.
@@ -173,25 +173,25 @@ Q has orthonormal columns: Q^T Q = I
 R is upper triangular
 
 To solve Ax = b:
-  QRx = b
-  Rx = Q^T b    (just multiply by Q^T, no inversion needed)
-  Back substitute to get x.
+ QRx = b
+ Rx = Q^T b (just multiply by Q^T, no inversion needed)
+ Back substitute to get x.
 ```
 
 QR is numerically more stable than LU for solving least-squares problems. The Gram-Schmidt process builds Q column by column:
 
 ```
-Given columns a1, a2, ... of A:
+Given columns a1, a2,... of A:
 
 q1 = a1 / ||a1||
 
-q2 = a2 - (a2 . q1) * q1        (subtract projection onto q1)
-q2 = q2 / ||q2||                (normalize)
+q2 = a2 - (a2. q1) * q1 (subtract projection onto q1)
+q2 = q2 / ||q2|| (normalize)
 
-q3 = a3 - (a3 . q1) * q1 - (a3 . q2) * q2
+q3 = a3 - (a3. q1) * q1 - (a3. q2) * q2
 q3 = q3 / ||q3||
 
-R[i][j] = qi . aj    for i <= j
+R[i][j] = qi. aj for i <= j
 ```
 
 Each step removes the component along all previous q vectors, leaving only the new orthogonal direction.
@@ -203,11 +203,11 @@ When A is symmetric (A = A^T) and positive definite (all eigenvalues positive), 
 ```
 A = L @ L^T
 
-| 4  2 |   | 2  0 |   | 2  1 |
-| 2  5 | = | 1  2 | @ | 0  2 |
+| 4 2 | | 2 0 | | 2 1 |
+| 2 5 | = | 1 2 | @ | 0 2 |
 
 L[i][i] = sqrt(A[i][i] - sum(L[i][k]^2 for k < i))
-L[i][j] = (A[i][j] - sum(L[i][k]*L[j][k] for k < j)) / L[j][j]    for i > j
+L[i][j] = (A[i][j] - sum(L[i][k]*L[j][k] for k < j)) / L[j][j] for i > j
 ```
 
 Cholesky is twice as fast as LU and requires half the storage. It only works for symmetric positive definite matrices, but those show up constantly:
@@ -227,7 +227,7 @@ If A is m x n with m > n (more equations than unknowns), the system is overdeter
 minimize ||Ax - b||^2
 
 This is the sum of squared residuals:
-  sum((A[i,:] @ x - b[i])^2 for i in range(m))
+ sum((A[i,:] @ x - b[i])^2 for i in range(m))
 ```
 
 The minimizer satisfies the normal equations:
@@ -240,14 +240,14 @@ Derivation: expand ||Ax - b||^2 = (Ax - b)^T (Ax - b) = x^T A^T A x - 2 x^T A^T 
 
 ```
 Original system (overdetermined, 4 equations, 2 unknowns):
-| 1  1 |         | 3 |
-| 1  2 | x     = | 5 |       No exact x satisfies all 4 equations.
-| 1  3 |         | 6 |
-| 1  4 |         | 8 |
+| 1 1 | | 3 |
+| 1 2 | x = | 5 | No exact x satisfies all 4 equations.
+| 1 3 | | 6 |
+| 1 4 | | 8 |
 
 Normal equations:
-A^T A = | 4  10 |    A^T b = | 22 |
-        | 10 30 |            | 63 |
+A^T A = | 4 10 | A^T b = | 22 |
+ | 10 30 | | 63 |
 
 Solve: x = [1.5, 1.7]
 
@@ -281,17 +281,17 @@ The pseudoinverse A+ generalizes matrix inversion to non-square and singular mat
 ```
 x = A+ b
 
-where A+ = V Sigma+ U^T    (computed via SVD)
+where A+ = V Sigma+ U^T (computed via SVD)
 ```
 
 Sigma+ is formed by taking the reciprocal of each nonzero singular value and transposing the result. If A = U Sigma V^T, then A+ = V Sigma+ U^T.
 
 ```
-A = U Sigma V^T        (SVD)
+A = U Sigma V^T (SVD)
 
-Sigma = | 5  0 |       Sigma+ = | 1/5  0  0 |
-        | 0  2 |                | 0  1/2  0 |
-        | 0  0 |
+Sigma = | 5 0 | Sigma+ = | 1/5 0 0 |
+ | 0 2 | | 0 1/2 0 |
+ | 0 0 |
 
 A+ = V Sigma+ U^T
 ```
@@ -314,12 +314,12 @@ kappa(A) = ||A|| * ||A^(-1)|| = sigma_max / sigma_min
 where sigma_max and sigma_min are the largest and smallest singular values.
 
 ```
-Well-conditioned (kappa ~ 1):        Ill-conditioned (kappa ~ 10^15):
-Small change in b -->                Small change in b -->
-small change in x                    huge change in x
+Well-conditioned (kappa ~ 1): Ill-conditioned (kappa ~ 10^15):
+Small change in b --> Small change in b -->
+small change in x huge change in x
 
-| 2  0 |   kappa = 2/1 = 2          | 1   1          |   kappa ~ 10^15
-| 0  1 |   safe to solve            | 1   1+10^(-15) |   solution is garbage
+| 2 0 | kappa = 2/1 = 2 | 1 1 | kappa ~ 10^15
+| 0 1 | safe to solve | 1 1+10^(-15) | solution is garbage
 ```
 
 Rules of thumb:
@@ -337,17 +337,17 @@ Conjugate gradient (CG) solves Ax = b when A is symmetric positive definite. It 
 
 ```
 Algorithm sketch:
-  x0 = initial guess (often zero)
-  r0 = b - A x0           (residual)
-  p0 = r0                 (search direction)
+ x0 = initial guess (often zero)
+ r0 = b - A x0 (residual)
+ p0 = r0 (search direction)
 
-  For k = 0, 1, 2, ...:
-    alpha = (rk . rk) / (pk . A pk)
-    x_{k+1} = xk + alpha * pk
-    r_{k+1} = rk - alpha * A pk
-    beta = (r_{k+1} . r_{k+1}) / (rk . rk)
-    p_{k+1} = r_{k+1} + beta * pk
-    if ||r_{k+1}|| < tolerance: stop
+ For k = 0, 1, 2,...:
+ alpha = (rk. rk) / (pk. A pk)
+ x_{k+1} = xk + alpha * pk
+ r_{k+1} = rk - alpha * A pk
+ beta = (r_{k+1}. r_{k+1}) / (rk. rk)
+ p_{k+1} = r_{k+1} + beta * pk
+ if ||r_{k+1}|| < tolerance: stop
 ```
 
 CG is used in:
@@ -394,113 +394,113 @@ Every method in this lesson appears in production ML:
 import numpy as np
 
 def gaussian_elimination(A, b):
-    n = len(b)
-    Ab = np.hstack([A.astype(float), b.reshape(-1, 1).astype(float)])
+ n = len(b)
+ Ab = np.hstack([A.astype(float), b.reshape(-1, 1).astype(float)])
 
-    for k in range(n):
-        max_row = k + np.argmax(np.abs(Ab[k:, k]))
-        Ab[[k, max_row]] = Ab[[max_row, k]]
+ for k in range(n):
+ max_row = k + np.argmax(np.abs(Ab[k:, k]))
+ Ab[[k, max_row]] = Ab[[max_row, k]]
 
-        if abs(Ab[k, k]) < 1e-12:
-            raise ValueError(f"Matrix is singular or nearly singular at pivot {k}")
+ if abs(Ab[k, k]) < 1e-12:
+ raise ValueError(f"Matrix is singular or nearly singular at pivot {k}")
 
-        for i in range(k + 1, n):
-            m = Ab[i, k] / Ab[k, k]
-            Ab[i, k:] -= m * Ab[k, k:]
+ for i in range(k + 1, n):
+ m = Ab[i, k] / Ab[k, k]
+ Ab[i, k:] -= m * Ab[k, k:]
 
-    x = np.zeros(n)
-    for i in range(n - 1, -1, -1):
-        x[i] = (Ab[i, -1] - Ab[i, i+1:n] @ x[i+1:n]) / Ab[i, i]
+ x = np.zeros(n)
+ for i in range(n - 1, -1, -1):
+ x[i] = (Ab[i, -1] - Ab[i, i+1:n] @ x[i+1:n]) / Ab[i, i]
 
-    return x
+ return x
 ```
 
 ### Step 2: LU decomposition
 
 ```python
 def lu_decompose(A):
-    n = A.shape[0]
-    L = np.eye(n)
-    U = A.astype(float).copy()
-    P = np.eye(n)
+ n = A.shape[0]
+ L = np.eye(n)
+ U = A.astype(float).copy()
+ P = np.eye(n)
 
-    for k in range(n):
-        max_row = k + np.argmax(np.abs(U[k:, k]))
-        if max_row != k:
-            U[[k, max_row]] = U[[max_row, k]]
-            P[[k, max_row]] = P[[max_row, k]]
-            if k > 0:
-                L[[k, max_row], :k] = L[[max_row, k], :k]
+ for k in range(n):
+ max_row = k + np.argmax(np.abs(U[k:, k]))
+ if max_row != k:
+ U[[k, max_row]] = U[[max_row, k]]
+ P[[k, max_row]] = P[[max_row, k]]
+ if k > 0:
+ L[[k, max_row], :k] = L[[max_row, k], :k]
 
-        for i in range(k + 1, n):
-            L[i, k] = U[i, k] / U[k, k]
-            U[i, k:] -= L[i, k] * U[k, k:]
+ for i in range(k + 1, n):
+ L[i, k] = U[i, k] / U[k, k]
+ U[i, k:] -= L[i, k] * U[k, k:]
 
-    return P, L, U
+ return P, L, U
 
 def lu_solve(P, L, U, b):
-    n = len(b)
-    Pb = P @ b.astype(float)
+ n = len(b)
+ Pb = P @ b.astype(float)
 
-    y = np.zeros(n)
-    for i in range(n):
-        y[i] = Pb[i] - L[i, :i] @ y[:i]
+ y = np.zeros(n)
+ for i in range(n):
+ y[i] = Pb[i] - L[i, :i] @ y[:i]
 
-    x = np.zeros(n)
-    for i in range(n - 1, -1, -1):
-        x[i] = (y[i] - U[i, i+1:] @ x[i+1:]) / U[i, i]
+ x = np.zeros(n)
+ for i in range(n - 1, -1, -1):
+ x[i] = (y[i] - U[i, i+1:] @ x[i+1:]) / U[i, i]
 
-    return x
+ return x
 ```
 
 ### Step 3: Cholesky decomposition
 
 ```python
 def cholesky(A):
-    n = A.shape[0]
-    L = np.zeros_like(A, dtype=float)
+ n = A.shape[0]
+ L = np.zeros_like(A, dtype=float)
 
-    for i in range(n):
-        for j in range(i + 1):
-            s = A[i, j] - L[i, :j] @ L[j, :j]
-            if i == j:
-                if s <= 0:
-                    raise ValueError("Matrix is not positive definite")
-                L[i, j] = np.sqrt(s)
-            else:
-                L[i, j] = s / L[j, j]
+ for i in range(n):
+ for j in range(i + 1):
+ s = A[i, j] - L[i, :j] @ L[j, :j]
+ if i == j:
+ if s <= 0:
+ raise ValueError("Matrix is not positive definite")
+ L[i, j] = np.sqrt(s)
+ else:
+ L[i, j] = s / L[j, j]
 
-    return L
+ return L
 ```
 
 ### Step 4: Least squares via normal equations
 
 ```python
 def least_squares_normal(A, b):
-    AtA = A.T @ A
-    Atb = A.T @ b
-    return gaussian_elimination(AtA, Atb)
+ AtA = A.T @ A
+ Atb = A.T @ b
+ return gaussian_elimination(AtA, Atb)
 
 def ridge_regression(A, b, lam):
-    n = A.shape[1]
-    AtA = A.T @ A + lam * np.eye(n)
-    Atb = A.T @ b
-    L = cholesky(AtA)
-    y = np.zeros(n)
-    for i in range(n):
-        y[i] = (Atb[i] - L[i, :i] @ y[:i]) / L[i, i]
-    x = np.zeros(n)
-    for i in range(n - 1, -1, -1):
-        x[i] = (y[i] - L.T[i, i+1:] @ x[i+1:]) / L.T[i, i]
-    return x
+ n = A.shape[1]
+ AtA = A.T @ A + lam * np.eye(n)
+ Atb = A.T @ b
+ L = cholesky(AtA)
+ y = np.zeros(n)
+ for i in range(n):
+ y[i] = (Atb[i] - L[i, :i] @ y[:i]) / L[i, i]
+ x = np.zeros(n)
+ for i in range(n - 1, -1, -1):
+ x[i] = (y[i] - L.T[i, i+1:] @ x[i+1:]) / L.T[i, i]
+ return x
 ```
 
 ### Step 5: Condition number
 
 ```python
 def condition_number(A):
-    U, S, Vt = np.linalg.svd(A)
-    return S[0] / S[-1]
+ U, S, Vt = np.linalg.svd(A)
+ return S[0] / S[-1]
 ```
 
 ## Use It
@@ -516,14 +516,14 @@ y = X_raw @ w_true + np.random.randn(100) * 0.1
 X = np.column_stack([np.ones(100), X_raw])
 
 w_ols = least_squares_normal(X, y)
-print(f"OLS weights (ours):    {w_ols}")
+print(f"OLS weights (ours): {w_ols}")
 
 w_np = np.linalg.lstsq(X, y, rcond=None)[0]
-print(f"OLS weights (numpy):   {w_np}")
+print(f"OLS weights (numpy): {w_np}")
 print(f"Max difference: {np.max(np.abs(w_ols - w_np)):.2e}")
 
 w_ridge = ridge_regression(X, y, lam=1.0)
-print(f"Ridge weights (ours):  {w_ridge}")
+print(f"Ridge weights (ours): {w_ridge}")
 
 from sklearn.linear_model import Ridge
 ridge_sk = Ridge(alpha=1.0, fit_intercept=False)

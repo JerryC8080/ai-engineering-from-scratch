@@ -39,44 +39,44 @@ from collections import Counter
 
 
 def build_cooccurrence(docs, window=5):
-    pair_counts = Counter()
-    vocab = {}
-    for doc in docs:
-        for token in doc:
-            if token not in vocab:
-                vocab[token] = len(vocab)
-    for doc in docs:
-        indexed = [vocab[t] for t in doc]
-        for i, center in enumerate(indexed):
-            for j in range(max(0, i - window), min(len(indexed), i + window + 1)):
-                if i != j:
-                    distance = abs(i - j)
-                    pair_counts[(center, indexed[j])] += 1.0 / distance
-    return vocab, pair_counts
+ pair_counts = Counter()
+ vocab = {}
+ for doc in docs:
+ for token in doc:
+ if token not in vocab:
+ vocab[token] = len(vocab)
+ for doc in docs:
+ indexed = [vocab[t] for t in doc]
+ for i, center in enumerate(indexed):
+ for j in range(max(0, i - window), min(len(indexed), i + window + 1)):
+ if i != j:
+ distance = abs(i - j)
+ pair_counts[(center, indexed[j])] += 1.0 / distance
+ return vocab, pair_counts
 
 
 def glove_train(vocab, pair_counts, dim=16, epochs=100, lr=0.05, x_max=100, alpha=0.75, seed=0):
-    n = len(vocab)
-    rng = np.random.default_rng(seed)
-    W = rng.normal(0, 0.1, size=(n, dim))
-    W_tilde = rng.normal(0, 0.1, size=(n, dim))
-    b = np.zeros(n)
-    b_tilde = np.zeros(n)
+ n = len(vocab)
+ rng = np.random.default_rng(seed)
+ W = rng.normal(0, 0.1, size=(n, dim))
+ W_tilde = rng.normal(0, 0.1, size=(n, dim))
+ b = np.zeros(n)
+ b_tilde = np.zeros(n)
 
-    for epoch in range(epochs):
-        for (i, j), x_ij in pair_counts.items():
-            weight = (x_ij / x_max) ** alpha if x_ij < x_max else 1.0
-            diff = W[i] @ W_tilde[j] + b[i] + b_tilde[j] - np.log(x_ij)
-            coef = weight * diff
+ for epoch in range(epochs):
+ for (i, j), x_ij in pair_counts.items():
+ weight = (x_ij / x_max) ** alpha if x_ij < x_max else 1.0
+ diff = W[i] @ W_tilde[j] + b[i] + b_tilde[j] - np.log(x_ij)
+ coef = weight * diff
 
-            grad_W_i = coef * W_tilde[j]
-            grad_W_tilde_j = coef * W[i]
-            W[i] -= lr * grad_W_i
-            W_tilde[j] -= lr * grad_W_tilde_j
-            b[i] -= lr * coef
-            b_tilde[j] -= lr * coef
+ grad_W_i = coef * W_tilde[j]
+ grad_W_tilde_j = coef * W[i]
+ W[i] -= lr * grad_W_i
+ W_tilde[j] -= lr * grad_W_tilde_j
+ b[i] -= lr * coef
+ b_tilde[j] -= lr * coef
 
-    return W + W_tilde
+ return W + W_tilde
 ```
 
 Two moving pieces worth naming. The weighting function `f(x) = (x/x_max)^alpha` downweights very frequent pairs (like `(the, and)`) so they do not dominate the loss. The final embedding is the sum of `W` (center) and `W_tilde` (context) tables. Summing both is a published trick that tends to outperform using just one.
@@ -85,12 +85,12 @@ Two moving pieces worth naming. The weighting function `f(x) = (x/x_max)^alpha` 
 
 ```python
 def char_ngrams(word, n_min=3, n_max=6):
-    wrapped = f"<{word}>"
-    grams = {wrapped}
-    for n in range(n_min, n_max + 1):
-        for i in range(len(wrapped) - n + 1):
-            grams.add(wrapped[i:i + n])
-    return grams
+ wrapped = f"<{word}>"
+ grams = {wrapped}
+ for n in range(n_min, n_max + 1):
+ for i in range(len(wrapped) - n + 1):
+ grams.add(wrapped[i:i + n])
+ return grams
 ```
 
 ```python
@@ -102,11 +102,11 @@ Each word is represented by its set of n-grams (typically 3 to 6 characters). Th
 
 ```python
 def fasttext_vector(word, ngram_table):
-    grams = char_ngrams(word)
-    vecs = [ngram_table[g] for g in grams if g in ngram_table]
-    if not vecs:
-        return None
-    return np.sum(vecs, axis=0)
+ grams = char_ngrams(word)
+ vecs = [ngram_table[g] for g in grams if g in ngram_table]
+ if not vecs:
+ return None
+ return np.sum(vecs, axis=0)
 ```
 
 For an unseen word, you still get a vector as long as some of its n-grams are known. `whereupon` shares `<wh`, `her`, `ere`, and `<where` with `where`, so the two land near each other.
@@ -115,52 +115,52 @@ For an unseen word, you still get a vector as long as some of its n-grams are kn
 
 ```python
 def learn_bpe(corpus, k_merges):
-    vocab = Counter()
-    for word, freq in corpus.items():
-        tokens = tuple(word) + ("</w>",)
-        vocab[tokens] = freq
+ vocab = Counter()
+ for word, freq in corpus.items():
+ tokens = tuple(word) + ("</w>",)
+ vocab[tokens] = freq
 
-    merges = []
-    for _ in range(k_merges):
-        pair_freq = Counter()
-        for tokens, freq in vocab.items():
-            for a, b in zip(tokens, tokens[1:]):
-                pair_freq[(a, b)] += freq
-        if not pair_freq:
-            break
-        best = pair_freq.most_common(1)[0][0]
-        merges.append(best)
+ merges = []
+ for _ in range(k_merges):
+ pair_freq = Counter()
+ for tokens, freq in vocab.items():
+ for a, b in zip(tokens, tokens[1:]):
+ pair_freq[(a, b)] += freq
+ if not pair_freq:
+ break
+ best = pair_freq.most_common(1)[0][0]
+ merges.append(best)
 
-        new_vocab = Counter()
-        for tokens, freq in vocab.items():
-            new_tokens = []
-            i = 0
-            while i < len(tokens):
-                if i + 1 < len(tokens) and (tokens[i], tokens[i + 1]) == best:
-                    new_tokens.append(tokens[i] + tokens[i + 1])
-                    i += 2
-                else:
-                    new_tokens.append(tokens[i])
-                    i += 1
-            new_vocab[tuple(new_tokens)] = freq
-        vocab = new_vocab
-    return merges
+ new_vocab = Counter()
+ for tokens, freq in vocab.items():
+ new_tokens = []
+ i = 0
+ while i < len(tokens):
+ if i + 1 < len(tokens) and (tokens[i], tokens[i + 1]) == best:
+ new_tokens.append(tokens[i] + tokens[i + 1])
+ i += 2
+ else:
+ new_tokens.append(tokens[i])
+ i += 1
+ new_vocab[tuple(new_tokens)] = freq
+ vocab = new_vocab
+ return merges
 
 
 def apply_bpe(word, merges):
-    tokens = list(word) + ["</w>"]
-    for a, b in merges:
-        new_tokens = []
-        i = 0
-        while i < len(tokens):
-            if i + 1 < len(tokens) and tokens[i] == a and tokens[i + 1] == b:
-                new_tokens.append(a + b)
-                i += 2
-            else:
-                new_tokens.append(tokens[i])
-                i += 1
-        tokens = new_tokens
-    return tokens
+ tokens = list(word) + ["</w>"]
+ for a, b in merges:
+ new_tokens = []
+ i = 0
+ while i < len(tokens):
+ if i + 1 < len(tokens) and tokens[i] == a and tokens[i + 1] == b:
+ new_tokens.append(a + b)
+ i += 2
+ else:
+ new_tokens.append(tokens[i])
+ i += 1
+ tokens = new_tokens
+ return tokens
 ```
 
 ```python

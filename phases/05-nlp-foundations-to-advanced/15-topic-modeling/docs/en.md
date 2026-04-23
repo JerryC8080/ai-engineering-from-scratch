@@ -50,29 +50,29 @@ import numpy as np
 
 
 def fit_lda(documents, n_topics=5, max_features=1000):
-    cv = CountVectorizer(
-        max_features=max_features,
-        stop_words="english",
-        min_df=2,
-        max_df=0.9,
-    )
-    X = cv.fit_transform(documents)
-    lda = LatentDirichletAllocation(
-        n_components=n_topics,
-        random_state=42,
-        max_iter=50,
-        learning_method="online",
-    )
-    doc_topic = lda.fit_transform(X)
-    feature_names = cv.get_feature_names_out()
-    return lda, cv, doc_topic, feature_names
+ cv = CountVectorizer(
+ max_features=max_features,
+ stop_words="english",
+ min_df=2,
+ max_df=0.9,
+ )
+ X = cv.fit_transform(documents)
+ lda = LatentDirichletAllocation(
+ n_components=n_topics,
+ random_state=42,
+ max_iter=50,
+ learning_method="online",
+ )
+ doc_topic = lda.fit_transform(X)
+ feature_names = cv.get_feature_names_out()
+ return lda, cv, doc_topic, feature_names
 
 
 def print_top_words(lda, feature_names, n_top=10):
-    for idx, topic in enumerate(lda.components_):
-        top_idx = np.argsort(-topic)[:n_top]
-        words = [feature_names[i] for i in top_idx]
-        print(f"topic {idx}: {' '.join(words)}")
+ for idx, topic in enumerate(lda.components_):
+ top_idx = np.argsort(-topic)[:n_top]
+ words = [feature_names[i] for i in top_idx]
+ print(f"topic {idx}: {' '.join(words)}")
 ```
 
 Notice: stopwords removed, min_df and max_df filter rare and ubiquitous terms, CountVectorizer (not TfidfVectorizer) because LDA expects raw counts.
@@ -83,9 +83,9 @@ Notice: stopwords removed, min_df and max_df filter rare and ubiquitous terms, C
 from bertopic import BERTopic
 
 topic_model = BERTopic(
-    embedding_model="sentence-transformers/all-MiniLM-L6-v2",
-    min_topic_size=15,
-    verbose=True,
+ embedding_model="sentence-transformers/all-MiniLM-L6-v2",
+ min_topic_size=15,
+ verbose=True,
 )
 
 topics, probs = topic_model.fit_transform(documents)
@@ -93,7 +93,7 @@ info = topic_model.get_topic_info()
 print(info.head(20))
 valid_topics = info[info["Topic"] != -1]["Topic"].tolist()
 for topic_id in valid_topics[:5]:
-    print(f"topic {topic_id}: {topic_model.get_topic(topic_id)[:10]}")
+ print(f"topic {topic_id}: {topic_model.get_topic(topic_id)[:10]}")
 ```
 
 The filter on `Topic != -1` drops BERTopic's outlier bucket (documents HDBSCAN could not cluster). `min_topic_size` controls HDBSCAN's minimum cluster size; BERTopic's library default is 10. This example sets it to 15 explicitly for the lesson's scale. For corpora over 10,000 documents, increase to 50 or 100.

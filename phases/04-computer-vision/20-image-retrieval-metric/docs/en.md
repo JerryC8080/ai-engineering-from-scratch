@@ -28,17 +28,17 @@ That shaping is metric learning. It is a small but high-leverage discipline.
 
 ```mermaid
 flowchart LR
-    Q["Query image<br/>or text"] --> ENC["Encoder"]
-    ENC --> EMB["Query embedding"]
-    EMB --> IDX["FAISS index"]
-    CAT["Catalogue images"] --> ENC2["Encoder (same)"] --> IDX_BUILD["Build index"]
-    IDX_BUILD --> IDX
-    IDX --> RANK["Top-k nearest<br/>by cosine / L2"]
-    RANK --> OUT["Ranked results"]
+ Q["Query image<br/>or text"] --> ENC["Encoder"]
+ ENC --> EMB["Query embedding"]
+ EMB --> IDX["FAISS index"]
+ CAT["Catalogue images"] --> ENC2["Encoder (same)"] --> IDX_BUILD["Build index"]
+ IDX_BUILD --> IDX
+ IDX --> RANK["Top-k nearest<br/>by cosine / L2"]
+ RANK --> OUT["Ranked results"]
 
-    style ENC fill:#dbeafe,stroke:#2563eb
-    style IDX fill:#fef3c7,stroke:#d97706
-    style OUT fill:#dcfce7,stroke:#16a34a
+ style ENC fill:#dbeafe,stroke:#2563eb
+ style IDX fill:#fef3c7,stroke:#d97706
+ style OUT fill:#dcfce7,stroke:#16a34a
 ```
 
 ### The four loss families
@@ -111,9 +111,9 @@ import torch
 import torch.nn.functional as F
 
 def triplet_loss(anchor, positive, negative, margin=0.2):
-    d_ap = F.pairwise_distance(anchor, positive, p=2)
-    d_an = F.pairwise_distance(anchor, negative, p=2)
-    return F.relu(d_ap - d_an + margin).mean()
+ d_ap = F.pairwise_distance(anchor, positive, p=2)
+ d_an = F.pairwise_distance(anchor, negative, p=2)
+ return F.relu(d_ap - d_an + margin).mean()
 ```
 
 One line. Works on L2-normalised or raw embeddings.
@@ -124,28 +124,28 @@ Given a batch of embeddings and labels, find the hardest semi-hard negative for 
 
 ```python
 def semi_hard_negatives(emb, labels, margin=0.2):
-    dist = torch.cdist(emb, emb)
-    same_class = labels[:, None] == labels[None, :]
-    diff_class = ~same_class
-    N = emb.size(0)
+ dist = torch.cdist(emb, emb)
+ same_class = labels[:, None] == labels[None, :]
+ diff_class = ~same_class
+ N = emb.size(0)
 
-    positives = dist.clone()
-    positives[~same_class] = float("-inf")
-    positives.fill_diagonal_(float("-inf"))
-    pos_idx = positives.argmax(dim=1)
+ positives = dist.clone()
+ positives[~same_class] = float("-inf")
+ positives.fill_diagonal_(float("-inf"))
+ pos_idx = positives.argmax(dim=1)
 
-    semi_hard = dist.clone()
-    semi_hard[same_class] = float("inf")
-    d_ap = dist[torch.arange(N), pos_idx].unsqueeze(1)
-    semi_hard[dist <= d_ap] = float("inf")
-    neg_idx = semi_hard.argmin(dim=1)
+ semi_hard = dist.clone()
+ semi_hard[same_class] = float("inf")
+ d_ap = dist[torch.arange(N), pos_idx].unsqueeze(1)
+ semi_hard[dist <= d_ap] = float("inf")
+ neg_idx = semi_hard.argmin(dim=1)
 
-    fallback_mask = semi_hard[torch.arange(N), neg_idx] == float("inf")
-    if fallback_mask.any():
-        hardest = dist.clone()
-        hardest[same_class] = float("inf")
-        neg_idx = torch.where(fallback_mask, hardest.argmin(dim=1), neg_idx)
-    return pos_idx, neg_idx
+ fallback_mask = semi_hard[torch.arange(N), neg_idx] == float("inf")
+ if fallback_mask.any():
+ hardest = dist.clone()
+ hardest[same_class] = float("inf")
+ neg_idx = torch.where(fallback_mask, hardest.argmin(dim=1), neg_idx)
+ return pos_idx, neg_idx
 ```
 
 Each anchor gets the hardest positive in-class and a semi-hard negative that is further than the positive but within margin.
@@ -154,10 +154,10 @@ Each anchor gets the hardest positive in-class and a semi-hard negative that is 
 
 ```python
 def recall_at_k(query_emb, gallery_emb, query_labels, gallery_labels, k=1):
-    sim = query_emb @ gallery_emb.T
-    _, top_k = sim.topk(k, dim=-1)
-    matches = (gallery_labels[top_k] == query_labels[:, None]).any(dim=-1)
-    return matches.float().mean().item()
+ sim = query_emb @ gallery_emb.T
+ _, top_k = sim.topk(k, dim=-1)
+ matches = (gallery_labels[top_k] == query_labels[:, None]).any(dim=-1)
+ return matches.float().mean().item()
 ```
 
 Top-k by inner product on L2-normalised embeddings equals top-k by cosine. Report the mean proportion of queries with at least one correct neighbour.
@@ -170,34 +170,34 @@ import torch.nn as nn
 from torch.optim import Adam
 
 class Encoder(nn.Module):
-    def __init__(self, in_dim=128, emb_dim=64):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(in_dim, 128), nn.ReLU(),
-            nn.Linear(128, emb_dim),
-        )
+ def __init__(self, in_dim=128, emb_dim=64):
+ super().__init__()
+ self.net = nn.Sequential(
+ nn.Linear(in_dim, 128), nn.ReLU(),
+ nn.Linear(128, emb_dim),
+ )
 
-    def forward(self, x):
-        return F.normalize(self.net(x), dim=-1)
+ def forward(self, x):
+ return F.normalize(self.net(x), dim=-1)
 
 torch.manual_seed(0)
 num_classes = 6
 protos = F.normalize(torch.randn(num_classes, 128), dim=-1)
 
 def sample_batch(bs=32):
-    labels = torch.randint(0, num_classes, (bs,))
-    x = protos[labels] + 0.15 * torch.randn(bs, 128)
-    return x, labels
+ labels = torch.randint(0, num_classes, (bs,))
+ x = protos[labels] + 0.15 * torch.randn(bs, 128)
+ return x, labels
 
 enc = Encoder()
 opt = Adam(enc.parameters(), lr=3e-3)
 
 for step in range(200):
-    x, y = sample_batch(32)
-    emb = enc(x)
-    pos_idx, neg_idx = semi_hard_negatives(emb, y)
-    loss = triplet_loss(emb, emb[pos_idx], emb[neg_idx])
-    opt.zero_grad(); loss.backward(); opt.step()
+ x, y = sample_batch(32)
+ emb = enc(x)
+ pos_idx, neg_idx = semi_hard_negatives(emb, y)
+ loss = triplet_loss(emb, emb[pos_idx], emb[neg_idx])
+ opt.zero_grad(); loss.backward(); opt.step()
 ```
 
 After a few hundred steps the embedding clusters form one cluster per class.

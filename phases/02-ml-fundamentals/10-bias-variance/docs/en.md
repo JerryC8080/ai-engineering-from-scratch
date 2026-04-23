@@ -32,10 +32,10 @@ High bias means the model is too rigid to capture the real pattern. A straight l
 
 ```
 High bias (underfitting):
-  Model always predicts roughly the same wrong thing.
-  Training error: HIGH
-  Test error: HIGH
-  Gap between them: SMALL
+ Model always predicts roughly the same wrong thing.
+ Training error: HIGH
+ Test error: HIGH
+ Gap between them: SMALL
 ```
 
 ### Variance: Sensitivity to Training Data
@@ -46,10 +46,10 @@ High variance means the model is fitting noise in the training data, not the und
 
 ```
 High variance (overfitting):
-  Model fits training data perfectly but fails on new data.
-  Training error: LOW
-  Test error: HIGH
-  Gap between them: LARGE
+ Model fits training data perfectly but fails on new data.
+ Training error: LOW
+ Test error: HIGH
+ Gap between them: LARGE
 ```
 
 ### The Decomposition
@@ -60,9 +60,9 @@ For any point x, the expected prediction error under squared loss decomposes exa
 Expected Error = Bias^2 + Variance + Irreducible Noise
 
 where:
-  Bias^2   = (E[f_hat(x)] - f(x))^2
-  Variance = E[(f_hat(x) - E[f_hat(x)])^2]
-  Noise    = E[(y - f(x))^2]             (sigma^2)
+ Bias^2 = (E[f_hat(x)] - f(x))^2
+ Variance = E[(f_hat(x) - E[f_hat(x)])^2]
+ Noise = E[(y - f(x))^2] (sigma^2)
 ```
 
 - `f(x)` is the true function
@@ -76,12 +76,12 @@ The noise term is irreducible. No model can do better than sigma^2 on noisy data
 
 ```mermaid
 graph LR
-    A[Simple Model] -->|increase complexity| B[Sweet Spot]
-    B -->|increase complexity| C[Complex Model]
+ A[Simple Model] -->|increase complexity| B[Sweet Spot]
+ B -->|increase complexity| C[Complex Model]
 
-    style A fill:#f9f,stroke:#333
-    style B fill:#9f9,stroke:#333
-    style C fill:#f99,stroke:#333
+ style A fill:#f9f,stroke:#333
+ style B fill:#9f9,stroke:#333
+ style C fill:#f99,stroke:#333
 ```
 
 The classic U-shaped curve:
@@ -109,14 +109,14 @@ Classical theory says: after the sweet spot, more complexity always hurts. But r
 
 ```mermaid
 graph LR
-    A[Underfit Zone] --> B[Classical Sweet Spot]
-    B --> C[Interpolation Threshold]
-    C --> D[Double Descent - Error Drops Again]
+ A[Underfit Zone] --> B[Classical Sweet Spot]
+ B --> C[Interpolation Threshold]
+ C --> D[Double Descent - Error Drops Again]
 
-    style A fill:#fdd,stroke:#333
-    style B fill:#dfd,stroke:#333
-    style C fill:#fdd,stroke:#333
-    style D fill:#dfd,stroke:#333
+ style A fill:#fdd,stroke:#333
+ style B fill:#dfd,stroke:#333
+ style C fill:#fdd,stroke:#333
+ style D fill:#dfd,stroke:#333
 ```
 
 This "double descent" phenomenon explains why massively overparameterized neural networks (with far more parameters than training examples) still generalize well. The classical bias-variance tradeoff is not wrong, but it is incomplete for the modern regime.
@@ -141,15 +141,15 @@ For practical purposes: if you are using neural networks or large tree ensembles
 
 ```mermaid
 flowchart TD
-    A[Compare train error vs test error] --> B{Large gap?}
-    B -->|Yes| C[High variance - overfitting]
-    B -->|No| D{Both errors high?}
-    D -->|Yes| E[High bias - underfitting]
-    D -->|No| F[Good fit]
+ A[Compare train error vs test error] --> B{Large gap?}
+ B -->|Yes| C[High variance - overfitting]
+ B -->|No| D{Both errors high?}
+ D -->|Yes| E[High bias - underfitting]
+ D -->|No| F[Good fit]
 
-    C --> G[More data / Regularize / Simpler model]
-    E --> H[More features / Complex model / Less regularization]
-    F --> I[Deploy]
+ C --> G[More data / Regularize / Simpler model]
+ E --> H[More features / Complex model / Less regularization]
+ F --> I[Deploy]
 ```
 
 | Symptom | Diagnosis | Fix |
@@ -199,26 +199,26 @@ Learning curves plot training and validation error as a function of training set
 
 ```mermaid
 flowchart TD
-    subgraph HB["High Bias Learning Curve"]
-        direction LR
-        HB1["Small N: both errors high"]
-        HB2["Large N: both errors converge to HIGH error"]
-        HB1 --> HB2
-    end
+ subgraph HB["High Bias Learning Curve"]
+ direction LR
+ HB1["Small N: both errors high"]
+ HB2["Large N: both errors converge to HIGH error"]
+ HB1 --> HB2
+ end
 
-    subgraph HV["High Variance Learning Curve"]
-        direction LR
-        HV1["Small N: train low, test high (big gap)"]
-        HV2["Large N: gap shrinks but slowly"]
-        HV1 --> HV2
-    end
+ subgraph HV["High Variance Learning Curve"]
+ direction LR
+ HV1["Small N: train low, test high (big gap)"]
+ HV2["Large N: gap shrinks but slowly"]
+ HV1 --> HV2
+ end
 
-    subgraph GF["Good Fit Learning Curve"]
-        direction LR
-        GF1["Small N: some gap"]
-        GF2["Large N: both converge to LOW error"]
-        GF1 --> GF2
-    end
+ subgraph GF["Good Fit Learning Curve"]
+ direction LR
+ GF1["Small N: some gap"]
+ GF2["Large N: both converge to LOW error"]
+ GF1 --> GF2
+ end
 ```
 
 How to read them:
@@ -245,13 +245,13 @@ Both approaches complement each other. The first tells you if more data will hel
 
 ```mermaid
 flowchart TD
-    A[Model underperforming] --> B[Generate learning curve]
-    B --> C{Gap between train and val?}
-    C -->|Large gap, val still decreasing| D[More data will help]
-    C -->|Small gap, both high| E[More data will NOT help]
-    C -->|Large gap, val flat| F[Regularize or simplify]
-    E --> G[Generate validation curve]
-    G --> H[Try more complex model]
+ A[Model underperforming] --> B[Generate learning curve]
+ B --> C{Gap between train and val?}
+ C -->|Large gap, val still decreasing| D[More data will help]
+ C -->|Small gap, both high| E[More data will NOT help]
+ C -->|Large gap, val flat| F[Regularize or simplify]
+ E --> G[Generate validation curve]
+ G --> H[Try more complex model]
 ```
 
 ## Build It
@@ -264,13 +264,13 @@ We use `f(x) = sin(1.5x) + 0.5x` with Gaussian noise. Knowing the true function 
 
 ```python
 def true_function(x):
-    return np.sin(1.5 * x) + 0.5 * x
+ return np.sin(1.5 * x) + 0.5 * x
 
 def generate_data(n_samples=30, noise_std=0.5, x_range=(-3, 3), seed=None):
-    rng = np.random.RandomState(seed)
-    x = rng.uniform(x_range[0], x_range[1], n_samples)
-    y = true_function(x) + rng.normal(0, noise_std, n_samples)
-    return x, y
+ rng = np.random.RandomState(seed)
+ x = rng.uniform(x_range[0], x_range[1], n_samples)
+ y = true_function(x) + rng.normal(0, noise_std, n_samples)
+ return x, y
 ```
 
 ### Step 2: Bootstrap Sampling and Polynomial Fitting
@@ -279,14 +279,14 @@ For each polynomial degree, we draw many bootstrap training sets, fit the polyno
 
 ```python
 def fit_polynomial(x_train, y_train, degree, lam=0.0):
-    X = np.column_stack([x_train ** d for d in range(degree + 1)])
-    if lam > 0:
-        penalty = lam * np.eye(X.shape[1])
-        penalty[0, 0] = 0
-        w = np.linalg.solve(X.T @ X + penalty, X.T @ y_train)
-    else:
-        w = np.linalg.lstsq(X, y_train, rcond=None)[0]
-    return w
+ X = np.column_stack([x_train ** d for d in range(degree + 1)])
+ if lam > 0:
+ penalty = lam * np.eye(X.shape[1])
+ penalty[0, 0] = 0
+ w = np.linalg.solve(X.T @ X + penalty, X.T @ y_train)
+ else:
+ w = np.linalg.lstsq(X, y_train, rcond=None)[0]
+ return w
 ```
 
 We fit on 200 different bootstrap samples. Each bootstrap sample is drawn from the same underlying distribution but contains different points.
@@ -313,22 +313,22 @@ Learning curves sweep training set size while holding model complexity fixed. Th
 
 ```python
 def demo_learning_curves():
-    sizes = [10, 15, 20, 30, 50, 75, 100, 150, 200, 300]
-    degree = 5
+ sizes = [10, 15, 20, 30, 50, 75, 100, 150, 200, 300]
+ degree = 5
 
-    for n in sizes:
-        train_errors = []
-        test_errors = []
-        for seed in range(50):
-            x_train, y_train = generate_data(n_samples=n, seed=seed * 100)
-            w = fit_polynomial(x_train, y_train, degree)
-            train_pred = predict_polynomial(x_train, w)
-            train_mse = np.mean((train_pred - y_train) ** 2)
-            test_pred = predict_polynomial(x_test, w)
-            test_mse = np.mean((test_pred - y_test) ** 2)
-            train_errors.append(train_mse)
-            test_errors.append(test_mse)
-        # Average over runs gives the learning curve point
+ for n in sizes:
+ train_errors = []
+ test_errors = []
+ for seed in range(50):
+ x_train, y_train = generate_data(n_samples=n, seed=seed * 100)
+ w = fit_polynomial(x_train, y_train, degree)
+ train_pred = predict_polynomial(x_train, w)
+ train_mse = np.mean((train_pred - y_train) ** 2)
+ test_pred = predict_polynomial(x_test, w)
+ test_mse = np.mean((test_pred - y_test) ** 2)
+ train_errors.append(train_mse)
+ test_errors.append(test_mse)
+ # Average over runs gives the learning curve point
 ```
 
 For a high-variance model (degree 5 with small data), you see:
@@ -344,11 +344,11 @@ The code also includes `demo_regularization_sweep()`, which fixes a high-degree 
 
 ```python
 def demo_regularization_sweep():
-    alphas = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
-    for alpha in alphas:
-        results = bias_variance_decomposition([15], lam=alpha)
-        r = results[15]
-        print(f"alpha={alpha:.3f}  bias={r['bias_sq']:.4f}  var={r['variance']:.4f}")
+ alphas = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
+ for alpha in alphas:
+ results = bias_variance_decomposition([15], lam=alpha)
+ r = results[15]
+ print(f"alpha={alpha:.3f} bias={r['bias_sq']:.4f} var={r['variance']:.4f}")
 ```
 
 At low alpha, the degree-15 polynomial is nearly unconstrained. Variance dominates because the model chases noise in each bootstrap sample. At high alpha, the penalty is so strong that the model effectively becomes a near-constant function. Bias dominates. The optimal alpha sits between these extremes.
@@ -372,13 +372,13 @@ train_scores_all = []
 val_scores_all = []
 
 for d in degrees:
-    pipe = make_pipeline(PolynomialFeatures(d), Ridge(alpha=0.01))
-    train_scores, val_scores = validation_curve(
-        pipe, X, y, param_name="polynomialfeatures__degree",
-        param_range=[d], cv=5, scoring="neg_mean_squared_error"
-    )
-    train_scores_all.append(-train_scores.mean())
-    val_scores_all.append(-val_scores.mean())
+ pipe = make_pipeline(PolynomialFeatures(d), Ridge(alpha=0.01))
+ train_scores, val_scores = validation_curve(
+ pipe, X, y, param_name="polynomialfeatures__degree",
+ param_range=[d], cv=5, scoring="neg_mean_squared_error"
+ )
+ train_scores_all.append(-train_scores.mean())
+ val_scores_all.append(-val_scores.mean())
 ```
 
 This gives you the bias-variance tradeoff curve directly. Where the validation score is worst relative to train score, variance dominates. Where both are bad, bias dominates.
@@ -390,8 +390,8 @@ from sklearn.model_selection import learning_curve
 
 pipe = make_pipeline(PolynomialFeatures(5), Ridge(alpha=0.01))
 train_sizes, train_scores, val_scores = learning_curve(
-    pipe, X, y, train_sizes=np.linspace(0.1, 1.0, 10),
-    cv=5, scoring="neg_mean_squared_error"
+ pipe, X, y, train_sizes=np.linspace(0.1, 1.0, 10),
+ cv=5, scoring="neg_mean_squared_error"
 )
 train_mse = -train_scores.mean(axis=1)
 val_mse = -val_scores.mean(axis=1)
@@ -406,9 +406,9 @@ from sklearn.model_selection import cross_val_score
 
 alphas = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 for alpha in alphas:
-    pipe = make_pipeline(PolynomialFeatures(10), Ridge(alpha=alpha))
-    scores = cross_val_score(pipe, X, y, cv=5, scoring="neg_mean_squared_error")
-    print(f"alpha={alpha:>7.3f}  MSE={-scores.mean():.4f} +/- {scores.std():.4f}")
+ pipe = make_pipeline(PolynomialFeatures(10), Ridge(alpha=alpha))
+ scores = cross_val_score(pipe, X, y, cv=5, scoring="neg_mean_squared_error")
+ print(f"alpha={alpha:>7.3f} MSE={-scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
 This sweeps regularization strength for a fixed model complexity. You will see the same bias-variance tradeoff: low alpha means high variance, high alpha means high bias.

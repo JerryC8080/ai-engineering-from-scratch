@@ -26,17 +26,17 @@ Docker wraps your code, runtime, libraries, and system tools into an isolated un
 
 ```mermaid
 graph TD
-    subgraph without["Without Docker"]
-        A1["Your machine<br/>Python 3.12<br/>CUDA 12.4<br/>PyTorch 2.3"] -->|crashes| X1["???"]
-        A2["Their machine<br/>Python 3.10<br/>CUDA 11.8<br/>PyTorch 2.1"] -->|crashes| X2["???"]
-        A3["Server<br/>Python 3.11<br/>CUDA 12.1<br/>PyTorch 2.2"] -->|crashes| X3["???"]
-    end
+ subgraph without["Without Docker"]
+ A1["Your machine<br/>Python 3.12<br/>CUDA 12.4<br/>PyTorch 2.3"] -->|crashes| X1["???"]
+ A2["Their machine<br/>Python 3.10<br/>CUDA 11.8<br/>PyTorch 2.1"] -->|crashes| X2["???"]
+ A3["Server<br/>Python 3.11<br/>CUDA 12.1<br/>PyTorch 2.2"] -->|crashes| X3["???"]
+ end
 
-    subgraph with_docker["With Docker — Same image everywhere"]
-        B1["Your machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
-        B2["Their machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
-        B3["Server<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
-    end
+ subgraph with_docker["With Docker — Same image everywhere"]
+ B1["Your machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+ B2["Their machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+ B3["Server<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code"]
+ end
 ```
 
 ### Why AI projects need Docker more than most
@@ -61,16 +61,16 @@ graph TD
 
 ```
 Dev Container
-  Full toolkit. Editor support. Jupyter. Debugging tools.
-  Used during development and experimentation.
+ Full toolkit. Editor support. Jupyter. Debugging tools.
+ Used during development and experimentation.
 
 Training Container
-  Minimal. Just the training script and dependencies.
-  Runs on GPU clusters. No editor, no Jupyter.
+ Minimal. Just the training script and dependencies.
+ Runs on GPU clusters. No editor, no Jupyter.
 
 Inference Container
-  Optimized for serving. Small image. Fast cold start.
-  Runs behind a load balancer in production.
+ Optimized for serving. Small image. Fast cold start.
+ Runs behind a load balancer in production.
 ```
 
 ## Build It
@@ -103,8 +103,8 @@ This lets Docker containers access your GPU. macOS and Windows (WSL2) users can 
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
-    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+ sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+ sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
 sudo apt-get update
 sudo apt-get install -y nvidia-container-toolkit
@@ -126,24 +126,24 @@ Choosing the right base image saves hours of debugging.
 
 ```
 nvidia/cuda:12.4.1-devel-ubuntu22.04
-  Full CUDA toolkit. Compilers included.
-  Use for: building packages that need nvcc (flash-attn, bitsandbytes)
-  Size: ~4 GB
+ Full CUDA toolkit. Compilers included.
+ Use for: building packages that need nvcc (flash-attn, bitsandbytes)
+ Size: ~4 GB
 
 nvidia/cuda:12.4.1-runtime-ubuntu22.04
-  CUDA runtime only. No compilers.
-  Use for: running pre-built code
-  Size: ~1.5 GB
+ CUDA runtime only. No compilers.
+ Use for: running pre-built code
+ Size: ~1.5 GB
 
 pytorch/pytorch:2.3.1-cuda12.4-cudnn9-runtime
-  PyTorch pre-installed on top of CUDA.
-  Use for: skipping the PyTorch install step
-  Size: ~6 GB
+ PyTorch pre-installed on top of CUDA.
+ Use for: skipping the PyTorch install step
+ Size: ~6 GB
 
 python:3.12-slim
-  No CUDA. CPU only.
-  Use for: inference on CPU, lightweight tools
-  Size: ~150 MB
+ No CUDA. CPU only.
+ Use for: inference on CPU, lightweight tools
+ Size: ~150 MB
 ```
 
 ### Step 4: Write a Dockerfile for AI development
@@ -157,35 +157,35 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.12 \
-    python3.12-venv \
-    python3.12-dev \
-    python3-pip \
-    git \
-    curl \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+ python3.12 \
+ python3.12-venv \
+ python3.12-dev \
+ python3-pip \
+ git \
+ curl \
+ build-essential \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
 
 RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 RUN python -m pip install --no-cache-dir \
-    torch==2.3.1 \
-    torchvision==0.18.1 \
-    torchaudio==2.3.1 \
-    --index-url https://download.pytorch.org/whl/cu124
+ torch==2.3.1 \
+ torchvision==0.18.1 \
+ torchaudio==2.3.1 \
+ --index-url https://download.pytorch.org/whl/cu124
 
 RUN python -m pip install --no-cache-dir \
-    numpy \
-    pandas \
-    scikit-learn \
-    matplotlib \
-    jupyter \
-    transformers \
-    datasets \
-    accelerate \
-    safetensors
+ numpy \
+ pandas \
+ scikit-learn \
+ matplotlib \
+ jupyter \
+ transformers \
+ datasets \
+ accelerate \
+ safetensors
 
 WORKDIR /workspace
 
@@ -199,7 +199,7 @@ CMD ["python"]
 Build it:
 
 ```bash
-docker build -t ai-dev -f phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile .
+docker build -t ai-dev -f phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile.
 ```
 
 This takes a while the first time (downloading CUDA base image + PyTorch). Subsequent builds use cached layers.
@@ -208,19 +208,19 @@ Run it:
 
 ```bash
 docker run --rm -it --gpus all \
-    -v $(pwd):/workspace \
-    -v ~/models:/models \
-    ai-dev python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
+ -v $(pwd):/workspace \
+ -v ~/models:/models \
+ ai-dev python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 ```
 
 Run Jupyter inside the container:
 
 ```bash
 docker run --rm -it --gpus all \
-    -v $(pwd):/workspace \
-    -v ~/models:/models \
-    -p 8888:8888 \
-    ai-dev jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+ -v $(pwd):/workspace \
+ -v ~/models:/models \
+ -p 8888:8888 \
+ ai-dev jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 ```
 
 ### Step 5: Volume mounts for data and models
@@ -256,37 +256,37 @@ See `code/docker-compose.yml`:
 
 ```yaml
 services:
-  ai-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    volumes:
-      - ../../../:/workspace
-      - ~/models:/models
-      - ~/datasets:/data
-    ports:
-      - "8888:8888"
-    stdin_open: true
-    tty: true
-    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+ ai-dev:
+ build:
+ context:.
+ dockerfile: Dockerfile
+ deploy:
+ resources:
+ reservations:
+ devices:
+ - driver: nvidia
+ count: all
+ capabilities: [gpu]
+ volumes:
+ -../../../:/workspace
+ - ~/models:/models
+ - ~/datasets:/data
+ ports:
+ - "8888:8888"
+ stdin_open: true
+ tty: true
+ command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 
-  qdrant:
-    image: qdrant/qdrant:v1.12.5
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - qdrant_data:/qdrant/storage
+ qdrant:
+ image: qdrant/qdrant:v1.12.5
+ ports:
+ - "6333:6333"
+ - "6334:6334"
+ volumes:
+ - qdrant_data:/qdrant/storage
 
 volumes:
-  qdrant_data:
+ qdrant_data:
 ```
 
 Start everything:
@@ -335,7 +335,7 @@ docker system prune -a
 docker exec -it <container_id> nvidia-smi
 
 # Copy a file from container to host
-docker cp <container_id>:/workspace/results.csv ./results.csv
+docker cp <container_id>:/workspace/results.csv./results.csv
 
 # View container logs
 docker logs -f <container_id>

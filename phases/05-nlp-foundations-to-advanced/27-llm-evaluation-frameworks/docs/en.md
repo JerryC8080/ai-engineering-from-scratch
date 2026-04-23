@@ -59,32 +59,32 @@ from typing import Callable
 from transformers import pipeline
 
 nli = pipeline("text-classification",
-               model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
-               top_k=None)
+ model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
+ top_k=None)
 
 # `llm` is any callable: prompt str -> generated str.
-# Example: llm = lambda p: client.messages.create(model="claude-haiku-4-5", ...).content[0].text
+# Example: llm = lambda p: client.messages.create(model="claude-haiku-4-5",...).content[0].text
 LLM = Callable[[str], str]
 
 
 def atomic_claims(answer: str, llm: LLM) -> list[str]:
-    prompt = f"""Break this answer into simple factual claims (one per line):
+ prompt = f"""Break this answer into simple factual claims (one per line):
 {answer}
 """
-    return llm(prompt).splitlines()
+ return llm(prompt).splitlines()
 
 
 def faithfulness(answer: str, context: str, llm: LLM) -> float:
-    claims = atomic_claims(answer, llm)
-    if not claims:
-        return 0.0
-    supported = 0
-    for claim in claims:
-        result = nli({"text": context, "text_pair": claim})[0]
-        entail = next((s for s in result if s["label"] == "entailment"), None)
-        if entail and entail["score"] > 0.5:
-            supported += 1
-    return supported / len(claims)
+ claims = atomic_claims(answer, llm)
+ if not claims:
+ return 0.0
+ supported = 0
+ for claim in claims:
+ result = nli({"text": context, "text_pair": claim})[0]
+ entail = next((s for s in result if s["label"] == "entailment"), None)
+ if entail and entail["score"] > 0.5:
+ supported += 1
+ return supported / len(claims)
 ```
 
 Decompose the answer into atomic claims. NLI-check each claim against the retrieved context. Faithfulness = fraction supported.
@@ -95,18 +95,18 @@ Decompose the answer into atomic claims. NLI-check each claim against the retrie
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-# encoder: any model implementing .encode(texts, normalize_embeddings=True) -> ndarray
+# encoder: any model implementing.encode(texts, normalize_embeddings=True) -> ndarray
 # e.g., encoder = SentenceTransformer("BAAI/bge-small-en-v1.5")
 
 def answer_relevance(question: str, answer: str, encoder, llm: LLM, n: int = 3) -> float:
-    prompt = f"Write {n} questions this answer could be the answer to:\n{answer}"
-    generated = [line for line in llm(prompt).splitlines() if line.strip()][:n]
-    if not generated:
-        return 0.0
-    q_emb = np.asarray(encoder.encode([question], normalize_embeddings=True)[0])
-    g_embs = np.asarray(encoder.encode(generated, normalize_embeddings=True))
-    sims = [float(q_emb @ g_emb) for g_emb in g_embs]
-    return sum(sims) / len(sims)
+ prompt = f"Write {n} questions this answer could be the answer to:\n{answer}"
+ generated = [line for line in llm(prompt).splitlines() if line.strip()][:n]
+ if not generated:
+ return 0.0
+ q_emb = np.asarray(encoder.encode([question], normalize_embeddings=True)[0])
+ g_embs = np.asarray(encoder.encode(generated, normalize_embeddings=True))
+ sims = [float(q_emb @ g_emb) for g_emb in g_embs]
+ return sum(sims) / len(sims)
 ```
 
 If the answer implies different questions than the one asked, relevance drops.
@@ -118,21 +118,21 @@ from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams, LLMTestCase
 
 metric = GEval(
-    name="Correctness",
-    criteria="The answer should be factually accurate and match the expected output.",
-    evaluation_steps=[
-        "Read the expected output.",
-        "Read the actual output.",
-        "List factual claims in the actual output.",
-        "For each claim, mark supported or unsupported by the expected output.",
-        "Return score = fraction supported.",
-    ],
-    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.EXPECTED_OUTPUT],
+ name="Correctness",
+ criteria="The answer should be factually accurate and match the expected output.",
+ evaluation_steps=[
+ "Read the expected output.",
+ "Read the actual output.",
+ "List factual claims in the actual output.",
+ "For each claim, mark supported or unsupported by the expected output.",
+ "Return score = fraction supported.",
+ ],
+ evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.EXPECTED_OUTPUT],
 )
 
 test = LLMTestCase(input="When was the first iPhone released?",
-                   actual_output="June 29th, 2007.",
-                   expected_output="June 29, 2007.")
+ actual_output="June 29th, 2007.",
+ expected_output="June 29, 2007.")
 metric.measure(test)
 print(metric.score, metric.reason)
 ```
@@ -147,14 +147,14 @@ from deepeval.metrics import FaithfulnessMetric, ContextualRelevancyMetric
 
 
 def test_rag_system():
-    cases = load_regression_cases()
-    faith = FaithfulnessMetric(threshold=0.85)
-    rel = ContextualRelevancyMetric(threshold=0.7)
-    for case in cases:
-        faith.measure(case)
-        assert faith.score >= 0.85, f"faithfulness regression on {case.id}"
-        rel.measure(case)
-        assert rel.score >= 0.7, f"relevancy regression on {case.id}"
+ cases = load_regression_cases()
+ faith = FaithfulnessMetric(threshold=0.85)
+ rel = ContextualRelevancyMetric(threshold=0.7)
+ for case in cases:
+ faith.measure(case)
+ assert faith.score >= 0.85, f"faithfulness regression on {case.id}"
+ rel.measure(case)
+ assert rel.score >= 0.7, f"relevancy regression on {case.id}"
 ```
 
 Ship as a pytest file. Run on every PR. Block merges on regressions.

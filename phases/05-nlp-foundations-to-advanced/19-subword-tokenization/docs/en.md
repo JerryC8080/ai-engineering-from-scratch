@@ -43,19 +43,19 @@ See `code/main.py`. The loop:
 
 ```python
 def train_bpe(corpus, num_merges):
-    vocab = {tuple(word) + ("</w>",): count for word, count in corpus.items()}
-    merges = []
-    for _ in range(num_merges):
-        pairs = Counter()
-        for symbols, freq in vocab.items():
-            for a, b in zip(symbols, symbols[1:]):
-                pairs[(a, b)] += freq
-        if not pairs:
-            break
-        best = pairs.most_common(1)[0][0]
-        merges.append(best)
-        vocab = apply_merge(vocab, best)
-    return merges
+ vocab = {tuple(word) + ("</w>",): count for word, count in corpus.items()}
+ merges = []
+ for _ in range(num_merges):
+ pairs = Counter()
+ for symbols, freq in vocab.items():
+ for a, b in zip(symbols, symbols[1:]):
+ pairs[(a, b)] += freq
+ if not pairs:
+ break
+ best = pairs.most_common(1)[0][0]
+ merges.append(best)
+ vocab = apply_merge(vocab, best)
+ return merges
 ```
 
 Three facts the algorithm encodes. `</w>` marks word end so "low" (suffix) and "lower" (prefix) stay distinct. Frequency weighting makes high-frequency pairs win early. The merge list is ordered — inference applies merges in training order.
@@ -64,15 +64,15 @@ Three facts the algorithm encodes. `</w>` marks word end so "low" (suffix) and "
 
 ```python
 def encode_bpe(word, merges):
-    symbols = list(word) + ["</w>"]
-    for a, b in merges:
-        i = 0
-        while i < len(symbols) - 1:
-            if symbols[i] == a and symbols[i + 1] == b:
-                symbols = symbols[:i] + [a + b] + symbols[i + 2:]
-            else:
-                i += 1
-    return symbols
+ symbols = list(word) + ["</w>"]
+ for a, b in merges:
+ i = 0
+ while i < len(symbols) - 1:
+ if symbols[i] == a and symbols[i + 1] == b:
+ symbols = symbols[:i] + [a + b] + symbols[i + 2:]
+ else:
+ i += 1
+ return symbols
 ```
 
 Naive O(n·|merges|). Production implementations (tiktoken, HF Tokenizers) use merge-rank lookup with priority queues and run in near-linear time.
@@ -83,12 +83,12 @@ Naive O(n·|merges|). Production implementations (tiktoken, HF Tokenizers) use m
 import sentencepiece as spm
 
 spm.SentencePieceTrainer.train(
-    input="corpus.txt",
-    model_prefix="my_tokenizer",
-    vocab_size=8000,
-    model_type="bpe",          # or "unigram"
-    character_coverage=0.9995, # lower for CJK (e.g. 0.9995 for English, 0.995 for Japanese)
-    normalization_rule_name="nmt_nfkc",
+ input="corpus.txt",
+ model_prefix="my_tokenizer",
+ vocab_size=8000,
+ model_type="bpe", # or "unigram"
+ character_coverage=0.9995, # lower for CJK (e.g. 0.9995 for English, 0.995 for Japanese)
+ normalization_rule_name="nmt_nfkc",
 )
 
 sp = spm.SentencePieceProcessor(model_file="my_tokenizer.model")
@@ -103,8 +103,8 @@ Notice: no pre-tokenization required, space encoded as `▁`, `character_coverag
 ```python
 import tiktoken
 enc = tiktoken.get_encoding("o200k_base")
-print(enc.encode("untokenizable"))        # [127340, 101028]
-print(len(enc.encode("Hello, world!")))   # 4
+print(enc.encode("untokenizable")) # [127340, 101028]
+print(len(enc.encode("Hello, world!"))) # 4
 ```
 
 Encoding-only. Fast (Rust backend). Exact match with GPT-4/5 tokenization for byte-counting, cost estimation, context-window budgeting.

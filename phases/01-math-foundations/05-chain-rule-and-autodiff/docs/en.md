@@ -39,8 +39,8 @@ Multiply the derivatives along the chain. Each link contributes its local deriva
 Example: `y = sin(x^2)`
 
 ```
-g(x) = x^2       g'(x) = 2x
-f(g) = sin(g)     f'(g) = cos(g)
+g(x) = x^2 g'(x) = 2x
+f(g) = sin(g) f'(g) = cos(g)
 
 dy/dx = cos(x^2) * 2x
 ```
@@ -63,23 +63,23 @@ A computational graph makes the chain rule visual. Every operation becomes a nod
 
 ```mermaid
 graph TD
-    x1["x1 = 2"] --> mul["* (multiply)"]
-    x2["x2 = 3"] --> mul
-    mul -->|"a = 6"| add["+ (add)"]
-    b["b = 1"] --> add
-    add -->|"c = 7"| relu["relu"]
-    relu -->|"y = 7"| y["output y"]
+ x1["x1 = 2"] --> mul["* (multiply)"]
+ x2["x2 = 3"] --> mul
+ mul -->|"a = 6"| add["+ (add)"]
+ b["b = 1"] --> add
+ add -->|"c = 7"| relu["relu"]
+ relu -->|"y = 7"| y["output y"]
 ```
 
 **Backward pass (compute gradients):**
 
 ```mermaid
 graph TD
-    dy["dy/dy = 1"] -->|"relu'(c)=1 since c>0"| dc["dy/dc = 1"]
-    dc -->|"dc/da = 1"| da["dy/da = 1"]
-    dc -->|"dc/db = 1"| db["dy/db = 1"]
-    da -->|"da/dx1 = x2 = 3"| dx1["dy/dx1 = 3"]
-    da -->|"da/dx2 = x1 = 2"| dx2["dy/dx2 = 2"]
+ dy["dy/dy = 1"] -->|"relu'(c)=1 since c>0"| dc["dy/dc = 1"]
+ dc -->|"dc/da = 1"| da["dy/da = 1"]
+ dc -->|"dc/db = 1"| db["dy/db = 1"]
+ da -->|"da/dx1 = x2 = 3"| dx1["dy/dx1 = 3"]
+ da -->|"da/dx2 = x1 = 2"| dx2["dy/dx2 = 2"]
 ```
 
 The backward pass applies the chain rule at every node, propagating gradients from output to inputs.
@@ -93,9 +93,9 @@ There are two ways to apply the chain rule through a graph.
 ```
 Forward mode: seed dx/dx = 1, propagate forward
 
-  x = 2       (dx/dx = 1)
-  a = x^2     (da/dx = 2x = 4)
-  y = sin(a)  (dy/dx = cos(a) * da/dx = cos(4) * 4 = -2.615)
+ x = 2 (dx/dx = 1)
+ a = x^2 (da/dx = 2x = 4)
+ y = sin(a) (dy/dx = cos(a) * da/dx = cos(4) * 4 = -2.615)
 ```
 
 **Reverse mode** starts at the output and pulls gradients backward. It computes `dy/dy = 1` and propagates through each operation in reverse. Good when you have many inputs and few outputs.
@@ -103,9 +103,9 @@ Forward mode: seed dx/dx = 1, propagate forward
 ```
 Reverse mode: seed dy/dy = 1, propagate backward
 
-  y = sin(a)  (dy/dy = 1)
-  a = x^2     (dy/da = cos(a) = cos(4) = -0.654)
-  x = 2       (dy/dx = dy/da * da/dx = -0.654 * 4 = -2.615)
+ y = sin(a) (dy/dy = 1)
+ a = x^2 (dy/da = cos(a) = cos(4) = -0.654)
+ x = 2 (dy/dx = dy/da * da/dx = -0.654 * 4 = -2.615)
 ```
 
 Neural networks have millions of inputs (weights) and one output (loss). Reverse mode computes all gradients in one backward pass. This is why backpropagation uses reverse mode.
@@ -125,9 +125,9 @@ Dual number: (value, derivative)
 (2, 1) means: value is 2, derivative w.r.t. x is 1
 
 Arithmetic rules:
-  (a, a') + (b, b') = (a+b, a'+b')
-  (a, a') * (b, b') = (a*b, a'*b + a*b')
-  sin(a, a')         = (sin(a), cos(a)*a')
+ (a, a') + (b, b') = (a+b, a'+b')
+ (a, a') * (b, b') = (a*b, a'*b + a*b')
+ sin(a, a') = (sin(a), cos(a)*a')
 ```
 
 Seed the input variable with derivative 1. The derivative propagates automatically through every operation.
@@ -150,7 +150,7 @@ When you write PyTorch code:
 x = torch.tensor(2.0, requires_grad=True)
 y = x ** 2 + 3 * x + 1
 y.backward()
-print(x.grad)  # 7.0 = 2*x + 3 = 2*2 + 3
+print(x.grad) # 7.0 = 2*x + 3 = 2*2 + 3
 ```
 
 PyTorch internally:
@@ -169,15 +169,15 @@ The graph is dynamic (define-by-run). A new graph is built on every forward pass
 
 ```python
 class Value:
-    def __init__(self, data, children=(), op=''):
-        self.data = data
-        self.grad = 0.0
-        self._backward = lambda: None
-        self._prev = set(children)
-        self._op = op
+ def __init__(self, data, children=(), op=''):
+ self.data = data
+ self.grad = 0.0
+ self._backward = lambda: None
+ self._prev = set(children)
+ self._op = op
 
-    def __repr__(self):
-        return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
+ def __repr__(self):
+ return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
 ```
 
 Every `Value` stores its numeric data, its gradient (initially zero), a backward function, and pointers to child nodes that produced it.
@@ -185,30 +185,30 @@ Every `Value` stores its numeric data, its gradient (initially zero), a backward
 ### Step 2: Arithmetic operations with gradient tracking
 
 ```python
-    def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data, (self, other), '+')
-        def _backward():
-            self.grad += out.grad
-            other.grad += out.grad
-        out._backward = _backward
-        return out
+ def __add__(self, other):
+ other = other if isinstance(other, Value) else Value(other)
+ out = Value(self.data + other.data, (self, other), '+')
+ def _backward():
+ self.grad += out.grad
+ other.grad += out.grad
+ out._backward = _backward
+ return out
 
-    def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data, (self, other), '*')
-        def _backward():
-            self.grad += other.data * out.grad
-            other.grad += self.data * out.grad
-        out._backward = _backward
-        return out
+ def __mul__(self, other):
+ other = other if isinstance(other, Value) else Value(other)
+ out = Value(self.data * other.data, (self, other), '*')
+ def _backward():
+ self.grad += other.data * out.grad
+ other.grad += self.data * out.grad
+ out._backward = _backward
+ return out
 
-    def relu(self):
-        out = Value(max(0, self.data), (self,), 'relu')
-        def _backward():
-            self.grad += (1.0 if out.data > 0 else 0.0) * out.grad
-        out._backward = _backward
-        return out
+ def relu(self):
+ out = Value(max(0, self.data), (self,), 'relu')
+ def _backward():
+ self.grad += (1.0 if out.data > 0 else 0.0) * out.grad
+ out._backward = _backward
+ return out
 ```
 
 Each operation creates a closure that knows how to compute local gradients and multiply by the upstream gradient (`out.grad`). The `+=` handles the case where a value is used in multiple operations.
@@ -216,20 +216,20 @@ Each operation creates a closure that knows how to compute local gradients and m
 ### Step 3: The backward pass
 
 ```python
-    def backward(self):
-        topo = []
-        visited = set()
-        def build_topo(v):
-            if v not in visited:
-                visited.add(v)
-                for child in v._prev:
-                    build_topo(child)
-                topo.append(v)
-        build_topo(self)
+ def backward(self):
+ topo = []
+ visited = set()
+ def build_topo(v):
+ if v not in visited:
+ visited.add(v)
+ for child in v._prev:
+ build_topo(child)
+ topo.append(v)
+ build_topo(self)
 
-        self.grad = 1.0
-        for v in reversed(topo):
-            v._backward()
+ self.grad = 1.0
+ for v in reversed(topo):
+ v._backward()
 ```
 
 Topological sort ensures every node's gradient is fully computed before it propagates to its children. The seed gradient is 1.0 (dy/dy = 1).
@@ -239,56 +239,56 @@ Topological sort ensures every node's gradient is fully computed before it propa
 The basic Value class handles addition, multiplication, and relu. A real autograd engine needs more. Here are the operations you need to build neural networks:
 
 ```python
-    def __neg__(self):
-        return self * -1
+ def __neg__(self):
+ return self * -1
 
-    def __sub__(self, other):
-        return self + (-other)
+ def __sub__(self, other):
+ return self + (-other)
 
-    def __radd__(self, other):
-        return self + other
+ def __radd__(self, other):
+ return self + other
 
-    def __rmul__(self, other):
-        return self * other
+ def __rmul__(self, other):
+ return self * other
 
-    def __rsub__(self, other):
-        return other + (-self)
+ def __rsub__(self, other):
+ return other + (-self)
 
-    def __pow__(self, n):
-        out = Value(self.data ** n, (self,), f'**{n}')
-        def _backward():
-            self.grad += n * (self.data ** (n - 1)) * out.grad
-        out._backward = _backward
-        return out
+ def __pow__(self, n):
+ out = Value(self.data ** n, (self,), f'**{n}')
+ def _backward():
+ self.grad += n * (self.data ** (n - 1)) * out.grad
+ out._backward = _backward
+ return out
 
-    def __truediv__(self, other):
-        return self * (other ** -1) if isinstance(other, Value) else self * (Value(other) ** -1)
+ def __truediv__(self, other):
+ return self * (other ** -1) if isinstance(other, Value) else self * (Value(other) ** -1)
 
-    def exp(self):
-        import math
-        e = math.exp(self.data)
-        out = Value(e, (self,), 'exp')
-        def _backward():
-            self.grad += e * out.grad
-        out._backward = _backward
-        return out
+ def exp(self):
+ import math
+ e = math.exp(self.data)
+ out = Value(e, (self,), 'exp')
+ def _backward():
+ self.grad += e * out.grad
+ out._backward = _backward
+ return out
 
-    def log(self):
-        import math
-        out = Value(math.log(self.data), (self,), 'log')
-        def _backward():
-            self.grad += (1.0 / self.data) * out.grad
-        out._backward = _backward
-        return out
+ def log(self):
+ import math
+ out = Value(math.log(self.data), (self,), 'log')
+ def _backward():
+ self.grad += (1.0 / self.data) * out.grad
+ out._backward = _backward
+ return out
 
-    def tanh(self):
-        import math
-        t = math.tanh(self.data)
-        out = Value(t, (self,), 'tanh')
-        def _backward():
-            self.grad += (1 - t ** 2) * out.grad
-        out._backward = _backward
-        return out
+ def tanh(self):
+ import math
+ t = math.tanh(self.data)
+ out = Value(t, (self,), 'tanh')
+ def _backward():
+ self.grad += (1 - t ** 2) * out.grad
+ out._backward = _backward
+ return out
 ```
 
 **Why each operation matters:**
@@ -312,69 +312,69 @@ With a complete Value class, you can build a neural network. No PyTorch. No NumP
 import random
 
 class Neuron:
-    def __init__(self, n_inputs):
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
-        self.b = Value(0.0)
+ def __init__(self, n_inputs):
+ self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+ self.b = Value(0.0)
 
-    def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act.tanh()
+ def __call__(self, x):
+ act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
+ return act.tanh()
 
-    def parameters(self):
-        return self.w + [self.b]
+ def parameters(self):
+ return self.w + [self.b]
 
 class Layer:
-    def __init__(self, n_inputs, n_outputs):
-        self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
+ def __init__(self, n_inputs, n_outputs):
+ self.neurons = [Neuron(n_inputs) for _ in range(n_outputs)]
 
-    def __call__(self, x):
-        return [n(x) for n in self.neurons]
+ def __call__(self, x):
+ return [n(x) for n in self.neurons]
 
-    def parameters(self):
-        return [p for n in self.neurons for p in n.parameters()]
+ def parameters(self):
+ return [p for n in self.neurons for p in n.parameters()]
 
 class MLP:
-    def __init__(self, sizes):
-        self.layers = [Layer(sizes[i], sizes[i+1]) for i in range(len(sizes)-1)]
+ def __init__(self, sizes):
+ self.layers = [Layer(sizes[i], sizes[i+1]) for i in range(len(sizes)-1)]
 
-    def __call__(self, x):
-        for layer in self.layers:
-            x = layer(x)
-        return x[0] if len(x) == 1 else x
+ def __call__(self, x):
+ for layer in self.layers:
+ x = layer(x)
+ return x[0] if len(x) == 1 else x
 
-    def parameters(self):
-        return [p for layer in self.layers for p in layer.parameters()]
+ def parameters(self):
+ return [p for layer in self.layers for p in layer.parameters()]
 ```
 
-A `Neuron` computes `tanh(w1*x1 + w2*x2 + ... + b)`. A `Layer` is a list of neurons. An `MLP` stacks layers. Every weight is a `Value`, so calling `loss.backward()` propagates gradients to every parameter.
+A `Neuron` computes `tanh(w1*x1 + w2*x2 +... + b)`. A `Layer` is a list of neurons. An `MLP` stacks layers. Every weight is a `Value`, so calling `loss.backward()` propagates gradients to every parameter.
 
 **Training on XOR:**
 
 ```python
 random.seed(42)
-model = MLP([2, 4, 1])  # 2 inputs, 4 hidden neurons, 1 output
+model = MLP([2, 4, 1]) # 2 inputs, 4 hidden neurons, 1 output
 
 xs = [[0, 0], [0, 1], [1, 0], [1, 1]]
-ys = [-1, 1, 1, -1]  # XOR pattern (using -1/1 for tanh)
+ys = [-1, 1, 1, -1] # XOR pattern (using -1/1 for tanh)
 
 for step in range(100):
-    preds = [model(x) for x in xs]
-    loss = sum((p - y) ** 2 for p, y in zip(preds, ys))
+ preds = [model(x) for x in xs]
+ loss = sum((p - y) ** 2 for p, y in zip(preds, ys))
 
-    for p in model.parameters():
-        p.grad = 0.0
-    loss.backward()
+ for p in model.parameters():
+ p.grad = 0.0
+ loss.backward()
 
-    lr = 0.05
-    for p in model.parameters():
-        p.data -= lr * p.grad
+ lr = 0.05
+ for p in model.parameters():
+ p.data -= lr * p.grad
 
-    if step % 20 == 0:
-        print(f"step {step:3d}  loss = {loss.data:.4f}")
+ if step % 20 == 0:
+ print(f"step {step:3d} loss = {loss.data:.4f}")
 
 print("\nPredictions after training:")
 for x, y in zip(xs, ys):
-    print(f"  input={x}  target={y:2d}  pred={model(x).data:6.3f}")
+ print(f" input={x} target={y:2d} pred={model(x).data:6.3f}")
 ```
 
 This is micrograd. A complete neural network training loop in pure Python with automatic differentiation. Every commercial deep learning framework does the same thing at massive scale.
@@ -385,27 +385,27 @@ How do you know your autodiff is correct? Compare it against numerical derivativ
 
 ```python
 def gradient_check(build_expr, x_val, h=1e-7):
-    x = Value(x_val)
-    y = build_expr(x)
-    y.backward()
-    autodiff_grad = x.grad
+ x = Value(x_val)
+ y = build_expr(x)
+ y.backward()
+ autodiff_grad = x.grad
 
-    y_plus = build_expr(Value(x_val + h)).data
-    y_minus = build_expr(Value(x_val - h)).data
-    numerical_grad = (y_plus - y_minus) / (2 * h)
+ y_plus = build_expr(Value(x_val + h)).data
+ y_minus = build_expr(Value(x_val - h)).data
+ numerical_grad = (y_plus - y_minus) / (2 * h)
 
-    diff = abs(autodiff_grad - numerical_grad)
-    return autodiff_grad, numerical_grad, diff
+ diff = abs(autodiff_grad - numerical_grad)
+ return autodiff_grad, numerical_grad, diff
 ```
 
 Test it on a complex expression:
 
 ```python
 def expr(x):
-    return (x ** 3 + x * 2 + 1).tanh()
+ return (x ** 3 + x * 2 + 1).tanh()
 
 ad, num, diff = gradient_check(expr, 0.5)
-print(f"Autodiff:  {ad:.8f}")
+print(f"Autodiff: {ad:.8f}")
 print(f"Numerical: {num:.8f}")
 print(f"Difference: {diff:.2e}")
 # Difference should be < 1e-5
@@ -427,15 +427,15 @@ Gradient checking is essential when implementing new operations. If your backwar
 ```python
 x1 = Value(2.0)
 x2 = Value(3.0)
-a = x1 * x2          # a = 6.0
-b = a + Value(1.0)    # b = 7.0
-y = b.relu()          # y = 7.0
+a = x1 * x2 # a = 6.0
+b = a + Value(1.0) # b = 7.0
+y = b.relu() # y = 7.0
 
 y.backward()
 
-print(f"y = {y.data}")          # 7.0
-print(f"dy/dx1 = {x1.grad}")   # 3.0 (= x2)
-print(f"dy/dx2 = {x2.grad}")   # 2.0 (= x1)
+print(f"y = {y.data}") # 7.0
+print(f"dy/dx1 = {x1.grad}") # 3.0 (= x2)
+print(f"dy/dx2 = {x2.grad}") # 2.0 (= x1)
 ```
 
 Manual check: `y = relu(x1*x2 + 1)`. Since `x1*x2 + 1 = 7 > 0`, relu is identity.
@@ -455,8 +455,8 @@ b = a + 1.0
 y = torch.relu(b)
 y.backward()
 
-print(f"PyTorch dy/dx1 = {x1.grad.item()}")  # 3.0
-print(f"PyTorch dy/dx2 = {x2.grad.item()}")  # 2.0
+print(f"PyTorch dy/dx1 = {x1.grad.item()}") # 3.0
+print(f"PyTorch dy/dx2 = {x2.grad.item()}") # 2.0
 ```
 
 Same gradients. Your engine computes the same result as PyTorch because the math is the same: reverse-mode autodiff via the chain rule.
@@ -467,12 +467,12 @@ Same gradients. Your engine computes the same result as PyTorch because the math
 a = Value(2.0)
 b = Value(-3.0)
 c = Value(10.0)
-f = (a * b + c).relu()  # relu(2*(-3) + 10) = relu(4) = 4
+f = (a * b + c).relu() # relu(2*(-3) + 10) = relu(4) = 4
 
 f.backward()
-print(f"df/da = {a.grad}")  # -3.0 (= b)
-print(f"df/db = {b.grad}")  #  2.0 (= a)
-print(f"df/dc = {c.grad}")  #  1.0
+print(f"df/da = {a.grad}") # -3.0 (= b)
+print(f"df/db = {b.grad}") # 2.0 (= a)
+print(f"df/dc = {c.grad}") # 1.0
 ```
 
 ## Ship It
@@ -508,7 +508,7 @@ The Value class built here is the foundation for the neural network training loo
 | Dynamic graph | "Define by run" | A computation graph rebuilt on every forward pass, allowing Python control flow inside models (PyTorch style) |
 | Gradient checking | "Numerical verification" | Comparing autodiff gradients against numerical finite-difference gradients to verify correctness. Essential for debugging. |
 | MLP | "Multi-layer perceptron" | A neural network with one or more hidden layers of neurons. Each neuron computes a weighted sum plus bias, then applies an activation function. |
-| Neuron | "Weighted sum + activation" | The basic unit: output = activation(w1*x1 + w2*x2 + ... + b). The weights and bias are learnable parameters. |
+| Neuron | "Weighted sum + activation" | The basic unit: output = activation(w1*x1 + w2*x2 +... + b). The weights and bias are learnable parameters. |
 
 ## Further Reading
 
