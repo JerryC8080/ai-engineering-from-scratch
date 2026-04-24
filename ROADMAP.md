@@ -2,7 +2,7 @@
 
 Progress tracking for every phase and lesson.
 
-**Total estimated time: ~292 hours (at your own pace)**
+**Total estimated time: ~304 hours (at your own pace)**
 
 **Legend:** ✅ Complete | 🚧 In Progress | ⬚ Planned
 
@@ -298,20 +298,32 @@ Progress tracking for every phase and lesson.
 | 10 | Text-to-Video Pipelines | ⬚ | ~75 min |
 | 11 | Any-to-Any Models | ⬚ | ~45 min |
 
-## Phase 13: Tools & Protocols — ⬚ (~11 hours)
+## Phase 13: Tools & Protocols — ✅ (~23 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Function Calling Deep Dive | ⬚ | ~45 min |
-| 02 | Tool Use Patterns | ⬚ | ~45 min |
-| 03 | MCP — Model Context Protocol Fundamentals | ⬚ | ~45 min |
-| 04 | Building MCP Servers | ⬚ | ~75 min |
-| 05 | Building MCP Clients | ⬚ | ~75 min |
-| 06 | MCP Resources, Prompts & Sampling | ⬚ | ~45 min |
-| 07 | Structured Output Schemas | ⬚ | ~75 min |
-| 08 | API Design for AI | ⬚ | ~75 min |
-| 09 | Browser Automation & Web Agents | ⬚ | ~75 min |
-| 10 | Build a Complete Tool Ecosystem | ⬚ | ~120 min |
+| 01 | [The Tool Interface](phases/13-tools-and-protocols/01-the-tool-interface/) | ✅ | ~45 min |
+| 02 | [Function Calling Deep Dive](phases/13-tools-and-protocols/02-function-calling-deep-dive/) | ✅ | ~75 min |
+| 03 | [Parallel and Streaming Tool Calls](phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls/) | ✅ | ~75 min |
+| 04 | [Structured Output](phases/13-tools-and-protocols/04-structured-output/) | ✅ | ~75 min |
+| 05 | [Tool Schema Design](phases/13-tools-and-protocols/05-tool-schema-design/) | ✅ | ~45 min |
+| 06 | [MCP Fundamentals](phases/13-tools-and-protocols/06-mcp-fundamentals/) | ✅ | ~45 min |
+| 07 | [Building an MCP Server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | ✅ | ~75 min |
+| 08 | [Building an MCP Client](phases/13-tools-and-protocols/08-building-an-mcp-client/) | ✅ | ~75 min |
+| 09 | [MCP Transports](phases/13-tools-and-protocols/09-mcp-transports/) | ✅ | ~45 min |
+| 10 | [MCP Resources and Prompts](phases/13-tools-and-protocols/10-mcp-resources-and-prompts/) | ✅ | ~45 min |
+| 11 | [MCP Sampling](phases/13-tools-and-protocols/11-mcp-sampling/) | ✅ | ~75 min |
+| 12 | [MCP Roots and Elicitation](phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/) | ✅ | ~45 min |
+| 13 | [MCP Async Tasks](phases/13-tools-and-protocols/13-mcp-async-tasks/) | ✅ | ~75 min |
+| 14 | [MCP Apps](phases/13-tools-and-protocols/14-mcp-apps/) | ✅ | ~75 min |
+| 15 | [MCP Security I — Tool Poisoning](phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) | ✅ | ~45 min |
+| 16 | [MCP Security II — OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | ✅ | ~75 min |
+| 17 | [MCP Gateways and Registries](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | ✅ | ~45 min |
+| 18 | [A2A Protocol](phases/13-tools-and-protocols/18-a2a-protocol/) | ✅ | ~75 min |
+| 19 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/19-opentelemetry-genai/) | ✅ | ~75 min |
+| 20 | [LLM Routing Layer](phases/13-tools-and-protocols/20-llm-routing-layer/) | ✅ | ~45 min |
+| 21 | [Skills and Agent SDKs](phases/13-tools-and-protocols/21-skills-and-agent-sdks/) | ✅ | ~45 min |
+| 22 | [Capstone — Tool Ecosystem](phases/13-tools-and-protocols/22-capstone-tool-ecosystem/) | ✅ | ~120 min |
 
 ## Phase 14: Agent Engineering — 🚧 (~17 hours)
 

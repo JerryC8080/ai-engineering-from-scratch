@@ -537,21 +537,33 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </details>
 
 <details id="phase-13">
-<summary><b>🟦 Phase 13 — Tools & Protocols</b> &nbsp;<code>10 lessons</code>&nbsp; <em>The interfaces between AI and the real world.</em></summary>
+<summary><b>🟦 Phase 13 — Tools & Protocols</b> &nbsp;<code>22 lessons</code>&nbsp; <em>The interfaces between AI and the real world.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | Function Calling Deep Dive | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 🟦 |
-| 02 | Tool Use Patterns | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 03 | MCP: Model Context Protocol | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | — |
-| 04 | Building MCP Servers | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
-| 05 | Building MCP Clients | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
-| 06 | MCP Resources, Prompts & Sampling | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 07 | Structured Output Schemas | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
-| 08 | API Design for AI | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 09 | Browser Automation & Web Agents | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 10 | Build a Complete Tool Ecosystem | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
+| 01 | [The Tool Interface](phases/13-tools-and-protocols/01-the-tool-interface/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 02 | [Function Calling Deep Dive](phases/13-tools-and-protocols/02-function-calling-deep-dive/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 03 | [Parallel and Streaming Tool Calls](phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 04 | [Structured Output](phases/13-tools-and-protocols/04-structured-output/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 05 | [Tool Schema Design](phases/13-tools-and-protocols/05-tool-schema-design/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 06 | [MCP Fundamentals](phases/13-tools-and-protocols/06-mcp-fundamentals/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 07 | [Building an MCP Server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 08 | [Building an MCP Client](phases/13-tools-and-protocols/08-building-an-mcp-client/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 09 | [MCP Transports](phases/13-tools-and-protocols/09-mcp-transports/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 10 | [MCP Resources and Prompts](phases/13-tools-and-protocols/10-mcp-resources-and-prompts/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 11 | [MCP Sampling](phases/13-tools-and-protocols/11-mcp-sampling/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 12 | [MCP Roots and Elicitation](phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 13 | [MCP Async Tasks](phases/13-tools-and-protocols/13-mcp-async-tasks/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 14 | [MCP Apps](phases/13-tools-and-protocols/14-mcp-apps/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 15 | [MCP Security I — Tool Poisoning](phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 16 | [MCP Security II — OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 17 | [MCP Gateways and Registries](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 18 | [A2A Protocol](phases/13-tools-and-protocols/18-a2a-protocol/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 19 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/19-opentelemetry-genai/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 20 | [LLM Routing Layer](phases/13-tools-and-protocols/20-llm-routing-layer/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 21 | [Skills and Agent SDKs](phases/13-tools-and-protocols/21-skills-and-agent-sdks/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 22 | [Capstone — Tool Ecosystem](phases/13-tools-and-protocols/22-capstone-tool-ecosystem/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
 
 </details>
 
