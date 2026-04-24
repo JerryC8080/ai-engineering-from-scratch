@@ -43,7 +43,7 @@ def max_steps_for_target(per_step: float, target: float) -> int:
     """Largest N such that per_step**N >= target."""
     if per_step >= 1.0:
         return 10**9
-    return int(math.floor(math.log(target) / math.log(per_step)))
+    return math.floor(math.log(target) / math.log(per_step))
 
 
 def fmt_hours(h: float) -> str:
