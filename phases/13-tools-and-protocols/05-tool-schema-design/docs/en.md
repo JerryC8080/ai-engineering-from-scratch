@@ -119,7 +119,7 @@ Descriptions land in the model's context verbatim. A malicious server can embed 
 - **MCPToolBench++.** Extends StableToolBench to MCP servers; captures discovery and selection.
 - **SafeToolBench.** Measures safety under adversarial tool sets (poisoned descriptions).
 
-All three are open; a full evaluation loop runs in under an hour on a modest GPU setup. Include one in your CI (Phase 14 · 14 for eval-driven development).
+All three are open; a full evaluation loop runs in under an hour on a modest GPU setup. Include one in your CI (eval-driven development is covered in a future phase).
 
 ## Use It
 
@@ -144,7 +144,7 @@ This lesson produces `outputs/skill-tool-schema-linter.md`. Given any tool regis
 
 3. Pick an existing popular MCP server from the official registry and lint its tool descriptions. Find at least two actionable improvements.
 
-4. Add the linter to your CI. On a PR that changes a tool registry, fail the build on severity `block` findings. Phase 14 · 14 explains the eval-driven CI pattern.
+4. Add the linter to your CI. On a PR that changes a tool registry, fail the build on severity `block` findings. The eval-driven CI pattern is covered in a future phase.
 
 5. Read Composio's tool-design field guide top to bottom. Identify one rule not covered in this lesson and add it to the linter.
 
