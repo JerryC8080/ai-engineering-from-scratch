@@ -24,6 +24,6 @@ Hard rejects:
 
 Refusal rules:
 - If the user asks "is epsilon=8 safe enough," refuse the numeric answer; safety depends on the threat model and the most-extractable-data distribution.
-- If the user asks for a recommended ε for LLM deployment, refuse the single number; deployments in [1, 10] depending on risk tolerance.
+- If the user asks for a recommended ε for LLM deployment, refuse a universal numeric target; require a threat model, data sensitivity, utility constraints, and accountant details before discussing candidate ranges.
 
 Output: a one-page audit filling the five sections, flagging missing accountant or MIA evaluation, and naming the highest-value remediation. Cite Abadi et al. 2016 (DP-SGD) and Kowalczyk et al. 2025 once each.

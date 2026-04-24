@@ -36,7 +36,7 @@ Abadi et al. 2016. The standard recipe:
 4. Sum the clipped gradients and add Gaussian noise with std σ * C.
 5. Use the noisy sum to update parameters.
 
-Privacy cost is tracked by an accountant (Moments Accountant, Rényi DP accountant). Standard deployments target ε in [1, 10]; ε=8 is a common LLM value. The lower the ε, the more noise, the more utility loss.
+Privacy cost is tracked by an accountant (Moments Accountant, Rényi DP accountant). Reported ε values in the LLM literature vary widely by threat model, data sensitivity, and utility target; there is no universally "safe" default ε. Published examples span roughly ε ≈ 1–10 in some LLM training settings, but these are illustrative — not recommended defaults. Lower ε generally requires more noise and can increase utility loss.
 
 ### LoRA + DP-SGD
 
