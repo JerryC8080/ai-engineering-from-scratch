@@ -39,8 +39,8 @@ The logistic-fit shape is the right one because capability generally has an incr
 
 Per Time Horizon 1.1:
 
-- Claude Opus 4.6: ~14 hours at 50% reliability.
-- Doubling time on HCAST-style tasks: ~7 months (consistent with the March 2025 fit; narrower confidence interval).
+- Claude Opus 4.6: ~14 hours at 50% reliability, as of Time Horizon 1.1 (January 2026).
+- Doubling time on HCAST-style tasks: ~7 months (consistent with the March 2025 fit; narrower confidence interval), as of Time Horizon 1.1 (January 2026).
 
 Those are the specific numbers the rest of Phase 15 references. They are cited in Anthropic's RSP v3.0 (Lesson 19) and DeepMind's FSF v3 (Lesson 20) as one of the measurements feeding threshold assessments.
 

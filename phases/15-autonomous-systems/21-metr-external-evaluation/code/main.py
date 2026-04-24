@@ -71,6 +71,15 @@ def horizon_at(w: float, b: float, p: float) -> float:
     """Expert time where P(success) = p.  sigmoid(w*log(t)+b) = p ->
     log(t) = (logit(p) - b) / w."""
     logit = math.log(p / (1 - p))
+    # A zero (or near-zero) slope means success probability does not
+    # depend on task length, so the horizon is undefined. Raise rather
+    # than silently returning inf/nan so callers see a loud failure.
+    eps = 1e-12
+    if abs(w) < eps:
+        raise ValueError(
+            f"horizon undefined: slope w={w} is ~0 "
+            f"(b={b}, p={p}, logit={logit})"
+        )
     return math.exp((logit - b) / w)
 
 
