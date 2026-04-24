@@ -20,24 +20,33 @@ class Vendor:
     tokens_per_minute: int          # effective tokens when GPU is saturated
     cold_start_sec: float
     notes: str
+    min_reserved_minutes_per_day: int = 0  # reserved-minute floor for per-minute vendors (warm pool / minimum commitment)
 
 
 VENDORS = [
     Vendor("Fireworks",    "Llama 70B",          0.90,  None,    None,  900_000, 1.5, "FireAttention, batch tier 50% off"),
     Vendor("Together",     "Llama 70B",          0.88,  None,    None,  850_000, 2.0, "200+ models, 50-70% below Replicate"),
-    Vendor("Baseten",      "Custom Llama 70B",   None,  0.55,    None,  900_000, 5.0, "Truss, SOC2 HIPAA, per-min billing"),
-    Vendor("Modal",        "Custom Llama 70B",   None,  0.48,    None,  800_000, 2.5, "Python-native, per-sec billing"),
+    Vendor("Baseten",      "Custom Llama 70B",   None,  0.55,    None,  900_000, 5.0, "Truss, SOC2 HIPAA, per-min billing", 1440),
+    Vendor("Modal",        "Custom Llama 70B",   None,  0.48,    None,  800_000, 2.5, "Python-native, per-sec billing", 1440),
     Vendor("Replicate",    "Llama 70B",          None,  None,    0.006, 750_000, 4.0, "Pay-per-prediction, multimodal"),
-    Vendor("Anyscale",     "Llama 70B RayTurbo", None,  0.60,    None,  850_000, 3.0, "Ray-native, distributed Python"),
+    Vendor("Anyscale",     "Llama 70B RayTurbo", None,  0.60,    None,  850_000, 3.0, "Ray-native, distributed Python", 1440),
 ]
 
 
 def cost_per_day(v: Vendor, tokens_per_day: int, predictions_per_day: int) -> float:
-    """Effective $/day given the vendor's pricing model."""
+    """Effective $/day given the vendor's pricing model.
+
+    Per-minute vendors are billed for the maximum of saturated serving time and
+    a reserved-minute floor (warm-pool minimum / reservation). This makes the
+    per-minute model consistent across `run_scenario` and `utilization_breakeven`
+    instead of assuming perfect scale-to-zero in one place and reserved 24h in
+    the other.
+    """
     if v.per_mtok_output is not None:
         return (tokens_per_day / 1e6) * v.per_mtok_output
     if v.per_minute is not None:
-        minutes = tokens_per_day / v.tokens_per_minute
+        saturated_minutes = tokens_per_day / v.tokens_per_minute
+        minutes = max(saturated_minutes, v.min_reserved_minutes_per_day)
         return minutes * v.per_minute
     if v.per_prediction is not None:
         return predictions_per_day * v.per_prediction
@@ -73,7 +82,7 @@ def utilization_breakeven() -> None:
     for util_pct in (5, 10, 15, 20, 25, 30, 35, 40, 50, 75, 100):
         tokens_per_day = int(bt.tokens_per_minute * 60 * 24 * util_pct / 100)
         fw_cost = cost_per_day(fw, tokens_per_day, 0)
-        bt_cost = 24 * 60 * bt.per_minute
+        bt_cost = cost_per_day(bt, tokens_per_day, 0)
         winner = "Baseten" if bt_cost < fw_cost else "Fireworks"
         print(f"{util_pct:>7}%  ${fw_cost:>15.2f}  ${bt_cost:>13.2f}  {winner}")
 
@@ -101,7 +110,8 @@ def main() -> None:
     utilization_breakeven()
     cold_start_penalty()
 
-    print("\nRule of thumb: per-minute (Baseten, Modal) beats per-token above ~30% util.")
+    print("\nRule of thumb: under reserved-minute billing, per-minute (Baseten, Modal) beats per-token")
+    print("once GPU saturation stays above ~60-70% utilization; below that, per-token wins.")
 
 
 if __name__ == "__main__":
