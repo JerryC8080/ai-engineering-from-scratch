@@ -384,16 +384,40 @@ Progress tracking for every phase and lesson.
 | 10 | Security | ⬚ | ~45 min |
 | 11 | Build a Production AI Platform | ⬚ | ~120 min |
 
-## Phase 18: Ethics, Safety & Alignment — ⬚ (~5 hours)
+## Phase 18: Ethics, Safety & Alignment — ✅ (~31 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | AI Ethics | ⬚ | ~45 min |
-| 02 | Alignment | ⬚ | ~45 min |
-| 03 | Red Teaming & Adversarial Testing | ⬚ | ~75 min |
-| 04 | Responsible AI Frameworks | ⬚ | ~45 min |
-| 05 | Privacy — Differential Privacy, Federated Learning | ⬚ | ~45 min |
-| 06 | Interpretability | ⬚ | ~45 min |
+| 01 | [Instruction-Following as Alignment Signal](phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal) | ✅ | ~45 min |
+| 02 | [Reward Hacking & Goodhart's Law](phases/18-ethics-safety-alignment/02-reward-hacking-goodhart) | ✅ | ~60 min |
+| 03 | [Direct Preference Optimization Family](phases/18-ethics-safety-alignment/03-direct-preference-optimization-family) | ✅ | ~60 min |
+| 04 | [Sycophancy as RLHF Amplification](phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification) | ✅ | ~45 min |
+| 05 | [Constitutional AI & RLAIF](phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif) | ✅ | ~60 min |
+| 06 | [Mesa-Optimization & Deceptive Alignment](phases/18-ethics-safety-alignment/06-mesa-optimization-deceptive-alignment) | ✅ | ~75 min |
+| 07 | [Sleeper Agents — Persistent Deception](phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception) | ✅ | ~60 min |
+| 08 | [In-Context Scheming in Frontier Models](phases/18-ethics-safety-alignment/08-in-context-scheming-frontier-models) | ✅ | ~60 min |
+| 09 | [Alignment Faking](phases/18-ethics-safety-alignment/09-alignment-faking) | ✅ | ~60 min |
+| 10 | [AI Control — Safety Despite Subversion](phases/18-ethics-safety-alignment/10-ai-control-subversion) | ✅ | ~75 min |
+| 11 | [Scalable Oversight & Weak-to-Strong Generalization](phases/18-ethics-safety-alignment/11-scalable-oversight-weak-to-strong) | ✅ | ~60 min |
+| 12 | [Red-Teaming — PAIR & Automated Attacks](phases/18-ethics-safety-alignment/12-red-teaming-pair-automated-attacks) | ✅ | ~75 min |
+| 13 | [Many-Shot Jailbreaking](phases/18-ethics-safety-alignment/13-many-shot-jailbreaking) | ✅ | ~45 min |
+| 14 | [ASCII Art & Visual Jailbreaks](phases/18-ethics-safety-alignment/14-ascii-art-visual-jailbreaks) | ✅ | ~60 min |
+| 15 | [Indirect Prompt Injection](phases/18-ethics-safety-alignment/15-indirect-prompt-injection) | ✅ | ~75 min |
+| 16 | [Red-Team Tooling — Garak, Llama Guard, PyRIT](phases/18-ethics-safety-alignment/16-red-team-tooling-garak-llamaguard-pyrit) | ✅ | ~75 min |
+| 17 | [WMDP & Dual-Use Capability Evaluation](phases/18-ethics-safety-alignment/17-wmdp-dual-use-evaluation) | ✅ | ~60 min |
+| 18 | [Frontier Safety Frameworks — RSP, PF, FSF](phases/18-ethics-safety-alignment/18-frontier-safety-frameworks-rsp-pf-fsf) | ✅ | ~75 min |
+| 19 | [Model Welfare Research](phases/18-ethics-safety-alignment/19-model-welfare-research) | ✅ | ~45 min |
+| 20 | [Bias & Representational Harm](phases/18-ethics-safety-alignment/20-bias-representational-harm) | ✅ | ~60 min |
+| 21 | [Fairness Criteria — Group, Individual, Counterfactual](phases/18-ethics-safety-alignment/21-fairness-criteria-group-individual-counterfactual) | ✅ | ~60 min |
+| 22 | [Differential Privacy for LLMs](phases/18-ethics-safety-alignment/22-differential-privacy-for-llms) | ✅ | ~60 min |
+| 23 | [Watermarking — SynthID, Stable Signature, C2PA](phases/18-ethics-safety-alignment/23-watermarking-synthid-stable-signature-c2pa) | ✅ | ~75 min |
+| 24 | [Regulatory Frameworks — EU, US, UK, Korea](phases/18-ethics-safety-alignment/24-regulatory-frameworks-eu-us-uk-korea) | ✅ | ~75 min |
+| 25 | [EchoLeak & CVEs for AI](phases/18-ethics-safety-alignment/25-echoleak-cves-for-ai) | ✅ | ~45 min |
+| 26 | [Model, System & Dataset Cards](phases/18-ethics-safety-alignment/26-model-system-dataset-cards) | ✅ | ~60 min |
+| 27 | [Data Provenance & Training-Data Governance](phases/18-ethics-safety-alignment/27-data-provenance-training-governance) | ✅ | ~60 min |
+| 28 | [Alignment Research Ecosystem — MATS, Redwood, Apollo, METR](phases/18-ethics-safety-alignment/28-alignment-research-ecosystem) | ✅ | ~45 min |
+| 29 | [Moderation Systems — OpenAI, Perspective, Llama Guard](phases/18-ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard) | ✅ | ~60 min |
+| 30 | [Dual-Use Risk — Cyber, Bio, Chem, Nuclear](phases/18-ethics-safety-alignment/30-dual-use-risk-cyber-bio-chem-nuclear) | ✅ | ~75 min |
 
 ## Phase 19: Capstone Projects — ⬚ (~10 hours)
 
@@ -407,6 +431,6 @@ Progress tracking for every phase and lesson.
 
 ---
 
-**Total: 20 phases, 300+ lessons | 191 complete | ~340 hours estimated**
+**Total: 20 phases, 320+ lessons | 221 complete | ~365 hours estimated**
 
 Want to help? Pick any ⬚ lesson and submit a PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
