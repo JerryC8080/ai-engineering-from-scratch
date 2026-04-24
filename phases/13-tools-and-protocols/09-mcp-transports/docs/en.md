@@ -82,6 +82,18 @@ Production remote MCP servers in 2026 run on Cloudflare Workers (with their MCP 
 
 When you front multiple MCP servers with a gateway (Phase 13 · 17), the gateway is a single Streamable HTTP endpoint that rewrites session ids and multiplexes upstream. Tools are merged at the gateway layer; the client sees a single logical server.
 
+### Transport failure modes
+
+- **stdio SIGPIPE.** Child process death mid-write raises SIGPIPE; servers should exit cleanly. Clients should detect EOF and mark the session dead.
+- **HTTP 502 / 504.** Cloudflare, nginx, and other proxies emit these on upstream failure. Streamable HTTP clients should retry once after a short backoff.
+- **SSE connection drop.** TCP RST, proxy timeout, or client network change closes the stream. Client reconnects with `Mcp-Session-Id` and optional `last-event-id` to resume.
+- **Session revocation.** Server invalidates a session id; client sees 404 on next request. Client must re-handshake.
+- **Clock skew.** Resource-TTL calculations on the client diverge from the server. Client should treat server timestamps as authoritative.
+
+### When to bypass Streamable HTTP
+
+Some enterprises deploy MCP servers behind gRPC or message-queue transports inside their own networks. This is non-standard — MCP's spec does not formally define these. Gateways can expose a Streamable HTTP surface to MCP clients while using gRPC internally. Keep the external surface spec-compliant; the gateway owns the translation.
+
 ## Use It
 
 `code/main.py` implements a minimal Streamable HTTP endpoint using `http.server` (stdlib). It handles POST, GET, and DELETE on `/mcp`, sets `Mcp-Session-Id` on first response, validates `Origin`, and rejects requests from non-allowlisted origins. The handler reuses the Lesson 07 notes server's dispatch logic.

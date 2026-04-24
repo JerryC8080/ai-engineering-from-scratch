@@ -81,6 +81,22 @@ For text: `mimeType: "text/plain"`, `text/markdown`, `application/json`.
 For binary: `image/png`, `application/pdf`, plus the `blob` field.
 For MCP Apps (Lesson 14): `text/html;profile=mcp-app` in a `ui://` URI.
 
+### Dynamic resources
+
+A resource URI does not have to correspond to a static file. `notes://recent` can return the latest five notes on every read. `db://query/users/active` can execute a parameterized query. The server is free to compute content dynamically.
+
+Rule: if the client can cache by URI, the URI must be stable. If computation is one-shot, the URI should include a timestamp or nonce so the client cache does not stale out.
+
+### Subscriptions vs polling
+
+Subscription-capable clients get server push via `notifications/resources/updated`. Pre-subscription clients or hosts that do not support it poll by re-reading. Both are spec-compliant. The server's capability declaration tells the client which it supports.
+
+Cost of subscriptions: per-session state on the server (who is subscribed to what). Keep the subscribed set bounded; disconnected clients should time out.
+
+### Prompts vs system prompts
+
+Prompts in MCP are not system prompts. The host's system prompt (its own operating instructions) and MCP prompts (server-supplied templates invoked by user) live side by side. A well-behaved client never lets a server prompt override its own system prompt; it layers them.
+
 ## Use It
 
 `code/main.py` extends the notes server from Lesson 07 with:

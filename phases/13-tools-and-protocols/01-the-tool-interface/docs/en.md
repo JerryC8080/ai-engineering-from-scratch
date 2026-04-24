@@ -84,6 +84,24 @@ Native function calling is better for three reasons. First, the provider trains 
 
 Phase 13 · 02 walks the three provider APIs side by side. Phase 13 · 04 goes deep on structured outputs.
 
+### Circuit breakers
+
+The loop terminates when the model stops emitting calls or the host hits a maximum turn count. Production hosts set this to between 5 and 20 turns. Beyond that, you are almost certainly in a loop the model cannot exit. Claude Code defaults to 20; OpenAI Assistants to 10; Cursor's agent mode to 25.
+
+The alternative — unbounded loops — shows up every six months as "agent spent $400 in API calls overnight" post-mortems. Do not ship without a bound.
+
+Phase 14 · 12 covers error recovery and self-healing in depth; Phase 17 covers production rate limits.
+
+### Where Phase 13 goes from here
+
+- Lessons 02 through 05 polish the provider-level tool-call surface.
+- Lessons 06 through 14 generalize the loop into MCP.
+- Lessons 15 through 17 defend the loop against hostile servers and adversarial users.
+- Lessons 18 through 21 extend the pattern to agent-to-agent collaboration, observability, routing, and packaging.
+- Lesson 22 ships a complete ecosystem using every primitive.
+
+Every remaining lesson is an elaboration of this four-step loop. Hold it in mind as the invariant.
+
 ## Use It
 
 `code/main.py` runs the four-step loop without an LLM. A fake "decider" function simulates the model by pattern-matching on the user message; the executor, schema validator, and observe-step harness are real. Run it to see the full request/response choreography with printable intermediate state, then replace the fake decider with any real provider in a later lesson.
