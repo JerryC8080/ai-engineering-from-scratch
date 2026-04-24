@@ -1,0 +1,167 @@
+"""CodeAct vs JSON tool-call scaffold comparison — stdlib Python.
+
+Both scaffolds use the same stub "model" (deterministic rules) so the
+comparison isolates the scaffold from model quality. Metrics:
+  - tasks solved
+  - turns used
+  - per-action blast radius (number of files an action can touch)
+
+The point is pedagogical: scaffolding is load-bearing. OpenHands
+(arXiv:2407.16741) made the CodeAct bet explicitly; JSON tool calls
+dominate managed services where the provider controls the executor.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass, field
+
+
+# ---------- Mini-world: a tiny in-memory "repo" ----------
+
+INITIAL_REPO = {
+    "app.py": "def add(a, b):\n    return a - b\n",
+    "util.py": "def lower(s):\n    return s.upper()\n",
+    "cli.py": "VERSION = 'v0.0'\n",
+}
+
+TESTS = [
+    ("app.py", "add(2, 3) == 5"),
+    ("util.py", "lower('AB') == 'ab'"),
+    ("cli.py", "VERSION == 'v1.0'"),
+]
+
+
+def run_tests(repo: dict[str, str]) -> list[bool]:
+    """Deterministic stub: simulate the test suite against the repo string."""
+    results = []
+    for path, expr in TESTS:
+        src = repo.get(path, "")
+        passed = False
+        if path == "app.py":
+            passed = "return a + b" in src
+        elif path == "util.py":
+            passed = "return s.lower()" in src
+        elif path == "cli.py":
+            passed = "VERSION = 'v1.0'" in src
+        results.append(passed)
+    return results
+
+
+# ---------- JSON tool-call scaffold: one action per turn ----------
+
+@dataclass
+class JsonScaffold:
+    repo: dict[str, str] = field(default_factory=lambda: dict(INITIAL_REPO))
+    turns: int = 0
+
+    def step(self) -> str:
+        """Return one JSON action at a time, based on current failing test."""
+        self.turns += 1
+        results = run_tests(self.repo)
+        for (path, _), ok in zip(TESTS, results):
+            if ok:
+                continue
+            src = self.repo[path]
+            if path == "app.py":
+                new = src.replace("a - b", "a + b")
+            elif path == "util.py":
+                new = src.replace("s.upper()", "s.lower()")
+            elif path == "cli.py":
+                new = src.replace("v0.0", "v1.0")
+            self.repo[path] = new
+            return f'{{"tool":"edit","path":"{path}"}}'
+        return '{"tool":"done"}'
+
+    def blast_radius(self) -> int:
+        return 1  # each action touches exactly one file
+
+    def run(self, max_turns: int = 10) -> tuple[int, int]:
+        for _ in range(max_turns):
+            action = self.step()
+            if action.endswith('"done"}'):
+                break
+        passed = sum(run_tests(self.repo))
+        return passed, self.turns
+
+
+# ---------- CodeAct scaffold: one snippet may touch many files ----------
+
+@dataclass
+class CodeActScaffold:
+    repo: dict[str, str] = field(default_factory=lambda: dict(INITIAL_REPO))
+    turns: int = 0
+
+    def step(self) -> str:
+        """Return one Python snippet that may edit multiple files in one go."""
+        self.turns += 1
+        # A single "snippet" action rewrites every failing file at once.
+        snippet_lines = []
+        results = run_tests(self.repo)
+        for (path, _), ok in zip(TESTS, results):
+            if ok:
+                continue
+            src = self.repo[path]
+            if path == "app.py":
+                new = src.replace("a - b", "a + b")
+            elif path == "util.py":
+                new = src.replace("s.upper()", "s.lower()")
+            elif path == "cli.py":
+                new = src.replace("v0.0", "v1.0")
+            self.repo[path] = new
+            snippet_lines.append(f"fs.write('{path}', ...)")
+        if not snippet_lines:
+            return "done()"
+        return "; ".join(snippet_lines)
+
+    def blast_radius(self) -> int:
+        # worst-case: single action touches every file
+        return len(self.repo)
+
+    def run(self, max_turns: int = 10) -> tuple[int, int]:
+        for _ in range(max_turns):
+            action = self.step()
+            if action == "done()":
+                break
+        passed = sum(run_tests(self.repo))
+        return passed, self.turns
+
+
+# ---------- Driver ----------
+
+def report(name: str, passed: int, turns: int, blast: int) -> None:
+    total = len(TESTS)
+    print(f"  {name:<18}  passed {passed}/{total}  turns {turns:>2}  "
+          f"blast-radius {blast}")
+
+
+def main() -> None:
+    print("=" * 70)
+    print("CODEACT vs JSON TOOL-CALL SCAFFOLDS (Phase 15, Lesson 9)")
+    print("=" * 70)
+    print()
+    print("Same stub model, three-bug toy repo. Scaffold-only comparison.")
+    print("-" * 70)
+
+    js = JsonScaffold()
+    passed, turns = js.run()
+    report("JSON tool-call", passed, turns, js.blast_radius())
+
+    ca = CodeActScaffold()
+    passed, turns = ca.run()
+    report("CodeAct (stub)", passed, turns, ca.blast_radius())
+
+    print()
+    print("=" * 70)
+    print("HEADLINE: scaffolding is not scenery. It is the product.")
+    print("-" * 70)
+    print("  Same model, two scaffolds, different turn counts.")
+    print("  CodeAct compresses multiple edits into one action.")
+    print("  The cost is blast radius: CodeAct needs hardened sandbox")
+    print("  isolation (OpenHands uses Docker). JSON tool-calls get safety")
+    print("  by construction since every action is independently validated.")
+    print("  Neither is strictly better; the trade-off is what to audit.")
+
+
+if __name__ == "__main__":
+    main()
