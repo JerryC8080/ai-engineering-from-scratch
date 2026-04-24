@@ -113,7 +113,7 @@ def simulate_task(agent: str, task_type: str, rng: random.Random) -> float:
     return max(0.0, min(1.0, base + rng.uniform(-0.15, 0.15)))
 
 
-def run_amro_s(n_tasks: int = 200, seed: int = 0) -> tuple[float, float]:
+def run_amro_s(n_tasks: int = 200, seed: int = 0) -> tuple[float, float, PheromoneRouter]:
     rng = random.Random(seed)
     task_types = ["code", "math", "writing", "planning"]
     agents = list(AGENT_TASK_AFFINITY.keys())
@@ -136,7 +136,7 @@ def run_amro_s(n_tasks: int = 200, seed: int = 0) -> tuple[float, float]:
         aco_quality += aq
         router.deposit(tt, aco_agent, aq)
 
-    return random_router_quality / n_tasks, aco_quality / n_tasks
+    return random_router_quality / n_tasks, aco_quality / n_tasks, router
 
 
 def print_pheromone_table(router: PheromoneRouter) -> None:
@@ -159,22 +159,12 @@ def main() -> None:
     print("\n" + "=" * 72)
     print("AMRO-S — 200 tasks routed across 3 agents × 4 task-types")
     print("=" * 72)
-    rand_quality, aco_quality = run_amro_s()
+    rand_quality, aco_quality, router = run_amro_s()
     print(f"  random routing avg quality: {rand_quality:.3f}")
     print(f"  ACO routing    avg quality: {aco_quality:.3f}")
     print(f"  improvement: {(aco_quality - rand_quality) / rand_quality * 100:+.1f}%")
 
-    # Show final pheromone table for inspection
-    rng = random.Random(0)
-    router = PheromoneRouter(["code", "math", "writing", "planning"],
-                             list(AGENT_TASK_AFFINITY.keys()))
-    task_types = ["code", "math", "writing", "planning"]
-    agents = list(AGENT_TASK_AFFINITY.keys())
-    for i in range(200):
-        tt = task_types[i % len(task_types)]
-        a = router.choose(tt, rng)
-        q = simulate_task(a, tt, rng)
-        router.deposit(tt, a, q)
+    # Show the pheromone table from the run we just measured
     print("\n  final pheromone table (after 200 tasks):")
     print_pheromone_table(router)
 
