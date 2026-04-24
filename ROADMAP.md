@@ -282,21 +282,35 @@ Progress tracking for every phase and lesson.
 | 14 | [Model Context Protocol (MCP)](phases/11-llm-engineering/14-model-context-protocol) | ✅ | ~75 min |
 | 15 | [Prompt Caching & Context Caching](phases/11-llm-engineering/15-prompt-caching) | ✅ | ~60 min |
 
-## Phase 12: Multimodal AI — ⬚ (~11 hours)
+## Phase 12: Multimodal AI — ✅ (~65 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Multimodal Representations | ⬚ | ~45 min |
-| 02 | CLIP — Connecting Vision and Language | ⬚ | ~75 min |
-| 03 | Vision-Language Models | ⬚ | ~45 min |
-| 04 | Audio-Language Models | ⬚ | ~45 min |
-| 05 | Document Understanding | ⬚ | ~75 min |
-| 06 | Video-Language Models | ⬚ | ~45 min |
-| 07 | Multimodal RAG | ⬚ | ~75 min |
-| 08 | Multimodal Agents | ⬚ | ~75 min |
-| 09 | Text-to-Image Pipelines | ⬚ | ~75 min |
-| 10 | Text-to-Video Pipelines | ⬚ | ~75 min |
-| 11 | Any-to-Any Models | ⬚ | ~45 min |
+| 01 | [Vision Transformers and the Patch-Token Primitive](phases/12-multimodal-ai/01-vision-transformer-patch-tokens) | ✅ | ~120 min |
+| 02 | [CLIP and Contrastive Vision-Language Pretraining](phases/12-multimodal-ai/02-clip-contrastive-pretraining) | ✅ | ~180 min |
+| 03 | [BLIP-2 and Q-Former as Modality Bridge](phases/12-multimodal-ai/03-blip2-qformer-bridge) | ✅ | ~180 min |
+| 04 | [Flamingo and Gated Cross-Attention](phases/12-multimodal-ai/04-flamingo-gated-cross-attention) | ✅ | ~120 min |
+| 05 | [LLaVA and Visual Instruction Tuning](phases/12-multimodal-ai/05-llava-visual-instruction-tuning) | ✅ | ~180 min |
+| 06 | [Any-Resolution Vision: Patch-n'-Pack and NaFlex](phases/12-multimodal-ai/06-any-resolution-patch-n-pack) | ✅ | ~120 min |
+| 07 | [Open-Weight VLM Recipes: What Actually Matters](phases/12-multimodal-ai/07-open-weight-vlm-recipes) | ✅ | ~180 min |
+| 08 | [LLaVA-OneVision: Single, Multi, Video](phases/12-multimodal-ai/08-llava-onevision-single-multi-video) | ✅ | ~180 min |
+| 09 | [Qwen-VL Family and Dynamic-FPS Video](phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps) | ✅ | ~120 min |
+| 10 | [InternVL3 Native Multimodal Pretraining](phases/12-multimodal-ai/10-internvl3-native-multimodal) | ✅ | ~120 min |
+| 11 | [Chameleon and Early-Fusion Token-Only](phases/12-multimodal-ai/11-chameleon-early-fusion-tokens) | ✅ | ~180 min |
+| 12 | [Emu3 Next-Token Prediction for Generation](phases/12-multimodal-ai/12-emu3-next-token-for-generation) | ✅ | ~120 min |
+| 13 | [Transfusion Autoregressive + Diffusion](phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion) | ✅ | ~180 min |
+| 14 | [Show-o and Discrete-Diffusion Unified](phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified) | ✅ | ~120 min |
+| 15 | [Janus-Pro Decoupled Encoders](phases/12-multimodal-ai/15-janus-pro-decoupled-encoders) | ✅ | ~120 min |
+| 16 | [MIO Any-to-Any Streaming](phases/12-multimodal-ai/16-mio-any-to-any-streaming) | ✅ | ~120 min |
+| 17 | [Video-Language Temporal Grounding](phases/12-multimodal-ai/17-video-language-temporal-grounding) | ✅ | ~180 min |
+| 18 | [Long-Video Understanding at Million-Token Context](phases/12-multimodal-ai/18-long-video-million-token) | ✅ | ~180 min |
+| 19 | [Audio-Language Models: Whisper to AF3](phases/12-multimodal-ai/19-audio-language-whisper-to-af3) | ✅ | ~180 min |
+| 20 | [Omni Models: Thinker-Talker](phases/12-multimodal-ai/20-omni-models-thinker-talker) | ✅ | ~180 min |
+| 21 | [Embodied VLAs: RT-2, OpenVLA, π0, GR00T](phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot) | ✅ | ~180 min |
+| 22 | [Document and Diagram Understanding](phases/12-multimodal-ai/22-document-diagram-understanding) | ✅ | ~180 min |
+| 23 | [ColPali Vision-Native Document RAG](phases/12-multimodal-ai/23-colpali-vision-native-rag) | ✅ | ~180 min |
+| 24 | [Multimodal RAG and Cross-Modal Retrieval](phases/12-multimodal-ai/24-multimodal-rag-cross-modal) | ✅ | ~180 min |
+| 25 | [Multimodal Agents and Computer-Use (Capstone)](phases/12-multimodal-ai/25-multimodal-agents-computer-use) | ✅ | ~240 min |
 
 ## Phase 13: Tools & Protocols — ⬚ (~11 hours)
 
