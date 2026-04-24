@@ -29,7 +29,7 @@ def fixed_sample_size(p_baseline: float, lift: float, alpha: float = 0.05, power
     return int(num / den)
 
 
-def simulate(p_a: float, p_b: float, seed: int = 7, max_n: int = 50_000) -> dict:
+def simulate(p_a: float, p_b: float, seed: int = 7, max_n: int = 300_000) -> dict:
     rng = random.Random(seed)
     success_a = success_b = 0
     n_a = n_b = 0
@@ -46,16 +46,19 @@ def simulate(p_a: float, p_b: float, seed: int = 7, max_n: int = 50_000) -> dict
                 success_a += 1
         if n_a > 100 and n_b > 100 and sequential_stopped_at is None:
             z = z_statistic(success_a, n_a, success_b, n_b)
-            alpha = 0.05 * math.sqrt(math.log(max(n_a + n_b, 100) + 1) / (n_a + n_b))
-            threshold = 1.96 + 2.0 * math.sqrt(math.log(1 / max(alpha, 0.0001)))
+            # Always-valid z-boundary (mSPRT-style): grows with log(n) so Type-I stays bounded.
+            # threshold(n) ≈ sqrt(2 * log(1/alpha) + log(n)) for alpha=0.05.
+            n_total = n_a + n_b
+            threshold = math.sqrt(2 * math.log(1 / 0.05) + math.log(n_total))
             if abs(z) > threshold:
-                sequential_stopped_at = n_a + n_b
+                sequential_stopped_at = n_total
+                break
 
     return {
         "n_a": n_a,
         "n_b": n_b,
-        "p_a_observed": success_a / n_a,
-        "p_b_observed": success_b / n_b,
+        "p_a_observed": success_a / n_a if n_a else 0.0,
+        "p_b_observed": success_b / n_b if n_b else 0.0,
         "sequential_stop_at": sequential_stopped_at,
     }
 
@@ -82,10 +85,19 @@ def main() -> None:
     print("\nSimulation — actual lift 10% (p_a=0.03, p_b=0.033):")
     result = simulate(0.03, 0.033)
     print(f"  final n: A={result['n_a']}, B={result['n_b']}")
+    print(f"  observed: p_a={result['p_a_observed']*100:.3f}%, p_b={result['p_b_observed']*100:.3f}%")
     print(f"  sequential stop at n={result['sequential_stop_at']}")
 
-    print("\nRead: sequential lets you stop early on strong signals, reducing")
-    print("required sample size ~30-50% on real experiments.")
+    print("\nSimulation — actual lift 50% (p_a=0.03, p_b=0.045) — strong signal:")
+    result = simulate(0.03, 0.045)
+    print(f"  final n: A={result['n_a']}, B={result['n_b']}")
+    print(f"  observed: p_a={result['p_a_observed']*100:.3f}%, p_b={result['p_b_observed']*100:.3f}%")
+    print(f"  sequential stop at n={result['sequential_stop_at']}")
+
+    print("\nRead: on strong signals the sequential bound fires early (the 50% lift")
+    print("case above), and the returned n_a/n_b reflect samples *up to* the stop")
+    print("point, not the full horizon. For small or zero effects the bound is")
+    print("deliberately conservative — that is the Type-I guarantee.")
 
 
 if __name__ == "__main__":
