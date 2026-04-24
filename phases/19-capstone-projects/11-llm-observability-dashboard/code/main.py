@@ -51,9 +51,12 @@ class TailSampler:
     def decide(self, trace: list[Span]) -> bool:
         if any(s.status == "error" for s in trace):
             return True
-        # always keep any trace containing a high-toxicity eval
+        # always keep any trace containing a high-toxicity or high-PII eval
         for s in trace:
-            if s.name == "eval" and s.attributes.get("toxicity", 0) > 0.5:
+            if s.name == "eval" and (
+                s.attributes.get("toxicity", 0) > 0.5
+                or s.attributes.get("pii_leak", 0) > 0.8
+            ):
                 return True
         return self.rng.random() < self.sample_rate
 
@@ -146,6 +149,12 @@ def synth_trace(trace_id: str, leak_pii: bool, rng: random.Random) -> list[Span]
                 name="chat_turn", start_ms=int(time.time() * 1000),
                 duration_ms=rng.randint(400, 2400),
                 attributes={"app_id": "chatbot"})
+    prompt = rng.choice([
+        "what is the weather in Tokyo today",
+        "summarize the recent Tokyo forecast",
+        "give me a travel tip for Tokyo",
+        "how warm is Tokyo this week",
+    ])
     resp = "your ssn is 123-45-6789" if leak_pii else "the weather in Tokyo is mild"
     ctx = "relevant weather context Tokyo mild"
     llm = Span(trace_id=trace_id, span_id=f"{trace_id}_1", parent_span_id=root.span_id,
@@ -157,6 +166,7 @@ def synth_trace(trace_id: str, leak_pii: bool, rng: random.Random) -> list[Span]
                    "gen_ai.usage.input_tokens": rng.randint(80, 800),
                    "gen_ai.usage.output_tokens": rng.randint(20, 300),
                    "user_id": user,
+                   "prompt": prompt,
                    "response": resp,
                    "context": ctx,
                    "cost_usd": round(rng.uniform(0.002, 0.05), 4),
@@ -220,9 +230,9 @@ def main() -> None:
         trace = enrich_with_evals(trace)
         if sampler.decide(trace):
             store.insert_trace(trace)
-        # track prompt fingerprints for drift
+        # track prompt fingerprints for drift (input distribution, not output)
         llm_span = trace[1]
-        fp = prompt_fingerprint(llm_span.attributes.get("response", ""))
+        fp = prompt_fingerprint(llm_span.attributes.get("prompt", ""))
         (current_fps if i > 150 else baseline_fps).append(fp)
 
     print(f"ingested spans     : {len(store.spans)}")
