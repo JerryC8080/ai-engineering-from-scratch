@@ -191,9 +191,11 @@ def main() -> None:
     print()
 
     pairs = [sample_pref_pair() for _ in range(500)]
-    labels = [(random.randrange(N_ACTIONS),
-               random.random() < sigmoid(TRUE_UTILITY[random.randrange(N_ACTIONS)]))
-              for _ in range(500)]
+    labels = []
+    for _ in range(500):
+        a = random.randrange(N_ACTIONS)
+        desirable = random.random() < sigmoid(TRUE_UTILITY[a])
+        labels.append((a, desirable))
 
     ref, _ = make_policy_and_ref()
     report("REF", ref)
