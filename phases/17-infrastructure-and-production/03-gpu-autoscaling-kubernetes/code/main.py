@@ -112,7 +112,10 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
             replica_available_at[next_replica_id] = ready_at
             next_replica_id += 1
         if replicas_ready > replicas_target:
-            replicas_ready -= 1
+            idle = [rid for rid, t in replica_available_at.items() if t <= now]
+            if idle:
+                replica_available_at.pop(idle[0])
+                replicas_ready -= 1
 
         for r in queue[:]:
             if now - r.arrived_at > 30:  # SLA timeout
