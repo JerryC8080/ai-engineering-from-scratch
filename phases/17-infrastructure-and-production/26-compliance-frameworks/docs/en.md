@@ -1,6 +1,6 @@
 # Compliance — SOC 2, HIPAA, GDPR, PCI-DSS, EU AI Act, ISO 42001
 
-> Multi-framework coverage is table stakes for 2026 enterprise deals. **EU AI Act**: in force since August 1, 2024. Most high-risk requirements enforce August 2026. Fines up to €35M or 7% global annual turnover. Applies globally if serving EU users. **Colorado AI Act**: effective February 2026 — impact assessments for high-risk systems, right to appeal AI decisions. Virginia similar for credit/employment/housing/education. **SOC 2 Type II**: de facto B2B AI requirement (Type II, not Type I, for fintech). **GDPR**: recent AI-violation fines reached €345M — real-time PII redaction at inference is the defensible standard; post-processing cleanup is not enough. **HIPAA**: healthcare bound — cannot send PHI to external AI services without BAA. **PCI-DSS**: AI-interaction-layer coverage requires configuration + contractual agreements, not automatic. **ISO 42001**: emerging AI governance standard, growing procurement requirement alongside ISO 27001. Reference profile: OpenAI maintains SOC 2 Type 2, ISO/IEC 27001:2022, ISO/IEC 27701:2019, GDPR/CCPA/HIPAA (BAA)/FERPA, PCI-DSS for ChatGPT payment components. Cross-framework mapping reduces audit fatigue: access controls map across ISO 27001 A.5.15-5.18, GDPR Art. 32, HIPAA §164.312(a).
+> Multi-framework coverage is table stakes for 2026 enterprise deals. **EU AI Act**: in force since August 1, 2024. Most high-risk requirements enforce August 2, 2026. Fines up to €35M or 7% global annual turnover. Applies globally if serving EU users. **Colorado AI Act**: effective June 30, 2026 (delayed from February 2026 by SB25B-004) — impact assessments for high-risk systems, right to appeal AI decisions. Virginia similar for credit/employment/housing/education. **SOC 2 Type II**: de facto B2B AI requirement (Type II, not Type I, for fintech). **GDPR**: largest documented AI-specific fine is €30.5M against Clearview AI (Dutch DPA, Sept 2024); Italy's Garante issued €15M against OpenAI in Dec 2024 (later overturned on appeal in March 2026). Real-time PII redaction at inference is the defensible standard; post-processing cleanup is not enough. **HIPAA**: healthcare bound — cannot send PHI to external AI services without BAA. **PCI-DSS**: AI-interaction-layer coverage requires configuration + contractual agreements, not automatic. **ISO 42001**: emerging AI governance standard, growing procurement requirement alongside ISO 27001. Reference profile: OpenAI maintains SOC 2 Type 2, ISO/IEC 27001:2022, ISO/IEC 27701:2019, GDPR/CCPA/HIPAA (BAA)/FERPA, PCI-DSS for ChatGPT payment components. Cross-framework mapping reduces audit fatigue: access controls map across ISO 27001 A.5.15-5.18, GDPR Art. 32, HIPAA §164.312(a).
 
 **Type:** Learn
 **Languages:** (Python optional — compliance is policy + process, not code)
@@ -53,7 +53,7 @@ Post-processing cleanup (redact PII after the LLM sees it) is not a defensible p
 - Consistent tokenization (Mesh approach) preserves semantics.
 - Store only redacted prompts + consented opt-in raw.
 
-Recent enforcement: €345M fines on AI-specific violations. Post-processing claims have failed at audit.
+Recent enforcement: €30.5M against Clearview AI (Dutch DPA, Sept 2024) is the largest documented AI-specific GDPR fine to date; €15M against OpenAI (Italy's Garante, Dec 2024) is the largest LLM-specific fine, though it was overturned on appeal in March 2026 and the ruling remains under further review. Post-processing claims have failed at audit.
 
 ### HIPAA — BAA is not optional
 
@@ -93,9 +93,10 @@ OpenAI maintains SOC 2 Type 2, ISO/IEC 27001:2022, ISO/IEC 27701:2019, GDPR/CCPA
 
 - EU AI Act fines: up to €35M or 7% global turnover.
 - EU AI Act high-risk enforcement: August 2, 2026.
-- GDPR AI-violation fines: reached €345M.
+- Largest documented AI-specific GDPR fine: €30.5M, Clearview AI (Dutch DPA, Sept 2024).
+- Largest LLM-specific GDPR fine: €15M, OpenAI (Italy's Garante, Dec 2024; overturned on appeal March 2026).
 - SOC 2 Type II window: 6-12 months of operated controls.
-- Colorado AI Act: February 2026 effective.
+- Colorado AI Act effective date: June 30, 2026 (delayed from February 2026 by SB25B-004).
 
 ## Use It
 
@@ -121,7 +122,7 @@ This lesson produces `outputs/skill-compliance-matrix.md`. Given customer segmen
 | HIPAA BAA | "healthcare contract" | Business Associate Agreement; required for PHI |
 | GDPR | "EU privacy" | Real-time PII redaction is the defensible 2026 standard |
 | EU AI Act | "EU AI rules" | High-risk enforcement August 2026; €35M fines |
-| Colorado AI Act | "US AI state law" | February 2026 effective; impact assessments |
+| Colorado AI Act | "US AI state law" | June 30, 2026 effective (delayed by SB25B-004); impact assessments |
 | ISO 42001 | "AI governance" | Emerging framework for AI risk + transparency |
 | ISO 27001 | "security ISMS" | Information Security Management System baseline |
 | Conformity assessment | "EU AI doc package" | High-risk requirement: docs, testing, logging |

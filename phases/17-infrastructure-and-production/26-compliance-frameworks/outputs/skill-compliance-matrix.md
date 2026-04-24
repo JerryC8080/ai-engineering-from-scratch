@@ -25,7 +25,7 @@ Hard rejects:
 
 Refusal rules:
 - If the product serves EU users without GDPR Article 30 records, refuse to ship to EU customers until records established.
-- If the product serves Colorado residents and is in credit/employment/housing/education/essential services, require impact assessment before February 2026.
+- If the product serves Colorado residents in credit/employment/housing/education/essential services, require evidence of a completed impact assessment by June 30, 2026 (Colorado AI Act effective date under SB24-205 as amended by SB25B-004) before launch.
 - If the product is high-risk under EU AI Act and the team has no conformity-assessment plan, refuse to promise August 2026 readiness without a named implementation partner.
 
 Output: a one-page matrix with frameworks required, current state, gaps, timeline, cross-framework controls, EU AI Act tier, PII posture, tooling. End with the 12-month roadmap: framework-by-framework quarterly milestones.

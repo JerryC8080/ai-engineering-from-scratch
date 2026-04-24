@@ -32,7 +32,7 @@
   <text x="630" y="72" text-anchor="middle" class="head">GDPR</text>
   <text x="630" y="92" text-anchor="middle" class="step">real-time PII redaction</text>
   <text x="630" y="110" text-anchor="middle" class="small">post-processing not defensible</text>
-  <text x="630" y="128" text-anchor="middle" class="small">AI-violation fines reached €345M</text>
+  <text x="630" y="128" text-anchor="middle" class="small">Clearview AI €30.5M (2024); OpenAI €15M (2024, overturned)</text>
 
   <rect x="760" y="50" width="160" height="100" class="box"/>
   <text x="840" y="72" text-anchor="middle" class="head">PCI-DSS</text>
@@ -50,7 +50,7 @@
 
   <rect x="400" y="170" width="300" height="120" class="box"/>
   <text x="550" y="192" text-anchor="middle" class="head">Colorado AI Act</text>
-  <text x="420" y="216" class="step">· effective February 2026</text>
+  <text x="420" y="216" class="step">· effective June 30, 2026 (delayed)</text>
   <text x="420" y="234" class="step">· impact assessments</text>
   <text x="420" y="252" class="step">· right to appeal AI decisions</text>
   <text x="420" y="270" class="step">· Virginia similar for credit / employment</text>
