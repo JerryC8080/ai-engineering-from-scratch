@@ -63,6 +63,7 @@ function parseReadme(content, roadmapStatuses) {
   const lines = content.split('\n');
   let currentPhase = null;
   let inLessonTable = false;
+  let isCapstoneTable = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -113,6 +114,7 @@ function parseReadme(content, roadmapStatuses) {
     // Detect start of lesson table
     if (currentPhase && line.match(/^\|\s*#\s*\|\s*Lesson/)) {
       inLessonTable = true;
+      isCapstoneTable = false;
       continue;
     }
 
@@ -188,13 +190,19 @@ function parseReadme(content, roadmapStatuses) {
           status = 'complete';
         }
 
-        currentPhase.lessons.push({
+        // Capstone tables use the middle column for prerequisite phase tokens
+        // (e.g., "P11 P13 P14"), not a Build/Learn enum. Keep `type` on the
+        // Build/Learn axis so CSS selectors (data-type="Build"/"Learn") stay
+        // valid, and emit the prereq string in a dedicated `combines` field.
+        const lessonEntry = {
           name: lessonName.trim(),
           status,
-          type: type.trim(),
+          type: isCapstoneTable ? 'Capstone' : type.trim(),
           lang: lang.trim() || '—',
-          ...(url && { url })
-        });
+          ...(isCapstoneTable && { combines: type.trim() }),
+          ...(url && { url }),
+        };
+        currentPhase.lessons.push(lessonEntry);
       }
     }
 
@@ -206,6 +214,7 @@ function parseReadme(content, roadmapStatuses) {
     // Also detect capstone table format (# | Project | Combines | Lang)
     if (currentPhase && line.match(/^\|\s*#\s*\|\s*Project/)) {
       inLessonTable = true;
+      isCapstoneTable = true;
       continue;
     }
   }

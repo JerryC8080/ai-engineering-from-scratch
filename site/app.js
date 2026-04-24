@@ -237,7 +237,7 @@
       } else {
         html += '<a>' + escapeHtml(l.name) + '</a>';
       }
-      html += '<span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '">' + escapeHtml(l.type) + '</span>';
+      html += '<span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '"' + (l.combines ? ' title="Combines: ' + escapeHtml(l.combines) + '"' : '') + '>' + escapeHtml(l.type) + '</span>';
       html += '<span class="modal-lesson-lang">' + escapeHtml(l.lang) + '</span>';
 
       var actionHtml = '';

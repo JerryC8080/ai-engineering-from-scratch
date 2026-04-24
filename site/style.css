@@ -896,6 +896,11 @@ a:hover {
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
 
+.modal-lesson-type[data-type="Capstone"] {
+  color: var(--warn, #F1C40F);
+  border-color: color-mix(in srgb, var(--warn, #F1C40F) 35%, var(--border));
+}
+
 .modal-lesson .modal-lesson-read {
   font-family: var(--font-body);
   font-size: 0.78rem;
