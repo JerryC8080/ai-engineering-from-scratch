@@ -28,7 +28,7 @@ Start from a base model with some weak reasoning ability. On each training probl
 
 One twist matters. If the model can never get a problem right, the loop cannot learn on it. STaR adds **rationalization**: for problems the model fails, inject the correct answer as a hint and re-prompt the model to produce a rationale that leads to it. Rationalized rationales are added to the training set.
 
-Result in the original paper: a GPT-J base model gained roughly 35% absolute on GSM8K through repeated STaR rounds, matching a 30x larger model fine-tuned on hand-annotated rationales.
+Result in the original paper (Zelikman et al., 2022): a GPT-J base model improved on GSM8K from 5.8% to 10.7% through repeated STaR rounds with rationalization — about 5 percentage points absolute. On CommonsenseQA, STaR-trained GPT-J 6B reached 72.5%, comparable to a fine-tuned GPT-3 175B (~73%) — a roughly 30x larger model trained on hand-annotated rationales.
 
 ### V-STaR: train a verifier with DPO
 

@@ -106,6 +106,11 @@ def vstar_infer(model: Model, samples_per_problem: int, n_problems: int,
     """V-STaR-style best-of-N: pick the trace we'd believe. We model the
     verifier as a confidence score that is itself biased by sound vs
     shortcut (sound = 0.9 ranker reliability, shortcut = 0.55).
+
+    Note: this is an idealized verifier — it reads the ground-truth
+    ``rationale_sound`` flag, so it represents an upper bound on what a
+    well-trained verifier could achieve. A real verifier must infer
+    soundness from the trace itself, so real-world gains will be smaller.
     """
     correct = 0
     for _ in range(n_problems):
