@@ -43,7 +43,7 @@ A circuit breaker pauses a specific pattern, not the whole agent. Classical shap
 
 - **Closed**: action is allowed.
 - **Open**: action is blocked.
-- **Half-open**: after a cool-down, a small number of attempts is allowed; success closes the breaker, failure re-opens.
+- **Half-open**: after a cool-down, 1–3 probe attempts are allowed (default 1); success closes the breaker, any remaining failure re-opens it.
 
 Agent-relevant triggers:
 
