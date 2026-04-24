@@ -13,7 +13,7 @@ dominate managed services where the provider controls the executor.
 
 from __future__ import annotations
 
-import re
+import json
 from dataclasses import dataclass, field
 
 
@@ -70,8 +70,8 @@ class JsonScaffold:
             elif path == "cli.py":
                 new = src.replace("v0.0", "v1.0")
             self.repo[path] = new
-            return f'{{"tool":"edit","path":"{path}"}}'
-        return '{"tool":"done"}'
+            return json.dumps({"tool": "edit", "path": path})
+        return json.dumps({"tool": "done"})
 
     def blast_radius(self) -> int:
         return 1  # each action touches exactly one file
@@ -79,7 +79,7 @@ class JsonScaffold:
     def run(self, max_turns: int = 10) -> tuple[int, int]:
         for _ in range(max_turns):
             action = self.step()
-            if action.endswith('"done"}'):
+            if json.loads(action).get("tool") == "done":
                 break
         passed = sum(run_tests(self.repo))
         return passed, self.turns
@@ -91,6 +91,10 @@ class JsonScaffold:
 class CodeActScaffold:
     repo: dict[str, str] = field(default_factory=lambda: dict(INITIAL_REPO))
     turns: int = 0
+    # Track the observed max number of files touched by a single action.
+    # This is more honest than a static upper bound of len(repo) because
+    # it would not silently inflate if someone adds an untested helper.
+    worst_touched: int = 0
 
     def step(self) -> str:
         """Return one Python snippet that may edit multiple files in one go."""
@@ -110,13 +114,14 @@ class CodeActScaffold:
                 new = src.replace("v0.0", "v1.0")
             self.repo[path] = new
             snippet_lines.append(f"fs.write('{path}', ...)")
+        self.worst_touched = max(self.worst_touched, len(snippet_lines))
         if not snippet_lines:
             return "done()"
         return "; ".join(snippet_lines)
 
     def blast_radius(self) -> int:
-        # worst-case: single action touches every file
-        return len(self.repo)
+        # observed worst-case: files touched by a single action.
+        return self.worst_touched
 
     def run(self, max_turns: int = 10) -> tuple[int, int]:
         for _ in range(max_turns):
