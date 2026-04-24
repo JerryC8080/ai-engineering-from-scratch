@@ -1,6 +1,6 @@
 :root {
-  --font-heading: 'Kalam', cursive;
-  --font-body: 'Patrick Hand', cursive;
+  --font-heading: 'Kalam', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   --font-mono: 'JetBrains Mono', 'Consolas', monospace;
 
   --bg: #0d0d18;
