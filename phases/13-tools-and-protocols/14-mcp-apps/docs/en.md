@@ -73,21 +73,29 @@ The host renders the HTML inside a sandboxed `<iframe>` with:
 
 The iframe communicates with the host via `window.postMessage`. A tiny JSON-RPC 2.0 dialect:
 
+Always pin `targetOrigin` to the peer's exact origin, and on the receiving side validate `event.origin` against an allowlist before processing any payload. Never use `"*"` for either side of this channel — the body carries tool calls and resource reads.
+
 ```js
-// iframe to host
+// iframe to host  (pin to host origin)
 window.parent.postMessage({
   jsonrpc: "2.0",
   id: 1,
   method: "host.callTool",
   params: { name: "notes_update", arguments: { id: "note-14", title: "..." } }
-}, "*");
+}, "https://host.example.com");
 
-// host to iframe
+// host to iframe  (pin to iframe origin)
 iframe.contentWindow.postMessage({
   jsonrpc: "2.0",
   id: 1,
   result: { content: [...] }
-}, "*");
+}, "https://iframe.example.com");
+
+// receiver on both sides
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://expected-peer.example.com") return;
+  // safe to process event.data
+});
 ```
 
 Available host-side methods the UI can call:
