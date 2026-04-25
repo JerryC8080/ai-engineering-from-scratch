@@ -374,21 +374,32 @@ Progress tracking for every phase and lesson.
 | 29 | Production Runtimes — Queue, Event, Cron | ✅ | ~60 min |
 | 30 | Eval-Driven Agent Development | ✅ | ~60 min |
 
-## Phase 15: Autonomous Systems — ⬚ (~11 hours)
+## Phase 15: Autonomous Systems — ✅ (~20 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | What Makes a System Autonomous | ⬚ | ~45 min |
-| 02 | Autonomous Loops — The Core Pattern | ⬚ | ~75 min |
-| 03 | Self-Healing Agents | ⬚ | ~75 min |
-| 04 | AutoResearch — Autonomous Research Agents | ⬚ | ~75 min |
-| 05 | Eval-Driven Loops | ⬚ | ~45 min |
-| 06 | Human-in-the-Loop | ⬚ | ~45 min |
-| 07 | Continuous Agents | ⬚ | ~45 min |
-| 08 | Cost-Aware Autonomous Systems | ⬚ | ~45 min |
-| 09 | Monitoring & Observability | ⬚ | ~45 min |
-| 10 | Safety Boundaries — When to Stop | ⬚ | ~45 min |
-| 11 | Build an Autonomous Coding Agent | ⬚ | ~120 min |
+| 01 | From Chatbots to Long-Horizon Agents (METR) | ✅ | ~45 min |
+| 02 | STaR, V-STaR, Quiet-STaR — Self-Taught Reasoning | ✅ | ~60 min |
+| 03 | AlphaEvolve — Evolutionary Coding Agents | ✅ | ~60 min |
+| 04 | Darwin Gödel Machine — Self-Modifying Agents | ✅ | ~60 min |
+| 05 | AI Scientist v2 — Workshop-Level Research | ✅ | ~60 min |
+| 06 | Automated Alignment Research (Anthropic AAR) | ✅ | ~60 min |
+| 07 | Recursive Self-Improvement — Capability vs Alignment | ✅ | ~60 min |
+| 08 | Bounded Self-Improvement Designs | ✅ | ~60 min |
+| 09 | Autonomous Coding Agent Landscape (SWE-bench, CodeAct) | ✅ | ~45 min |
+| 10 | Claude Code Permission Modes and Auto Mode | ✅ | ~45 min |
+| 11 | Browser Agents and Indirect Prompt Injection | ✅ | ~45 min |
+| 12 | Durable Execution for Long-Running Agents | ✅ | ~60 min |
+| 13 | Action Budgets, Iteration Caps, Cost Governors | ✅ | ~60 min |
+| 14 | Kill Switches, Circuit Breakers, Canary Tokens | ✅ | ~60 min |
+| 15 | HITL — Propose-Then-Commit | ✅ | ~60 min |
+| 16 | Checkpoints and Rollback | ✅ | ~60 min |
+| 17 | Constitutional AI and Rule Overrides | ✅ | ~60 min |
+| 18 | Llama Guard and Input/Output Classification | ✅ | ~45 min |
+| 19 | Anthropic Responsible Scaling Policy v3.0 | ✅ | ~45 min |
+| 20 | OpenAI Preparedness Framework and DeepMind FSF | ✅ | ~45 min |
+| 21 | METR Time Horizons and External Evaluation | ✅ | ~60 min |
+| 22 | CAIS, CAISI, and Societal-Scale Risk | ✅ | ~45 min |
 
 ## Phase 16: Multi-Agent & Swarms — ✅ (~28 hours)
 

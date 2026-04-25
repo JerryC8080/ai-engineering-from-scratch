@@ -176,7 +176,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 [![Phase 12](https://img.shields.io/badge/12-Multimodal-16A085?style=flat-square)](#phase-12)
 [![Phase 13](https://img.shields.io/badge/13-Tools-2980B9?style=flat-square)](#phase-13)
 [![Phase 14](https://img.shields.io/badge/14-Agents-D35400?style=flat-square)](#phase-14)
-[![Phase 15](https://img.shields.io/badge/15-Autonomous-7F8C8D?style=flat-square)](#phase-15)
+[![Phase 15](https://img.shields.io/badge/15-Autonomous-8E44AD?style=flat-square)](#phase-15)
 [![Phase 16](https://img.shields.io/badge/16-Swarms-27AE60?style=flat-square)](#phase-16)
 [![Phase 17](https://img.shields.io/badge/17-Production-34495E?style=flat-square)](#phase-17)
 [![Phase 18](https://img.shields.io/badge/18-Ethics-D7BDE2?style=flat-square)](#phase-18)
@@ -621,22 +621,33 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </details>
 
 <details id="phase-15">
-<summary><b>⬜ Phase 15 — Autonomous Systems</b> &nbsp;<code>11 lessons</code>&nbsp; <em>Agents that run without human intervention safely.</em></summary>
+<summary><b>🟩 Phase 15 — Autonomous Systems</b> &nbsp;<code>22 lessons</code>&nbsp; <em>Long-horizon agents, self-improvement, and the 2026 safety stack.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | What Makes a System Autonomous | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | — |
-| 02 | Autonomous Loops | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
-| 03 | Self-Healing Agents | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 04 | AutoResearch: Autonomous Research | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🐍 |
-| 05 | Eval-Driven Loops | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 06 | Human-in-the-Loop | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 07 | Continuous Agents | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 08 | Cost-Aware Autonomous Systems | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 09 | Monitoring & Observability | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
-| 10 | Safety Boundaries | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 11 | Build an Autonomous Coding Agent | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
+| 01 | [From Chatbots to Long-Horizon Agents (METR)](phases/15-autonomous-systems/01-long-horizon-agents/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 02 | [STaR, V-STaR, Quiet-STaR: Self-Taught Reasoning](phases/15-autonomous-systems/02-star-family-reasoning/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 03 | [AlphaEvolve: Evolutionary Coding Agents](phases/15-autonomous-systems/03-alphaevolve-evolutionary-coding/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 04 | [Darwin Gödel Machine: Self-Modifying Agents](phases/15-autonomous-systems/04-darwin-godel-machine/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 05 | [AI Scientist v2: Workshop-Level Research](phases/15-autonomous-systems/05-ai-scientist-v2/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 06 | [Automated Alignment Research (Anthropic AAR)](phases/15-autonomous-systems/06-automated-alignment-research/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 07 | [Recursive Self-Improvement: Capability vs Alignment](phases/15-autonomous-systems/07-recursive-self-improvement/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 08 | [Bounded Self-Improvement Designs](phases/15-autonomous-systems/08-bounded-self-improvement/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 09 | [Autonomous Coding Agent Landscape (SWE-bench, CodeAct)](phases/15-autonomous-systems/09-coding-agent-landscape/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 10 | [Claude Code Permission Modes and Auto Mode](phases/15-autonomous-systems/10-claude-code-permission-modes/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 11 | [Browser Agents and Indirect Prompt Injection](phases/15-autonomous-systems/11-browser-agents/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 12 | [Durable Execution for Long-Running Agents](phases/15-autonomous-systems/12-durable-execution/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 13 | [Action Budgets, Iteration Caps, Cost Governors](phases/15-autonomous-systems/13-cost-governors/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 14 | [Kill Switches, Circuit Breakers, Canary Tokens](phases/15-autonomous-systems/14-kill-switches-canaries/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 15 | [HITL: Propose-Then-Commit](phases/15-autonomous-systems/15-propose-then-commit/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 16 | [Checkpoints and Rollback](phases/15-autonomous-systems/16-checkpoints-rollback/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 17 | [Constitutional AI and Rule Overrides](phases/15-autonomous-systems/17-constitutional-ai/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 18 | [Llama Guard and Input/Output Classification](phases/15-autonomous-systems/18-llama-guard/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 19 | [Anthropic Responsible Scaling Policy v3.0](phases/15-autonomous-systems/19-anthropic-rsp/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 20 | [OpenAI Preparedness Framework and DeepMind FSF](phases/15-autonomous-systems/20-openai-preparedness-deepmind-fsf/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 21 | [METR Time Horizons and External Evaluation](phases/15-autonomous-systems/21-metr-external-evaluation/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 22 | [CAIS, CAISI, and Societal-Scale Risk](phases/15-autonomous-systems/22-cais-caisi-societal-risk/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
 
 </details>
 
