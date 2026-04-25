@@ -63,41 +63,60 @@
 
     .lesson-sidebar-toggle:hover {
       border-color: var(--accent);
+      background: var(--bg-surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .lesson-sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .lesson-sidebar::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
     }
 
     .sidebar-phase-header {
-      padding: 8px 20px;
+      padding: 16px 20px 8px;
       font-family: var(--font-heading);
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.5px;
+      opacity: 0.8;
     }
 
     .sidebar-lesson-link {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
+      gap: 12px;
+      padding: 10px 20px;
       font-family: var(--font-body);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       text-decoration: none;
-      transition: background-color 0.15s, color 0.15s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       border-left: 3px solid transparent;
+      margin: 2px 0;
     }
 
     .sidebar-lesson-link:hover {
-      background: var(--bg-surface-hover);
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text);
+      padding-left: 24px;
+    }
+
+    [data-theme="light"] .sidebar-lesson-link:hover {
+      background: rgba(0, 0, 0, 0.03);
     }
 
     .sidebar-lesson-link.active {
       color: var(--accent);
-      background: rgba(255, 107, 107, 0.08);
+      background: rgba(255, 107, 107, 0.06);
       border-left-color: var(--accent);
-      font-weight: 700;
+      font-weight: 600;
+      padding-left: 24px;
     }
 
     .sidebar-lesson-dot {
@@ -263,6 +282,12 @@
       color: var(--text);
       margin-top: 32px;
       margin-bottom: 12px;
+    }
+
+    .lesson-article h1,
+    .lesson-article h2,
+    .lesson-article h3 {
+      scroll-margin-top: var(--header-offset, 92px);
     }
 
     .lesson-article p {
@@ -1687,6 +1712,125 @@
       }
     }
 
+    .toc-sidebar {
+      position: fixed;
+      top: 64px;
+      right: 0;
+      bottom: 0;
+      width: 260px;
+      background: transparent;
+      overflow-y: auto;
+      z-index: 40;
+      padding: 48px 24px 80px;
+      display: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .toc-sidebar[aria-hidden="true"] {
+      display: none !important;
+    }
+
+    .toc-sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    .toc-header {
+      font-family: var(--font-heading);
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+
+    .toc-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      border-left: 1px solid var(--border);
+    }
+
+    .toc-item {
+      line-height: 1.4;
+    }
+
+    .toc-h2 {
+      margin-top: 2px;
+    }
+
+    .toc-h3 {
+      /* Nested styling handled by indent/font-size */
+    }
+
+    .toc-link {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: block;
+      border-left: 2px solid transparent;
+      padding: 6px 16px;
+      margin-left: -1px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-h3 .toc-link {
+      padding-left: 28px;
+      font-size: 0.78rem;
+    }
+
+    .toc-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .toc-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    [data-theme="light"] .toc-link:hover {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .toc-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+      background: rgba(255, 107, 107, 0.06);
+    }
+
+    @media (min-width: 1280px) {
+      .lesson-main {
+        padding-right: 260px;
+      }
+      .toc-sidebar {
+        display: block;
+      }
+    }
+
+    @media (max-width: 1279px) {
+      .lesson-main {
+        padding-right: 32px;
+      }
+    }
+
     @media (min-width: 1440px) {
       .lesson-article {
         max-width: 800px;
@@ -1699,6 +1843,11 @@
 
       .lesson-main {
         margin-left: 300px;
+        padding-right: 320px;
+      }
+
+      .toc-sidebar {
+        width: 300px;
       }
     }
   </style>
@@ -1753,6 +1902,7 @@
         </div>
       </div>
     </main>
+    <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
 
   <script src="data.js?v=20260424a"></script>
@@ -1990,9 +2140,11 @@
         initCodeCopy();
         renderMermaidBlocks();
         renderAIPanels();
+        buildTOC();
 
         document.querySelectorAll('a[href^="#"]').forEach(function (link) {
           link.addEventListener('click', function (e) {
+            if (link.classList && link.classList.contains('toc-link')) return;
             var target = document.querySelector(link.getAttribute('href'));
             if (target) {
               e.preventDefault();
@@ -2000,6 +2152,198 @@
             }
           });
         });
+      }
+
+      function buildTOC() {
+        var sidebar = document.getElementById('tocSidebar');
+        if (!sidebar) return;
+
+        var article = document.querySelector('.lesson-article');
+        if (!article) {
+          sidebar.innerHTML = '';
+          sidebar.setAttribute('aria-hidden', 'true');
+          return;
+        }
+
+        var headings = article.querySelectorAll('h2, h3');
+        if (!headings.length) {
+          sidebar.innerHTML = '';
+          sidebar.setAttribute('aria-hidden', 'true');
+          return;
+        }
+
+        var used = Object.create(null);
+
+        function ensureHeadingId(heading, idx) {
+          if (!heading) return '';
+
+          var base = '';
+          if (heading.id) {
+            base = heading.id;
+          } else if (typeof slugify === 'function') {
+            base = slugify(heading.textContent || '');
+          } else {
+            base = String(heading.textContent || '').toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+          }
+          if (!base) base = 'section-' + String(idx + 1);
+
+          var candidate = base;
+          var n = 2;
+
+          while (used[candidate] || (document.getElementById(candidate) && document.getElementById(candidate) !== heading)) {
+            candidate = base + '-' + n;
+            n++;
+          }
+          
+          used[candidate] = true;
+          heading.id = candidate;
+          return candidate;
+        }
+
+        var html = '<div class="toc-header">On this page</div>';
+        html += '<nav aria-label="On this page"><ul class="toc-nav">';
+        for (var i = 0; i < headings.length; i++) {
+          var heading = headings[i];
+          var level = heading.tagName.toLowerCase();
+          var id = ensureHeadingId(heading, i);
+          if (!id) continue;
+          var fullText = (heading.textContent || '').trim();
+          var text = fullText.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+          if (!text) continue;
+          html += '<li class="toc-item toc-' + level + '"><a href="#' + id + '" class="toc-link" data-toc-id="' + id + '" title="' + escapeHtml(fullText) + '">' + escapeHtml(text) + '</a></li>';
+        }
+        html += '</ul></nav>';
+        sidebar.innerHTML = html;
+        sidebar.removeAttribute('aria-hidden');
+
+        sidebar.querySelectorAll('.toc-link').forEach(function (a) {
+          a.addEventListener('click', function (e) {
+            var href = a.getAttribute('href');
+            if (!href || href.charAt(0) !== '#') return;
+            var id = href.slice(1);
+            var target = document.getElementById(id);
+            if (!target) return;
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', '#' + id);
+            if (!target.hasAttribute('tabindex')) {
+              target.setAttribute('tabindex', '-1');
+              target.addEventListener('blur', function blurHandler() {
+                target.removeAttribute('tabindex');
+                target.removeEventListener('blur', blurHandler);
+              });
+            }
+            target.focus({ preventScroll: true });
+          });
+        });
+
+        initScrollspy(headings, sidebar);
+      }
+
+      function initScrollspy(headings, sidebar) {
+        sidebar = sidebar || document.getElementById('tocSidebar');
+        if (!sidebar) return;
+
+        var links = sidebar.querySelectorAll('.toc-link');
+        if (!links.length || !headings || !headings.length) return;
+
+        var headerOffsetStr = getComputedStyle(document.documentElement).getPropertyValue('--header-offset').trim();
+        var headerOffset = parseInt(headerOffsetStr, 10) || 92;
+
+        if (sidebar._tocObserver && sidebar._tocObserver.disconnect) {
+          sidebar._tocObserver.disconnect();
+          sidebar._tocObserver = null;
+        }
+        if (sidebar._tocScrollHandler) {
+          window.removeEventListener('scroll', sidebar._tocScrollHandler);
+          sidebar._tocScrollHandler = null;
+        }
+        if (sidebar._tocResizeHandler) {
+          window.removeEventListener('resize', sidebar._tocResizeHandler);
+          sidebar._tocResizeHandler = null;
+        }
+
+        function setActive(id) {
+          if (!id || sidebar._tocActiveId === id) return;
+          sidebar._tocActiveId = id;
+
+          links.forEach(function (link) {
+            var href = link.getAttribute('href');
+            var match = href && href.charAt(0) === '#' ? href.slice(1) : '';
+            if (match === id) link.classList.add('active');
+            else link.classList.remove('active');
+          });
+
+          var activeLink = sidebar.querySelector('.toc-link.active');
+          if (activeLink) {
+            var linkTop = activeLink.offsetTop;
+            var sidebarHeight = sidebar.clientHeight;
+            var sidebarScroll = sidebar.scrollTop;
+            if (linkTop < sidebarScroll + 50 || linkTop > sidebarScroll + sidebarHeight - 100) {
+              sidebar.scrollTo({ top: Math.max(0, linkTop - sidebarHeight / 3), behavior: 'smooth' });
+            }
+          }
+        }
+
+        function fallbackByScroll() {
+          var y = (window.scrollY || document.documentElement.scrollTop || 0) + headerOffset + 18;
+          var active = '';
+          for (var i = 0; i < headings.length; i++) {
+            var h = headings[i];
+            if (!h || !h.id) continue;
+            var top = h.getBoundingClientRect().top + window.scrollY;
+            if (top <= y) active = h.id;
+            else break;
+          }
+          if (!active && headings[0] && headings[0].id) active = headings[0].id;
+          if (active) setActive(active);
+        }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+          var marginOffset = headerOffset - 4;
+          var obs = new IntersectionObserver(function (entries) {
+            var best = null;
+            for (var i = 0; i < entries.length; i++) {
+              var e = entries[i];
+              if (!e.isIntersecting) continue;
+              if (!best) best = e;
+              else if (e.boundingClientRect.top < best.boundingClientRect.top) best = e;
+            }
+            if (best && best.target && best.target.id) setActive(best.target.id);
+          }, {
+            root: null,
+            threshold: [0.01, 0.1],
+            rootMargin: '-' + marginOffset + 'px 0px -70% 0px'
+          });
+
+          Array.from(headings).forEach(function (h) {
+            if (h && h.id) obs.observe(h);
+          });
+          sidebar._tocObserver = obs;
+
+          var initial = (location.hash && location.hash.charAt(0) === '#') ? location.hash.slice(1) : '';
+          if (initial && document.getElementById(initial)) setActive(initial);
+          else if (headings[0] && headings[0].id) setActive(headings[0].id);
+
+          return;
+        }
+
+        sidebar._tocScrollHandler = function () {
+          if (window._tocTicking) return;
+          window._tocTicking = true;
+          window.requestAnimationFrame(function () {
+            fallbackByScroll();
+            window._tocTicking = false;
+          });
+        };
+        window.addEventListener('scroll', sidebar._tocScrollHandler, { passive: true });
+
+        sidebar._tocResizeHandler = function () {
+          fallbackByScroll();
+        };
+        window.addEventListener('resize', sidebar._tocResizeHandler);
+
+        fallbackByScroll();
       }
 
       function extractTitle(md) {

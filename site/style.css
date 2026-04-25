@@ -23,6 +23,7 @@
   --modal-bg: #141428;
   --header-bg: rgba(13, 13, 24, 0.94);
   --code-bg: #111122;
+  --header-offset: 92px;
 }
 
 [data-theme="light"] {
