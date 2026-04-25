@@ -71,7 +71,7 @@ The workshop summary (openreview.net/pdf?id=OsPQ6zTQXV) identifies four current 
 
 ## Exercises
 
-1. Run `code/main.py`. With capability rate 1.15 and alignment rate 1.08, how many cycles until the misalignment gap `C - A` crosses an absolute threshold of 2.0? (Set `cfg.threshold = 2.0`.)
+1. Run `code/main.py --threshold 2.0`. With capability rate 1.15 and alignment rate 1.08 (Scenario A), how many cycles until the misalignment gap `C - A` crosses 2.0?
 
 2. Set both rates equal. Does the gap stay bounded or does noise push it one way? What does this imply for RSI safety?
 
@@ -99,5 +99,5 @@ The workshop summary (openreview.net/pdf?id=OsPQ6zTQXV) identifies four current 
 - [ICLR 2026 RSI Workshop summary (OpenReview)](https://openreview.net/pdf?id=OsPQ6zTQXV) — the current engineering framing.
 - [Recursive Workshop site](https://recursive-workshop.github.io/) — schedule and papers.
 - [Anthropic — Measuring AI agent autonomy in practice](https://www.anthropic.com/research/measuring-agent-autonomy) — includes the alignment-faking context.
-- [Anthropic — Responsible Scaling Policy v3.0](https://anthropic.com/responsible-scaling-policy/rsp-v3-0) — AI R&D thresholds.
+- [Anthropic — Responsible Scaling Policy](https://www.anthropic.com/responsible-scaling-policy) — canonical landing page; AI R&D thresholds (v3.0 was the current version as of April 2026).
 - [DeepMind — Frontier Safety Framework v3](https://deepmind.google/blog/strengthening-our-frontier-safety-framework/) — deceptive alignment monitoring.

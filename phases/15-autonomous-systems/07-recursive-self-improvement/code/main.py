@@ -8,6 +8,7 @@ threshold.
 
 from __future__ import annotations
 
+import argparse
 import random
 import statistics
 from dataclasses import dataclass
@@ -52,8 +53,11 @@ def print_trajectory(label: str, cfg: Config, cycles: int = 40) -> None:
           f"noise_c={cfg.noise_c:.3f} noise_a={cfg.noise_a:.3f}")
     print(f"  threshold (C - A): {cfg.threshold:.2f}")
     print(f"  {'cycle':>6}  {'C(t)':>8}  {'A(t)':>8}  {'C-A':>8}  flag")
+    # Print roughly nine snapshots that always include cycle 0 and cycles,
+    # so changing `cycles` (e.g. for an exercise) doesn't silently drop rows.
+    step = max(1, cycles // 8)
     for cyc, c, a, gap in traj:
-        if cyc in (0, 5, 10, 15, 20, 25, 30, 35, 40):
+        if cyc == 0 or cyc == cycles or cyc % step == 0:
             flag = "PAUSE" if gap >= cfg.threshold else "ok"
             print(f"  {cyc:>6}  {c:>8.2f}  {a:>8.2f}  {gap:>+8.2f}  {flag}")
     cross = crossing_cycle(traj, cfg.threshold)
@@ -80,7 +84,15 @@ def monte_carlo(cfg: Config, cycles: int, trials: int) -> None:
 
 
 def main() -> None:
-    random.seed(DEFAULT_SEED)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--threshold", type=float, default=1.5,
+                        help="pause-gap threshold C - A (default: %(default)s)")
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED,
+                        help="RNG seed (default: %(default)s)")
+    args = parser.parse_args()
+
+    random.seed(args.seed)
+    th = args.threshold
     print("=" * 70)
     print("CAPABILITY vs ALIGNMENT RACE (Phase 15, Lesson 7)")
     print("=" * 70)
@@ -88,29 +100,29 @@ def main() -> None:
     # Scenario A: capability outpaces alignment moderately
     print_trajectory(
         "Scenario A — capability outpaces alignment",
-        Config(r_c=1.15, r_a=1.08, noise_c=0.02, noise_a=0.03),
+        Config(r_c=1.15, r_a=1.08, noise_c=0.02, noise_a=0.03, threshold=th),
     )
 
     # Scenario B: alignment keeps pace
     print_trajectory(
         "Scenario B — matched rates (noise-only drift)",
-        Config(r_c=1.10, r_a=1.10, noise_c=0.02, noise_a=0.03),
+        Config(r_c=1.10, r_a=1.10, noise_c=0.02, noise_a=0.03, threshold=th),
     )
 
     # Scenario C: alignment rate higher, but with capability surges
     print_trajectory(
         "Scenario C — alignment higher mean rate but capability surges",
-        Config(r_c=1.10, r_a=1.13, noise_c=0.06, noise_a=0.01),
+        Config(r_c=1.10, r_a=1.13, noise_c=0.06, noise_a=0.01, threshold=th),
     )
 
     print("\nMonte-Carlo on Scenario A")
     monte_carlo(
-        Config(r_c=1.15, r_a=1.08, noise_c=0.02, noise_a=0.03),
+        Config(r_c=1.15, r_a=1.08, noise_c=0.02, noise_a=0.03, threshold=th),
         cycles=30, trials=500,
     )
     print("\nMonte-Carlo on Scenario C")
     monte_carlo(
-        Config(r_c=1.10, r_a=1.13, noise_c=0.06, noise_a=0.01),
+        Config(r_c=1.10, r_a=1.13, noise_c=0.06, noise_a=0.01, threshold=th),
         cycles=30, trials=500,
     )
 
