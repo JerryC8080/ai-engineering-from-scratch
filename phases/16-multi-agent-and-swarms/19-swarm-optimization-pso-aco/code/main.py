@@ -169,7 +169,7 @@ def main() -> None:
     print_pheromone_table(router)
 
     print("\nTakeaways:")
-    print("  PSO converges to the bowl minimum without gradients, using only fitness evals.")
+    print("  PSO converges to the fitness peak without gradients, using only fitness evals.")
     print("  ACO pheromone trails surface interpretable evidence for who routes where.")
     print("  quality-gated deposits (threshold=0.6) prevent fast-but-wrong agents from locking in.")
 
