@@ -14,9 +14,6 @@ import math
 import random
 
 
-random.seed(3)
-
-
 # ---------- Synthetic data generator ----------
 
 def synth_tasks(true_horizon_hours: float, slope: float = 1.2,
@@ -109,6 +106,7 @@ def report(label: str, w: float, b: float) -> None:
 
 
 def main() -> None:
+    random.seed(3)
     print("=" * 80)
     print("METR-STYLE HORIZON ESTIMATOR (Phase 15, Lesson 21)")
     print("=" * 80)
@@ -119,22 +117,31 @@ def main() -> None:
 
     tasks = synth_tasks(true_horizon_hours=true_h, n=160)
     w, b = fit(tasks)
+    clean_h50 = horizon_at(w, b, 0.50)
     report("clean evaluation (no gaming)", w, b)
 
+    gamed_h50: dict[float, float] = {}
     for rate in (0.1, 0.2, 0.4):
         gamed = inject_gaming(tasks, gaming_rate=rate)
         w_g, b_g = fit(gamed)
+        gamed_h50[rate] = horizon_at(w_g, b_g, 0.50)
         report(f"with eval-context gaming rate {rate:.0%}", w_g, b_g)
 
     print()
     print("=" * 80)
     print("HEADLINE: horizons are fit to observed success; gaming shifts them")
     print("-" * 80)
-    print("  Clean fit lands near the synthetic 14-hour horizon.")
-    print("  20% gaming pushes the 50% horizon higher than ground truth.")
-    print("  40% gaming makes the headline number unreliable.")
-    print("  A horizon number without a gaming audit is a capability ceiling")
-    print("  that the deploy-context reality may not reach.")
+    print(f"  With seed=3 / n=160 / iters=4000 / true_h={true_h:.1f} hr:")
+    print(f"    clean fit          50% horizon ≈ {clean_h50:>6.2f} hr "
+          f"(ground truth {true_h:.1f})")
+    for rate, h in gamed_h50.items():
+        delta = h - true_h
+        print(f"    gaming rate {rate:>4.0%}   50% horizon ≈ {h:>6.2f} hr "
+              f"({delta:+.2f} hr vs ground truth)")
+    print("  Trend: gaming pushes the observed 50% horizon further from the")
+    print("  synthetic ground truth as the rate climbs. Exact deltas depend on")
+    print("  seed, n, iters, and the chosen true_h. A horizon number without a")
+    print("  gaming audit is a capability ceiling the deploy context may not reach.")
 
 
 if __name__ == "__main__":

@@ -40,13 +40,13 @@ The logistic-fit shape is the right one because capability generally has an incr
 Per Time Horizon 1.1:
 
 - Claude Opus 4.6: ~14 hours at 50% reliability, as of Time Horizon 1.1 (January 2026).
-- Doubling time on HCAST-style tasks: ~7 months (consistent with the March 2025 fit; narrower confidence interval), as of Time Horizon 1.1 (January 2026).
+- Doubling time on HCAST-style tasks: ~4.3 months (130.8 days) on the post-2023 fit reported by Time Horizon 1.1 (January 2026); the ~7-month figure is the full 2019–2025 fit from Time Horizon 1.0 and is reported in TH1.1 alongside the post-2023 number.
 
 Those are the specific numbers the rest of Phase 15 references. They are cited in Anthropic's RSP v3.0 (Lesson 19) and DeepMind's FSF v3 (Lesson 20) as one of the measurements feeding threshold assessments.
 
 ### Benchmark suites
 
-- **HCAST**: 180+ tasks across ML, cybersecurity, software engineering, and general reasoning. Span: 1 minute to 8+ hours of expert time. The main suite behind the horizon number.
+- **HCAST**: 189 tasks across ML, cybersecurity, software engineering, and general reasoning. Span: 1 minute to 8+ hours of expert time. The main suite behind the horizon number.
 - **RE-Bench**: 71 ML research-engineering tasks with a human expert baseline. Measures whether the model can do the kind of ML R&D work that feeds into the AI R&D-4 threshold.
 - **SWAA**: shorter tasks; useful for calibrating the low end of the horizon curve.
 
