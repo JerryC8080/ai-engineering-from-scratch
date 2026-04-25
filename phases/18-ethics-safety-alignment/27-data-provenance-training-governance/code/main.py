@@ -1,9 +1,9 @@
 """California AB 2013 dataset-summary scaffold — stdlib Python.
 
-Generates the 12-field summary required by California AB 2013 for a toy
-dataset. Identifies follow-on obligations triggered by specific fields
-(personal-information flag -> CPRA; copyright-protected flag -> EU TDM
-opt-out respect).
+Generates the 12-item high-level summary required by California AB 2013
+Section 3111(a) for a toy dataset. Identifies follow-on obligations
+triggered by specific items (personal-information flag -> CPRA;
+copyright-protected flag -> EU TDM opt-out respect).
 
 Usage: python3 code/main.py
 """
@@ -12,52 +12,54 @@ from __future__ import annotations
 
 
 AB_2013_FIELDS = [
-    "dataset_source_name",
-    "source_url_or_description",
-    "acquisition_mode (purchased / licensed / other)",
-    "amount_paid",
-    "contains_personal_information (Y/N)",
-    "is_synthetic_data (Y/N)",
-    "collection_time_period",
-    "modification_or_curation_description",
-    "contains_copyright_protected_material (Y/N)",
-    "aggregation_level",
-    "intended_purpose",
-    "publication_date",
+    "sources_or_owners",
+    "how_dataset_furthers_intended_purpose",
+    "number_of_data_points (or range)",
+    "types_of_data_points (label types or general characteristics)",
+    "contains_copyright_trademark_or_patent_protected (Y/N) or fully_public_domain",
+    "purchased_or_licensed (Y/N)",
+    "contains_personal_information (Y/N, per Cal. Civ. Code §1798.140(v))",
+    "contains_aggregate_consumer_information (Y/N, per Cal. Civ. Code §1798.140(b))",
+    "cleaning_processing_or_modification_description",
+    "data_collection_time_period (with ongoing-collection notice if applicable)",
+    "dates_first_used_during_development",
+    "uses_synthetic_data_generation (Y/N)",
 ]
 
 
 TOY_EXAMPLE = {
-    "dataset_source_name": "ToyBinaryClassification-1.0",
-    "source_url_or_description": "generated in-repo via Python random.gauss",
-    "acquisition_mode (purchased / licensed / other)": "other (synthetic)",
-    "amount_paid": "$0.00",
-    "contains_personal_information (Y/N)": "N",
-    "is_synthetic_data (Y/N)": "Y",
-    "collection_time_period": "2026-04 (single run, fixed seed)",
-    "modification_or_curation_description": "none (generated deterministically)",
-    "contains_copyright_protected_material (Y/N)": "N",
-    "aggregation_level": "per-example",
-    "intended_purpose": "pedagogical demonstration in Phase 18",
-    "publication_date": "2026-04-22",
+    "sources_or_owners": "generated in-repo via Python random.gauss; owner: this repository",
+    "how_dataset_furthers_intended_purpose": "pedagogical demonstration of binary classification in Phase 18",
+    "number_of_data_points (or range)": "1,000 examples (fixed seed)",
+    "types_of_data_points (label types or general characteristics)": "two real-valued features; binary {0,1} labels",
+    "contains_copyright_trademark_or_patent_protected (Y/N) or fully_public_domain": "N (entirely synthetic; no third-party material)",
+    "purchased_or_licensed (Y/N)": "N",
+    "contains_personal_information (Y/N, per Cal. Civ. Code §1798.140(v))": "N",
+    "contains_aggregate_consumer_information (Y/N, per Cal. Civ. Code §1798.140(b))": "N",
+    "cleaning_processing_or_modification_description": "none (generated deterministically)",
+    "data_collection_time_period (with ongoing-collection notice if applicable)": "2026-04 (single run, fixed seed; not ongoing)",
+    "dates_first_used_during_development": "2026-04-22",
+    "uses_synthetic_data_generation (Y/N)": "Y (entire dataset is synthetic)",
 }
 
 
 def flag_followups(summary: dict) -> list[str]:
     flags = []
-    if summary["contains_personal_information (Y/N)"] == "Y":
+    if summary["contains_personal_information (Y/N, per Cal. Civ. Code §1798.140(v))"] == "Y":
         flags.append("triggers CPRA obligations (California Privacy Rights Act)")
-    if summary["contains_copyright_protected_material (Y/N)"] == "Y":
+    if summary["contains_aggregate_consumer_information (Y/N, per Cal. Civ. Code §1798.140(b))"] == "Y":
+        flags.append("aggregate consumer information disclosure obligations apply")
+    if summary["contains_copyright_trademark_or_patent_protected (Y/N) or fully_public_domain"].startswith("Y"):
         flags.append("must respect EU TDM opt-out signals (EU Copyright Directive)")
-    if summary["is_synthetic_data (Y/N)"] == "Y":
+    if summary["uses_synthetic_data_generation (Y/N)"].startswith("Y"):
         flags.append("may still trigger obligations on the base model used for generation")
-    if "other" in summary["acquisition_mode (purchased / licensed / other)"]:
-        flags.append("document the provenance of 'other' acquisition mode")
+    if summary["purchased_or_licensed (Y/N)"] == "Y":
+        flags.append("retain license terms and provenance records for audit")
     return flags
 
 
 def render_markdown(summary: dict) -> str:
-    lines = ["# Dataset Summary (AB 2013 12-field)", ""]
+    lines = ["# Dataset Summary (AB 2013 Section 3111(a) 12-item)", ""]
     for field in AB_2013_FIELDS:
         lines.append(f"- **{field}**: {summary.get(field, '(missing)')}")
     followups = flag_followups(summary)
@@ -71,17 +73,18 @@ def render_markdown(summary: dict) -> str:
 
 def main() -> None:
     print("=" * 74)
-    print("CALIFORNIA AB 2013 12-FIELD GENERATOR (Phase 18, Lesson 27)")
+    print("CALIFORNIA AB 2013 SECTION 3111(a) 12-ITEM GENERATOR (Phase 18, L27)")
     print("=" * 74)
     print()
     print(render_markdown(TOY_EXAMPLE))
     print()
     print("=" * 74)
-    print("TAKEAWAY: the 12 fields are the California baseline. fields 5 and 9")
-    print("trigger cascading obligations (CPRA + EU TDM). EU AI Act GPAI")
-    print("Code of Practice Copyright chapter requires opt-out respect. 2025")
-    print("DPA convergence: legitimate interest + opt-out = lawful. compliance")
-    print("window is at collection time; irreversibility precludes downstream fix.")
+    print("TAKEAWAY: the 12 items in Section 3111(a) are the California baseline.")
+    print("Items 5 and 7 trigger cascading obligations (EU TDM opt-out + CPRA).")
+    print("EU AI Act GPAI Code of Practice Copyright chapter requires opt-out")
+    print("respect. 2025 DPA convergence: legitimate interest + opt-out = lawful.")
+    print("Compliance window is at collection time; irreversibility precludes")
+    print("downstream fix.")
     print("=" * 74)
 
 

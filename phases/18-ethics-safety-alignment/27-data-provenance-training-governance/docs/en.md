@@ -22,21 +22,21 @@ Training-data governance is the upstream of every model card (Lesson 26) and reg
 
 ### California AB 2013
 
-Signed 2024. Effective January 2025 for new models; January 2027 for existing models. Requires developers to publish a summary of datasets used in training, including 12 fields:
-1. Dataset source name.
-2. Source URL or description.
-3. Whether the data was purchased, licensed, or otherwise acquired.
-4. Amount paid (if purchased).
-5. Inclusion of personal information (Y/N).
-6. Synthetic data flag.
-7. Data collection period.
-8. Modification or curation description.
-9. Copyright-protected material flag.
-10. Aggregation level.
-11. Dataset intended purpose.
-12. Publication date of summary.
+Signed 2024. Documentation must be posted on or before January 1, 2026 for systems released on or after January 1, 2022. Section 3111(a) requires developers to publish a high-level summary of datasets used in training with 12 statutory items:
+1. Sources or owners of the datasets.
+2. Description of how the datasets further the intended purpose of the AI system.
+3. Number of data points in the datasets (general ranges acceptable; estimates for dynamic datasets).
+4. Description of the types of data points (label types for labeled datasets; general characteristics for unlabeled).
+5. Whether the datasets include any data protected by copyright, trademark, or patent, or are entirely in the public domain.
+6. Whether the datasets were purchased or licensed.
+7. Whether the datasets include personal information (per Cal. Civ. Code §1798.140(v)).
+8. Whether the datasets include aggregate consumer information (per Cal. Civ. Code §1798.140(b)).
+9. Cleaning, processing, or other modification by the developer, with intended purpose.
+10. Time period during which the data was collected, with notice if collection is ongoing.
+11. Dates the datasets were first used during development.
+12. Whether the system uses or continuously uses synthetic data generation.
 
-Sixth field (synthetic data) is new relative to Gebru et al. 2018 datasheets. The fifth field (personal information) triggers Privacy Rights Act (CPRA) obligations.
+Item 12 (synthetic data) is new relative to Gebru et al. 2018 datasheets. Item 7 (personal information) triggers Privacy Rights Act (CPRA) obligations. The statute exempts security/integrity, aircraft-operation, and federal-only national-security systems (Section 3111(b)).
 
 ### EU AI Act (Lesson 24) and TDM opt-out
 
@@ -44,7 +44,7 @@ EU Copyright Directive text-and-data-mining exception allows training on publicl
 
 ### 2025 DPA convergence on legitimate interest
 
-Irish DPC (21 May 2025): Meta's plan to train on first-party public EU/EEA adult-user content accepted with safeguards after EDPB opinion. Cologne Higher Regional Court (23 May 2025) dismisses injunction against Meta: opt-out is sufficient. Hamburg DPA drops urgency procedure for EU-wide consistency. UK ICO (23 September 2025): LinkedIn cleared with similar safeguards.
+Irish DPC (21 May 2025): Meta's plan to train on first-party public EU/EEA adult-user content accepted with safeguards after EDPB opinion. Cologne Higher Regional Court (23 May 2025) dismisses injunction against Meta: opt-out is sufficient. Hamburg DPA drops urgency procedure for EU-wide consistency. UK ICO (23 September 2025) issued a positive regulatory response — not a formal clearance — to LinkedIn's resumption of AI training with similar safeguards and ongoing monitoring.
 
 Convergent principle: legitimate interest can justify training on publicly available first-party content with opt-out. Consent is not required.
 
