@@ -71,12 +71,14 @@ def simulate_bargain(buyer_fn, rng: random.Random, buyer_max: int = 100,
     while state.rounds < state.max_rounds:
         state.buyer_offer = buyer_fn(state, rng)
         if state.seller_offer is not None and state.buyer_offer >= state.seller_offer:
-            if state.buyer_offer <= state.buyer_max:
+            # trade clears at seller's standing ask; feasible iff within both reservations
+            if state.seller_offer >= state.seller_min and state.seller_offer <= state.buyer_max:
                 deal = True
             break
         state.seller_offer = seller_response(state, rng)
         if state.buyer_offer is not None and state.seller_offer <= state.buyer_offer:
-            if state.seller_offer >= state.seller_min:
+            # trade clears at buyer's standing bid; feasible iff within both reservations
+            if state.buyer_offer <= state.buyer_max and state.buyer_offer >= state.seller_min:
                 deal = True
             break
         state.rounds += 1
