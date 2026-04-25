@@ -157,7 +157,9 @@ def run_adaptive(learner_id: str, inherent_ability: float,
 
 def run_baseline(learner_id: str, inherent_ability: float,
                  cmap: dict[str, Concept], n_turns: int, rng: random.Random) -> LearnerState:
-    """Non-adaptive: pick concepts round-robin, no BKT."""
+    """Non-adaptive concept selection (round-robin). Mastery is still updated
+    via BKT so both arms share the same learner model; only the policy /
+    concept-selection strategy differs."""
     state = LearnerState(learner_id=learner_id)
     p = BKTParams()
     order = list(cmap.keys())
