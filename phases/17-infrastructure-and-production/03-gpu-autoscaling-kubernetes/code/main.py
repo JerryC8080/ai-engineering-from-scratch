@@ -64,6 +64,7 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
     idle_gpu_sec = 0.0
     pending_replicas: list[tuple[float, int]] = []  # (ready_at, replica_id)
     next_replica_id = MIN_WARM_REPLICAS
+    peak_replicas = replicas_ready
 
     while now < sim_end:
         while cursor < len(reqs) and reqs[cursor].arrived_at <= now:
@@ -84,10 +85,15 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
                 r.completed_at = now + service_time
                 replica_available_at[rid] = r.completed_at
             else:
-                idle_gpu_sec += HPA_TICK_SEC / replicas_ready if replicas_ready else 0
+                idle_gpu_sec += HPA_TICK_SEC
 
         if strategy == "DUTY_CYCLE":
-            busy = sum(1 for t in replica_available_at.values() if t > now)
+            pending_ids = {rid for _, rid in pending_replicas}
+            busy = sum(
+                1
+                for rid, t in replica_available_at.items()
+                if t > now and rid not in pending_ids
+            )
             util = busy / max(replicas_ready, 1) * 100
             if util > TARGET_GPU_UTIL and replicas_target < MAX_REPLICAS:
                 replicas_target += 1
@@ -111,6 +117,7 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
             pending_replicas.append((ready_at, next_replica_id))
             replica_available_at[next_replica_id] = ready_at
             next_replica_id += 1
+        peak_replicas = max(peak_replicas, replicas_ready + len(pending_replicas))
         if replicas_ready > replicas_target:
             idle = [rid for rid, t in replica_available_at.items() if t <= now]
             if idle:
@@ -125,8 +132,12 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
         now += HPA_TICK_SEC
 
     dropped = sum(1 for r in reqs if r.dropped)
-    completed = sum(1 for r in reqs if r.completed_at)
-    mean_wait = sum((r.started_at - r.arrived_at) for r in reqs if r.started_at) / max(completed, 1)
+    completed = sum(1 for r in reqs if r.completed_at is not None)
+    started = [r for r in reqs if r.started_at is not None]
+    mean_wait = (
+        sum(r.started_at - r.arrived_at for r in started) / len(started)
+        if started else 0.0
+    )
     return {
         "strategy": strategy,
         "total": len(reqs),
@@ -134,7 +145,7 @@ def simulate(strategy: str, reqs: list[Request]) -> dict:
         "dropped": dropped,
         "mean_wait_s": mean_wait,
         "idle_gpu_min": idle_gpu_sec / 60,
-        "peak_replicas": next_replica_id,
+        "peak_replicas": peak_replicas,
     }
 
 
