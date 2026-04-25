@@ -91,7 +91,7 @@ def lock_in_cost() -> None:
     print(f"Idle secondary headroom ({failover_headroom_pct:.0f}%): ${primary_cost * failover_headroom_pct / 100:.2f}/day")
     print(f"Total uplift: ${uplift:.2f}/day")
     print(f"Monthly uplift: ${uplift * 30:.2f}")
-    print(f"Cost of one multi-hour regional outage without redundancy: customer churn, SLA credits, war-room time")
+    print("Cost of one multi-hour regional outage without redundancy: customer churn, SLA credits, war-room time")
 
 
 def main() -> None:
