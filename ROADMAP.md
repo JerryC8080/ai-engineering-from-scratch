@@ -378,24 +378,35 @@ Progress tracking for every phase and lesson.
 | 10 | Safety Boundaries — When to Stop | ⬚ | ~45 min |
 | 11 | Build an Autonomous Coding Agent | ⬚ | ~120 min |
 
-## Phase 16: Multi-Agent & Swarms — 🚧 (~15 hours)
+## Phase 16: Multi-Agent & Swarms — ✅ (~28 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | Why Multi-Agent | ✅ | ~45 min |
-| 02 | Agent Teams — Roles, Specialization, Delegation | ⬚ | ~75 min |
-| 03 | Communication Protocols | ✅ | ~45 min |
-| 04 | Shared State & Coordination | ⬚ | ~75 min |
-| 05 | Message Passing & Mailboxes | ⬚ | ~75 min |
-| 06 | Task Markets — Agents Bidding for Work | ⬚ | ~45 min |
-| 07 | Consensus Algorithms for Agents | ⬚ | ~75 min |
-| 08 | Swarm Intelligence — Emergent Behavior | ⬚ | ~45 min |
-| 09 | Agent Economies | ⬚ | ~45 min |
-| 10 | Worktree Isolation | ⬚ | ~75 min |
-| 11 | Hierarchical Swarms | ⬚ | ~45 min |
-| 12 | Self-Organizing Systems | ⬚ | ~45 min |
-| 13 | DAG-Based Orchestration | ⬚ | ~75 min |
-| 14 | Build an Autonomous Agent Swarm | ⬚ | ~120 min |
+| 01 | [Why Multi-Agent](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | ✅ | ~45 min |
+| 02 | [FIPA-ACL Heritage and Speech Acts](phases/16-multi-agent-and-swarms/02-fipa-acl-heritage/) | ✅ | ~60 min |
+| 03 | [Communication Protocols](phases/16-multi-agent-and-swarms/03-communication-protocols/) | ✅ | ~45 min |
+| 04 | [The Multi-Agent Primitive Model](phases/16-multi-agent-and-swarms/04-primitive-model/) | ✅ | ~60 min |
+| 05 | [Supervisor / Orchestrator-Worker Pattern](phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/) | ✅ | ~75 min |
+| 06 | [Hierarchical Architecture and Decomposition Drift](phases/16-multi-agent-and-swarms/06-hierarchical-architecture/) | ✅ | ~60 min |
+| 07 | [Society of Mind and Multi-Agent Debate](phases/16-multi-agent-and-swarms/07-society-of-mind-debate/) | ✅ | ~75 min |
+| 08 | [Role Specialization — Planner / Critic / Executor / Verifier](phases/16-multi-agent-and-swarms/08-role-specialization/) | ✅ | ~75 min |
+| 09 | [Parallel Swarm and Networked Architectures](phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/) | ✅ | ~60 min |
+| 10 | [Group Chat and Speaker Selection](phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection/) | ✅ | ~60 min |
+| 11 | [Handoffs and Routines (Stateless Orchestration)](phases/16-multi-agent-and-swarms/11-handoffs-and-routines/) | ✅ | ~60 min |
+| 12 | [A2A — The Agent-to-Agent Protocol](phases/16-multi-agent-and-swarms/12-a2a-protocol/) | ✅ | ~75 min |
+| 13 | [Shared Memory and Blackboard Patterns](phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/) | ✅ | ~75 min |
+| 14 | [Consensus and Byzantine Fault Tolerance for Agents](phases/16-multi-agent-and-swarms/14-consensus-and-bft/) | ✅ | ~75 min |
+| 15 | [Voting, Self-Consistency, and Debate Topology](phases/16-multi-agent-and-swarms/15-voting-debate-topology/) | ✅ | ~75 min |
+| 16 | [Negotiation and Bargaining](phases/16-multi-agent-and-swarms/16-negotiation-bargaining/) | ✅ | ~75 min |
+| 17 | [Generative Agents and Emergent Simulation](phases/16-multi-agent-and-swarms/17-generative-agents-simulation/) | ✅ | ~75 min |
+| 18 | [Theory of Mind and Emergent Coordination](phases/16-multi-agent-and-swarms/18-theory-of-mind-coordination/) | ✅ | ~75 min |
+| 19 | [Swarm Optimization for LLMs (PSO, ACO)](phases/16-multi-agent-and-swarms/19-swarm-optimization-pso-aco/) | ✅ | ~75 min |
+| 20 | [MARL — MADDPG, QMIX, MAPPO](phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo/) | ✅ | ~90 min |
+| 21 | [Agent Economies, Token Incentives, Reputation](phases/16-multi-agent-and-swarms/21-agent-economies/) | ✅ | ~75 min |
+| 22 | [Production Scaling — Queues, Checkpoints, Durability](phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/) | ✅ | ~75 min |
+| 23 | [Failure Modes — MAST, Groupthink, Monoculture, Cascading](phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/) | ✅ | ~75 min |
+| 24 | [Evaluation and Coordination Benchmarks](phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks/) | ✅ | ~75 min |
+| 25 | [Case Studies and 2026 State of the Art](phases/16-multi-agent-and-swarms/25-case-studies-2026-sota/) | ✅ | ~90 min |
 
 ## Phase 17: Infrastructure & Production — 🚧 (~13 hours)
 

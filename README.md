@@ -46,7 +46,7 @@
 
 </div>
 
-**272+ lessons. 20 phases. ~306 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, and MCP servers.
+**283+ lessons. 20 phases. ~320 hours.** From linear algebra to autonomous agent swarms. Python, TypeScript, Rust, Julia. Every lesson produces something reusable: prompts, skills, agents, and MCP servers.
 
 You don't just learn AI. You learn AI **with** AI. Then you build real things. Then you ship tools others can use.
 
@@ -159,7 +159,7 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 
 ## 🗺️ The Journey
 
-### *20 phases · 272+ lessons · click any phase to expand*
+### *20 phases · 283+ lessons · click any phase to expand*
 
 [![Phase 0](https://img.shields.io/badge/0-Setup-95A5A6?style=flat-square)](#phase-0)
 [![Phase 1](https://img.shields.io/badge/1-Math-9B59B6?style=flat-square)](#phase-1)
@@ -629,25 +629,36 @@ Other courses end with *"congratulations, you learned X."* Our lessons end with 
 </details>
 
 <details id="phase-16">
-<summary><b>🟩 Phase 16 — Multi-Agent & Swarms</b> &nbsp;<code>14 lessons</code>&nbsp; <em>Coordination, emergence, and collective intelligence.</em></summary>
+<summary><b>🟩 Phase 16 — Multi-Agent & Swarms</b> &nbsp;<code>25 lessons</code>&nbsp; <em>Coordination, emergence, and collective intelligence.</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [Why Multi-Agent](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | — |
-| 02 | Agent Teams: Roles & Delegation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
+| 01 | [Why Multi-Agent](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🟦 |
+| 02 | [FIPA-ACL Heritage and Speech Acts](phases/16-multi-agent-and-swarms/02-fipa-acl-heritage/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
 | 03 | [Communication Protocols](phases/16-multi-agent-and-swarms/03-communication-protocols/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 04 | Shared State & Coordination | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
-| 05 | Message Passing & Mailboxes | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 06 | Task Markets | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 07 | Consensus Algorithms | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
-| 08 | Swarm Intelligence | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 🟦 |
-| 09 | Agent Economies | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 10 | Worktree Isolation | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 11 | Hierarchical Swarms | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 |
-| 12 | Self-Organizing Systems | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
-| 13 | DAG-Based Orchestration | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
-| 14 | Build an Autonomous Swarm | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🟦 🦀 |
+| 04 | [The Multi-Agent Primitive Model](phases/16-multi-agent-and-swarms/04-primitive-model/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 05 | [Supervisor / Orchestrator-Worker Pattern](phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 06 | [Hierarchical Architecture and Decomposition Drift](phases/16-multi-agent-and-swarms/06-hierarchical-architecture/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 07 | [Society of Mind and Multi-Agent Debate](phases/16-multi-agent-and-swarms/07-society-of-mind-debate/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 08 | [Role Specialization — Planner / Critic / Executor / Verifier](phases/16-multi-agent-and-swarms/08-role-specialization/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 09 | [Parallel Swarm and Networked Architectures](phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 10 | [Group Chat and Speaker Selection](phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 11 | [Handoffs and Routines (Stateless Orchestration)](phases/16-multi-agent-and-swarms/11-handoffs-and-routines/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 12 | [A2A — The Agent-to-Agent Protocol](phases/16-multi-agent-and-swarms/12-a2a-protocol/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 13 | [Shared Memory and Blackboard Patterns](phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 14 | [Consensus and Byzantine Fault Tolerance](phases/16-multi-agent-and-swarms/14-consensus-and-bft/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 15 | [Voting, Self-Consistency, and Debate Topology](phases/16-multi-agent-and-swarms/15-voting-debate-topology/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 16 | [Negotiation and Bargaining](phases/16-multi-agent-and-swarms/16-negotiation-bargaining/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 17 | [Generative Agents and Emergent Simulation](phases/16-multi-agent-and-swarms/17-generative-agents-simulation/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 18 | [Theory of Mind and Emergent Coordination](phases/16-multi-agent-and-swarms/18-theory-of-mind-coordination/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 19 | [Swarm Optimization (PSO, ACO)](phases/16-multi-agent-and-swarms/19-swarm-optimization-pso-aco/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 20 | [MARL — MADDPG, QMIX, MAPPO](phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 21 | [Agent Economies, Token Incentives, Reputation](phases/16-multi-agent-and-swarms/21-agent-economies/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 22 | [Production Scaling — Queues, Checkpoints, Durability](phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/) | ![Build](https://img.shields.io/badge/-Build-2ECC71?style=flat-square) | 🐍 |
+| 23 | [Failure Modes — MAST, Groupthink, Monoculture](phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 24 | [Evaluation and Coordination Benchmarks](phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
+| 25 | [Case Studies and 2026 State of the Art](phases/16-multi-agent-and-swarms/25-case-studies-2026-sota/) | ![Learn](https://img.shields.io/badge/-Learn-3498DB?style=flat-square) | 🐍 |
 
 </details>
 
