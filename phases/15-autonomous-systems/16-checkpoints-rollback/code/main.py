@@ -103,6 +103,16 @@ def run_transfer(cp: Checkpoint, txid: str, from_acct: str, to_acct: str,
     # save and persist_transfer leaves a "committed" marker the retry
     # can detect and short-circuit. We only promote to "verified" once
     # the post-action read (below) confirms the side effect landed.
+    #
+    # Subtle durability gap (lesson trade-off): if the process crashes
+    # AFTER cp.save and BEFORE persist_transfer, a retry will see
+    # status == "committed" and return "idempotent-skip" even though
+    # the transfer never actually ran. Production systems close this
+    # gap by either (a) carrying the idempotency key into the side
+    # effect itself so the destination DB enforces exactly-once, or
+    # (b) gating "committed" on a post-action read of the destination,
+    # which is exactly what the verify step below does for the
+    # non-crash path.
     cp.save(k, {"status": "committed", "txid": txid,
                 "from_acct": from_acct, "to_acct": to_acct,
                 "amount": amount,
@@ -171,7 +181,7 @@ def main() -> None:
     print("  Four pieces, not one. Each covers a distinct failure class:")
     print("  idempotency -> retry-safe on crash")
     print("  precondition -> state drift between approval and commit")
-    print("  verify       -> the side effect did not happen we thought it did")
+    print("  verify       -> the side effect did not happen when we thought it did")
     print("  rollback     -> known-bad state restored or alerted")
     print("  Article 14 operational reading: checkpoints queryable, rollbacks")
     print("  rehearsed, audit trail survives deploys.")
