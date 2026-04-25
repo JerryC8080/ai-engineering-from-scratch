@@ -312,7 +312,7 @@ Progress tracking for every phase and lesson.
 | 24 | [Multimodal RAG and Cross-Modal Retrieval](phases/12-multimodal-ai/24-multimodal-rag-cross-modal) | ✅ | ~180 min |
 | 25 | [Multimodal Agents and Computer-Use (Capstone)](phases/12-multimodal-ai/25-multimodal-agents-computer-use) | ✅ | ~240 min |
 
-## Phase 13: Tools & Protocols — ✅ (~23 hours)
+## Phase 13: Tools & Protocols — ✅ (~24.5 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -333,11 +333,12 @@ Progress tracking for every phase and lesson.
 | 15 | [MCP Security I — Tool Poisoning](phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) | ✅ | ~45 min |
 | 16 | [MCP Security II — OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | ✅ | ~75 min |
 | 17 | [MCP Gateways and Registries](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | ✅ | ~45 min |
-| 18 | [A2A Protocol](phases/13-tools-and-protocols/18-a2a-protocol/) | ✅ | ~75 min |
-| 19 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/19-opentelemetry-genai/) | ✅ | ~75 min |
-| 20 | [LLM Routing Layer](phases/13-tools-and-protocols/20-llm-routing-layer/) | ✅ | ~45 min |
-| 21 | [Skills and Agent SDKs](phases/13-tools-and-protocols/21-skills-and-agent-sdks/) | ✅ | ~45 min |
-| 22 | [Capstone — Tool Ecosystem](phases/13-tools-and-protocols/22-capstone-tool-ecosystem/) | ✅ | ~120 min |
+| 18 | [MCP Auth in Production — DCR + JWKS on iii](phases/13-tools-and-protocols/18-mcp-auth-production/) | ✅ | ~90 min |
+| 19 | [A2A Protocol](phases/13-tools-and-protocols/19-a2a-protocol/) | ✅ | ~75 min |
+| 20 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/20-opentelemetry-genai/) | ✅ | ~75 min |
+| 21 | [LLM Routing Layer](phases/13-tools-and-protocols/21-llm-routing-layer/) | ✅ | ~45 min |
+| 22 | [Skills and Agent SDKs](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | ✅ | ~45 min |
+| 23 | [Capstone — Tool Ecosystem](phases/13-tools-and-protocols/23-capstone-tool-ecosystem/) | ✅ | ~120 min |
 
 ## Phase 14: Agent Engineering — ✅ (~32 hours)
 
