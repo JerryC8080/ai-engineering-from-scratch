@@ -66,7 +66,7 @@ Datacenter HBM3 at 3 TB/s clears the same 3.5 GB in 1.2 ms — ceiling is 830 to
 |--------|--------|-------|
 | Apple ANE | INT4 weights + FP16 activations | Core ML conversion path |
 | Qualcomm Hexagon | QNN INT8 / INT4 | AI Hub converters |
-| WebGPU / WebLLM | Q4 GGUF (4-bit) | Browser memory ceiling at ~3-4 GB |
+| WebGPU / WebLLM | Q4 MLC (q4f16_1) | Use `mlc_llm convert_weight` + compiled `.wasm`; GGUF is not supported |
 | Jetson Orin Nano | Q4 GGUF or TRT-LLM INT4 | Memory-bound |
 | Jetson AGX / Thor | NVFP4 + FP8 KV | Edge-LLM path |
 
