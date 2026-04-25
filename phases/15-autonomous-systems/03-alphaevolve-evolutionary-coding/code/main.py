@@ -18,7 +18,6 @@ from dataclasses import dataclass
 
 
 DEFAULT_SEED = 1
-random.seed(DEFAULT_SEED)
 
 
 # Target function the loop tries to rediscover.
