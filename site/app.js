@@ -69,16 +69,11 @@
     };
   }
 
-  function bar(pct, width) {
-    width = width || 40;
-    var filled = Math.round((pct / 100) * width);
-    if (filled > width) filled = width;
-    if (filled < 0) filled = 0;
-    var partial = '';
-    var s = '';
-    for (var i = 0; i < filled; i++) s += '█';
-    for (var j = 0; j < (width - filled); j++) s += '░';
-    return s;
+  function setBar(selector, pct) {
+    var el = document.querySelector(selector);
+    if (!el) return;
+    var clamped = Math.max(0, Math.min(100, pct));
+    el.style.setProperty('--bar-pct', clamped.toFixed(1) + '%');
   }
 
   function populateStats() {
@@ -90,8 +85,10 @@
     setText('[data-stat="complete-frac"]', stats.complete + ' / ' + stats.lessons);
     setText('[data-stat="phases-frac"]', stats.completePhases + ' / ' + stats.phases);
     setText('[data-stat="glossary-count"]', String(glossaryCount));
-    setText('[data-bar="complete"]', bar(pct));
-    setText('[data-bar="phases"]', bar(phasePct));
+    setBar('[data-bar="complete"]', pct);
+    setBar('[data-bar="phases"]', phasePct);
+    setBar('[data-bar="languages"]', 100);
+    setBar('[data-bar="glossary"]', glossaryCount > 0 ? 100 : 0);
 
     var legacyEls = document.querySelectorAll('.stat-number[data-target]');
     for (var i = 0; i < legacyEls.length; i++) {

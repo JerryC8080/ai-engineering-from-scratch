@@ -130,7 +130,7 @@
     .stat-rows {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 14px;
+      gap: 10px;
       max-width: 760px;
       font-family: var(--font-mono);
       font-size: 0.92rem;
@@ -138,10 +138,10 @@
 
     .stat-row {
       display: grid;
-      grid-template-columns: 220px 1fr 80px;
+      grid-template-columns: 200px minmax(0, 360px) 110px;
       align-items: center;
       gap: 16px;
-      padding: 6px 0;
+      padding: 4px 0;
     }
 
     .stat-row-label {
@@ -151,10 +151,22 @@
     }
 
     .stat-row-bar {
-      letter-spacing: 0;
-      color: var(--blueprint);
-      white-space: nowrap;
+      position: relative;
+      height: 14px;
+      background: var(--rule-soft);
       overflow: hidden;
+      font-size: 0;
+      line-height: 0;
+      text-indent: -9999px;
+    }
+
+    .stat-row-bar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: var(--bar-pct, 0%);
+      background: var(--blueprint);
+      transition: width 0.6s ease;
     }
 
     .stat-row-value {
@@ -162,6 +174,7 @@
       font-variant-numeric: tabular-nums;
       color: var(--ink);
       letter-spacing: 0.04em;
+      white-space: nowrap;
     }
 
     .toc {
@@ -413,22 +426,22 @@
       <div class="stat-rows" id="statRows">
         <div class="stat-row">
           <span class="stat-row-label">Finished Lessons</span>
-          <span class="stat-row-bar" data-bar="complete">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span>
+          <span class="stat-row-bar" data-bar="complete" style="--bar-pct:0%;" aria-hidden="true">bar</span>
           <span class="stat-row-value" data-stat="complete-frac">0 / 0</span>
         </div>
         <div class="stat-row">
           <span class="stat-row-label">Phases</span>
-          <span class="stat-row-bar" data-bar="phases">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span>
+          <span class="stat-row-bar" data-bar="phases" style="--bar-pct:0%;" aria-hidden="true">bar</span>
           <span class="stat-row-value" data-stat="phases-frac">0 / 0</span>
         </div>
         <div class="stat-row">
           <span class="stat-row-label">Languages</span>
-          <span class="stat-row-bar" data-bar="languages">████████████████████████████████████████</span>
+          <span class="stat-row-bar" data-bar="languages" style="--bar-pct:100%;" aria-hidden="true">bar</span>
           <span class="stat-row-value">4</span>
         </div>
         <div class="stat-row">
           <span class="stat-row-label">Glossary Terms</span>
-          <span class="stat-row-bar" data-bar="glossary">████████████████████████████████████████</span>
+          <span class="stat-row-bar" data-bar="glossary" style="--bar-pct:100%;" aria-hidden="true">bar</span>
           <span class="stat-row-value" data-stat="glossary-count">—</span>
         </div>
       </div>

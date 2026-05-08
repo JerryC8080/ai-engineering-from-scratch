@@ -151,19 +151,27 @@ code, pre, kbd, samp {
 .ascii-rule {
   display: block;
   width: 100%;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  letter-spacing: 0;
-  color: var(--blueprint);
-  white-space: nowrap;
-  overflow: hidden;
-  user-select: none;
+  height: 6px;
   margin: 32px 0;
-  text-align: left;
-}
-
-.ascii-rule::before {
-  content: "░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒";
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      var(--blueprint) 0,
+      var(--blueprint) 4px,
+      transparent 4px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent 8px,
+      var(--blueprint-tint-strong) 8px,
+      var(--blueprint-tint-strong) 14px
+    );
+  background-size: 100% 3px, 100% 3px;
+  background-position: 0 0, 0 3px;
+  background-repeat: no-repeat;
+  user-select: none;
 }
 
 .label {
