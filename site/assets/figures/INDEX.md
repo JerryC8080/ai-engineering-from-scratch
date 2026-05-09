@@ -2,7 +2,7 @@
 
 Every figure shipped under `site/assets/figures/` is listed below. FIG numbers are global, monotonically increasing, and never reused.
 
-The aesthetic is documented in the [`blueprint-diagram` skill](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/.claude/skills/blueprint-diagram/SKILL.md). To author a new figure, run the skill and append a row here.
+The aesthetic is documented in the `blueprint-diagram` Claude Code skill, which is distributed separately from this repo (per the project's "no vendor/tooling artifacts in repos" rule). The skill source lives under `~/.claude/skills/blueprint-diagram/` once installed; ask a maintainer for the install path or follow the [How to add](#how-to-add) section below for a manual workflow that does not require the skill.
 
 | FIG | slug | phase | lesson | added | notes |
 |---|---|---|---|---|---|
@@ -21,12 +21,19 @@ The aesthetic is documented in the [`blueprint-diagram` skill](https://github.co
 
 ## How to add
 
-1. Run the `blueprint-diagram` skill with a description of the concept.
-2. The skill writes the SVG to `site/assets/figures/NNN-slug.svg`.
-3. The skill appends a row here with the next available number.
-4. The skill (or you) wires the figure into the relevant lesson markdown via `![FIG_NNN](path)`.
-5. Verify at multiple widths (480 / 720 / 1200 px) that labels do not overlap geometry.
+If you have the `blueprint-diagram` skill installed:
+
+1. Run the skill with a description of the concept.
+2. The skill writes the SVG to `site/assets/figures/NNN-slug.svg`, appends a row here with the next available number, and (if asked) wires the figure into the relevant lesson markdown via `![FIG_NNN](path)`.
+
+If you don't have the skill, do it manually:
+
+1. Author an SVG in the cream + blueprint aesthetic (cream `#fafaf5` paper, `#3553ff` blueprint blue strokes, JetBrains Mono uppercase labels with leader lines, no other chromatic accents).
+2. Save as `site/assets/figures/<NNN>-<slug>.svg` using the next available FIG number from the table above.
+3. Add a row to the table here with the FIG number, slug, target phase + lesson, today's date, and a one-line note.
+4. Reference the figure from the lesson markdown as `![FIG_NNN](../../site/assets/figures/<NNN>-<slug>.svg)`.
+5. Verify at 480 / 720 / 1200 px viewport widths — labels must not overlap geometry, leader lines must reach their targets.
 
 ## License
 
-Figures inherit the repo's MIT license. They are CC-0 in spirit — copy them, modify them, ship them in your own work. Attribution appreciated, not required.
+Figures are released under the repo's MIT license. The MIT license requires preserving the copyright notice in distributions of the source SVG; visual reuse of the rendered image (e.g. embedding in a blog post or slide deck) is fine without further attribution.
