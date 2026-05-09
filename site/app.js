@@ -14,10 +14,12 @@
     initThemeToggle();
     populateStats();
     renderPhases();
+    initStaggerIndex();
     initModal();
     initCopyButton();
     initSmoothScroll();
     initFadeObserver();
+    initScrollExplode();
   });
 
   function updateThemeIcon() {
@@ -73,7 +75,12 @@
     var el = document.querySelector(selector);
     if (!el) return;
     var clamped = Math.max(0, Math.min(100, pct));
-    el.style.setProperty('--bar-pct', clamped.toFixed(1) + '%');
+    el.setAttribute('data-target-pct', clamped.toFixed(1));
+    if (el.classList.contains('in-view') || !window.IntersectionObserver) {
+      el.style.setProperty('--bar-pct', clamped.toFixed(1) + '%');
+    } else {
+      el.style.setProperty('--bar-pct', '0%');
+    }
   }
 
   function populateStats() {
@@ -313,18 +320,90 @@
   }
 
   function initFadeObserver() {
-    var els = document.querySelectorAll('.fade-in');
+    if (!window.IntersectionObserver) {
+      document.querySelectorAll('.reveal, .fade-in, .stat-row-bar').forEach(function (el) {
+        el.classList.add('in-view', 'visible');
+        var target = el.getAttribute('data-target-pct');
+        if (target !== null) el.style.setProperty('--bar-pct', target + '%');
+      });
+      return;
+    }
+
+    var els = document.querySelectorAll('.reveal, .fade-in, .stat-row-bar, .ascii-rule, .toc-row');
     if (!els.length) return;
     var observer = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
         if (entries[i].isIntersecting) {
-          entries[i].target.classList.add('visible');
-          observer.unobserve(entries[i].target);
+          var el = entries[i].target;
+          el.classList.add('in-view', 'visible');
+          var target = el.getAttribute('data-target-pct');
+          if (target !== null) {
+            el.style.setProperty('--bar-pct', target + '%');
+          }
+          observer.unobserve(el);
         }
       }
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     for (var i = 0; i < els.length; i++) {
       observer.observe(els[i]);
+    }
+  }
+
+  function initStaggerIndex() {
+    var rows = document.querySelectorAll('.toc-list .toc-row');
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].style.setProperty('--stagger-delay', (i * 30) + 'ms');
+    }
+  }
+
+  function initScrollExplode() {
+    var containers = document.querySelectorAll('[data-svg-explode]');
+    if (!containers.length) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      for (var c = 0; c < containers.length; c++) applyExplode(containers[c], 1);
+      return;
+    }
+
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      for (var i = 0; i < containers.length; i++) {
+        var rect = containers[i].getBoundingClientRect();
+        var startEdge = vh;
+        var endEdge = vh * 0.35;
+        var raw = (startEdge - rect.top) / (startEdge - endEdge);
+        var progress = Math.max(0, Math.min(1, raw));
+        progress = 1 - Math.pow(1 - progress, 3);
+        applyExplode(containers[i], progress);
+      }
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  }
+
+  function applyExplode(container, progress) {
+    var layers = container.querySelectorAll('.explode-layer');
+    for (var i = 0; i < layers.length; i++) {
+      var final = parseFloat(layers[i].getAttribute('data-final')) || 0;
+      var dy = -final * progress;
+      layers[i].setAttribute('transform', 'translate(0, ' + dy.toFixed(2) + ')');
+    }
+    var labels = container.querySelectorAll('.explode-label');
+    for (var j = 0; j < labels.length; j++) {
+      var final2 = parseFloat(labels[j].getAttribute('data-final')) || 0;
+      var stagger = parseFloat(labels[j].getAttribute('data-stagger')) || 0;
+      var dy2 = -final2 * progress;
+      labels[j].setAttribute('transform', 'translate(0, ' + dy2.toFixed(2) + ')');
+      var labelStart = stagger / 540;
+      var labelProgress = Math.max(0, Math.min(1, (progress - labelStart) / Math.max(0.001, 1 - labelStart)));
+      labels[j].setAttribute('opacity', labelProgress.toFixed(3));
     }
   }
 

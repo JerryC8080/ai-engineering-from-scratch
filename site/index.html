@@ -113,6 +113,41 @@
       color: var(--blueprint);
     }
 
+    .figure-demo {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .figure-demo-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--blueprint);
+      margin-bottom: 12px;
+    }
+
+    .figure-demo-caption {
+      max-width: 640px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin-bottom: 32px;
+    }
+
+    .figure-demo-svg {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .figure-demo-svg svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     .stat-block {
       padding: 56px 0;
       border-bottom: 1px solid var(--rule-soft);
@@ -520,15 +555,15 @@
         <span class="right">© 2026 — open source · MIT license</span>
       </div>
       <h1 class="manual-title">AI Engineering<br>from Scratch.</h1>
-      <p class="manual-tagline">A reference manual for people who want to design and build AI systems from first principles.</p>
-      <p class="manual-attribution">Written and maintained by Rohit Ghumare and contributors.</p>
+      <p class="manual-tagline reveal">A reference manual for people who want to design and build AI systems from first principles.</p>
+      <p class="manual-attribution reveal" style="--stagger-delay: 80ms;">Written and maintained by Rohit Ghumare and contributors.</p>
       <div class="ascii-rule" style="margin-top:48px;"></div>
     </section>
 
     <section class="preface container">
       <div class="preface-grid">
-        <div class="preface-eyebrow">Preface</div>
-        <div class="preface-body">
+        <div class="preface-eyebrow reveal reveal--left">Preface</div>
+        <div class="preface-body reveal" style="--stagger-delay: 120ms;">
           <p>Have you ever wondered how a transformer actually pays attention? Or what backpropagation is doing under the hood when your loss curve drops? Or why a tokenizer ends up splitting "playing" into three pieces?</p>
           <p>If you have, this is for you. This isn't a tutorial. It's a reference manual that explains how the things you use every day — from gradient descent to retrieval-augmented generation to multi-agent orchestration — actually work.</p>
           <p>It won't make you a better ML engineer tomorrow. There's nothing actionable in here you can paste into a Jupyter cell. But knowing how things work comes in handy when you're debugging a model that loses signal halfway through training, or you're trying to figure out why your agent keeps hallucinating tool calls.</p>
@@ -538,9 +573,86 @@
       <div class="ascii-rule"></div>
     </section>
 
+    <section class="figure-demo container">
+      <div class="figure-demo-eyebrow reveal reveal--left">FIG_001 · Curriculum Stack</div>
+      <p class="figure-demo-caption reveal" style="--stagger-delay: 80ms;">Twenty phases stack on top of each other. Math is the floor; agents and production are the roof. Scroll to see how the stack assembles.</p>
+      <div class="figure-demo-svg reveal" style="--stagger-delay: 120ms;" data-svg-explode>
+        <svg viewBox="0 0 760 520" role="img" aria-label="FIG_001 — animated curriculum stack" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="fdPaper" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+              <circle cx="0" cy="0" r="0.9" fill="currentColor" fill-opacity="0.08"/>
+            </pattern>
+          </defs>
+          <g style="color: var(--ink);">
+            <rect width="760" height="520" fill="url(#fdPaper)" opacity="0.5"/>
+          </g>
+
+          <!-- Stack: 7 panels. Each panel has a `data-base-y` attribute (final position) and starts collapsed at the same y as panel 7 (bottom). Scroll progress 0..1 lerps from collapsed → exploded. -->
+          <g transform="translate(140, 80)">
+            <g class="explode-layer" data-rest="0"   data-final="0">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="36">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="72">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="108">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="144">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="180">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.06)" stroke="#3553ff" stroke-width="1.2" stroke-linejoin="miter"/>
+            </g>
+            <g class="explode-layer" data-rest="0"   data-final="216">
+              <polygon points="0,260 132,234 332,247 200,273" fill="rgba(53, 83, 255, 0.18)" stroke="#3553ff" stroke-width="1.4" stroke-linejoin="miter"/>
+            </g>
+
+            <!-- Leader lines + labels (right column), revealed as progress passes -->
+            <g class="explode-labels" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="#3553ff">
+              <g class="explode-label" data-final="0"   data-stagger="0">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">SETUP &amp; TOOLING</text>
+              </g>
+              <g class="explode-label" data-final="36"  data-stagger="60">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">MATH FOUNDATIONS</text>
+              </g>
+              <g class="explode-label" data-final="72"  data-stagger="120">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">ML FUNDAMENTALS</text>
+              </g>
+              <g class="explode-label" data-final="108" data-stagger="180">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">DEEP LEARNING · RL</text>
+              </g>
+              <g class="explode-label" data-final="144" data-stagger="240">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">VISION · SPEECH · NLP</text>
+              </g>
+              <g class="explode-label" data-final="180" data-stagger="300">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">LLMS · TRANSFORMERS</text>
+              </g>
+              <g class="explode-label" data-final="216" data-stagger="360">
+                <line x1="340" y1="247" x2="416" y2="247" stroke="#3553ff" stroke-width="0.8" stroke-dasharray="3 3"/>
+                <text x="424" y="251">AGENTS · SWARMS · PROD</text>
+              </g>
+            </g>
+          </g>
+
+          <text x="40" y="36" font-family="JetBrains Mono, ui-monospace, monospace" font-size="10" letter-spacing="2" fill="#3553ff">FIG_001 — SCROLL TO ASSEMBLE</text>
+        </svg>
+      </div>
+      <div class="ascii-rule"></div>
+    </section>
+
     <section class="stat-block container">
-      <div class="stat-block-title">Current Progress</div>
-      <div class="stat-rows" id="statRows">
+      <div class="stat-block-title reveal reveal--left">Current Progress</div>
+      <div class="stat-rows reveal" style="--stagger-delay: 100ms;" id="statRows">
         <div class="stat-row">
           <span class="stat-row-label">Finished Lessons</span>
           <span class="stat-row-bar" data-bar="complete" style="--bar-pct:0%;" aria-hidden="true">bar</span>
@@ -566,8 +678,8 @@
     </section>
 
     <section class="toc container" id="contents">
-      <div class="toc-title">Table of Contents · v1.0</div>
-      <div class="toc-subtitle">Twenty phases. Click any phase to see its lessons.</div>
+      <div class="toc-title reveal reveal--left">Table of Contents · v1.0</div>
+      <div class="toc-subtitle reveal" style="--stagger-delay: 80ms;">Twenty phases. Click any phase to see its lessons.</div>
       <div class="toc-list" id="phasesGrid"></div>
       <div class="legend">
         <span class="legend-item"><span class="toc-status complete"></span> Complete</span>
@@ -596,8 +708,8 @@
 
     <section class="colophon container">
       <div class="colophon-grid">
-        <div class="colophon-eyebrow">Colophon</div>
-        <div>
+        <div class="colophon-eyebrow reveal reveal--left">Colophon</div>
+        <div class="reveal" style="--stagger-delay: 80ms;">
           <p>The entire curriculum is on GitHub. Clone it, fork it, learn at your own pace. No paywall, no signup. Every lesson has runnable code in Python, TypeScript, Rust, or Julia, depending on what fits the concept best.</p>
           <div class="colophon-cmd">
             <code id="cloneCmd">git clone https://github.com/rohitg00/ai-engineering-from-scratch.git</code>
