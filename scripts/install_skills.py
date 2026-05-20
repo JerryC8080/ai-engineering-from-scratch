@@ -269,7 +269,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument(
         "--json",
         action="store_true",
-        help="suppress human-readable output; manifest.json is always written",
+        help="suppress human-readable output (manifest.json still written unless --dry-run)",
     )
     args = parser.parse_args(argv)
 
@@ -298,7 +298,7 @@ def main(argv: list[str]) -> int:
                 f"dry run: {len(plan.actions)} artifact(s) -> {args.target_dir} "
                 f"(layout={args.layout})\n"
             )
-            for artifact, dest in plan.actions[:20]:
+            for artifact, _dest in plan.actions[:20]:
                 sys.stdout.write(
                     f"  [{artifact.type}] {artifact.name} "
                     f"<- {artifact.source.relative_to(ROOT)}\n"

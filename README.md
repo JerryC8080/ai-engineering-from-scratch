@@ -877,16 +877,38 @@ python3 scripts/install_skills.py ./out --phase 14                 # one phase o
 python3 scripts/install_skills.py ./out --tag rag                  # filter by tag
 python3 scripts/install_skills.py ./out --layout flat              # flat files instead of SkillKit
 python3 scripts/install_skills.py ./out --dry-run                  # preview without writing
+python3 scripts/install_skills.py ./out --force                    # overwrite existing files
 ```
 
-Every run writes a `manifest.json` in the target with the full inventory
-grouped by type and phase. Pick the layout your agent reads:
+By default the script refuses to overwrite an existing destination and exits
+with code 1 after listing every colliding path. Use `--dry-run` to preview
+collisions or `--force` to overwrite. Every non-dry-run run writes a
+`manifest.json` in the target with the full inventory grouped by type and
+phase. Pick the layout your agent reads:
 
 | `--layout`  | Path written |
 |---|---|
 | `skillkit`  | `<target>/<name>/SKILL.md` (Claude / Cursor / SkillKit) |
 | `by-phase`  | `<target>/phase-NN/<name>.md` |
 | `flat`      | `<target>/<name>.md` |
+
+### Drop the agent workbench into your own repo
+
+The Phase 14 capstone ships a reusable Agent Workbench pack (AGENTS.md, schemas,
+init / verify / handoff scripts). Scaffold it into any repo with:
+
+```bash
+python3 scripts/scaffold_workbench.py path/to/your-repo            # full pack + seeds
+python3 scripts/scaffold_workbench.py path/to/your-repo --minimal  # skip docs/
+python3 scripts/scaffold_workbench.py path/to/your-repo --dry-run  # preview only
+python3 scripts/scaffold_workbench.py path/to/your-repo --force    # overwrite
+```
+
+You get the seven workbench surfaces wired up, a starter `task_board.json`,
+and a fresh `agent_state.json` at `schema_version: 1`. From there: edit the
+task, edit `AGENTS.md`, run `scripts/init_agent.py`, hand the contract to
+your agent. The pack source lives at
+`phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/`.
 
 ## Where to start
 
