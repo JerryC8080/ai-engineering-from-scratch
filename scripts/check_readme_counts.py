@@ -233,13 +233,14 @@ def main(argv: list[str] | None = None) -> int:
     readme_text = README_PATH.read_text(encoding="utf-8")
 
     if args.fix:
-        new_text = apply_fixes(readme_text, totals)
-        if new_text == readme_text:
+        initial_mismatches = find_mismatches(readme_text, totals)
+        if not initial_mismatches:
             if args.json:
                 sys.stdout.write(render_json_report([], totals))
             else:
                 sys.stdout.write("README.md already matches catalog.json totals.\n")
             return 0
+        new_text = apply_fixes(readme_text, totals)
         README_PATH.write_text(new_text, encoding="utf-8")
         remaining = find_mismatches(new_text, totals)
         if args.json:
