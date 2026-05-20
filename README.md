@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
-  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-428-3553ff?style=flat-square&labelColor=fafaf5" alt="428 lessons"></a>
+  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-435-3553ff?style=flat-square&labelColor=fafaf5" alt="435 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="https://github.com/rohitg00/ai-engineering-from-scratch/stargazers"><img src="https://img.shields.io/github/stars/rohitg00/ai-engineering-from-scratch?style=flat-square&labelColor=fafaf5&color=3553ff" alt="GitHub stars"></a>
   <a href="https://aiengineeringfromscratch.com"><img src="https://img.shields.io/badge/web-aiengineeringfromscratch.com-3553ff?style=flat-square&labelColor=fafaf5" alt="Website"></a>
@@ -17,7 +17,7 @@
 > **84% of students already use AI tools. Only 18% feel prepared to use them
 > professionally.** This curriculum closes that gap.
 >
-> 428 lessons. 20 phases. ~320 hours. Python, TypeScript, Rust, Julia. Every lesson ships
+> 435 lessons. 20 phases. ~320 hours. Python, TypeScript, Rust, Julia. Every lesson ships
 > a reusable artifact: a prompt, a skill, an agent, an MCP server. Free, open source, MIT.
 >
 > You don't just learn AI. You build it. End-to-end. By hand.
@@ -29,7 +29,7 @@ flashy agent demo somewhere else. The pieces rarely line up. You ship a chatbot 
 explain its loss curve. You hook a function to an agent but can't say what attention does
 inside the model that's calling it.
 
-This curriculum is the spine. 20 phases, 428 lessons, four languages: Python, TypeScript,
+This curriculum is the spine. 20 phases, 435 lessons, four languages: Python, TypeScript,
 Rust, Julia. Linear algebra at one end, autonomous swarms at the other. Every algorithm
 gets built from raw math first. Backprop. Tokenizer. Attention. Agent loop. By the time
 PyTorch shows up, you already know what it's doing under the hood.
@@ -173,7 +173,7 @@ Other curricula end with *"congratulations, you learned X."* Each lesson here en
 </table>
 
 > Install the lot with [SkillKit](https://github.com/rohitg00/skillkit). Real tools, not
-> homework. By the end of the curriculum, you have a portfolio of 428 artifacts you actually
+> homework. By the end of the curriculum, you have a portfolio of 435 artifacts you actually
 > understand because you built them.
 
 ### FIG_002 · A worked sample
@@ -857,9 +857,7 @@ Every lesson produces a reusable artifact. By the end you have:
 ```
 outputs/
 ├── prompts/      prompt templates for every AI task
-├── skills/       SKILL.md files for AI coding agents
-├── agents/       agent definitions ready to deploy
-└── mcp-servers/  MCP servers built during the course
+└── skills/       SKILL.md files for AI coding agents
 ```
 
 Install them with [SkillKit](https://github.com/rohitg00/skillkit). Plug them into Claude, Cursor,
@@ -867,7 +865,7 @@ Codex, OpenClaw, Hermes, or any MCP-compatible agent. Real tools, not homework.
 
 ### Install every course skill into your agent
 
-The repo ships 373 skills, 99 prompts, and 6 agents under `phases/**/outputs/`.
+The repo ships 373 skills and 99 prompts under `phases/**/outputs/`.
 `scripts/install_skills.py` walks every artifact, parses YAML frontmatter, and
 copies the matching files into a target directory in the layout your agent
 expects.
@@ -1040,7 +1038,7 @@ relative links inside lesson docs.
 
 ## Sponsor the work
 
-Free, MIT-licensed, 428 lessons. The curriculum is maintained on sponsorship alone. Cash only.
+Free, MIT-licensed, 435 lessons. The curriculum is maintained on sponsorship alone. Cash only.
 
 **Reach (verified 2026-05-14):** 55,593 monthly visitors · 90,709 page views · 7.5K stars ·
 Twitter/X is the #1 acquisition channel.
