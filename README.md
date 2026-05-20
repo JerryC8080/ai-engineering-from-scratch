@@ -863,6 +863,35 @@ outputs/
 Install them with [SkillKit](https://github.com/rohitg00/skillkit). Plug them into Claude, Cursor,
 Codex, OpenClaw, Hermes, or any MCP-compatible agent. Real tools, not homework.
 
+### Install every course skill into your agent
+
+The repo ships 373 skills, 99 prompts, and 6 agents under `phases/**/outputs/`.
+`scripts/install_skills.py` walks every artifact, parses YAML frontmatter, and
+copies the matching files into a target directory in the layout your agent
+expects.
+
+```bash
+python3 scripts/install_skills.py ~/.claude/skills                 # every skill, SkillKit layout
+python3 scripts/install_skills.py ./out --type all                 # skills + prompts + agents
+python3 scripts/install_skills.py ./out --phase 14                 # one phase only
+python3 scripts/install_skills.py ./out --tag rag                  # filter by tag
+python3 scripts/install_skills.py ./out --layout flat              # flat files instead of SkillKit
+python3 scripts/install_skills.py ./out --dry-run                  # preview without writing
+python3 scripts/install_skills.py ./out --force                    # overwrite existing files
+```
+
+By default the script refuses to overwrite an existing destination and exits
+with code 1 after listing every colliding path. Use `--dry-run` to preview
+collisions or `--force` to overwrite. Every non-dry-run run writes a
+`manifest.json` in the target with the full inventory grouped by type and
+phase. Pick the layout your agent reads:
+
+| `--layout`  | Path written |
+|---|---|
+| `skillkit`  | `<target>/<name>/SKILL.md` (Claude / Cursor / SkillKit) |
+| `by-phase`  | `<target>/phase-NN/<name>.md` |
+| `flat`      | `<target>/<name>.md` |
+
 ### Drop the agent workbench into your own repo
 
 The Phase 14 capstone ships a reusable Agent Workbench pack (AGENTS.md, schemas,
