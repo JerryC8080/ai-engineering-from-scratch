@@ -1037,14 +1037,17 @@ Sign up via [GitHub Sponsors](https://github.com/sponsors/rohitg00).
 
 ## From the same author
 
-The curriculum teaches the primitives. These three repositories ship them in production —
-memory, reasoning, and a knowledge-base protocol — and compose into a full agent stack.
+The curriculum teaches the primitives. These repositories ship them in production:
+memory, reasoning, knowledge protocol, agent-skill toolchain, and an agent-workflow
+patterns library.
 
 | Repo | Stars | What it is |
 |---|---|---|
 | [agentmemory](https://github.com/rohitg00/agentmemory) | ![stars](https://img.shields.io/github/stars/rohitg00/agentmemory?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Persistent memory for AI coding agents. The state surface from Phase 14, productionized. |
 | [agentbrain](https://github.com/rohitg00/agentbrain) | ![stars](https://img.shields.io/github/stars/rohitg00/agentbrain?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Evidence-first operating system for agents. Reasoning + verification surfaces, end-to-end. |
 | [akbp](https://github.com/rohitg00/akbp) | ![stars](https://img.shields.io/github/stars/rohitg00/akbp?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Agent Knowledge Base Protocol. Handoff + knowledge layer between sessions and across agents. |
+| [skillkit](https://github.com/rohitg00/skillkit) | ![stars](https://img.shields.io/github/stars/rohitg00/skillkit?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Universal CLI to install skills across 32 AI coding agents (Claude, Cursor, Codex, OpenClaw, Hermes, ...). |
+| [pro-workflow](https://github.com/rohitg00/pro-workflow) | ![stars](https://img.shields.io/github/stars/rohitg00/pro-workflow?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Battle-tested Claude Code workflows. 8 patterns from power users: self-correction, parallel worktrees, split memory, learning logs. |
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
