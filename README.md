@@ -927,6 +927,19 @@ Codex, OpenClaw, Hermes, or any MCP-compatible agent. Real tools, not homework.
 | Glossary | [glossary/terms.md](glossary/terms.md) |
 | Code of conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
+Before submitting a lesson, run the invariant check:
+
+```bash
+python3 scripts/audit_lessons.py           # full curriculum
+python3 scripts/audit_lessons.py --phase 14  # single phase
+python3 scripts/audit_lessons.py --json    # CI-friendly output
+```
+
+Exit code is non-zero when any rule fails. Rules (L001–L010) validate directory
+shape, `docs/en.md` presence + H1, `code/` non-emptiness, `quiz.json` schema
+(rejects the legacy `q/choices/answer` keys that caused issue #102), and
+relative links inside lesson docs.
+
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
