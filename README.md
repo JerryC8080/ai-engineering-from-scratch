@@ -910,6 +910,28 @@ task, edit `AGENTS.md`, run `scripts/init_agent.py`, hand the contract to
 your agent. The pack source lives at
 `phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/`.
 
+### Browse the entire course as JSON
+
+`scripts/build_catalog.py` walks every phase, every lesson, every artifact on
+disk and writes `catalog.json` at the repo root. One file, every course truth.
+
+```bash
+python3 scripts/build_catalog.py               # writes <repo>/catalog.json
+python3 scripts/build_catalog.py --stdout      # to stdout, do not touch repo
+python3 scripts/build_catalog.py --out path/to/file.json
+```
+
+The catalog is filesystem-derived, not README-derived, so counts always match
+what is actually on disk. Use it for site builds, downstream tooling, or to
+verify the README counts have not drifted. Schema is documented at the top of
+the script.
+
+A GitHub Action (`.github/workflows/curriculum.yml`) rebuilds `catalog.json`
+on every PR and fails the build if the committed file is stale. After editing
+any lesson, run `python3 scripts/build_catalog.py` and commit the result, or
+CI will reject the PR. The same workflow runs `audit_lessons.py` in
+warn-only mode (so existing drift does not block contributors).
+
 ## Where to start
 
 | Background | Start at | Estimated time |
