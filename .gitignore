@@ -53,3 +53,5 @@ mlruns/
 *.bin
 *.h5
 .gstack/
+
+.link-cache.json

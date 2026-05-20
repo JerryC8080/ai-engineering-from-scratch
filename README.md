@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
-  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-428-3553ff?style=flat-square&labelColor=fafaf5" alt="428 lessons"></a>
+  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-435-3553ff?style=flat-square&labelColor=fafaf5" alt="435 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="https://github.com/rohitg00/ai-engineering-from-scratch/stargazers"><img src="https://img.shields.io/github/stars/rohitg00/ai-engineering-from-scratch?style=flat-square&labelColor=fafaf5&color=3553ff" alt="GitHub stars"></a>
   <a href="https://aiengineeringfromscratch.com"><img src="https://img.shields.io/badge/web-aiengineeringfromscratch.com-3553ff?style=flat-square&labelColor=fafaf5" alt="Website"></a>
@@ -17,7 +17,7 @@
 > **84% of students already use AI tools. Only 18% feel prepared to use them
 > professionally.** This curriculum closes that gap.
 >
-> 428 lessons. 20 phases. ~320 hours. Python, TypeScript, Rust, Julia. Every lesson ships
+> 435 lessons. 20 phases. ~320 hours. Python, TypeScript, Rust, Julia. Every lesson ships
 > a reusable artifact: a prompt, a skill, an agent, an MCP server. Free, open source, MIT.
 >
 > You don't just learn AI. You build it. End-to-end. By hand.
@@ -29,7 +29,7 @@ flashy agent demo somewhere else. The pieces rarely line up. You ship a chatbot 
 explain its loss curve. You hook a function to an agent but can't say what attention does
 inside the model that's calling it.
 
-This curriculum is the spine. 20 phases, 428 lessons, four languages: Python, TypeScript,
+This curriculum is the spine. 20 phases, 435 lessons, four languages: Python, TypeScript,
 Rust, Julia. Linear algebra at one end, autonomous swarms at the other. Every algorithm
 gets built from raw math first. Backprop. Tokenizer. Attention. Agent loop. By the time
 PyTorch shows up, you already know what it's doing under the hood.
@@ -173,7 +173,7 @@ Other curricula end with *"congratulations, you learned X."* Each lesson here en
 </table>
 
 > Install the lot with [SkillKit](https://github.com/rohitg00/skillkit). Real tools, not
-> homework. By the end of the curriculum, you have a portfolio of 428 artifacts you actually
+> homework. By the end of the curriculum, you have a portfolio of 435 artifacts you actually
 > understand because you built them.
 
 ### FIG_002 · A worked sample
@@ -675,6 +675,8 @@ Twenty phases. Click any phase to expand its lesson list.
 | 41 | [The Workbench on a Real Repo](phases/14-agent-engineering/41-workbench-for-real-repos/) | Build | Python |
 | 42 | [Capstone: Ship a Reusable Agent Workbench Pack](phases/14-agent-engineering/42-agent-workbench-capstone/) | Build | Python |
 
+Each Phase 14 workbench lesson (31-42) ships a `mission.md` briefing the agent before it opens the full lesson docs.
+
 </details>
 
 <details id="phase-15">
@@ -855,9 +857,7 @@ Every lesson produces a reusable artifact. By the end you have:
 ```
 outputs/
 ├── prompts/      prompt templates for every AI task
-├── skills/       SKILL.md files for AI coding agents
-├── agents/       agent definitions ready to deploy
-└── mcp-servers/  MCP servers built during the course
+└── skills/       SKILL.md files for AI coding agents
 ```
 
 Install them with [SkillKit](https://github.com/rohitg00/skillkit). Plug them into Claude, Cursor,
@@ -865,7 +865,7 @@ Codex, OpenClaw, Hermes, or any MCP-compatible agent. Real tools, not homework.
 
 ### Install every course skill into your agent
 
-The repo ships 373 skills, 99 prompts, and 6 agents under `phases/**/outputs/`.
+The repo ships 373 skills and 99 prompts under `phases/**/outputs/`.
 `scripts/install_skills.py` walks every artifact, parses YAML frontmatter, and
 copies the matching files into a target directory in the layout your agent
 expects.
@@ -952,6 +952,11 @@ python3 scripts/lesson_run.py --execute        # actually run, 10s timeout per l
 pkg2` comment listing non-stdlib deps are skipped with reason `needs <deps>`.
 The script is opt-in and not wired into CI.
 
+Stdlib only, Python 3.10+. Set `LINK_CHECK_SKIP=domain1,domain2` to override
+the default skip-list (`twitter.com`, `x.com`, `linkedin.com`,
+`instagram.com`, `medium.com` — domains that aggressively block automated
+HEAD/GET).
+
 ## Where to start
 
 | Background | Start at | Estimated time |
@@ -1035,7 +1040,7 @@ relative links inside lesson docs.
 
 ## Sponsor the work
 
-Free, MIT-licensed, 428 lessons. The curriculum is maintained on sponsorship alone. Cash only.
+Free, MIT-licensed, 435 lessons. The curriculum is maintained on sponsorship alone. Cash only.
 
 **Reach (verified 2026-05-14):** 55,593 monthly visitors · 90,709 page views · 7.5K stars ·
 Twitter/X is the #1 acquisition channel.
@@ -1057,14 +1062,17 @@ Sign up via [GitHub Sponsors](https://github.com/sponsors/rohitg00).
 
 ## From the same author
 
-The curriculum teaches the primitives. These three repositories ship them in production —
-memory, reasoning, and a knowledge-base protocol — and compose into a full agent stack.
+The curriculum teaches the primitives. These repositories ship them in production:
+memory, reasoning, knowledge protocol, agent-skill toolchain, and an agent-workflow
+patterns library.
 
 | Repo | Stars | What it is |
 |---|---|---|
 | [agentmemory](https://github.com/rohitg00/agentmemory) | ![stars](https://img.shields.io/github/stars/rohitg00/agentmemory?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Persistent memory for AI coding agents. The state surface from Phase 14, productionized. |
 | [agentbrain](https://github.com/rohitg00/agentbrain) | ![stars](https://img.shields.io/github/stars/rohitg00/agentbrain?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Evidence-first operating system for agents. Reasoning + verification surfaces, end-to-end. |
 | [akbp](https://github.com/rohitg00/akbp) | ![stars](https://img.shields.io/github/stars/rohitg00/akbp?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Agent Knowledge Base Protocol. Handoff + knowledge layer between sessions and across agents. |
+| [skillkit](https://github.com/rohitg00/skillkit) | ![stars](https://img.shields.io/github/stars/rohitg00/skillkit?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Universal CLI to install skills across 32 AI coding agents (Claude, Cursor, Codex, OpenClaw, Hermes, ...). |
+| [pro-workflow](https://github.com/rohitg00/pro-workflow) | ![stars](https://img.shields.io/github/stars/rohitg00/pro-workflow?style=flat-square&label=%E2%98%85&color=3553ff&labelColor=fafaf5) | Battle-tested Claude Code workflows. 8 patterns from power users: self-correction, parallel worktrees, split memory, learning logs. |
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
