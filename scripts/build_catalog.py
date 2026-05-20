@@ -199,18 +199,23 @@ def build_lesson_entry(lesson_dir: Path) -> dict[str, object] | None:
     outputs_dir = lesson_dir / "outputs"
     notebook_dir = lesson_dir / "notebook"
     quiz_path = lesson_dir / "quiz.json"
+    code_files = list_code_files(code_dir)
+    outputs = list_outputs(outputs_dir)
+    has_docs = docs_path.is_file()
+    if not has_docs and not code_files and not outputs and not quiz_path.is_file():
+        return None
     title = read_h1(docs_path) or slug_to_title(slug)
     return {
         "num": num,
         "slug": lesson_dir.name,
         "title": title,
         "path": lesson_dir.relative_to(ROOT).as_posix(),
-        "has_docs": docs_path.is_file(),
+        "has_docs": has_docs,
         "has_code": code_dir.is_dir(),
         "has_quiz": quiz_path.is_file(),
         "has_notebook": notebook_dir.is_dir(),
-        "code_files": list_code_files(code_dir),
-        "outputs": list_outputs(outputs_dir),
+        "code_files": code_files,
+        "outputs": outputs,
     }
 
 

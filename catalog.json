@@ -2,7 +2,7 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 436,
+    "lessons": 435,
     "skills": 373,
     "prompts": 99,
     "agents": 0,
@@ -5080,7 +5080,7 @@
       "num": 10,
       "slug": "10-llms-from-scratch",
       "title": "LLMs From Scratch",
-      "lesson_count": 25,
+      "lesson_count": 24,
       "lessons": [
         {
           "num": 1,
@@ -5650,18 +5650,6 @@
               ]
             }
           ]
-        },
-        {
-          "num": 18,
-          "slug": "18-synthetic-data-pipelines",
-          "title": "Synthetic Data Pipelines",
-          "path": "phases/10-llms-from-scratch/18-synthetic-data-pipelines",
-          "has_docs": false,
-          "has_code": true,
-          "has_quiz": false,
-          "has_notebook": false,
-          "code_files": [],
-          "outputs": []
         },
         {
           "num": 19,
