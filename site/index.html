@@ -108,6 +108,12 @@
       height: auto;
     }
 
+    .hero-repo-link { cursor: pointer; }
+    .hero-repo-link .hrepo-rect { transition: fill 0.15s; }
+    .hero-repo-link:hover .hrepo-rect { fill: rgba(53, 83, 255, 0.18); }
+    .hero-repo-link:focus { outline: none; }
+    .hero-repo-link:focus .hrepo-rect { stroke-width: 2; }
+
     @media (max-width: 1024px) {
       .manual-hero-grid { grid-template-columns: 1fr; gap: 32px; }
       .manual-hero-stack { max-width: 420px; }
@@ -757,12 +763,14 @@
             </style>
 
             <!-- agentbrain (top) -->
-            <g transform="translate(60, 16)">
-              <rect width="200" height="56" class="hbp-tint" stroke="#3553ff"/>
-              <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · REASONING</text>
-              <text x="12" y="40" class="hmono hink" font-size="14" font-weight="500">agentbrain</text>
-              <text x="188" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="agentbrain">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/agentbrain" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(60, 16)">
+                <rect width="200" height="56" class="hbp-tint hrepo-rect" stroke="#3553ff"/>
+                <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · REASONING</text>
+                <text x="12" y="40" class="hmono hink" font-size="13">agentbrain</text>
+                <text x="188" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="agentbrain">★ ...</text>
+              </g>
+            </a>
 
             <!-- arrow brain -> agent -->
             <line x1="160" y1="72" x2="160" y2="118" class="hflow"/>
@@ -787,12 +795,14 @@
             <text x="115" y="240" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">READ / WRITE</text>
 
             <!-- agentmemory -->
-            <g transform="translate(0, 262)">
-              <rect width="148" height="56" class="hbp-tint" stroke="#3553ff"/>
-              <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · MEMORY</text>
-              <text x="12" y="40" class="hmono hink" font-size="14" font-weight="500">agentmemory</text>
-              <text x="136" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="agentmemory">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/agentmemory" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(0, 262)">
+                <rect width="148" height="56" class="hbp-tint hrepo-rect" stroke="#3553ff"/>
+                <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · MEMORY</text>
+                <text x="12" y="40" class="hmono hink" font-size="13">agentmemory</text>
+                <text x="136" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="agentmemory">★ ...</text>
+              </g>
+            </a>
 
             <!-- arrow agent -> akbp -->
             <line x1="220" y1="214" x2="220" y2="258" class="hflow"/>
@@ -802,12 +812,14 @@
             <polyline points="229,220 234,214 239,220" class="hflow"/>
 
             <!-- akbp -->
-            <g transform="translate(172, 262)">
-              <rect width="148" height="56" class="hbp-tint" stroke="#3553ff"/>
-              <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · KNOWLEDGE</text>
-              <text x="12" y="40" class="hmono hink" font-size="14" font-weight="500">akbp</text>
-              <text x="136" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="akbp">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/akbp" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(172, 262)">
+                <rect width="148" height="56" class="hbp-tint hrepo-rect" stroke="#3553ff"/>
+                <text x="12" y="20" class="hmono hbp-fill" font-size="8" letter-spacing="1.4">REPO · KNOWLEDGE</text>
+                <text x="12" y="40" class="hmono hink" font-size="13">akbp</text>
+                <text x="136" y="50" text-anchor="end" class="hmono hbp-fill" font-size="10" data-eco-svg-stars="akbp">★ ...</text>
+              </g>
+            </a>
 
             <!-- divider -->
             <line x1="0" y1="338" x2="320" y2="338" stroke="#3553ff" stroke-opacity="0.25" stroke-width="0.6"/>
@@ -925,31 +937,37 @@
             </g>
 
             <!-- Left module: agentmemory -->
-            <g transform="translate(60, 180)">
-              <rect width="220" height="100" class="bp-tint" stroke="#3553ff" stroke-width="1.5"/>
-              <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · MEMORY SURFACE</text>
-              <text x="14" y="56" class="mono ink" font-size="18" font-weight="500">agentmemory</text>
-              <text x="14" y="78" class="serif ink-mute" font-size="13">persistent memory for AI coding agents.</text>
-              <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="agentmemory">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/agentmemory" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(60, 180)">
+                <rect width="220" height="100" class="bp-tint hrepo-rect" stroke="#3553ff" stroke-width="1.5"/>
+                <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · MEMORY SURFACE</text>
+                <text x="14" y="56" class="mono ink" font-size="17">agentmemory</text>
+                <text x="14" y="78" class="serif ink-mute" font-size="13">persistent memory for AI coding agents.</text>
+                <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="agentmemory">★ ...</text>
+              </g>
+            </a>
 
             <!-- Top module: agentbrain -->
-            <g transform="translate(440, 30)">
-              <rect width="220" height="100" class="bp-tint" stroke="#3553ff" stroke-width="1.5"/>
-              <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · REASONING SURFACE</text>
-              <text x="14" y="56" class="mono ink" font-size="18" font-weight="500">agentbrain</text>
-              <text x="14" y="78" class="serif ink-mute" font-size="13">evidence-first operating system for agents.</text>
-              <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="agentbrain">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/agentbrain" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(440, 30)">
+                <rect width="220" height="100" class="bp-tint hrepo-rect" stroke="#3553ff" stroke-width="1.5"/>
+                <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · REASONING SURFACE</text>
+                <text x="14" y="56" class="mono ink" font-size="17">agentbrain</text>
+                <text x="14" y="78" class="serif ink-mute" font-size="13">evidence-first operating system for agents.</text>
+                <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="agentbrain">★ ...</text>
+              </g>
+            </a>
 
             <!-- Right module: akbp -->
-            <g transform="translate(820, 180)">
-              <rect width="220" height="100" class="bp-tint" stroke="#3553ff" stroke-width="1.5"/>
-              <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · KNOWLEDGE SURFACE</text>
-              <text x="14" y="56" class="mono ink" font-size="18" font-weight="500">akbp</text>
-              <text x="14" y="78" class="serif ink-mute" font-size="13">agent knowledge base protocol.</text>
-              <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="akbp">★ ...</text>
-            </g>
+            <a href="https://github.com/rohitg00/akbp" target="_blank" rel="noopener" class="hero-repo-link">
+              <g transform="translate(820, 180)">
+                <rect width="220" height="100" class="bp-tint hrepo-rect" stroke="#3553ff" stroke-width="1.5"/>
+                <text x="14" y="28" class="mono bp-fill" font-size="9" letter-spacing="1.6">REPO · KNOWLEDGE SURFACE</text>
+                <text x="14" y="56" class="mono ink" font-size="17">akbp</text>
+                <text x="14" y="78" class="serif ink-mute" font-size="13">agent knowledge base protocol.</text>
+                <text x="206" y="94" text-anchor="end" class="mono bp-fill" font-size="11" data-eco-svg-stars="akbp">★ ...</text>
+              </g>
+            </a>
 
             <!-- Flow: agentmemory <-> AGENT (one label, two arrowheads) -->
             <line x1="280" y1="230" x2="440" y2="230" class="flow"/>
