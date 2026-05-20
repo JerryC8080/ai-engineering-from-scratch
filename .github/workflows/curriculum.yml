@@ -25,14 +25,17 @@ jobs:
   audit:
     name: invariant checks (warn-only)
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: run scripts/audit_lessons.py
+        continue-on-error: true
         run: python3 scripts/audit_lessons.py
+      - name: warn-only note
+        run: |
+          echo "::notice::audit results above are warn-only until the 11 backlog issues are fixed in a follow-up PR"
 
   catalog-drift:
     name: catalog.json drift check
