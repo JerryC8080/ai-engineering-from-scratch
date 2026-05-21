@@ -1306,61 +1306,6 @@
       white-space: nowrap;
     }
 
-    .tools-card {
-      margin-top: 32px;
-      padding: 16px;
-      border: 1px solid var(--rule-soft);
-      background: var(--bg-surface);
-    }
-    .tools-card-header {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink-mute);
-      margin-bottom: 14px;
-    }
-    .tools-card-item {
-      display: block;
-      padding: 12px 0;
-      text-decoration: none;
-      color: var(--ink);
-      border-top: 1px solid var(--rule-soft);
-    }
-    .tools-card-item:first-of-type { border-top: none; padding-top: 0; }
-    .tools-card-item:hover { color: var(--blueprint); }
-    .tools-card-name {
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      font-weight: 500;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .tools-card-stars {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--ink-mute);
-      white-space: nowrap;
-    }
-    .tools-card-desc {
-      font-family: var(--font-body);
-      font-size: 0.86rem;
-      color: var(--ink-soft);
-      line-height: 1.4;
-      margin-top: 4px;
-    }
-    .tools-card-foot {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--rule-soft);
-      font-family: var(--font-body);
-      font-size: 0.78rem;
-      color: var(--ink-mute);
-      font-style: italic;
-      line-height: 1.4;
-    }
 
     .phase-progress-bar {
       width: 100%;
@@ -1947,55 +1892,6 @@
         });
       }
 
-      var TOOLS = [
-        { repo: 'agentmemory', name: 'agentmemory', desc: 'Persistent memory for AI coding agents.' },
-        { repo: 'agentbrain',  name: 'agentbrain',  desc: 'Evidence-first operating system for agents.' },
-        { repo: 'akbp',        name: 'akbp',        desc: 'Agent Knowledge Base Protocol.' }
-      ];
-
-      function formatStars(n) {
-        if (typeof n !== 'number') return '';
-        if (n >= 1000) return '★ ' + (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-        return '★ ' + String(n);
-      }
-
-      function fetchStars(repo) {
-        var key = 'aifs:stars:' + repo;
-        try {
-          var cached = JSON.parse(localStorage.getItem(key));
-          if (cached && Date.now() - cached.ts < 6 * 3600 * 1000) return Promise.resolve(cached.count);
-        } catch (e) {}
-        return fetch('https://api.github.com/repos/rohitg00/' + repo).then(function (r) {
-          if (!r.ok) throw new Error('gh-' + r.status);
-          return r.json();
-        }).then(function (data) {
-          var count = data.stargazers_count;
-          try { localStorage.setItem(key, JSON.stringify({ count: count, ts: Date.now() })); } catch (e) {}
-          return count;
-        });
-      }
-
-      function renderToolsCard(sidebar) {
-        if (!sidebar || sidebar.querySelector('.tools-card')) return;
-        var html = '<div class="tools-card">';
-        html += '<div class="tools-card-header">Tools we maintain</div>';
-        TOOLS.forEach(function (t) {
-          html += '<a class="tools-card-item" href="https://github.com/rohitg00/' + t.repo + '" target="_blank" rel="noopener">';
-          html += '<div class="tools-card-name"><span>' + escapeHtml(t.name) + '</span><span class="tools-card-stars" data-repo="' + escapeAttr(t.repo) + '"></span></div>';
-          html += '<div class="tools-card-desc">' + escapeHtml(t.desc) + '</div>';
-          html += '</a>';
-        });
-        html += '<div class="tools-card-foot">Memory + reasoning + knowledge protocol for agents and harnesses.</div>';
-        html += '</div>';
-        sidebar.insertAdjacentHTML('beforeend', html);
-        TOOLS.forEach(function (t) {
-          fetchStars(t.repo).then(function (count) {
-            var el = sidebar.querySelector('.tools-card-stars[data-repo="' + t.repo + '"]');
-            if (el) el.textContent = formatStars(count);
-          }).catch(function () { /* rate limit, silent */ });
-        });
-      }
-
       function buildTOC() {
         var sidebar = document.getElementById('tocSidebar');
         if (!sidebar) return;
@@ -2003,7 +1899,6 @@
         var article = document.querySelector('.lesson-article');
         if (!article) {
           sidebar.innerHTML = '';
-          renderToolsCard(sidebar);
           sidebar.removeAttribute('aria-hidden');
           return;
         }
@@ -2011,7 +1906,6 @@
         var headings = article.querySelectorAll('h2, h3');
         if (!headings.length) {
           sidebar.innerHTML = '';
-          renderToolsCard(sidebar);
           sidebar.removeAttribute('aria-hidden');
           return;
         }
@@ -2058,7 +1952,6 @@
         }
         html += '</ul></nav>';
         sidebar.innerHTML = html;
-        renderToolsCard(sidebar);
         sidebar.removeAttribute('aria-hidden');
 
         sidebar.querySelectorAll('.toc-link').forEach(function (a) {
