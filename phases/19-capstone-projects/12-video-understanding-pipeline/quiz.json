@@ -1,0 +1,90 @@
+{
+  "lesson": "12-video-understanding-pipeline",
+  "title": "Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Why is a scene-level index still needed even when a long-context VLM can read a 2-hour video natively?",
+      "options": [
+        "Long-context VLMs cannot stream output",
+        "Ingesting 100 hours of video into a queryable corpus needs scene-level retrieval, even when individual videos can be read whole",
+        "Scene cuts are the only thing a VLM understands",
+        "Vector indexes do not support video files"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "pre",
+      "question": "Which three vector types does each scene get in the multi-vector index?",
+      "options": [
+        "Caption embedding, keyframe embedding, and transcript embedding",
+        "Audio waveform, mel-spectrogram, and MFCCs",
+        "Hash, gzip, and CRC",
+        "Pose, depth, and optical flow"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "How are results from the three retrieval streams merged at query time?",
+      "options": [
+        "By taking the union without scoring",
+        "Via reciprocal rank fusion across the three ranked lists",
+        "By picking the caption hit only",
+        "By averaging cosine similarities"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "What does the temporal grounding step refine inside the top scene?",
+      "options": [
+        "The keyframe embedding dimensionality",
+        "The (start, end) timestamp window that contains the answer",
+        "The transcript word timestamps from Whisper",
+        "The number of vectors stored in Qdrant"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "Which question class is reported separately because it is a known hallucination hotspot?",
+      "options": [
+        "Descriptive questions about scenery",
+        "Counting and action-type questions, where VLMs miscount or mis-order events",
+        "Speaker identification questions",
+        "Translation questions"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "Which grounding metric does the rubric measure on a held-out set?",
+      "options": [
+        "MRR@10",
+        "Temporal-grounding intersection-over-union (IoU)",
+        "Perplexity",
+        "Acceptance rate"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "Why does the pipeline require cited timestamps in answers?",
+      "options": [
+        "Timestamps are required by Qdrant payloads",
+        "They let the viewer jump to the exact (video_id, start, end) so users can verify the claim",
+        "They reduce the embedding dimension",
+        "Timestamps are required by Whisper output"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ]
+}
