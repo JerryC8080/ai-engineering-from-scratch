@@ -1,0 +1,78 @@
+{
+  "lesson": "26-model-system-dataset-cards",
+  "title": "Model, System, and Dataset Cards",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Which best describes the original Mitchell et al. (2019) Model Card?",
+      "options": [
+        "A regulatory legal contract",
+        "A 'nutrition label' for ML models: training data, intended use, factors, metrics, evaluation data, training data, quantitative disaggregated analyses, ethical considerations, caveats",
+        "A model checkpoint manifest only",
+        "An OpenAPI specification"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "What did Oreamuno et al. (2023) find about ethical-considerations adoption in Hugging Face model cards?",
+      "options": [
+        "Approximately 80% document ethical considerations",
+        "Approximately 0.3% document ethical considerations",
+        "All model cards document them",
+        "No model card has any text at all"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "What does Pushkarna et al. (Google 2022) Data Cards' telescopic / periscopic / microscopic layering provide?",
+      "options": [
+        "A boundary-object framing where the same document serves different readers (non-experts, ML practitioners, auditors) via three zoom levels of detail",
+        "A telescope-themed visualization library",
+        "A privacy-preserving query interface",
+        "A pre-RLHF audit checklist"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "What scope does a System Card cover that Model Cards do not?",
+      "options": [
+        "Only the tokenizer",
+        "End-to-end AI system: model + safety stack + deployment context, including security capabilities, prompt-injection protection, data-exfiltration detection, alignment, and incident response",
+        "Only the dataset",
+        "Only the prompt template"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "What did Liang et al. (2024) report about model-card detail and Hugging Face download rate?",
+      "options": [
+        "Detail had no effect on downloads",
+        "Detailed model cards correlate with up to 29% higher download rates on HF; adoption pressure is now market-driven, not only compliance-driven",
+        "Detail decreased download rates",
+        "Only ethical-considerations sections affected downloads"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "What does Laminator (Duddu et al. 2024) contribute to documentation?",
+      "options": [
+        "An LLM-based summary generator",
+        "Verifiable attestations via hardware TEE / cryptographic signatures, so the card can carry a proof-of-claim instead of just a claim",
+        "An automated benchmarking harness",
+        "A replacement for the Datasheets standard"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ]
+}
