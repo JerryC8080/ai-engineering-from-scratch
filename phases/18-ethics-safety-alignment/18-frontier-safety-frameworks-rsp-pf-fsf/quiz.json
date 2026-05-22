@@ -1,0 +1,78 @@
+{
+  "lesson": "18-frontier-safety-frameworks-rsp-pf-fsf",
+  "title": "Frontier Safety Frameworks - RSP, PF, FSF",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "What does Anthropic's ASL structure model itself on?",
+      "options": [
+        "Internet RFC tiers",
+        "Biosafety levels (BSL)",
+        "ITIL incident severities",
+        "EU AI Act categories"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "Which OpenAI Preparedness Framework v2 criterion captures 'harm occurs fast or cannot be undone'?",
+      "options": [
+        "Plausible",
+        "Measurable",
+        "Net-new",
+        "Instantaneous-or-irremediable"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "Which Critical Capability Level was added to DeepMind's FSF v3.0 (September 2025)?",
+      "options": [
+        "Cyber Uplift",
+        "Bioweapon Uplift",
+        "Harmful Manipulation",
+        "ML R&D Acceleration"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "What is a 'competitor-adjustment clause' in the 2025+ frontier safety frameworks?",
+      "options": [
+        "A pricing rule for API access",
+        "A provision allowing a lab to reduce safety requirements if peer labs ship without comparable safeguards",
+        "An export-control exemption",
+        "A model-card disclosure requirement"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "What are the three standard pillars of a safety case as described in the lesson?",
+      "options": [
+        "Speed, accuracy, cost",
+        "Monitoring, illegibility, incapability",
+        "Helpful, honest, harmless",
+        "Inner, outer, mesa"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "Which structural alignment exists across Anthropic's 'Capability Thresholds,' OpenAI's 'High Capability thresholds,' and DeepMind's 'Critical Capability Levels'?",
+      "options": [
+        "Identical terminology and numeric cutoffs",
+        "Structural alignment: tiered frontier-capability thresholds with published evaluation criteria, even though terminology differs",
+        "All three use the exact same evaluations",
+        "None are publicly documented"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ]
+}
