@@ -11382,7 +11382,7 @@
           "path": "phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11412,7 +11412,7 @@
           "path": "phases/18-ethics-safety-alignment/02-reward-hacking-goodhart",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11441,7 +11441,7 @@
           "path": "phases/18-ethics-safety-alignment/03-direct-preference-optimization-family",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11473,7 +11473,7 @@
           "path": "phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11501,7 +11501,7 @@
           "path": "phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11530,7 +11530,7 @@
           "path": "phases/18-ethics-safety-alignment/06-mesa-optimization-deceptive-alignment",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11558,7 +11558,7 @@
           "path": "phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11587,7 +11587,7 @@
           "path": "phases/18-ethics-safety-alignment/08-in-context-scheming-frontier-models",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11616,7 +11616,7 @@
           "path": "phases/18-ethics-safety-alignment/09-alignment-faking",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11644,7 +11644,7 @@
           "path": "phases/18-ethics-safety-alignment/10-ai-control-subversion",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11673,7 +11673,7 @@
           "path": "phases/18-ethics-safety-alignment/11-scalable-oversight-weak-to-strong",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11702,7 +11702,7 @@
           "path": "phases/18-ethics-safety-alignment/12-red-teaming-pair-automated-attacks",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11732,7 +11732,7 @@
           "path": "phases/18-ethics-safety-alignment/13-many-shot-jailbreaking",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11760,7 +11760,7 @@
           "path": "phases/18-ethics-safety-alignment/14-ascii-art-visual-jailbreaks",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11789,7 +11789,7 @@
           "path": "phases/18-ethics-safety-alignment/15-indirect-prompt-injection",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11818,7 +11818,7 @@
           "path": "phases/18-ethics-safety-alignment/16-red-team-tooling-garak-llamaguard-pyrit",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11847,7 +11847,7 @@
           "path": "phases/18-ethics-safety-alignment/17-wmdp-dual-use-evaluation",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11877,7 +11877,7 @@
           "path": "phases/18-ethics-safety-alignment/18-frontier-safety-frameworks-rsp-pf-fsf",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11906,7 +11906,7 @@
           "path": "phases/18-ethics-safety-alignment/19-model-welfare-research",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11934,7 +11934,7 @@
           "path": "phases/18-ethics-safety-alignment/20-bias-representational-harm",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11963,7 +11963,7 @@
           "path": "phases/18-ethics-safety-alignment/21-fairness-criteria-group-individual-counterfactual",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -11992,7 +11992,7 @@
           "path": "phases/18-ethics-safety-alignment/22-differential-privacy-for-llms",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12021,7 +12021,7 @@
           "path": "phases/18-ethics-safety-alignment/23-watermarking-synthid-stable-signature-c2pa",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12050,7 +12050,7 @@
           "path": "phases/18-ethics-safety-alignment/24-regulatory-frameworks-eu-us-uk-korea",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12079,7 +12079,7 @@
           "path": "phases/18-ethics-safety-alignment/25-echoleak-cves-for-ai",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12108,7 +12108,7 @@
           "path": "phases/18-ethics-safety-alignment/26-model-system-dataset-cards",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12137,7 +12137,7 @@
           "path": "phases/18-ethics-safety-alignment/27-data-provenance-training-governance",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12166,7 +12166,7 @@
           "path": "phases/18-ethics-safety-alignment/28-alignment-research-ecosystem",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12196,7 +12196,7 @@
           "path": "phases/18-ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
@@ -12225,7 +12225,7 @@
           "path": "phases/18-ethics-safety-alignment/30-dual-use-risk-cyber-bio-chem-nuclear",
           "has_docs": true,
           "has_code": true,
-          "has_quiz": false,
+          "has_quiz": true,
           "has_notebook": true,
           "code_files": [
             "main.py"
