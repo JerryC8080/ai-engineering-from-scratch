@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "How does the lesson distinguish representational harm from allocational harm?",
       "options": [
-        "Representational is computational; allocational is statistical",
+        "Representational harm only matters for vision models",
         "Representational harm is stereotypes / erasure / demeaning portrayal; allocational harm is unequal material outcomes for a group",
-        "Allocational harm only occurs offline",
-        "Representational harm only matters for vision models"
+        "Representational is computational; allocational is statistical",
+        "Allocational harm only occurs offline"
       ],
       "correct": 1,
       "explanation": ""
@@ -18,60 +18,60 @@
       "stage": "check",
       "question": "Which of these are the three evaluation-metric categories from Gallegos et al. 2024?",
       "options": [
-        "Embedding-based, probability-based, generated-text-based",
-        "WEAT, BLEU, ROUGE",
         "Pre-RLHF, mid-RLHF, post-RLHF",
-        "Vision, audio, text"
+        "Vision, audio, text",
+        "WEAT, BLEU, ROUGE",
+        "Embedding-based, probability-based, generated-text-based"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Why is intersectional fairness evaluation needed in addition to single-axis evaluation?",
       "options": [
+        "Intersectionality is the same as cross-validation",
         "Single-axis measures are computationally cheaper",
-        "Bias that only emerges at intersections (e.g., gender x race) is missed by evaluations that look at one axis at a time",
         "Single-axis is the only legally allowed approach",
-        "Intersectionality is the same as cross-validation"
+        "Bias that only emerges at intersections (e.g., gender x race) is missed by evaluations that look at one axis at a time"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What does WinoIdentity (COLM 2025) introduce?",
       "options": [
-        "A new tokenizer for identity terms",
-        "Uncertainty-based intersectional fairness evaluation that compares the model's uncertainty over outcomes across intersectional identity tuples, not just point predictions",
         "An adversarial attack on demographic classifiers",
-        "A replacement for WEAT in embedding space"
+        "A new tokenizer for identity terms",
+        "A replacement for WEAT in embedding space",
+        "Uncertainty-based intersectional fairness evaluation that compares the model's uncertainty over outcomes across intersectional identity tuples, not just point predictions"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Which of these is a mechanistic-interpretability approach to bias?",
       "options": [
-        "Re-labeling the training set",
-        "Adding more KL regularization",
+        "Switching to DPO from PPO",
         "Identifying gender neurons in MLP layers, using SAEs to surface race-correlated features, or manipulating specific attention heads (UniBias)",
-        "Switching to DPO from PPO"
+        "Adding more KL regularization",
+        "Re-labeling the training set"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "What does the 10-year meta-critique (arXiv:2508.11067) argue about the bias literature?",
       "options": [
-        "It is balanced across all identity axes",
         "It disproportionately focuses on binary-gender bias, neglecting other axes (disability, religion, migration status, multi-lingual identity) that may harm marginalized groups by neglect",
+        "It avoids quantitative methods",
         "It overemphasizes intersectionality",
-        "It avoids quantitative methods"
+        "It is balanced across all identity axes"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

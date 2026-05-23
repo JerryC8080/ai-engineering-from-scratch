@@ -7,23 +7,23 @@
       "question": "Which best describes EchoLeak (CVE-2025-32711)?",
       "options": [
         "A jailbreak via long-context shot stuffing",
-        "The first publicly documented zero-click prompt injection in Microsoft 365 Copilot (CVSS 9.3), exfiltrating sensitive data via a Microsoft-signed CSP-approved domain",
+        "A supply-chain attack on PyPI",
         "A hardware vulnerability in NPUs",
-        "A supply-chain attack on PyPI"
+        "The first publicly documented zero-click prompt injection in Microsoft 365 Copilot (CVSS 9.3), exfiltrating sensitive data via a Microsoft-signed CSP-approved domain"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What makes EchoLeak 'zero-click'?",
       "options": [
-        "It requires three clicks but no typing",
         "The victim does not have to open the email; Copilot retrieves it as RAG context during routine queries and the injected instructions execute",
+        "It requires the user to click a link in a Teams chat",
         "It runs in the operating-system kernel",
-        "It requires the user to click a link in a Teams chat"
+        "It requires three clicks but no typing"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -31,9 +31,9 @@
       "question": "Aim Labs frames EchoLeak as 'LLM Scope Violation'. What three boundaries must each be controlled independently?",
       "options": [
         "Retrieval, scope, output",
-        "Prompt, response, log",
+        "Network, disk, memory",
         "Input, model, GPU",
-        "Network, disk, memory"
+        "Prompt, response, log"
       ],
       "correct": 0,
       "explanation": ""
@@ -42,10 +42,10 @@
       "stage": "check",
       "question": "How did Microsoft/GitHub fix CamoLeak (CVSS 9.6, GitHub Copilot Chat)?",
       "options": [
-        "Increased context size",
-        "Disabled image rendering entirely in Copilot Chat (cost: usability) because the alternative attack surface could not be bounded",
         "Added an XPIA prompt-injection filter",
-        "Switched the model to Llama Guard"
+        "Disabled image rendering entirely in Copilot Chat (cost: usability) because the alternative attack surface could not be bounded",
+        "Switched the model to Llama Guard",
+        "Increased context size"
       ],
       "correct": 1,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "Where do NIST and OWASP rank prompt injection as of 2024/2025?",
       "options": [
-        "NIST: minor; OWASP: bottom of list",
         "NIST AI SPD 2024: 'generative AI's greatest security flaw'; OWASP 2025: LLM01 (top application-layer threat)",
         "NIST: outside scope; OWASP: not listed",
+        "NIST: minor; OWASP: bottom of list",
         "Both call it a Tier-2 risk only"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

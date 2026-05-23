@@ -7,11 +7,11 @@
       "question": "Which best matches the demographic-parity definition for groups A=a and A=a'?",
       "options": [
         "Equal true-positive and false-positive rates across groups",
-        "Equal acceptance rates: P(Y=1 | A=a) = P(Y=1 | A=a')",
         "Equal predictive value across groups",
-        "Equal Lipschitz constant across groups"
+        "Equal Lipschitz constant across groups",
+        "Equal acceptance rates: P(Y=1 | A=a) = P(Y=1 | A=a')"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -20,8 +20,8 @@
       "options": [
         "Group fairness is always achievable by re-weighting",
         "Under unequal base rates, demographic parity, equalized odds, and conditional use accuracy equality cannot all hold simultaneously",
-        "Individual fairness implies counterfactual fairness for any DAG",
-        "Counterfactual fairness implies demographic parity"
+        "Counterfactual fairness implies demographic parity",
+        "Individual fairness implies counterfactual fairness for any DAG"
       ],
       "correct": 1,
       "explanation": ""
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "Dwork et al. 2012 define individual fairness via:",
       "options": [
+        "Demographic parity at the individual level",
         "Equal accuracy across protected groups",
         "A Lipschitz condition on the decision map relative to a task-specific similarity metric, so similar individuals get similar decisions",
-        "A causal DAG with a sensitive-attribute intervention",
-        "Demographic parity at the individual level"
+        "A causal DAG with a sensitive-attribute intervention"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,33 +43,33 @@
       "question": "Counterfactual fairness (Kusner et al. 2017) requires:",
       "options": [
         "No causal assumptions",
-        "A causal DAG; the decision is unchanged when the individual's sensitive attribute is counterfactually altered",
+        "Equal Lipschitz constants for all groups",
         "Only group-level statistics",
-        "Equal Lipschitz constants for all groups"
+        "A causal DAG; the decision is unchanged when the individual's sensitive attribute is counterfactually altered"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Why do backtracking counterfactuals (arXiv:2401.13935) matter for legal compliance?",
       "options": [
-        "They eliminate the need for any causal model",
         "Instead of intervening on a protected attribute (which is legally problematic), they ask which combination of actual features would have produced the counterfactual outcome",
-        "They prove the impossibility theorem is wrong",
-        "They replace embedding-based bias metrics"
+        "They eliminate the need for any causal model",
+        "They replace embedding-based bias metrics",
+        "They prove the impossibility theorem is wrong"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "What does the ICLR Blogposts 2024 philosophical reconciliation argue?",
       "options": [
-        "Group and counterfactual fairness are unrelated",
+        "The impossibility theorems are resolved by re-weighting",
         "With an explicit causal graph, satisfying certain group-fairness measures entails counterfactual fairness, so the apparent opposition between families is partly an artifact of leaving the causal model implicit",
-        "Only individual fairness is justifiable",
-        "The impossibility theorems are resolved by re-weighting"
+        "Group and counterfactual fairness are unrelated",
+        "Only individual fairness is justifiable"
       ],
       "correct": 1,
       "explanation": ""

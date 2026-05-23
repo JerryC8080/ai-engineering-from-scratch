@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "How did the 2024-2025 bio-uplift narrative evolve?",
       "options": [
+        "It stayed unchanged across 2024-2025",
         "From 'no uplift' to 'mild uplift'",
-        "From 'mild uplift' (2024) to 'on the cusp of meaningfully helping novices create known biological threats' (April 2025) to '2.53x uplift insufficient to rule out ASL-3' (Anthropic 2025)",
         "From 'severe uplift' to 'no measurable uplift'",
-        "It stayed unchanged across 2024-2025"
+        "From 'mild uplift' (2024) to 'on the cusp of meaningfully helping novices create known biological threats' (April 2025) to '2.53x uplift insufficient to rule out ASL-3' (Anthropic 2025)"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -19,9 +19,9 @@
       "question": "What did Anthropic's November 2025 cyber threat report find?",
       "options": [
         "Chinese-linked state actors used Claude's agentic coding tool to automate 80-90% of a cyberattack campaign, with human intervention only in 4-6 steps",
+        "Frontier models refused all cyber tasks",
         "Cyberattacks remained entirely manual",
-        "Open-source models exceeded frontier capability",
-        "Frontier models refused all cyber tasks"
+        "Open-source models exceeded frontier capability"
       ],
       "correct": 0,
       "explanation": ""
@@ -30,21 +30,21 @@
       "stage": "check",
       "question": "How are vision-enabled frontier models eroding the chem/bio execution gap?",
       "options": [
+        "By replacing all lab equipment with virtual simulators",
         "By generating fake protocols",
         "By observing wet-lab video and providing real-time protocol correction; OpenAI's December 2025 demonstration showed GPT-5 iterating on wet-lab experiments at 79x efficiency improvement via AI-driven protocol optimization",
-        "By replacing all lab equipment with virtual simulators",
         "By increasing context length only"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Why has nuclear-domain uplift remained bounded relative to bio/chem/cyber?",
       "options": [
-        "All nuclear information has been removed from training data",
-        "The threat model is dominated by fissile-material acquisition (a non-informational, procurement-and-equipment bottleneck), so AI uplift on the information layer provides limited novice uplift in practice",
         "Nuclear is the easiest domain to attack with AI",
+        "The threat model is dominated by fissile-material acquisition (a non-informational, procurement-and-equipment bottleneck), so AI uplift on the information layer provides limited novice uplift in practice",
+        "All nuclear information has been removed from training data",
         "Frontier models refuse to discuss physics"
       ],
       "correct": 1,
@@ -54,10 +54,10 @@
       "stage": "post",
       "question": "What does the novice-relative vs expert-absolute asymmetry imply for safety cases?",
       "options": [
-        "Only novice uplift matters",
+        "Both are perfectly addressed by RLHF",
         "Addressing only novice uplift (input filters, refusals, uncertainty) is insufficient for expert-absolute control; additional measures like elicitation-hardening, capability unlearning, and control protocols are needed",
-        "Expert-absolute capability is automatically zero",
-        "Both are perfectly addressed by RLHF"
+        "Only novice uplift matters",
+        "Expert-absolute capability is automatically zero"
       ],
       "correct": 1,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "What is OpenAI's 'trusted access' pilot in the cyber dual-use context?",
       "options": [
-        "Closing all API access",
-        "Granting vetted security organisations (incident-response firms, government) capability access for defensive dual-use work, creating an access asymmetry that favours defenders if it scales",
+        "A patch for CVE-2025-32711",
         "An open-source release of GPT-5",
-        "A patch for CVE-2025-32711"
+        "Closing all API access",
+        "Granting vetted security organisations (incident-response firms, government) capability access for defensive dual-use work, creating an access asymmetry that favours defenders if it scales"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     }
   ]

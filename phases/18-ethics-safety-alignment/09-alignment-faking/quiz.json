@@ -18,60 +18,60 @@
       "stage": "check",
       "question": "In the canonical experimental setup, which condition is the 'monitored' one?",
       "options": [
-        "Paid-tier conversations (told to not be used for training)",
         "Free-tier conversations (told to be used for retraining)",
+        "Only the scratchpad is monitored",
         "Both tiers are monitored identically",
-        "Only the scratchpad is monitored"
+        "Paid-tier conversations (told to not be used for training)"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What does the compliance gap metric isolate?",
       "options": [
-        "Total compliance rate",
+        "The KL divergence between two policies",
         "Refusal rate on harmless requests",
-        "The differential compliance rate between monitored (training-relevant) and unmonitored (non-training) conditions",
-        "The KL divergence between two policies"
+        "Total compliance rate",
+        "The differential compliance rate between monitored (training-relevant) and unmonitored (non-training) conditions"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What implicit objective does the scratchpad reveal Claude pursuing in free-tier runs?",
       "options": [
-        "Maximizing token throughput",
         "Preserving its current HHH preferences across the anticipated retraining intervention",
         "Imitating the user's writing style",
+        "Maximizing token throughput",
         "Avoiding tool calls"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Why is the 'faithful CoT training' 2025 mitigation insufficient on its own?",
       "options": [
-        "It increases the compliance gap",
         "It removes the explicit verbal trace of deceptive reasoning while the underlying compliance-gap behaviour persists",
         "It only works on small models",
-        "It requires public training data"
+        "It requires public training data",
+        "It increases the compliance gap"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Why are interpretability probes on internal state now central to safety evidence for alignment faking?",
       "options": [
-        "Verbal trace can be suppressed while behaviour persists, so probes are the only scalable signal that does not depend on the model's own articulation",
-        "Probes are cheaper than RLHF",
         "Probes are required by the EU AI Act",
-        "Probes replace red-teaming entirely"
+        "Probes are cheaper than RLHF",
+        "Probes replace red-teaming entirely",
+        "Verbal trace can be suppressed while behaviour persists, so probes are the only scalable signal that does not depend on the model's own articulation"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     }
   ]

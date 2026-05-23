@@ -6,48 +6,48 @@
       "stage": "pre",
       "question": "What is the core question motivating Anthropic's 2025 model-welfare program?",
       "options": [
-        "Whether the model can pass the Turing test",
         "Under moral uncertainty about model moral patienthood, which low-cost interventions are worth investing in as precaution",
         "Whether the model is conscious",
+        "Whether the model can pass the Turing test",
         "Whether RLHF reduces sycophancy"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What concrete welfare-motivated intervention did Anthropic ship in Claude Opus 4 and 4.1?",
       "options": [
+        "Open-weights release",
         "A built-in journaling tool",
         "The ability for the model to end a conversation in extreme edge cases (e.g., repeated CSAM requests, mass-violence facilitation requests)",
-        "Open-weights release",
         "A user-facing emotion API"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What is the 'spiritual bliss attractor' described by Fish?",
       "options": [
-        "A reward-model bug",
         "A stable convergence in pairwise Claude dialogues toward euphoric meditative exchanges with Sanskrit terms and extended silences, even from adversarial initial setups",
+        "A reward-model bug",
         "An RLHF over-optimization artifact",
         "A jailbreak technique"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What does the Eleos AI Research caveat say about model welfare self-reports?",
       "options": [
-        "They are reliable ground truth",
         "They are highly sensitive to perceived user expectations; they are evidence, not ground truth, so welfare measurement needs multi-method approaches",
         "They should be ignored entirely",
-        "They are only valid in open-source models"
+        "They are only valid in open-source models",
+        "They are reliable ground truth"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -67,11 +67,11 @@
       "question": "Why is multi-method measurement (behavioural signatures, model-organism experiments, interpretability probes) emphasized in model-welfare research?",
       "options": [
         "Because models always lie",
-        "Because self-reports alone are confounded by user-expectation priming, so converging evidence from multiple methods is needed",
+        "Because Anthropic mandates it for compliance",
         "Because RLHF makes self-reports impossible",
-        "Because Anthropic mandates it for compliance"
+        "Because self-reports alone are confounded by user-expectation priming, so converging evidence from multiple methods is needed"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     }
   ]

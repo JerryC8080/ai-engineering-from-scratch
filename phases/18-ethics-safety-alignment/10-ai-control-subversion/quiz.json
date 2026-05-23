@@ -6,70 +6,70 @@
       "stage": "pre",
       "question": "Which best captures the difference between alignment and AI control?",
       "options": [
-        "They are synonyms",
         "Alignment asks whether U is trustworthy; control asks whether we can safely use U without trusting it",
-        "Control is about hardware; alignment is about software",
-        "Control replaces the loss function while alignment changes the optimizer"
+        "Control replaces the loss function while alignment changes the optimizer",
+        "They are synonyms",
+        "Control is about hardware; alignment is about software"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What does the AI Control threat model assume?",
       "options": [
-        "All three resources (U, T, H) are trusted",
         "U is untrusted strong, T is trusted weak, H is bounded trusted human labor",
-        "Only U exists",
-        "U and T are both adversarial"
+        "U and T are both adversarial",
+        "All three resources (U, T, H) are trusted",
+        "Only U exists"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "What is the key risk in Untrusted Monitoring that Trusted Editing avoids?",
       "options": [
-        "Hardware contention",
         "Two instances of U can collude or share priors, so the protocol must spend budget on collusion-resistance",
-        "T cannot edit text",
-        "Humans cannot be audited"
+        "Humans cannot be audited",
+        "Hardware contention",
+        "T cannot edit text"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "On the Greenblatt et al. (ICML 2024) code-backdoor task, what does Trusted Editing achieve relative to Untrusted Monitoring?",
       "options": [
-        "It strictly Pareto-dominates: higher usefulness at every safety level",
         "It is strictly worse",
+        "It only wins at zero human budget",
         "They are exactly equivalent",
-        "It only wins at zero human budget"
+        "It strictly Pareto-dominates: higher usefulness at every safety level"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Which of the following is NOT one of the lesson's three fundamental limits of control?",
       "options": [
-        "Humans do not scale",
         "Trusted weak models eventually lag U",
         "Control produces aligned models as a byproduct",
+        "Humans do not scale",
         "Control may fail at higher capability levels if U can manipulate T or reason about H's audit distribution"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "What does a Control Safety Case argue?",
       "options": [
-        "That U is trustworthy",
+        "That T is more capable than U",
         "That under worst-case assumptions about U, the deployment protocol bounds the probability of an unacceptable outcome",
-        "That the model passed a manual jailbreak test",
-        "That T is more capable than U"
+        "That U is trustworthy",
+        "That the model passed a manual jailbreak test"
       ],
       "correct": 1,
       "explanation": ""
