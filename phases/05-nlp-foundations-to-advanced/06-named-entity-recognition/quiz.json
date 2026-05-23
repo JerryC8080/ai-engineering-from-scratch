@@ -6,46 +6,46 @@
       "stage": "pre",
       "question": "What is BIO tagging?",
       "options": [
-        "A binary entity vs non-entity scheme",
         "Per-token labels: B-TYPE for entity start, I-TYPE for inside, O for outside",
+        "A binary entity vs non-entity scheme",
         "A tokenization style",
         "A tree representation of entities"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "BIO turns span extraction into token classification with B/I/O prefixes."
     },
     {
       "stage": "pre",
       "question": "Why are rule-based gazetteers brittle in production NER?",
       "options": [
+        "They require GPUs",
         "They are slow",
         "They have zero coverage on new entities and cannot disambiguate (e.g. Apple fruit vs company)",
-        "They require GPUs",
         "They cannot handle multi-token entities"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Gazetteers can match known strings but cannot disambiguate sense or generalize to unseen names."
     },
     {
       "stage": "check",
       "question": "What is the key advantage of a CRF over an HMM for NER?",
       "options": [
-        "CRFs are faster",
-        "CRFs are discriminative and can mix arbitrary features (shape, capitalization, neighbors)",
+        "CRFs avoid the Viterbi algorithm",
         "CRFs never need training data",
-        "CRFs avoid the Viterbi algorithm"
+        "CRFs are discriminative and can mix arbitrary features (shape, capitalization, neighbors)",
+        "CRFs are faster"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "CRFs are discriminative and let you condition on rich, overlapping features."
     },
     {
       "stage": "check",
       "question": "In a BiLSTM-CRF architecture, what role does the CRF layer play?",
       "options": [
-        "Replaces embeddings",
+        "Performs tokenization",
         "Enforces valid BIO tag sequences by modeling tag-to-tag transitions on top of LSTM emissions",
         "Pretrains the LSTM",
-        "Performs tokenization"
+        "Replaces embeddings"
       ],
       "correct": 1,
       "explanation": "The CRF on top of LSTM features models inter-label dependencies and rules out illegal sequences."
@@ -66,22 +66,22 @@
       "stage": "post",
       "question": "What does aggregation_strategy='simple' do in the HuggingFace NER pipeline?",
       "options": [
+        "Lowercases the output",
         "Skips tokenization",
         "Merges contiguous B-X and I-X tokens into a single span",
-        "Returns only the most confident entity",
-        "Lowercases the output"
+        "Returns only the most confident entity"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "It merges contiguous BIO tokens of the same type into span-level entities."
     },
     {
       "stage": "post",
       "question": "Why does standard BIO fail on nested entities?",
       "options": [
-        "BIO cannot represent multi-token entities",
+        "BIO requires a transformer",
         "BIO is a flat per-token scheme and cannot express two overlapping spans of different types",
-        "BIO drops the type label",
-        "BIO requires a transformer"
+        "BIO cannot represent multi-token entities",
+        "BIO drops the type label"
       ],
       "correct": 1,
       "explanation": "BIO assigns one label per token; nested spans need multi-pass or span-based models."
@@ -90,12 +90,12 @@
       "stage": "post",
       "question": "When does classical NER (CRF or BiLSTM-CRF) still beat an LLM in 2026?",
       "options": [
-        "On open-domain narrative",
-        "Under tight latency budgets, abundant labels, stable ontologies, or non-generative regulatory constraints",
+        "On nested entities",
         "Whenever the input is in English",
-        "On nested entities"
+        "On open-domain narrative",
+        "Under tight latency budgets, abundant labels, stable ontologies, or non-generative regulatory constraints"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Classical NER wins on latency, labeled-data regimes, fixed ontologies, and on-prem constraints."
     }
   ]

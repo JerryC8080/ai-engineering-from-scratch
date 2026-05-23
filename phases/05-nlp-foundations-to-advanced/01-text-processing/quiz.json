@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "Why does a language model need preprocessing before training?",
       "options": [
-        "Models read strings directly",
-        "Models consume discrete integer tokens, not raw text",
         "Preprocessing improves GPU utilization",
+        "Models consume discrete integer tokens, not raw text",
+        "Models read strings directly",
         "Preprocessing is required only for languages without whitespace"
       ],
       "correct": 1,
@@ -18,36 +18,36 @@
       "stage": "pre",
       "question": "Which preprocessing operation is rule-based suffix stripping?",
       "options": [
-        "Tokenization",
         "Stemming",
+        "POS tagging",
         "Lemmatization",
-        "POS tagging"
+        "Tokenization"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Stemming chops suffixes with rules; it is fast but can be wrong."
     },
     {
       "stage": "check",
       "question": "What does the Porter stemmer step 1a return for the word 'ponies'?",
       "options": [
-        "pony",
+        "ponies",
         "ponie",
-        "poni",
-        "ponies"
+        "pony",
+        "poni"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "The 'ies' rule replaces the suffix with 'i', producing 'poni'; step 1b in real Porter cleans it up."
     },
     {
       "stage": "check",
       "question": "Why does lemmatization usually need a POS tag?",
       "options": [
+        "Unicode handling",
         "Speed",
         "Grammatical context disambiguates forms like 'better' (ADJ) versus 'better' (VERB)",
-        "Unicode handling",
         "To reduce memory usage"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Lemmas depend on grammatical role; without the tag the lookup is ambiguous."
     },
     {
@@ -56,8 +56,8 @@
       "options": [
         "'n' (noun)",
         "'v' (verb)",
-        "'a' (adjective)",
-        "'r' (adverb)"
+        "'r' (adverb)",
+        "'a' (adjective)"
       ],
       "correct": 1,
       "explanation": "Verb-prefixed Penn Treebank tags map to WordNet 'v'."
@@ -66,9 +66,9 @@
       "stage": "post",
       "question": "What is 'training/inference mismatch' in NLP preprocessing?",
       "options": [
-        "A GPU memory issue",
-        "Training and serving apply different preprocessing, so the model sees an unfamiliar distribution at inference",
         "Different batch sizes between train and test",
+        "Training and serving apply different preprocessing, so the model sees an unfamiliar distribution at inference",
+        "A GPU memory issue",
         "Mixing tokenizer libraries within a notebook"
       ],
       "correct": 1,
@@ -79,21 +79,21 @@
       "question": "Which tool would you reach for in a transformer pipeline instead of classical preprocessing?",
       "options": [
         "NLTK word_tokenize",
-        "spaCy en_core_web_sm",
         "The model's own tokenizer (e.g. via tokenizers / transformers)",
-        "A regex tokenizer"
+        "A regex tokenizer",
+        "spaCy en_core_web_sm"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "Transformer models ship a paired tokenizer; classical preprocessing is bypassed."
     },
     {
       "stage": "post",
       "question": "Why pin NLTK and spaCy versions in requirements?",
       "options": [
-        "Newer versions are slower",
-        "Tokenizer and lemmatizer behavior shifts between minor releases, silently changing training distribution",
         "License compatibility",
-        "Older versions support more languages"
+        "Tokenizer and lemmatizer behavior shifts between minor releases, silently changing training distribution",
+        "Older versions support more languages",
+        "Newer versions are slower"
       ],
       "correct": 1,
       "explanation": "Library upgrades can change tokenization output, drifting from the training distribution."

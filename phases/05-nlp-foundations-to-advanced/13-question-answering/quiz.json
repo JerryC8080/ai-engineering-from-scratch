@@ -7,35 +7,35 @@
       "question": "What does extractive QA predict?",
       "options": [
         "A generated natural-language answer",
+        "A confidence score only",
         "Start and end token indices of the answer span within a given passage",
-        "A retrieved passage ID",
-        "A confidence score only"
+        "A retrieved passage ID"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Extractive QA outputs the span of the passage that contains the answer."
     },
     {
       "stage": "pre",
       "question": "What two components define a basic RAG pipeline?",
       "options": [
-        "Tokenizer and POS tagger",
-        "A retriever (find relevant passages) and a reader (extract or generate the answer)",
         "An encoder and a decoder trained jointly",
-        "A reranker and a translator"
+        "A reranker and a translator",
+        "Tokenizer and POS tagger",
+        "A retriever (find relevant passages) and a reader (extract or generate the answer)"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "RAG = retriever (finds relevant context) plus reader (answers from it)."
     },
     {
       "stage": "check",
       "question": "On SQuAD, what does Exact Match (EM) measure?",
       "options": [
+        "Edit distance",
         "Per-word overlap",
         "Whether the prediction matches the reference exactly after normalization (lowercase, strip punctuation, remove articles)",
-        "Edit distance",
         "Token-level F1"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "EM is strict equality after a defined normalization step; partial matches score zero."
     },
     {
@@ -54,36 +54,36 @@
       "stage": "check",
       "question": "Which RAGAS dimension targets hallucinations specifically?",
       "options": [
+        "Answer relevance",
         "Context recall",
         "Faithfulness, measured by NLI entailment between answer claims and retrieved context",
-        "Answer relevance",
         "Context precision"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Faithfulness checks each answer claim against retrieved context via NLI entailment."
     },
     {
       "stage": "post",
       "question": "Why should you measure retrieval recall before evaluating reader accuracy?",
       "options": [
-        "Reader latency depends on it",
-        "If the correct passage is not in the top-k, the reader cannot succeed regardless of how good it is",
+        "Required by transformers",
         "Recall determines ROUGE",
-        "Required by transformers"
+        "Reader latency depends on it",
+        "If the correct passage is not in the top-k, the reader cannot succeed regardless of how good it is"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "A reader cannot answer when the right passage is missing; retrieval recall bounds reader performance."
     },
     {
       "stage": "post",
       "question": "Which prompt pattern reduces hallucinations in RAG generation?",
       "options": [
-        "Asking the model to be creative",
         "Telling the model to answer only from the provided context and to reply 'I don't know' when the context is insufficient",
-        "Removing the question",
-        "Including more passages"
+        "Including more passages",
+        "Asking the model to be creative",
+        "Removing the question"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Grounding + explicit refusal instructions cuts hallucination rates substantially."
     },
     {
@@ -92,8 +92,8 @@
       "options": [
         "Conversational QA",
         "Regulated domains (legal, medical, audit) where literal quotation from authoritative sources is required",
-        "Open-domain trivia",
-        "Multilingual support"
+        "Multilingual support",
+        "Open-domain trivia"
       ],
       "correct": 1,
       "explanation": "Extractive QA gives verbatim quotes from an authoritative corpus, which compliance contexts demand."
