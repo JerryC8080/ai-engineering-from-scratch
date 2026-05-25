@@ -249,8 +249,8 @@ Twenty phases. Click any phase to expand its lesson list.
 | 03 | [GPU Setup & Cloud](phases/00-setup-and-tooling/03-gpu-setup-and-cloud/) | Build | Python |
 | 04 | [APIs & Keys](phases/00-setup-and-tooling/04-apis-and-keys/) | Build | Python |
 | 05 | [Jupyter Notebooks](phases/00-setup-and-tooling/05-jupyter-notebooks/) | Build | Python |
-| 06 | [Python Environments](phases/00-setup-and-tooling/06-python-environments/) | Build | — |
-| 07 | [Docker for AI](phases/00-setup-and-tooling/07-docker-for-ai/) | Build | — |
+| 06 | [Python Environments](phases/00-setup-and-tooling/06-python-environments/) | Build | Shell |
+| 07 | [Docker for AI](phases/00-setup-and-tooling/07-docker-for-ai/) | Build | Docker |
 | 08 | [Editor Setup](phases/00-setup-and-tooling/08-editor-setup/) | Build | — |
 | 09 | [Data Management](phases/00-setup-and-tooling/09-data-management/) | Build | Python |
 | 10 | [Terminal & Shell](phases/00-setup-and-tooling/10-terminal-and-shell/) | Learn | — |
