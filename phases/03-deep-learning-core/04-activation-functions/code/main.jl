@@ -37,7 +37,8 @@ leaky_relu_d(x::Float64; alpha::Float64=0.01)::Float64 = x > 0 ? 1.0 : alpha
 
 
 function gelu(x::Float64)::Float64
-    return 0.5 * x * (1 + tanh(sqrt(2 / pi) * (x + 0.044715 * x ^ 3)))
+    # Exact form x * Phi(x); keeps gelu and gelu_d consistent for backprop.
+    return 0.5 * x * (1 + erf_approx(x / sqrt(2.0)))
 end
 
 function gelu_d(x::Float64)::Float64
@@ -80,18 +81,21 @@ function gradient_scan(name::String, deriv; start::Float64=-5.0, stop::Float64=5
 end
 
 
-function vanishing_gradient_experiment(act, name::String; n_layers::Int=10, n_inputs::Int=5)
+function vanishing_gradient_experiment(act, act_d, name::String; n_layers::Int=10, n_inputs::Int=5)
     rng = MersenneTwister(42)
     values = randn(rng, n_inputs)
+    # Track the running product of |f'(z)| across layers — this is the
+    # quantity that actually vanishes during backprop, not the signal.
+    chain_grad = 1.0
     println("\n$name through $n_layers layers:")
     for layer in 1:n_layers
         weights = randn(rng, n_inputs)
         z = sum(weights .* values)
         activated = act(z)
-        magnitude = abs(activated)
-        bar_len = isfinite(magnitude) ? clamp(Int(round(magnitude * 20)), 0, 60) : 0
+        chain_grad *= abs(act_d(z))
+        bar_len = isfinite(chain_grad) ? clamp(Int(round(chain_grad * 20)), 0, 60) : 0
         bar = "#" ^ bar_len
-        @printf("  Layer %2d: magnitude = %.6f %s\n", layer, magnitude, bar)
+        @printf("  Layer %2d: |grad chain| = %.6f %s\n", layer, chain_grad, bar)
         values = fill(activated, n_inputs)
     end
 end
@@ -250,9 +254,9 @@ function main()
     println("\n" * "=" ^ 60)
     println("STEP 3: Vanishing Gradient Experiment")
     println("=" ^ 60)
-    vanishing_gradient_experiment(sigmoid, "Sigmoid")
-    vanishing_gradient_experiment(relu, "ReLU")
-    vanishing_gradient_experiment(gelu, "GELU")
+    vanishing_gradient_experiment(sigmoid, sigmoid_d, "Sigmoid")
+    vanishing_gradient_experiment(relu, relu_d, "ReLU")
+    vanishing_gradient_experiment(gelu, gelu_d, "GELU")
 
     println("\n" * "=" ^ 60)
     println("STEP 4: Dead Neuron Detection")
