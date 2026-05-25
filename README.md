@@ -1047,6 +1047,8 @@ Free, MIT-licensed, 435 lessons. The curriculum is maintained on sponsorship alo
 **Reach (verified 2026-05-14):** 55,593 monthly visitors · 90,709 page views · 7.5K stars ·
 Twitter/X is the #1 acquisition channel.
 
+**Current sponsors:** [CodeRabbit](https://coderabbit.link/rohit-ghumare) · [iii](https://iii.dev?utm_source=ai-engineering-from-scratch&utm_medium=readme&utm_campaign=sponsor)
+
 | Tier | $/mo | What you get |
 |------|------|---|
 | Backer | $25 | Name in BACKERS.md |
