@@ -23,6 +23,7 @@ function tokenize(text: string): string[] {
 }
 
 function hashEmbed(text: string, dim = 256): Vec {
+  if (dim <= 0) throw new Error("dim must be positive");
   // Hashing-trick embedder: every token contributes +/-1 to a hashed dim.
   // Deterministic, no training, useful as a stand-in for production
   // embedders (BGE-M3, text-embedding-3-small, voyage-3).
@@ -64,6 +65,7 @@ function chunkRecursive(
   size: number,
   seps: readonly string[] = ["\n\n", "\n", ". ", " "],
 ): string[] {
+  if (size <= 0) throw new Error("size must be positive");
   // Mirrors LangChain.js RecursiveCharacterTextSplitter: try the strongest
   // separator first (paragraph), drop to weaker ones (sentence, word) when
   // the current pass leaves chunks larger than `size`.
@@ -118,6 +120,7 @@ function chunkSemantic(text: string, threshold = 0.3, minChars = 40): string[] {
 }
 
 function chunkSentence(text: string, sentencesPerChunk = 3): string[] {
+  if (sentencesPerChunk <= 0) throw new Error("sentencesPerChunk must be positive");
   const sentences = splitSentences(text);
   const out: string[] = [];
   for (let i = 0; i < sentences.length; i += sentencesPerChunk) {
@@ -193,7 +196,7 @@ Chapter 5. Miscellaneous. This agreement is governed by the laws of the State of
     { name: "recursive", chunks: rec },
     { name: "semantic", chunks: sem },
     { name: "sentence", chunks: sent },
-    { name: "parent", chunks: pc.map((m) => m.parent) },
+    { name: "parent", chunks: Array.from(new Set(pc.map((m) => m.parent))) },
   ];
   for (const { name, chunks } of strategies) {
     const hits = queries.reduce((acc, { q, gold }) => acc + (retrieveRecall(chunks, q, gold) ? 1 : 0), 0);
