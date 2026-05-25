@@ -19,7 +19,12 @@ function combinations(n::Int, k::Int)::Int
 end
 
 
-conditional_probability(p_a_and_b::Float64, p_b::Float64) = p_a_and_b / p_b
+function conditional_probability(p_a_and_b::Float64, p_b::Float64)
+    if p_b == 0.0
+        throw(ArgumentError("conditional_probability: P(B) is zero; cannot divide"))
+    end
+    return p_a_and_b / p_b
+end
 
 
 bernoulli_pmf(k::Int, p::Float64) = k == 1 ? p : (1 - p)
@@ -81,7 +86,11 @@ end
 function sample_normal_box_muller(rng::AbstractRNG, mu::Float64, sigma::Float64, n::Int)
     samples = Float64[]
     for _ in 1:n
+        # rand(rng) is in [0, 1); guard against u1 == 0 so log(u1) stays finite.
         u1 = rand(rng)
+        while u1 == 0.0
+            u1 = rand(rng)
+        end
         u2 = rand(rng)
         z = sqrt(-2 * log(u1)) * cos(2pi * u2)
         push!(samples, mu + sigma * z)
