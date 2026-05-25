@@ -6,7 +6,7 @@
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 435
+    "code_files": 439
   },
   "phases": [
     {
@@ -25,6 +25,7 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
+            "main.rs",
             "verify.py"
           ],
           "outputs": [
@@ -2126,7 +2127,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
@@ -3682,7 +3684,8 @@
           "has_quiz": false,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
@@ -5430,7 +5433,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
