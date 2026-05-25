@@ -6,7 +6,7 @@
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 435
+    "code_files": 441
   },
   "phases": [
     {
@@ -25,7 +25,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "verify.py"
+            "verify.py",
+            "verify.ts"
           ],
           "outputs": [
             {
@@ -74,7 +75,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "first_api_call.py"
+            "first_api_call.py",
+            "first_api_call.ts"
           ],
           "outputs": [
             {
@@ -5946,7 +5948,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -6022,7 +6025,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -6060,7 +6064,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -8396,7 +8401,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
