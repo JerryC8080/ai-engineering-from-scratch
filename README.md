@@ -862,26 +862,45 @@ outputs/
 └── skills/       SKILL.md files for AI coding agents
 ```
 
-Install them with `python3 scripts/install_skills.py`. Plug them into Claude, Cursor,
-Codex, OpenClaw, Hermes, or any MCP-compatible agent. Real tools, not homework.
+Install them with `npx skills add`. Plug them into Claude, Cursor, Codex,
+OpenClaw, Hermes, or any agent that reads a SKILL.md / AGENTS.md directory.
+Real tools, not homework.
 
 ### Install every course skill into your agent
 
 The repo ships 378 skills and 99 prompts under `phases/**/outputs/`.
-`scripts/install_skills.py` walks every artifact, parses YAML frontmatter, and
-copies the matching files into a target directory in the layout your agent
-expects.
+
+**Recommended: install via [skills.sh](https://skills.sh).** No clone, no Python,
+detects your agent's skills directory automatically:
 
 ```bash
-python3 scripts/install_skills.py ~/.claude/skills                 # every skill, default --layout skills (nested)
-python3 scripts/install_skills.py ~/.claude/skills --layout skills # same as above, explicit
-python3 scripts/install_skills.py ./out --type all                 # skills + prompts + agents
-python3 scripts/install_skills.py ./out --phase 14                 # one phase only
-python3 scripts/install_skills.py ./out --tag rag                  # filter by tag
-python3 scripts/install_skills.py ./out --layout flat              # flat files
-python3 scripts/install_skills.py ./out --dry-run                  # preview without writing
-python3 scripts/install_skills.py ./out --force                    # overwrite existing files
+npx skills add rohitg00/ai-engineering-from-scratch                       # every skill
+npx skills add rohitg00/ai-engineering-from-scratch --skill agent-loop    # one skill
+npx skills add rohitg00/ai-engineering-from-scratch --phase 14            # one phase
 ```
+
+`skills` writes to whichever directory your agent picks up: `.claude/skills/`,
+`.cursor/skills/`, `.codex/skills/`, OpenClaw's skills folder, Hermes's bundle
+path, or any SKILL.md-aware tool. One command, every agent.
+
+**Advanced: offline / custom layout via `scripts/install_skills.py`.** Requires
+cloning the repo. Useful when you need tag filters, dry-runs, or a non-default
+layout:
+
+```bash
+python3 scripts/install_skills.py <target>                                 # every skill, default --layout skills (nested)
+python3 scripts/install_skills.py <target> --layout skills                 # same as above, explicit
+python3 scripts/install_skills.py <target> --type all                      # skills + prompts + agents
+python3 scripts/install_skills.py <target> --phase 14                      # one phase only
+python3 scripts/install_skills.py <target> --tag rag                       # filter by tag
+python3 scripts/install_skills.py <target> --layout flat                   # flat files
+python3 scripts/install_skills.py <target> --dry-run                       # preview without writing
+python3 scripts/install_skills.py <target> --force                         # overwrite existing files
+```
+
+`<target>` is the skills directory for your agent (examples:
+`~/.claude/skills/`, `~/.cursor/skills/`, `~/.config/openclaw/skills/`,
+`.skills/`, or any path your agent reads).
 
 By default the script refuses to overwrite an existing destination and exits
 with code 1 after listing every colliding path. Use `--dry-run` to preview
@@ -891,7 +910,7 @@ phase. Pick the layout your agent reads:
 
 | `--layout`  | Path written |
 |---|---|
-| `skills`    | `<target>/<name>/SKILL.md` (Claude / Cursor convention) |
+| `skills`    | `<target>/<name>/SKILL.md` (nested convention, supported by Claude / Cursor / Codex / OpenClaw / Hermes) |
 | `by-phase`  | `<target>/phase-NN/<name>.md` |
 | `flat`      | `<target>/<name>.md` |
 
