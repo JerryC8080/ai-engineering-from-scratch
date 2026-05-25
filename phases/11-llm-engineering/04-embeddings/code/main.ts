@@ -10,6 +10,8 @@ type Vec = readonly number[];
 type Doc = { readonly text: string; readonly source?: string };
 
 function chunkText(text: string, chunkSize = 200, overlap = 50): string[] {
+  if (chunkSize <= 0) throw new Error("chunkSize must be positive");
+  if (overlap >= chunkSize) throw new Error("overlap must be less than chunkSize");
   const words = text.split(/\s+/).filter((w) => w.length > 0);
   const out: string[] = [];
   let start = 0;
@@ -59,8 +61,9 @@ class TfIdfEmbedder {
     this.vocab = [...set].sort();
     this.wordToIdx = new Map(this.vocab.map((w, i) => [w, i] as const));
     const n = documents.length;
+    const docWordSets = documents.map((doc) => new Set(doc.toLowerCase().split(/\s+/)));
     this.idf = this.vocab.map((word) => {
-      const docCount = documents.reduce((acc, doc) => acc + (doc.toLowerCase().split(/\s+/).includes(word) ? 1 : 0), 0);
+      const docCount = docWordSets.reduce((acc, wordSet) => acc + (wordSet.has(word) ? 1 : 0), 0);
       return Math.log((n + 1) / (docCount + 1)) + 1;
     });
   }
