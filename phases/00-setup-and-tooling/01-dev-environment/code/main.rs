@@ -85,9 +85,10 @@ fn main() -> ExitCode {
         match run_check(check) {
             Ok(version) => {
                 if check.name.starts_with("Python") {
-                    if let Some((major, minor)) = parse_minor_python(&version) {
-                        if (major, minor) < (3, 10) {
-                            println!("  [FAIL] {:<14} {} (need 3.10+)", check.name, version);
+                    match parse_minor_python(&version) {
+                        Some((major, minor)) if (major, minor) >= (3, 10) => {}
+                        _ => {
+                            println!("  [FAIL] {:<14} {} (need parseable Python 3.10+)", check.name, version);
                             python_ok = false;
                             continue;
                         }
