@@ -140,12 +140,22 @@ function shadowEvaluate(samples: ShadowSample[]): ShadowReport {
   }
   let costDelta = 0;
   let latDelta = 0;
+  let costN = 0;
+  let latN = 0;
   for (const s of samples) {
-    costDelta += (s.candidateCost - s.baselineCost) / s.baselineCost;
-    latDelta += (s.candidateLatencyMs - s.baselineLatencyMs) / s.baselineLatencyMs;
+    // Skip rows with non-positive baselines so a single zero row cannot turn
+    // the average into Infinity/NaN and corrupt the gate decision.
+    if (s.baselineCost > 0) {
+      costDelta += (s.candidateCost - s.baselineCost) / s.baselineCost;
+      costN++;
+    }
+    if (s.baselineLatencyMs > 0) {
+      latDelta += (s.candidateLatencyMs - s.baselineLatencyMs) / s.baselineLatencyMs;
+      latN++;
+    }
   }
-  const meanCost = (costDelta / samples.length) * 100;
-  const meanLat = (latDelta / samples.length) * 100;
+  const meanCost = costN > 0 ? (costDelta / costN) * 100 : 0;
+  const meanLat = latN > 0 ? (latDelta / latN) * 100 : 0;
   const reasons: string[] = [];
   if (meanCost > 30) reasons.push(`cost +${meanCost.toFixed(1)}% (>30%)`);
   if (meanLat > 50) reasons.push(`latency +${meanLat.toFixed(1)}% (>50%)`);
@@ -178,10 +188,12 @@ function canaryRollout(reg: Regression): CanaryDecision {
 // PolicyEngine wraps a feature flag — flip pinnedModel from candidate back to
 // baseline in O(1). Mirrors LaunchDarkly/Flagsmith/Unleash flag-flip rollback.
 class PolicyEngine {
+  private baselineDigest: string;
   private pinnedDigest: string;
   private rolloutPct = 0;
 
   constructor(initialDigest: string) {
+    this.baselineDigest = initialDigest;
     this.pinnedDigest = initialDigest;
   }
 
@@ -190,16 +202,19 @@ class PolicyEngine {
     this.rolloutPct = pct;
   }
 
-  // Constant-time rollback — what your runbook flips.
-  rollback(baselineDigest: string): void {
-    this.pinnedDigest = baselineDigest;
+  // Constant-time rollback — what your runbook flips. Repins to the
+  // baseline captured at construction time (or the most recent rollback
+  // override).
+  rollback(baselineDigest?: string): void {
+    if (baselineDigest !== undefined) this.baselineDigest = baselineDigest;
+    this.pinnedDigest = this.baselineDigest;
     this.rolloutPct = 0;
   }
 
   pick(rng: () => number): { digest: string; chose: "baseline" | "candidate" } {
     return rng() < this.rolloutPct
       ? { digest: this.pinnedDigest, chose: "candidate" }
-      : { digest: "baseline-digest", chose: "baseline" };
+      : { digest: this.baselineDigest, chose: "baseline" };
   }
 }
 
@@ -276,7 +291,7 @@ function policyEngineDemo(): void {
   console.log(
     `  after promote to 10%: ${candidateCount}/1000 picks chose candidate (target ~100)`,
   );
-  engine.rollback("baseline-digest");
+  engine.rollback();
   let postCount = 0;
   for (let i = 0; i < 1000; i++) {
     if (engine.pick(rng).chose === "candidate") postCount++;
