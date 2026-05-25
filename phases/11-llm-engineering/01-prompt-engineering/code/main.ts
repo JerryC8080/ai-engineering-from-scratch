@@ -300,7 +300,7 @@ function scoreResponse(text: string, criteria: Criteria): Score {
       }
     } else if (criteria.expectedFormat === "bullet_points") {
       const lines = text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0);
-      const bullets = lines.filter((l) => /^[-*1]/.test(l));
+      const bullets = lines.filter((l) => /^\s*[-*+•]\s+/.test(l));
       score.formatValid = bullets.length >= lines.length * 0.5;
     } else {
       score.formatValid = /^\d+\./m.test(text);
@@ -327,6 +327,9 @@ function runPromptTest(prompt: BuiltPrompt, models: readonly string[] = Object.k
   const out: Record<string, ModelResult> = {};
   for (const name of models) {
     const cfg = MODEL_CONFIGS[name];
+    if (!cfg) {
+      throw new Error("Unknown model: " + name + ". Available models: " + Object.keys(MODEL_CONFIGS).join(", "));
+    }
     const request = FORMATTERS[cfg.provider](prompt, cfg);
     const start = Date.now();
     const response = simulateLlmCall(name, request);
