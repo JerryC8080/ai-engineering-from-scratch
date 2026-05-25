@@ -7246,7 +7246,8 @@
           "has_quiz": false,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -7416,7 +7417,8 @@
           "has_quiz": false,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -7765,7 +7767,8 @@
           "has_quiz": false,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -7917,7 +7920,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -8062,7 +8066,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
@@ -8268,7 +8273,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.ts"
           ],
           "outputs": [
             {
