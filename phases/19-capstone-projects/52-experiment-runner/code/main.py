@@ -10,6 +10,7 @@ Stdlib only. Run: python3 code/main.py
 from __future__ import annotations
 
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -19,6 +20,10 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Iterable
+
+
+_LOGGER = logging.getLogger(__name__)
+_MEMORY_POLLER_UNSUPPORTED_WARNED = False
 
 
 @dataclass
@@ -118,10 +123,16 @@ class _MemoryPoller(threading.Thread):
         self._stop_event.set()
 
     def run(self) -> None:
+        global _MEMORY_POLLER_UNSUPPORTED_WARNED
         while not self._stop_event.is_set() and self._proc.poll() is None:
             rss = _rss_mb(self._proc.pid)
             if rss is None:
                 self.unsupported = True
+                if not _MEMORY_POLLER_UNSUPPORTED_WARNED:
+                    _MEMORY_POLLER_UNSUPPORTED_WARNED = True
+                    _LOGGER.warning(
+                        "memory poller disabled: platform does not expose RSS via /proc or ps; wall clock timeout still applies",
+                    )
                 return
             self.peak_rss_mb = rss if self.peak_rss_mb is None else max(self.peak_rss_mb, rss)
             if rss > self._cap:
@@ -179,12 +190,27 @@ class ExperimentRunner:
 
     def _run_subprocess(self, spec: ExperimentSpec, config_path: str) -> ExperimentResult:
         start = time.perf_counter()
-        proc = subprocess.Popen(
-            [self._python, spec.script_path, config_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        try:
+            proc = subprocess.Popen(
+                [self._python, spec.script_path, config_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+        except OSError as exc:
+            wall = time.perf_counter() - start
+            return ExperimentResult(
+                spec_id=spec.spec_id,
+                hypothesis_id=spec.hypothesis_id,
+                exit_code=-1,
+                terminal="crash",
+                wall_time_s=wall,
+                peak_rss_mb=None,
+                metrics={},
+                intermediate_metrics=[],
+                stdout_tail="",
+                stderr_tail=str(exc),
+            )
         poller = _MemoryPoller(proc, spec.memory_cap_mb, self._poll_interval)
         poller.start()
         killed_for_timeout = False
@@ -267,8 +293,9 @@ class AblationRunner:
         self._runner = runner
 
     def sweep(self, base: ExperimentSpec, knob: str, values: Iterable[Any]) -> AblationTable:
+        value_list = list(values)
         rows: list[tuple[Any, ExperimentResult]] = []
-        for value, spec in zip(values, ablate(base, knob, values)):
+        for value, spec in zip(value_list, ablate(base, knob, value_list)):
             result = self._runner.run(spec)
             rows.append((value, result))
         return AblationTable(knob=knob, rows=rows)

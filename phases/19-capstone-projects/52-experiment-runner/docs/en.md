@@ -65,7 +65,7 @@ On systems without process inspection support, the poller logs a one time warnin
 
 The runner reads both pipes drained on completion. Stdout is scanned line by line; the last line that parses as json with all required `metric_keys` is taken as the metrics blob. Earlier json lines are kept in the result as `intermediate_metrics`; the evaluator can use these for learning curves.
 
-Stderr is captured verbatim into the result. The runner never raises on a non zero exit code; instead it records the code in the result. A non zero exit with parsable metrics is still a valid result. A non zero exit without metrics is a failed run.
+Stderr is captured verbatim into the result. The runner never raises on a non zero exit code; instead it records the code in the result. Any non zero exit is labelled `"crash"` even when the script printed metrics, so the evaluator treats partial runs as failures by default.
 
 ## Ablation table
 
@@ -74,7 +74,7 @@ def ablate(base: ExperimentSpec, knob: str, values: list[Any]) -> list[Experimen
     ...
 ```
 
-Given a base spec and a knob name, the helper returns one spec per value with `config[knob]` overridden. Each spec gets a derived `spec_id` (`base.spec_id + "_" + str(value)`). The runner ships an `AblationRunner` that runs them in order and returns an `AblationTable` keyed by knob value.
+Given a base spec and a knob name, the helper returns one spec per value with `config[knob]` overridden. Each spec gets a derived `spec_id` (`f"{base.spec_id}_{knob}_{value}"`). The runner ships an `AblationRunner` that runs them in order and returns an `AblationTable` keyed by knob value.
 
 Why one knob at a time. Full factorial sweeps blow up exponentially and produce results the evaluator cannot interpret. One knob at a time produces a clean axis the evaluator can plot. The lesson supports multi knob sweeps only as repeated single knob ablations, composed by the caller.
 
