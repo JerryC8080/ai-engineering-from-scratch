@@ -64,6 +64,7 @@ class ShardIndexEntry:
     shard_id: str
     path: str
     token_count: int
+    document_count: int
     sha256: str
     global_start: int
 
@@ -125,7 +126,7 @@ class HDF5ShardWriter:
         self._dataset: h5py.Dataset | None = None
 
     def __enter__(self) -> "HDF5ShardWriter":
-        self._file = h5py.File(self.path, "w")
+        self._file = h5py.File(self.path, "w", libver="latest")
         self._dataset = self._file.create_dataset(
             self.dataset_name,
             shape=(0,),
@@ -133,6 +134,7 @@ class HDF5ShardWriter:
             chunks=(self.chunk_size,),
             dtype=TOKEN_DTYPE,
         )
+        self._file.swmr_mode = True
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -173,6 +175,7 @@ class HDF5ShardWriter:
         new_total = self._token_count + size
         self._dataset.resize((new_total,))
         self._dataset[self._token_count : new_total] = chunk
+        self._dataset.flush()
         self._hasher.update(chunk.tobytes())
         self._token_count = new_total
         self._buffer = self._buffer[size:]
@@ -231,6 +234,7 @@ class ShardedTokenizationPipeline:
                     shard_id=result.shard_id,
                     path=result.path,
                     token_count=result.token_count,
+                    document_count=result.document_count,
                     sha256=result.sha256,
                     global_start=running_offset,
                 )
@@ -260,7 +264,18 @@ class MmapTokenStore:
         if not shard_entries:
             raise ValueError("at least one shard entry is required")
         self._entries = shard_entries
-        self._files: list[h5py.File] = [h5py.File(entry.path, "r", swmr=True) for entry in shard_entries]
+        self._files: list[h5py.File] = []
+        try:
+            for entry in shard_entries:
+                self._files.append(h5py.File(entry.path, "r", swmr=True))
+        except Exception:
+            for opened in self._files:
+                try:
+                    opened.close()
+                except Exception:
+                    pass
+            self._files = []
+            raise
         self._datasets: list[h5py.Dataset] = [f["tokens"] for f in self._files]
         self._total_tokens = sum(entry.token_count for entry in shard_entries)
 
@@ -443,6 +458,7 @@ def load_index(index_path: Path) -> list[ShardIndexEntry]:
                 shard_id=str(row["shard_id"]),
                 path=str(row["path"]),
                 token_count=int(row["token_count"]),
+                document_count=int(row.get("document_count", 0)),
                 sha256=str(row["sha256"]),
                 global_start=int(row["global_start"]),
             )

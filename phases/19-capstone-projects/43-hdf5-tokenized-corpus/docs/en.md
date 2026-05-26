@@ -11,14 +11,14 @@
 
 - Stream documents into a resizable HDF5 integer dataset with deterministic chunking.
 - Shard the write across multiple HDF5 files so failure is bounded and parallelism is possible.
-- Read tokens back via memory-mapped HDF5 access so the dataloader pays zero copy on the hot path.
+- Read tokens back through HDF5's page-cache-backed chunked layout so the dataloader copies into batch buffers only at batch time.
 - Implement a sliding-window dataloader that emits fixed-length training sequences with explicit packing rules.
 
 ## The Problem
 
 A modern language-model training run reads tokens at hundreds of thousands of samples per second across dozens of workers. JSONL on disk dies at the first cold-cache page fault: the JSON parser is slow, the document boundaries are not addressable, and seeking to "sample 4,217,884" requires scanning the file. Even Parquet, which compresses well, is a poor fit because the trainer does not want columns; it wants a flat token stream with O(1) random access.
 
-HDF5 fits because it offers a chunked, resizable, integer-only dataset whose chunks can be memory-mapped at read time. The trainer asks for a slice of `tokens[3,200,000 : 3,200,8192]` and HDF5 returns a NumPy view into the page cache. The cost is one open file handle and a chunk-sized page-cache footprint per worker, which is negligible compared to the cost of decoding JSONL.
+HDF5 fits because it offers a chunked, resizable, integer-only dataset whose chunks are page-cache friendly at read time. The trainer asks for a slice of `tokens[3,200,000 : 3,200,8192]` and HDF5 copies the requested hyperslab from the page cache into a freshly allocated NumPy array. The cost is one open file handle and a chunk-sized page-cache footprint per worker, which is negligible compared to the cost of decoding JSONL.
 
 The build problem is making the write side honest. Resizable datasets are easy to misuse: write one document at a time and the HDF5 file is fragmented to the point of unusable. Write all documents in one resize and a process death loses the whole shard. The right discipline is buffer-then-extend, with a buffer size that matches the chunk size, and a sharded write that splits the workload across files so a crash loses at most one shard.
 
@@ -50,7 +50,7 @@ A single HDF5 file is a single point of failure. The pipeline writes shards in p
 
 ### Memory-mapped read
 
-At training time each worker opens its share of HDF5 files in `swmr=True` mode and asks for `tokens[start:stop]`. HDF5's chunk layout makes this a page-cache read once the chunk is hot. The worker never materialises the file: the slice is a NumPy view, the dataloader copies into a pinned-memory training tensor only at batch time. The hot path has one syscall per chunk transition; everything else is RAM access.
+At training time each worker opens its share of HDF5 files in `swmr=True` mode and asks for `tokens[start:stop]`. HDF5's chunk layout makes this a page-cache-backed read once the chunk is hot. The worker never materialises the whole file: the slice is copied into the dataloader's batch buffer, which the dataloader then copies into a pinned-memory training tensor at batch time. The hot path has one syscall per chunk transition; everything else is RAM access.
 
 ### Sliding-window dataloader
 
@@ -86,7 +86,7 @@ Four patterns scale this lesson to a real training run.
 
 **Sharded sha256 with parallel verification.** Each shard has its own sha256 over the token bytes. The trainer can verify all shards in parallel before training starts. A wrong sha256 fails the run early, not on epoch three after sixteen hours.
 
-**`swmr=True` only on the reader side.** Single-Writer-Multiple-Reader mode is enabled when opening for read so multiple dataloader workers can share the file. Writers do not need it because the pipeline writes one shard at a time per process. Mixing the two modes is a common source of "file is locked" failures.
+**`swmr=True` on both sides, with `libver="latest"` on the writer.** Single-Writer-Multiple-Reader mode requires the writer to open with `libver="latest"`, create every dataset up front, then set `file.swmr_mode = True`. After that the writer must call `dataset.flush()` after each resize so reader workers (opened with `swmr=True`) see consistent data. Skipping `libver="latest"` or enabling SWMR after structural changes is a common source of "file is locked" failures.
 
 ## Use It
 
