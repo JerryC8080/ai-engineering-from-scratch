@@ -52,7 +52,7 @@ The lesson uses CPU autocast because that is what runs in CI; the same pattern t
 
 ### NaN and Inf detection
 
-The detection happens in two places. First, `scaler.unscale_` raises if it sees Inf gradients; the lesson catches the case explicitly by reading `scaler.is_enabled()` and inspecting the per-step inf flag. Second, the loss itself is checked with `torch.isfinite` before the backward pass; an Inf or NaN loss does not produce useful gradients and should be skipped without entering the optimizer. The two checks together cover both the forward-pass and the backward-pass failure modes.
+The detection happens in two places. First, the loss itself is checked with `torch.isfinite` before backward; an Inf or NaN loss does not produce useful gradients and is skipped without entering the optimizer. Second, after `scaler.unscale_(optimizer)` the lesson scans the unscaled gradients with `has_non_finite_grad(...)` and treats any Inf or NaN as a skip. The two checks together cover both the forward-pass and the backward-pass failure modes.
 
 ### Scaling factor diagnostics
 
@@ -74,7 +74,7 @@ Run it:
 python3 code/main.py
 ```
 
-The script exits zero and prints a per-step log with at least one `skip=True` row.
+The script exits zero and prints a per-step log with each row tagged `STEP` or `SKIP`; at least one row is a `SKIP`.
 
 ## Production Patterns
 
@@ -84,7 +84,7 @@ Four patterns elevate the loop to a production training step.
 
 **Clip threshold lives in the config.** `max_norm = 1.0` is the modern default for language-model training. Sweep it on a small model first; larger thresholds let the model recover from genuinely difficult batches; smaller thresholds bound the worst case at the cost of a noisier loss curve. The threshold belongs in the same YAML or JSON config as the schedule from lesson 44.
 
-**Norm log goes to a CSV with the schedule.** The CSV columns are `step, lr, grad_l2_pre_clip, grad_l2_post_clip, loss, skipped, scaler_scale`. A reviewer who opens the file sees the schedule, the gradient story, the scaling factor, and the skip outcome in one row. Splitting the columns across files is a recipe for misaligned analyses.
+**Norm log goes to a CSV with the schedule.** The CSV columns are `step, lr, grad_l2_pre_clip, grad_l2_post_clip, loss, skipped, skip_reason, scaler_scale`. A reviewer who opens the file sees the schedule, the gradient story, the scaling factor, and the skip outcome (with its reason) in one row. Splitting the columns across files is a recipe for misaligned analyses.
 
 **`scaler.update()` runs every step, even on skip.** On a clean step the scaler reads its no-inf counter, increments it, and possibly doubles the factor. On a skipped step the scaler halves the factor and resets the counter. Forgetting `update()` on the skip path is the bug that produces "the scaling factor never changed."
 
@@ -106,7 +106,7 @@ Production patterns:
 2. Add a `--bf16` mode that switches autocast to BF16 instead of FP16. BF16 has a wider exponent range than FP16 and rarely needs loss scaling; verify the skip rate drops to zero on the same demo.
 3. Add a unit test that the gradient-clip wrapper returns the pre-clip and post-clip norm correctly when no clipping occurs.
 4. Add a rolling-window skip-rate computation and a CLI flag that fails the run if the rate exceeds a configured threshold for 100 consecutive steps.
-5. Wire the loop to write the canonical CSV (`step, lr, grad_l2_pre_clip, grad_l2_post_clip, loss, skipped, scaler_scale`) and confirm the file survives a Ctrl-C by flushing after every row.
+5. Wire the loop to write the canonical CSV (`step, lr, grad_l2_pre_clip, grad_l2_post_clip, loss, skipped, skip_reason, scaler_scale`) and confirm the file survives a Ctrl-C by flushing after every row.
 
 ## Key Terms
 

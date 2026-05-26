@@ -211,7 +211,11 @@ class AmpTrainState:
             loss = self._loss_fn(predictions, targets)
 
         if not torch.isfinite(loss).all().item():
-            return self._record_skip(loss_value=float("nan"), reason="non_finite_loss", pre_clip=0.0)
+            return self._record_skip(
+                loss_value=float(loss.detach().cpu().item()),
+                reason="non_finite_loss",
+                pre_clip=0.0,
+            )
 
         self.scaler.scale(loss).backward()
         if gradient_corruptor is not None:
