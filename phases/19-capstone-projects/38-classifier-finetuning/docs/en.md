@@ -108,7 +108,7 @@ The body is a deliberately tiny transformer: vocab 260, hidden 64, 4 heads, 2 bl
 
 ## What you will build
 
-The implementation is one `main.py` plus four test modules.
+The implementation is one `main.py` plus one test module (`code/tests/test_main.py`).
 
 1. `ByteTokenizer`: maps bytes to ids, reserves a pad id.
 2. `Block`: a transformer block with multi-head attention and a feed-forward layer. Pre-norm.

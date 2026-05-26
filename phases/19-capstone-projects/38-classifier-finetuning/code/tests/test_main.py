@@ -65,7 +65,7 @@ class DatasetTests(unittest.TestCase):
 
     def test_stratified_split_preserves_balance(self) -> None:
         texts, labels = make_dataset(n_per_class=100, seed=2)
-        tr_t, tr_y, te_t, te_y = stratified_split(texts, labels, test_frac=0.2, seed=2)
+        tr_t, _tr_y, te_t, te_y = stratified_split(texts, labels, test_frac=0.2, seed=2)
         self.assertEqual(len(tr_t) + len(te_t), 200)
         # 20 percent of each class lands in the test split.
         self.assertEqual(te_y.count(0), 20)
@@ -150,8 +150,12 @@ class ForwardTests(unittest.TestCase):
         model.eval()
         tok = ByteTokenizer()
         ids1, mask1 = tok.encode("hello", max_len=cfg.max_len)
-        ids2, mask2 = tok.encode("hello", max_len=cfg.max_len)
-        # ids2 with extra pads injected past the real content should match.
+        # Perturb only masked (pad) positions; pooled output must stay unchanged.
+        ids2 = list(ids1)
+        mask2 = list(mask1)
+        for i, m in enumerate(mask2):
+            if m == 0:
+                ids2[i] = (ids2[i] + 1) % ByteTokenizer.VOCAB
         a = model(torch.tensor([ids1]), torch.tensor([mask1]))
         b = model(torch.tensor([ids2]), torch.tensor([mask2]))
         self.assertTrue(torch.allclose(a, b))
