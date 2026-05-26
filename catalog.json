@@ -6,7 +6,7 @@
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 473
+    "code_files": 478
   },
   "phases": [
     {
@@ -3948,6 +3948,7 @@
           "has_notebook": false,
           "code_files": [
             "main.jl",
+            "main.rs",
             "self_attention.py"
           ],
           "outputs": [
@@ -3971,7 +3972,8 @@
           "has_quiz": false,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
@@ -4000,7 +4002,8 @@
           "has_notebook": true,
           "code_files": [
             "main.jl",
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
@@ -5231,7 +5234,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
@@ -5486,7 +5490,8 @@
           "has_quiz": true,
           "has_notebook": false,
           "code_files": [
-            "main.py"
+            "main.py",
+            "main.rs"
           ],
           "outputs": [
             {
