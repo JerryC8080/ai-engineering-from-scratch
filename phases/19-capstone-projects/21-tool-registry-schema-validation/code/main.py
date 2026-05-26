@@ -118,6 +118,22 @@ def validate_schema_shape(schema: dict) -> None:
     t = schema.get("type")
     if t is not None and t not in PRIMITIVE_TYPE_MAP:
         raise ValueError(f"unsupported type: {t!r}")
+    enum_vals = schema.get("enum")
+    if enum_vals is not None and not isinstance(enum_vals, list):
+        raise ValueError("enum must be a list")
+    min_len = schema.get("minLength")
+    if min_len is not None:
+        if isinstance(min_len, bool) or not isinstance(min_len, int) or min_len < 0:
+            raise ValueError("minLength must be a non-negative integer")
+    max_len = schema.get("maxLength")
+    if max_len is not None:
+        if isinstance(max_len, bool) or not isinstance(max_len, int) or max_len < 0:
+            raise ValueError("maxLength must be a non-negative integer")
+    if min_len is not None and max_len is not None and min_len > max_len:
+        raise ValueError("minLength cannot be greater than maxLength")
+    pattern = schema.get("pattern")
+    if pattern is not None and not isinstance(pattern, str):
+        raise ValueError("pattern must be a string")
     props = schema.get("properties")
     if props is not None:
         if not isinstance(props, dict):
