@@ -18,6 +18,14 @@ export function buildIndex(items: Lesson[]): Record<string, Lesson> {
 }
 
 export function topoOrder(items: Lesson[]): string[] {
+  const known = new Set(items.map((l) => l.id));
+  for (const l of items) {
+    for (const p of l.prereqs) {
+      if (!known.has(p)) {
+        throw new Error(`lesson ${l.id} references unknown prereq ${p}`);
+      }
+    }
+  }
   const indeg: Record<string, number> = {};
   const out: Record<string, string[]> = {};
   for (const l of items) {
@@ -43,6 +51,12 @@ export function topoOrder(items: Lesson[]): string[] {
         ready.sort();
       }
     }
+  }
+  if (order.length !== Object.keys(indeg).length) {
+    const stuck = Object.keys(indeg)
+      .filter((id) => (indeg[id] ?? 0) > 0)
+      .sort();
+    throw new Error(`cycle detected in curriculum: ${stuck.join(", ")}`);
   }
   return order;
 }

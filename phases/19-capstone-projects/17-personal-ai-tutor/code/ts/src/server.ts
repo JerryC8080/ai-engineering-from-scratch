@@ -1,9 +1,6 @@
 import { Hono } from "hono";
-import { z } from "zod";
 import { buildIndex, CURRICULUM, pickNextLesson, topoOrder } from "./curriculum.js";
 import type { MasteryStore } from "./mastery.js";
-
-const SubmitBody = z.object({ correct: z.boolean() });
 
 export function buildApp(mastery: MasteryStore): Hono {
   const app = new Hono();
@@ -23,15 +20,21 @@ export function buildApp(mastery: MasteryStore): Hono {
   app.post("/lesson/:id/submit", async (c) => {
     const id = c.req.param("id");
     if (!index[id]) return c.json({ error: "unknown lesson", id }, 404);
-    let parsed: { correct: boolean };
+    let raw: unknown;
     try {
-      const raw = await c.req.json();
-      parsed = SubmitBody.parse(raw);
+      raw = await c.req.json();
     } catch (err) {
       return c.json({ error: "invalid body", detail: String(err) }, 400);
     }
-    const updated = mastery.record(id, parsed.correct, Date.now());
-    return c.json({ id, correct: parsed.correct, mastery: updated });
+    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+      return c.json({ error: "invalid payload", detail: "body must be a JSON object" }, 400);
+    }
+    const correct = (raw as Record<string, unknown>).correct;
+    if (typeof correct !== "boolean") {
+      return c.json({ error: "invalid payload", detail: "correct must be boolean" }, 400);
+    }
+    const updated = mastery.record(id, correct, Date.now());
+    return c.json({ id, correct, mastery: updated });
   });
 
   return app;

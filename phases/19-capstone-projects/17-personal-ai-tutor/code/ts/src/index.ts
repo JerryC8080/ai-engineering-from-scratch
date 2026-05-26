@@ -55,13 +55,27 @@ function runDemo(): void {
   }
 }
 
+const MAX_BODY_SIZE = 1024 * 1024;
+
 function nodeAdapter(app: ReturnType<typeof buildApp>) {
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const host = req.headers.host ?? "localhost";
     const url = new URL(req.url ?? "/", `http://${host}`);
-    const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
-    const body = chunks.length > 0 ? Buffer.concat(chunks) : undefined;
+    const body = await new Promise<Buffer | undefined>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      let received = 0;
+      req.on("data", (chunk: Buffer) => {
+        received += chunk.length;
+        if (received > MAX_BODY_SIZE) {
+          req.destroy();
+          reject(new Error(`request body exceeds ${MAX_BODY_SIZE} bytes`));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      req.on("end", () => resolve(chunks.length > 0 ? Buffer.concat(chunks) : undefined));
+      req.on("error", reject);
+    });
     const init: RequestInit = {
       method: req.method,
       headers: req.headers as Record<string, string>,
@@ -79,8 +93,11 @@ function runServer(port: number): void {
   const handler = nodeAdapter(app);
   const server = createServer((req, res) => {
     handler(req, res).catch((err) => {
-      res.writeHead(500, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: String(err) }));
+      const message = String(err);
+      const tooLarge = message.includes("exceeds");
+      if (res.headersSent) return;
+      res.writeHead(tooLarge ? 413 : 500, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: message }));
     });
   });
   server.listen(port, () => {
@@ -88,11 +105,28 @@ function runServer(port: number): void {
   });
 }
 
+const DEFAULT_PORT = 8090;
+
+function parsePort(argv: string[], defaultPort: number): number {
+  const portFlag = argv.indexOf("--port");
+  if (portFlag < 0) return defaultPort;
+  const raw = argv[portFlag + 1];
+  if (raw === undefined) {
+    process.stderr.write("--port requires a value\n");
+    process.exit(2);
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > 65535) {
+    process.stderr.write(`invalid --port ${raw}: must be integer in 1..65535\n`);
+    process.exit(2);
+  }
+  return n;
+}
+
 function main(): void {
   const argv = process.argv.slice(2);
   if (argv.includes("--serve")) {
-    const portFlag = argv.indexOf("--port");
-    const port = portFlag >= 0 ? Number(argv[portFlag + 1]) : 8090;
+    const port = parsePort(argv, DEFAULT_PORT);
     runServer(port);
     return;
   }
