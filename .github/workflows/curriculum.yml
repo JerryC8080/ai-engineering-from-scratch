@@ -55,12 +55,14 @@ jobs:
           python-version: "3.12"
       - name: rebuild catalog.json
         run: python3 scripts/build_catalog.py
+      - name: sync README counts
+        run: python3 scripts/check_readme_counts.py --fix
       - name: commit + push if changed
         env:
           BOT_COMMIT_PREFIX: "chore(catalog): auto-regen"
         run: |
-          if git diff --quiet catalog.json; then
-            echo "catalog.json already in sync"
+          if git diff --quiet catalog.json README.md; then
+            echo "catalog.json and README.md already in sync"
             exit 0
           fi
           last_msg=$(git log -1 --pretty=%s)
@@ -70,7 +72,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add catalog.json
+          git add catalog.json README.md
           git commit -m "$BOT_COMMIT_PREFIX"
           git push
 
@@ -96,8 +98,9 @@ jobs:
           fi
 
   readme-counts-drift:
-    name: README.md counts drift check
+    name: README.md counts drift advisory
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
         with:
@@ -108,4 +111,7 @@ jobs:
       - name: rebuild catalog
         run: python3 scripts/build_catalog.py
       - name: check README counts against catalog.json
-        run: python3 scripts/check_readme_counts.py
+        run: |
+          if ! python3 scripts/check_readme_counts.py; then
+            echo "::warning::README.md counts drift detected. Main will self-heal on merge via the catalog-sync job."
+          fi
