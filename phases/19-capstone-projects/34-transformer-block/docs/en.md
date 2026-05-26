@@ -81,7 +81,7 @@ They make the gradient path additive across depth, which keeps the gradient norm
 
 Run it:
 
-```
+```bash
 python3 code/main.py
 ```
 
@@ -113,7 +113,7 @@ Three patterns turn the textbook block into something you can ship.
 1. Add a `bias=False` flag to every linear in the block. Modern open weights LLMs ship without biases on the linear layers. Measure how many parameters you save in a 12 layer 768 dim model.
 2. Replace `nn.LayerNorm` with a hand rolled RMSNorm and verify the output shape is unchanged.
 3. Add a flag that returns the attention weights for the first head as a `(B, T, T)` tensor. Plot the upper triangle to confirm it is zero after softmax.
-4. Build a sanity check that feeds a `(2, 16, 384)` tensor with `H=6` through both variants and asserts the forward outputs match within `1e-6` when LayerNorm weights are initialized identically and dropout is set to zero.
+4. Build a sanity check that feeds a `(2, 16, 384)` tensor with `H=6` through both variants and asserts the forward outputs are different (for example, `not torch.allclose`) when weights are initialized identically and dropout is set to zero.
 
 ## Key Terms
 

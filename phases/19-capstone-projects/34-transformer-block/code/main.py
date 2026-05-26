@@ -220,7 +220,7 @@ def demo() -> None:
     pre_stack = BlockStack(cfg_pre, depth=depth)
     post_stack = BlockStack(cfg_post, depth=depth)
 
-    pre_stack.embed.weight.data.copy_(post_stack.embed.weight.data)
+    post_stack.load_state_dict(pre_stack.state_dict())
     _set_eval_mode(pre_stack)
     _set_eval_mode(post_stack)
 
