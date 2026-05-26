@@ -6,7 +6,7 @@
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 532
   },
   "phases": [
     {
@@ -12410,7 +12410,15 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "ts/src/fixtures.ts",
+            "ts/src/index.ts",
+            "ts/src/render.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/fixtures.test.ts",
+            "ts/tests/render.test.ts",
+            "ts/tests/server.test.ts"
           ],
           "outputs": [
             {
@@ -12472,7 +12480,16 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "ts/src/agent.ts",
+            "ts/src/blocks.ts",
+            "ts/src/index.ts",
+            "ts/src/server.ts",
+            "ts/src/slack_verify.ts",
+            "ts/src/types.ts",
+            "ts/tests/agent.test.ts",
+            "ts/tests/server.test.ts",
+            "ts/tests/slack_verify.test.ts"
           ],
           "outputs": [
             {
@@ -12536,7 +12553,15 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "ts/src/index.ts",
+            "ts/src/server.ts",
+            "ts/src/session.ts",
+            "ts/src/stream.ts",
+            "ts/src/types.ts",
+            "ts/tests/server.test.ts",
+            "ts/tests/session.test.ts",
+            "ts/tests/stream.test.ts"
           ],
           "outputs": [
             {
@@ -12568,8 +12593,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12632,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12671,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
