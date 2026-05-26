@@ -116,8 +116,13 @@ class SinusoidalPositionalEmbedding(nn.Module):
 
     def __init__(self, max_context_length: int, d_model: int, base: float = 10000.0) -> None:
         super().__init__()
+        if max_context_length < 1:
+            raise ValueError(f"max_context_length must be >= 1, got {max_context_length}")
+        if d_model < 1:
+            raise ValueError(f"d_model must be >= 1, got {d_model}")
         if d_model % 2 != 0:
             raise ValueError(f"d_model must be even, got {d_model}")
+        self.max_context_length = max_context_length
         pos = torch.arange(max_context_length, dtype=torch.float32).unsqueeze(1)
         i = torch.arange(d_model // 2, dtype=torch.float32)
         denom = base ** (2 * i / d_model)
@@ -128,6 +133,12 @@ class SinusoidalPositionalEmbedding(nn.Module):
         self.register_buffer("pe", pe, persistent=False)
 
     def forward(self, seq_len: int) -> torch.Tensor:
+        if seq_len < 1:
+            raise ValueError(f"seq_len must be >= 1, got {seq_len}")
+        if seq_len > self.max_context_length:
+            raise ValueError(
+                f"seq_len {seq_len} exceeds max_context_length {self.max_context_length}"
+            )
         return self.pe[:seq_len]
 
 
