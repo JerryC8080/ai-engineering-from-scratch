@@ -55,8 +55,9 @@ class RankResult:
 def init_process_group(rank: int, world_size: int, backend: str, master_port: int) -> None:
     os.environ["MASTER_ADDR"] = "127.0.0.1"
     os.environ["MASTER_PORT"] = str(master_port)
-    os.environ.setdefault("GLOO_SOCKET_IFNAME", "lo0")
-    os.environ.setdefault("TP_SOCKET_IFNAME", "lo0")
+    loopback = "lo0" if sys.platform == "darwin" else "lo"
+    os.environ.setdefault("GLOO_SOCKET_IFNAME", loopback)
+    os.environ.setdefault("TP_SOCKET_IFNAME", loopback)
     dist.init_process_group(backend=backend, rank=rank, world_size=world_size)
 
 
