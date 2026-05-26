@@ -167,6 +167,7 @@ class HarnessLoop:
         self._events: list[Event] = []
         self._history: list[Step] = []
         self._reason: str = ""
+        self._prev_state: State | None = None
 
     @property
     def events(self) -> list[Event]:
@@ -201,6 +202,7 @@ class HarnessLoop:
         self._emit("budget.warn", {"limit": which})
         self.hooks.fire("on_budget_exceeded", {"limit": which, "budget": self.budget})
         self._reason = f"budget_exceeded:{which}"
+        self._prev_state = self.state
         return self._pause(self._reason)
 
     def _pause(self, reason: str) -> PullRequest:
@@ -223,9 +225,14 @@ class HarnessLoop:
             self.budget.tool_calls = 0
             self.budget.started_at = time.time()
             self._reason = ""
-            self.state = State.REFLECTING if self._plan else State.IDLE
+            prev = self._prev_state
+            self._prev_state = None
             if not self._plan:
                 return self._begin_plan()
+            if prev == State.EXECUTING:
+                self.state = State.EXECUTING
+            else:
+                self.state = State.REFLECTING
             return self._step()
         if self.state == State.AWAITING_TOOL:
             if payload is None:

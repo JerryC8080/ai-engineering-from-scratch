@@ -24,28 +24,19 @@ This lesson builds that contract. We name six states, ten hook topics, two pull 
 
 The loop has six states. Five are active. One is terminal.
 
-```
-        +--------+
-        |  IDLE  |
-        +---+----+
-            | run(goal)
-            v
-       +----------+        +-----------+
-       | PLANNING |------->| EXECUTING |
-       +----------+        +-----+-----+
-            ^                    |
-            | replan             | tool_call needed
-            |                    v
-       +-----------+        +----------------+
-       | REFLECT-  |<-------| AWAITING_TOOL  |
-       |   ING     |  result+----------------+
-       +-----+-----+
-             |
-             | goal_met
-             v
-         +-------+
-         | DONE  |
-         +-------+
+```mermaid
+stateDiagram-v2
+    [*] --> IDLE
+    IDLE --> PLANNING: run(goal)
+    PLANNING --> EXECUTING: plan committed
+    EXECUTING --> AWAITING_TOOL: tool_call needed
+    AWAITING_TOOL --> REFLECTING: result
+    EXECUTING --> REFLECTING: no_tool step done
+    REFLECTING --> EXECUTING: next step
+    REFLECTING --> PLANNING: replan
+    REFLECTING --> DONE: goal_met
+    PLANNING --> DONE: no_plan
+    DONE --> [*]
 ```
 
 `IDLE` is the only legal entry point. `DONE` is the only legal exit. `AWAITING_TOOL` is the only state that yields a pull point. Every other transition is internal.
@@ -56,7 +47,7 @@ The state machine is deterministic. Given the same event log, the harness re-ent
 
 Hooks are the operator's seam into the loop. The harness fires ten topics. Each topic accepts any number of subscribers. Subscribers fire in registration order. A subscriber may mutate the payload, raise to abort the turn, or return a sentinel to skip the next step.
 
-```
+```text
 before_plan         after_plan
 before_tool_call    after_tool_call
 before_step         after_step
@@ -76,14 +67,19 @@ A pull point is not an exception. It is a return. The caller inspects the harnes
 
 ## The event stream
 
-Every state transition and every hook fire emits a typed event. There are eleven event types. The stream is append-only. Subscribers can replay from any offset.
+The loop appends events to a typed stream at specific points in the contract. The stream is append-only and subscribers can replay from any offset. The eleven implemented event types are:
 
-```
-session.start    plan.draft       plan.commit
-step.start       step.end
-tool.call        tool.result      tool.error
-budget.warn      session.pause    session.complete
-```
+- `session.start` — emitted once when `run(goal)` is called
+- `plan.draft` — emitted when the planner returns a draft plan
+- `plan.commit` — emitted after the draft is committed as the active plan
+- `step.start` — emitted at the start of each executing step
+- `step.end` — emitted at the end of each executing step
+- `tool.call` — emitted when a tool-requiring step yields control to the caller
+- `tool.result` — emitted on resume with a tool result
+- `tool.error` — emitted on resume with an error or when a hook aborts the call
+- `budget.warn` — emitted when a budget limit is reached
+- `session.pause` — emitted when the loop yields on a pause (budget or hook)
+- `session.complete` — emitted once when the loop reaches `DONE`
 
 The events do not duplicate hook payloads. Hooks are imperative (mutate, abort). Events are observational (record, ship). Treat them as orthogonal.
 
