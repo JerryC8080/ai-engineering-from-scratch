@@ -206,7 +206,7 @@ class IterationScheduler:
                                  "error": repr(exc)},
                     ))
                     continue
-                bs = stats[result.branch]
+                bs = stats.setdefault(result.branch, BranchStats(branch=result.branch))
                 bs.runs += 1
                 bs.reward_sum += result.reward
                 trace.append(TraceEvent(
@@ -264,10 +264,17 @@ class IterationScheduler:
             except Exception:
                 in_flight.pop(task, None)
                 continue
-            bs = stats[result.branch]
+            bs = stats.setdefault(result.branch, BranchStats(branch=result.branch))
             bs.runs += 1
             bs.reward_sum += result.reward
             in_flight.pop(task, None)
+            if (not bs.paper_triggered) and bs.mean >= self.paper_threshold:
+                bs.paper_triggered = True
+                triggers.append(result.branch)
+                trace.append(TraceEvent(
+                    kind="paper.trigger",
+                    payload={"branch": result.branch, "mean": bs.mean},
+                ))
             trace.append(TraceEvent(
                 kind="result.drain",
                 payload={"branch": result.branch, "reward": result.reward},

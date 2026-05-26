@@ -67,7 +67,7 @@ The pruning gate is separate from the picker. Pruning removes a branch from futu
 
 ## Parallel slots with asyncio
 
-The scheduler drives experiments with `asyncio.create_task`. Each task runs the experiment runner (an `async def` callable) and posts a `Result` to an `asyncio.Queue`. The main loop awaits the result queue and fires the scoring update.
+The scheduler drives experiments with `asyncio.create_task`. Each task runs the experiment runner (an `async def` callable) that returns a `Result`. The main loop waits on the set of in-flight tasks with `asyncio.wait(..., return_when=asyncio.FIRST_COMPLETED)` and fires the scoring update on each completion.
 
 ```mermaid
 sequenceDiagram
@@ -75,11 +75,11 @@ sequenceDiagram
     participant S as Scheduler
     participant Q as Hypothesis queue
     participant R as Experiment runner
-    participant B as Result bus
+    participant T as In-flight tasks
     S->>Q: pop highest UCB
     S->>R: create_task(run(hypothesis))
-    R-->>B: put(Result)
-    S->>B: await result
+    R-->>T: Result (task completes)
+    S->>T: await wait(FIRST_COMPLETED)
     S->>S: update UCB stats
     S->>Q: re-queue follow-ups
 ```
@@ -111,7 +111,7 @@ Each scheduling decision (pick, dispatch, result, prune, fan-out) emits one even
 
 ## How to read the code
 
-`code/main.py` defines `Hypothesis`, `Result`, `BranchStats`, `IterationScheduler`, and a `make_deterministic_runner` factory that returns an asyncio experiment runner with predictable rewards. The runner sleeps for a small random delay so concurrency is observable.
+`code/main.py` defines `Hypothesis`, `Result`, `BranchStats`, `IterationScheduler`, and a `make_deterministic_runner` factory that returns an asyncio experiment runner with predictable rewards. The runner sleeps for a fixed `delay_ms` (default `5ms`) so concurrency is observable.
 
 `code/tests/test_scheduler.py` covers: UCB picks untried branches first, parallel slot occupancy, paper triggers when threshold is crossed, branch pruning after low-yield trials, fan-out follow-up hypotheses, and budget exit (both experiment count and wall clock).
 
