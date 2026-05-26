@@ -2,11 +2,11 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 435,
+    "lessons": 439,
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 515
   },
   "phases": [
     {
@@ -12304,7 +12304,7 @@
       "num": 19,
       "slug": "19-capstone-projects",
       "title": "Capstone Projects",
-      "lesson_count": 17,
+      "lesson_count": 21,
       "lessons": [
         {
           "num": 1,
@@ -12568,8 +12568,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12607,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12646,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
@@ -12847,6 +12867,66 @@
               ]
             }
           ]
+        },
+        {
+          "num": 34,
+          "slug": "34-transformer-block",
+          "title": "Transformer Block from Scratch",
+          "path": "phases/19-capstone-projects/34-transformer-block",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_block.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 35,
+          "slug": "35-gpt-model-assembly",
+          "title": "GPT Model Assembly",
+          "path": "phases/19-capstone-projects/35-gpt-model-assembly",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_model.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 36,
+          "slug": "36-training-loop-eval",
+          "title": "Training Loop and Evaluation",
+          "path": "phases/19-capstone-projects/36-training-loop-eval",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_training.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 37,
+          "slug": "37-loading-pretrained-weights",
+          "title": "Loading Pretrained Weights",
+          "path": "phases/19-capstone-projects/37-loading-pretrained-weights",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_load.py"
+          ],
+          "outputs": []
         }
       ]
     }
