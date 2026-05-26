@@ -101,7 +101,7 @@ async function main(): Promise<number> {
   );
 
   const request: MessagesRequest = {
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-4-6",
     max_tokens: 256,
     messages: [{ role: "user", content: "What is a neural network in one sentence?" }],
   };
