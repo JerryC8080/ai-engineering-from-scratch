@@ -6,7 +6,7 @@
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 513
   },
   "phases": [
     {
@@ -12317,7 +12317,17 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "main.ts"
+            "ts/src/eval.ts",
+            "ts/src/harness.ts",
+            "ts/src/hooks.ts",
+            "ts/src/index.ts",
+            "ts/src/model.ts",
+            "ts/src/plan.ts",
+            "ts/src/repl.ts",
+            "ts/src/tools.ts",
+            "ts/src/types.ts",
+            "ts/tests/harness.test.ts",
+            "ts/tests/tools.test.ts"
           ],
           "outputs": [
             {
@@ -12349,7 +12359,15 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "main.ts"
+            "ts/src/corpus.ts",
+            "ts/src/index.ts",
+            "ts/src/index_store.ts",
+            "ts/src/retrieval.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/index_store.test.ts",
+            "ts/tests/retrieval.test.ts",
+            "ts/tests/server.test.ts"
           ],
           "outputs": [
             {
@@ -12381,7 +12399,15 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "main.ts"
+            "ts/src/index.ts",
+            "ts/src/orchestrator.ts",
+            "ts/src/protocol.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/src/vad.ts",
+            "ts/tests/orchestrator.test.ts",
+            "ts/tests/protocol.test.ts",
+            "ts/tests/vad.test.ts"
           ],
           "outputs": [
             {
