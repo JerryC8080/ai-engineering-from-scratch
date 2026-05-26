@@ -76,11 +76,16 @@ function nodeAdapter(app: ReturnType<typeof buildApp>) {
       req.on("end", () => resolve(chunks.length > 0 ? Buffer.concat(chunks) : undefined));
       req.on("error", reject);
     });
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (typeof value === "string") headers.set(key, value);
+      else if (Array.isArray(value)) headers.set(key, value.join(", "));
+    }
     const init: RequestInit = {
-      method: req.method,
-      headers: req.headers as Record<string, string>,
+      method: req.method ?? "GET",
+      headers,
     };
-    if (body) init.body = body;
+    if (body && req.method !== "GET" && req.method !== "HEAD") init.body = body;
     const fetchRes = await app.fetch(new Request(url.toString(), init));
     res.writeHead(fetchRes.status, Object.fromEntries(fetchRes.headers));
     res.end(Buffer.from(await fetchRes.arrayBuffer()));

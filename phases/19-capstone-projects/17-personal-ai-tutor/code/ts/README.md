@@ -7,7 +7,7 @@ scheduler behind two HTTP routes.
 
 ## Layout
 
-```
+```text
 src/
   index.ts       entry: demo (default) or HTTP server (--serve)
   server.ts      Hono routes (GET /lesson/next, POST /lesson/:id/submit)
