@@ -1,8 +1,11 @@
 import type { AgentReport } from "./types.js";
 
+let incidentCounter = 0;
+
 export function mockAgent(alertText: string): AgentReport {
   const tokens = alertText.toLowerCase();
-  const incidentId = `inc-${Date.now()}`;
+  incidentCounter += 1;
+  const incidentId = `inc-${Date.now()}-${incidentCounter}`;
   if (tokens.includes("oom") || tokens.includes("memory")) {
     return {
       incidentId,

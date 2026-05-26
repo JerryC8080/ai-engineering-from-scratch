@@ -5,8 +5,6 @@ import { mockAgent } from "./agent.js";
 import { actionReply, buildSlackResponse } from "./blocks.js";
 import type { OutboundCall } from "./types.js";
 
-const DEFAULT_SECRET = "test-signing-secret-DO-NOT-USE-IN-PROD";
-
 const InteractivitySchema = z.object({
   actions: z
     .array(
@@ -29,8 +27,10 @@ export function buildApp(options: AppOptions = {}): {
   app: Hono;
   outboundLog: OutboundCall[];
 } {
-  const signingSecret =
-    options.signingSecret ?? process.env.SLACK_SIGNING_SECRET ?? DEFAULT_SECRET;
+  const signingSecret = options.signingSecret || process.env.SLACK_SIGNING_SECRET;
+  if (!signingSecret) {
+    throw new Error("SLACK_SIGNING_SECRET is required");
+  }
   const outboundLog: OutboundCall[] = options.outboundLog ?? [];
   const now = options.now ?? (() => Math.floor(Date.now() / 1000));
   const app = new Hono();

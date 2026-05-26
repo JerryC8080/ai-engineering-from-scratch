@@ -34,5 +34,6 @@ describe("mockAgent", () => {
     const b = mockAgent("OOMKilled");
     assert.ok(a.incidentId.startsWith("inc-"));
     assert.ok(b.incidentId.startsWith("inc-"));
+    assert.notEqual(a.incidentId, b.incidentId);
   });
 });

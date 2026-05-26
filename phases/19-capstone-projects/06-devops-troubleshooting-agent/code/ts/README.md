@@ -7,7 +7,7 @@ Destructive remediations only run after the Slack card is approved.
 
 ## Layout
 
-```
+```text
 ts/
   package.json
   tsconfig.json
@@ -26,7 +26,7 @@ ts/
 
 ## Run
 
-```
+```bash
 npm install
 npm run typecheck
 npm test
