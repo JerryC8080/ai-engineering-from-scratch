@@ -2,11 +2,11 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 435,
+    "lessons": 439,
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 519
   },
   "phases": [
     {
@@ -12304,7 +12304,7 @@
       "num": 19,
       "slug": "19-capstone-projects",
       "title": "Capstone Projects",
-      "lesson_count": 17,
+      "lesson_count": 21,
       "lessons": [
         {
           "num": 1,
@@ -12568,8 +12568,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12607,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12646,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
@@ -12847,6 +12867,70 @@
               ]
             }
           ]
+        },
+        {
+          "num": 42,
+          "slug": "42-large-corpus-downloader",
+          "title": "Large Corpus Downloader",
+          "path": "phases/19-capstone-projects/42-large-corpus-downloader",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/__init__.py",
+            "tests/test_downloader.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 43,
+          "slug": "43-hdf5-tokenized-corpus",
+          "title": "HDF5 Tokenized Corpus",
+          "path": "phases/19-capstone-projects/43-hdf5-tokenized-corpus",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/__init__.py",
+            "tests/test_hdf5_corpus.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 44,
+          "slug": "44-cosine-lr-warmup",
+          "title": "Cosine LR with Linear Warmup",
+          "path": "phases/19-capstone-projects/44-cosine-lr-warmup",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/__init__.py",
+            "tests/test_schedule.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 45,
+          "slug": "45-gradient-clipping-amp",
+          "title": "Gradient Clipping and Mixed Precision",
+          "path": "phases/19-capstone-projects/45-gradient-clipping-amp",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/__init__.py",
+            "tests/test_amp.py"
+          ],
+          "outputs": []
         }
       ]
     }
