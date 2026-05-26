@@ -112,13 +112,14 @@ class LeaderboardOutputTests(unittest.TestCase):
             adapter = harness.ToyAdapter()
             board = harness.run_leaderboard(tasks, adapter)
             out = Path(tmp) / "leaderboard.json"
-            harness.write_leaderboard(board, out)
+            harness.write_leaderboard(board, out, adapter_name=adapter.name)
             payload = json.loads(out.read_text())
             self.assertEqual(payload["schema"], "leaderboard.v1")
+            self.assertEqual(payload["adapter"], adapter.name)
             self.assertEqual(len(payload["tasks"]), 5)
             for entry in payload["tasks"]:
                 self.assertNotIn("per_example", entry)
-            harness.write_leaderboard(board, out, include_per_example=True)
+            harness.write_leaderboard(board, out, adapter_name=adapter.name, include_per_example=True)
             payload2 = json.loads(out.read_text())
             for entry in payload2["tasks"]:
                 self.assertIn("per_example", entry)

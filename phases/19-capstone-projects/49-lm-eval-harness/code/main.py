@@ -293,6 +293,8 @@ def run_task(
     *,
     batch_size: int = 8,
 ) -> TaskResult:
+    if batch_size <= 0:
+        raise ValueError(f"batch_size must be > 0, got {batch_size}")
     if not examples:
         return TaskResult(task=task_name, metric="none", score=0.0, correct=0, total=0)
     metric = examples[0].metric
@@ -306,7 +308,11 @@ def run_task(
         chunk = examples[i:i + batch_size]
         prompts = [ex.prompt for ex in chunk]
         outputs = adapter.generate(prompts)
-        for ex, out in zip(chunk, outputs):
+        if len(outputs) != len(chunk):
+            raise ValueError(
+                f"adapter returned {len(outputs)} outputs for {len(chunk)} prompts in task {task_name}"
+            )
+        for ex, out in zip(chunk, outputs, strict=True):
             score = metric_fn(out, ex.targets, ex.extras)
             correct_sum += score
             total += 1
@@ -353,13 +359,19 @@ def run_leaderboard(
     )
 
 
-def write_leaderboard(board: Leaderboard, path: Path, *, include_per_example: bool = False) -> None:
+def write_leaderboard(
+    board: Leaderboard,
+    path: Path,
+    *,
+    adapter_name: str,
+    include_per_example: bool = False,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "schema": board.schema,
         "timestamp": board.timestamp,
         "overall_score": board.overall_score,
-        "adapter": _adapter_marker_from_results(board.tasks),
+        "adapter": adapter_name,
         "tasks": [
             {
                 "task": r.task,
@@ -374,10 +386,6 @@ def write_leaderboard(board: Leaderboard, path: Path, *, include_per_example: bo
         ],
     }
     path.write_text(json.dumps(payload, indent=2) + "\n")
-
-
-def _adapter_marker_from_results(tasks: List[TaskResult]) -> str:
-    return tasks[0].task if tasks else ""
 
 
 def build_arithmetic_task() -> List[Example]:
@@ -481,7 +489,12 @@ def main() -> int:
     print(f"loaded {len(tasks)} tasks: {sorted(tasks)}")
     adapter = ToyAdapter()
     board = run_leaderboard(tasks, adapter, batch_size=args.batch_size)
-    write_leaderboard(board, args.out, include_per_example=args.include_per_example)
+    write_leaderboard(
+        board,
+        args.out,
+        adapter_name=adapter.name,
+        include_per_example=args.include_per_example,
+    )
     print(f"overall_score = {board.overall_score:.3f}")
     for r in board.tasks:
         print(f"  {r.task:>16}  metric={r.metric:>18}  score={r.score:0.3f}  ({r.correct}/{r.total})  latency_ms={r.latency_ms:.1f}")
