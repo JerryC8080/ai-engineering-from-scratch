@@ -2,11 +2,11 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 435,
-    "skills": 378,
+    "lessons": 439,
+    "skills": 382,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 515
   },
   "phases": [
     {
@@ -12304,7 +12304,7 @@
       "num": 19,
       "slug": "19-capstone-projects",
       "title": "Capstone Projects",
-      "lesson_count": 17,
+      "lesson_count": 21,
       "lessons": [
         {
           "num": 1,
@@ -12568,8 +12568,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12607,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12646,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
@@ -12844,6 +12864,122 @@
                 "livekit",
                 "multimodal",
                 "coppa"
+              ]
+            }
+          ]
+        },
+        {
+          "num": 46,
+          "slug": "46-gradient-accumulation",
+          "title": "Gradient Accumulation",
+          "path": "phases/19-capstone-projects/46-gradient-accumulation",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "test_main.py"
+          ],
+          "outputs": [
+            {
+              "type": "skill",
+              "name": "gradient-accumulation",
+              "path": "phases/19-capstone-projects/46-gradient-accumulation/outputs/skill-gradient-accumulation.md",
+              "version": "1.0.0",
+              "description": "Train at an effective batch larger than device memory by scaling micro-batch losses and stepping the optimizer once per window.",
+              "tags": [
+                "training",
+                "batch-size",
+                "distributed",
+                "scaling"
+              ]
+            }
+          ]
+        },
+        {
+          "num": 47,
+          "slug": "47-checkpoint-save-resume",
+          "title": "Checkpoint Save and Resume",
+          "path": "phases/19-capstone-projects/47-checkpoint-save-resume",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "test_main.py"
+          ],
+          "outputs": [
+            {
+              "type": "skill",
+              "name": "checkpoint-save-resume",
+              "path": "phases/19-capstone-projects/47-checkpoint-save-resume/outputs/skill-checkpoint-save-resume.md",
+              "version": "1.0.0",
+              "description": "Atomic, sharded checkpoints with full RNG capture so a killed run resumes mid-epoch with the same loss trajectory.",
+              "tags": [
+                "training",
+                "durability",
+                "resume",
+                "sharded-state"
+              ]
+            }
+          ]
+        },
+        {
+          "num": 48,
+          "slug": "48-distributed-fsdp-ddp",
+          "title": "Distributed Data Parallel and FSDP from Scratch",
+          "path": "phases/19-capstone-projects/48-distributed-fsdp-ddp",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "test_main.py"
+          ],
+          "outputs": [
+            {
+              "type": "skill",
+              "name": "distributed-fsdp-ddp",
+              "path": "phases/19-capstone-projects/48-distributed-fsdp-ddp/outputs/skill-distributed-fsdp-ddp.md",
+              "version": "1.0.0",
+              "description": "Bring up multi-rank training with a from-scratch DDP wrapper and an FSDP parameter sharding sketch on the gloo or nccl backend.",
+              "tags": [
+                "distributed",
+                "ddp",
+                "fsdp",
+                "collectives"
+              ]
+            }
+          ]
+        },
+        {
+          "num": 49,
+          "slug": "49-lm-eval-harness",
+          "title": "Language Model Evaluation Harness",
+          "path": "phases/19-capstone-projects/49-lm-eval-harness",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "test_main.py"
+          ],
+          "outputs": [
+            {
+              "type": "skill",
+              "name": "lm-eval-harness",
+              "path": "phases/19-capstone-projects/49-lm-eval-harness/outputs/skill-lm-eval-harness.md",
+              "version": "1.0.0",
+              "description": "Minimal language model evaluation harness with JSONL task spec, five metrics, swappable adapter, and leaderboard JSON output.",
+              "tags": [
+                "evaluation",
+                "metrics",
+                "leaderboard",
+                "harness"
               ]
             }
           ]
