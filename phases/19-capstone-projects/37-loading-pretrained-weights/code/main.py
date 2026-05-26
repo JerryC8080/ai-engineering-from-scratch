@@ -141,6 +141,10 @@ class GPTModel(nn.Module):
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         batch, seq = tokens.shape
+        if seq > self.cfg.context_length:
+            raise ValueError(
+                f"sequence length {seq} exceeds context_length={self.cfg.context_length}"
+            )
         tok = self.tok_embed(tokens)
         pos = self.pos_embed(self.position_ids[:seq])
         x = self.embed_dropout(tok + pos)
@@ -215,6 +219,7 @@ def load_safetensors(model: GPTModel, path: Path, verbose: bool = True) -> LoadR
     report = LoadReport()
 
     seen_local: set[str] = set()
+    pending: list[tuple[str, str, torch.Tensor]] = []
     with safe_open(str(path), framework="pt") as reader:
         pretrained_names = list(reader.keys())
         for src_name in pretrained_names:
@@ -246,8 +251,18 @@ def load_safetensors(model: GPTModel, path: Path, verbose: bool = True) -> LoadR
                     )
                 continue
 
-            with torch.no_grad():
-                target.copy_(tensor.to(target.dtype))
+            pending.append((src_name, local_name, tensor))
+
+    if report.shape_mismatch:
+        expected = set(local_params.keys())
+        for name in sorted(expected - seen_local):
+            report.missing.append(name)
+        return report
+
+    with torch.no_grad():
+        for src_name, local_name, tensor in pending:
+            target = local_params[local_name]
+            target.copy_(tensor.to(device=target.device, dtype=target.dtype))
             seen_local.add(local_name)
             report.loaded.append((src_name, local_name, tuple(tensor.shape)))
             if verbose:

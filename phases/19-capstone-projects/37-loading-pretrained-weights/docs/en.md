@@ -97,14 +97,14 @@ Real GPT-2 weights are 0.5 GB. The demo does not download them; it generates a s
 `code/main.py` implements:
 
 - A small replica of the lesson 35 `GPTModel` so this lesson is self contained.
-- `NAME_MAP` and `make_pretrained_to_local(num_layers)` which expand the per layer entries.
+- `make_pretrained_to_local(num_layers)` which expands the per-layer entries.
 - `load_safetensors(model, path)` which iterates names, maps them, checks shape, transposes the conv1d-style weights, and assigns under `torch.no_grad()`. Returns a `LoadReport`.
 - `make_stub_safetensors(path, cfg)` which generates a fixture file with the exact pretrained naming convention.
 - A demo that creates `outputs/gpt2-stub.safetensors` on first run, builds a fresh model, captures one generated continuation from random init, loads the stub, captures another continuation, prints both, and verifies the two are different (the load actually changed the model).
 
 Run it:
 
-```
+```bash
 python3 code/main.py
 ```
 
