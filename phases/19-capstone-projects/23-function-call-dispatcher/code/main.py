@@ -29,6 +29,14 @@ class TransientError(Exception):
     """Raised by a handler to indicate the failure is worth retrying."""
 
 
+class _DispatchedError(Exception):
+    """Internal sentinel that wraps a DispatchError so dedup followers preserve kind."""
+
+    def __init__(self, error: "DispatchError") -> None:
+        super().__init__(error.message)
+        self.error = error
+
+
 @dataclass
 class DispatchError(Exception):
     kind: str
@@ -130,6 +138,8 @@ class Dispatcher:
         cache_ttl_seconds: float = 60.0,
         sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
+        if max_attempts <= 0:
+            raise ValueError("max_attempts must be > 0")
         self.registry = registry
         self.max_attempts = max_attempts
         self._sem = asyncio.Semaphore(concurrency)
@@ -230,7 +240,7 @@ class Dispatcher:
                 except Exception as exc:
                     err = _map_exception(exc, attempts=attempt)
                     if future is not None and not future.done():
-                        future.set_exception(exc)
+                        future.set_exception(_DispatchedError(err))
                     return err
                 if future is not None and not future.done():
                     future.set_result(result)
@@ -240,7 +250,7 @@ class Dispatcher:
 
             assert last_error is not None
             if future is not None and not future.done():
-                future.set_exception(RuntimeError(last_error.message))
+                future.set_exception(_DispatchedError(last_error))
             return last_error
         finally:
             if idempotency_key is not None:
@@ -265,6 +275,14 @@ def _backoff(attempt: int) -> float:
 
 
 def _map_exception(exc: Exception, attempts: int) -> DispatchError:
+    if isinstance(exc, _DispatchedError):
+        original = exc.error
+        return DispatchError(
+            kind=original.kind,
+            message=original.message,
+            attempts=original.attempts,
+            jsonrpc_code=original.jsonrpc_code,
+        )
     return DispatchError(
         kind="internal",
         message=f"{type(exc).__name__}: {exc}",
