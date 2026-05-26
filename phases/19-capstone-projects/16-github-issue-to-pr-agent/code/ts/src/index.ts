@@ -11,17 +11,18 @@ import { route } from "./router.js";
 import { buildApp } from "./server.js";
 import { expectedSig, verifySignature } from "./verify.js";
 
-const SHARED_SECRET = process.env.GH_WEBHOOK_SECRET ?? "demo-shared-secret";
+const DEMO_SECRET = "demo-shared-secret";
 
 function demoDelivery(
   audit: AuditLog,
   event: string,
   payload: unknown,
   signingSecret: string,
+  receiverSecret: string,
 ): void {
   const raw = Buffer.from(JSON.stringify(payload), "utf8");
   const sig = expectedSig(raw, signingSecret);
-  const ok = verifySignature(raw, sig, SHARED_SECRET);
+  const ok = verifySignature(raw, sig, receiverSecret);
   process.stdout.write(`\n>>> delivery event=${event} sig_valid=${ok}\n`);
   if (!ok) {
     process.stdout.write("<<< 401 invalid signature\n");
@@ -33,12 +34,13 @@ function demoDelivery(
 
 function runDemo(): void {
   const audit = new AuditLog();
+  const secret = DEMO_SECRET;
 
   process.stdout.write("=".repeat(72) + "\n");
   process.stdout.write("PHASE 19 LESSON 16 - GitHub webhook receiver (TypeScript)\n");
   process.stdout.write("=".repeat(72) + "\n");
 
-  demoDelivery(audit, "ping", { zen: "Speak like a human.", hook_id: 12345 }, SHARED_SECRET);
+  demoDelivery(audit, "ping", { zen: "Speak like a human.", hook_id: 12345 }, secret, secret);
 
   demoDelivery(
     audit,
@@ -52,7 +54,8 @@ function runDemo(): void {
       },
       repository: { full_name: "acme/widgets" },
     },
-    SHARED_SECRET,
+    secret,
+    secret,
   );
 
   demoDelivery(
@@ -64,6 +67,7 @@ function runDemo(): void {
       repository: { full_name: "acme/widgets" },
     },
     "wrong-secret",
+    secret,
   );
 
   demoDelivery(
@@ -74,19 +78,34 @@ function runDemo(): void {
       issue: { number: 41, title: "skip me" },
       repository: { full_name: "acme/widgets" },
     },
-    SHARED_SECRET,
+    secret,
+    secret,
   );
 
   process.stdout.write(`\naudit entries recorded: ${audit.count()}\n`);
 }
 
+const MAX_BODY_SIZE = 1024 * 1024;
+
 function nodeAdapter(app: ReturnType<typeof buildApp>) {
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const host = req.headers.host ?? "localhost";
     const url = new URL(req.url ?? "/", `http://${host}`);
-    const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
-    const body = chunks.length > 0 ? Buffer.concat(chunks) : undefined;
+    const body = await new Promise<Buffer | undefined>((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      let received = 0;
+      req.on("data", (chunk: Buffer) => {
+        received += chunk.length;
+        if (received > MAX_BODY_SIZE) {
+          req.destroy();
+          reject(new Error(`request body exceeds ${MAX_BODY_SIZE} bytes`));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      req.on("end", () => resolve(chunks.length > 0 ? Buffer.concat(chunks) : undefined));
+      req.on("error", reject);
+    });
     const init: RequestInit = {
       method: req.method,
       headers: req.headers as Record<string, string>,
@@ -98,14 +117,17 @@ function nodeAdapter(app: ReturnType<typeof buildApp>) {
   };
 }
 
-function runServer(port: number): void {
+function runServer(port: number, secret: string): void {
   const audit = new AuditLog();
-  const app = buildApp(audit, SHARED_SECRET);
+  const app = buildApp(audit, secret);
   const handler = nodeAdapter(app);
   const server = createServer((req, res) => {
     handler(req, res).catch((err) => {
-      res.writeHead(500, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: String(err) }));
+      const message = String(err);
+      const tooLarge = message.includes("exceeds");
+      if (res.headersSent) return;
+      res.writeHead(tooLarge ? 413 : 500, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: message }));
     });
   });
   server.listen(port, () => {
@@ -113,12 +135,36 @@ function runServer(port: number): void {
   });
 }
 
+const DEFAULT_PORT = 8081;
+
+function parsePort(argv: string[], defaultPort: number): number {
+  const portFlag = argv.indexOf("--port");
+  if (portFlag < 0) return defaultPort;
+  const raw = argv[portFlag + 1];
+  if (raw === undefined) {
+    process.stderr.write("--port requires a value\n");
+    process.exit(2);
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > 65535) {
+    process.stderr.write(`invalid --port ${raw}: must be integer in 1..65535\n`);
+    process.exit(2);
+  }
+  return n;
+}
+
 function main(): void {
   const argv = process.argv.slice(2);
   if (argv.includes("--serve")) {
-    const portFlag = argv.indexOf("--port");
-    const port = portFlag >= 0 ? Number(argv[portFlag + 1]) : 8081;
-    runServer(port);
+    const secret = process.env.GH_WEBHOOK_SECRET;
+    if (!secret) {
+      process.stderr.write(
+        "GH_WEBHOOK_SECRET must be set in the environment to run --serve\n",
+      );
+      process.exit(1);
+    }
+    const port = parsePort(argv, DEFAULT_PORT);
+    runServer(port, secret);
     return;
   }
   runDemo();
