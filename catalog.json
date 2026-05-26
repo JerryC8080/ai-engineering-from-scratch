@@ -2,11 +2,11 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 435,
+    "lessons": 440,
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 517
   },
   "phases": [
     {
@@ -12304,7 +12304,7 @@
       "num": 19,
       "slug": "19-capstone-projects",
       "title": "Capstone Projects",
-      "lesson_count": 17,
+      "lesson_count": 22,
       "lessons": [
         {
           "num": 1,
@@ -12568,8 +12568,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12607,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12646,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
@@ -12847,6 +12867,81 @@
               ]
             }
           ]
+        },
+        {
+          "num": 20,
+          "slug": "20-agent-harness-loop-contract",
+          "title": "Agent Harness Loop Contract",
+          "path": "phases/19-capstone-projects/20-agent-harness-loop-contract",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_loop.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 21,
+          "slug": "21-tool-registry-schema-validation",
+          "title": "Tool Registry with Schema Validation",
+          "path": "phases/19-capstone-projects/21-tool-registry-schema-validation",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_registry.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 22,
+          "slug": "22-jsonrpc-stdio-transport",
+          "title": "JSON-RPC 2.0 Over Newline-Delimited Stdio",
+          "path": "phases/19-capstone-projects/22-jsonrpc-stdio-transport",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_transport.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 23,
+          "slug": "23-function-call-dispatcher",
+          "title": "Function Call Dispatcher",
+          "path": "phases/19-capstone-projects/23-function-call-dispatcher",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_dispatcher.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 24,
+          "slug": "24-plan-execute-control-flow",
+          "title": "Plan-Execute Control Flow",
+          "path": "phases/19-capstone-projects/24-plan-execute-control-flow",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_agent.py"
+          ],
+          "outputs": []
         }
       ]
     }
