@@ -12571,6 +12571,7 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
+            "dashboard.ts",
             "main.py"
           ],
           "outputs": [
@@ -12602,7 +12603,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "team.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12635,8 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "main.py"
+            "main.py",
+            "server.ts"
           ],
           "outputs": [
             {
