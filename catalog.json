@@ -2,11 +2,11 @@
   "schema_version": 1,
   "totals": {
     "phases": 20,
-    "lessons": 435,
+    "lessons": 440,
     "skills": 378,
     "prompts": 99,
     "agents": 0,
-    "code_files": 487
+    "code_files": 529
   },
   "phases": [
     {
@@ -12304,7 +12304,7 @@
       "num": 19,
       "slug": "19-capstone-projects",
       "title": "Capstone Projects",
-      "lesson_count": 17,
+      "lesson_count": 22,
       "lessons": [
         {
           "num": 1,
@@ -12568,8 +12568,14 @@
           "has_quiz": true,
           "has_notebook": true,
           "code_files": [
-            "dashboard.ts",
-            "main.py"
+            "main.py",
+            "ts/src/cost.ts",
+            "ts/src/index.ts",
+            "ts/src/migrations.ts",
+            "ts/src/server.ts",
+            "ts/src/types.ts",
+            "ts/tests/cost.test.ts",
+            "ts/tests/migrations.test.ts"
           ],
           "outputs": [
             {
@@ -12601,7 +12607,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "team.ts"
+            "ts/src/agent.ts",
+            "ts/src/coordinator.ts",
+            "ts/src/index.ts",
+            "ts/src/runtime.ts",
+            "ts/src/types.ts",
+            "ts/src/workspace.ts",
+            "ts/tests/coordinator.test.ts",
+            "ts/tests/runtime.test.ts"
           ],
           "outputs": [
             {
@@ -12633,7 +12646,14 @@
           "has_notebook": true,
           "code_files": [
             "main.py",
-            "server.ts"
+            "ts/src/index.ts",
+            "ts/src/pricing.ts",
+            "ts/src/rollup.ts",
+            "ts/src/server.ts",
+            "ts/src/spans.ts",
+            "ts/src/types.ts",
+            "ts/tests/rollup.test.ts",
+            "ts/tests/spans.test.ts"
           ],
           "outputs": [
             {
@@ -12847,6 +12867,93 @@
               ]
             }
           ]
+        },
+        {
+          "num": 25,
+          "slug": "25-verification-gates-observation-budget",
+          "title": "Capstone Lesson 25: Verification Gates and the Observation Budget",
+          "path": "phases/19-capstone-projects/25-verification-gates-observation-budget",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_main.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 26,
+          "slug": "26-sandbox-runner-denylist",
+          "title": "Capstone Lesson 26: Sandbox Runner with Denylist and Path Jail",
+          "path": "phases/19-capstone-projects/26-sandbox-runner-denylist",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_main.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 27,
+          "slug": "27-eval-harness-fixture-tasks",
+          "title": "Capstone Lesson 27: Eval Harness with Fixture Tasks",
+          "path": "phases/19-capstone-projects/27-eval-harness-fixture-tasks",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tasks/task_001_fizzbuzz_offbyone/buggy/fizzbuzz.py",
+            "tasks/task_001_fizzbuzz_offbyone/expected/fizzbuzz.py",
+            "tasks/task_002_factorial_missing_return/buggy/factorial.py",
+            "tasks/task_002_factorial_missing_return/expected/factorial.py",
+            "tasks/task_003_error_message_typo/buggy/errors.py",
+            "tasks/task_003_error_message_typo/expected/errors.py",
+            "tasks/task_004_empty_reverse/buggy/reverse.py",
+            "tasks/task_004_empty_reverse/expected/reverse.py",
+            "tasks/task_005_linked_list_traversal/buggy/linked_list.py",
+            "tasks/task_005_linked_list_traversal/expected/linked_list.py",
+            "tests/test_main.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 28,
+          "slug": "28-observability-otel-traces",
+          "title": "Capstone Lesson 28: Observability with OTel GenAI Spans and Prometheus Metrics",
+          "path": "phases/19-capstone-projects/28-observability-otel-traces",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "main.py",
+            "tests/test_main.py"
+          ],
+          "outputs": []
+        },
+        {
+          "num": 29,
+          "slug": "29-end-to-end-coding-task-demo",
+          "title": "Capstone Lesson 29: End-to-End Coding Agent on the Harness",
+          "path": "phases/19-capstone-projects/29-end-to-end-coding-task-demo",
+          "has_docs": true,
+          "has_code": true,
+          "has_quiz": true,
+          "has_notebook": false,
+          "code_files": [
+            "fixture_repo/src/fizz.py",
+            "fixture_repo/tests/test_fizz.py",
+            "main.py",
+            "tests/test_main.py"
+          ],
+          "outputs": []
         }
       ]
     }
