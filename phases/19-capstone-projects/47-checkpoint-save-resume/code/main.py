@@ -424,7 +424,10 @@ def run_resume_demo(
 
     suffix_full = full_losses[interrupt_at:]
     suffix_resumed = resumed_losses[interrupt_at:]
-    max_diff = max(abs(a - b) for a, b in zip(suffix_full, suffix_resumed))
+    if not suffix_full:
+        max_diff = 0.0
+    else:
+        max_diff = max(abs(a - b) for a, b in zip(suffix_full, suffix_resumed, strict=True))
     return {
         "interrupt_at": interrupt_at,
         "total_steps": total_steps,

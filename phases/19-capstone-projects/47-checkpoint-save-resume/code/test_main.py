@@ -53,7 +53,9 @@ class CheckpointResumeTests(unittest.TestCase):
 
             ckpt.seed_everything(99)
             model2, opt2, sched2 = _build_components(total_steps=4)
-            for (k, v1), (_, v2) in zip(model.state_dict().items(), model2.state_dict().items()):
+            for (_k, v1), (_, v2) in zip(
+                model.state_dict().items(), model2.state_dict().items(), strict=True
+            ):
                 self.assertFalse(torch.allclose(v1, v2))
 
             restored = ckpt.load_checkpoint(target, model2, opt2, sched2)
@@ -61,7 +63,9 @@ class CheckpointResumeTests(unittest.TestCase):
             self.assertEqual(restored.epoch, 1)
             self.assertEqual(restored.batch_in_epoch, 2)
             self.assertEqual(restored.losses, [0.5, 0.4, 0.3])
-            for (k, v1), (_, v2) in zip(model.state_dict().items(), model2.state_dict().items()):
+            for (k, v1), (_, v2) in zip(
+                model.state_dict().items(), model2.state_dict().items(), strict=True
+            ):
                 self.assertTrue(torch.allclose(v1, v2), f"param diverged: {k}")
 
     def test_mid_epoch_resume_continues_deterministically(self):
