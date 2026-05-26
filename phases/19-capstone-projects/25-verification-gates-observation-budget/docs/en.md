@@ -29,15 +29,14 @@ A verification gate is the harness component that says no. It is not a model. It
 
 ## The Concept
 
-```
-                +-----------+
-   tool_call -->| Gate chain|--> ALLOW --> dispatch tool
-                +-----------+
-                      |
-                      v
-                    DENY --> reason --> append to message store
-                                       --> increment refusal_count
-                                       --> loop continues (or aborts at threshold)
+```mermaid
+flowchart LR
+  Call[tool_call] --> Chain[Gate chain]
+  Chain -->|ALLOW| Dispatch[dispatch tool]
+  Chain -->|DENY| Reason[reason]
+  Reason --> Store[append to message store]
+  Reason --> Refusal[increment refusal_count]
+  Reason --> Loop[loop continues<br/>or aborts at threshold]
 ```
 
 A gate is anything with an `evaluate(call, ctx) -> GateDecision` method. The chain is an ordered list. Evaluation short-circuits on the first deny. Order matters: cheap structural gates run before expensive token-counting gates.
@@ -53,26 +52,13 @@ The observation ledger is the bookkeeping. Every successful tool call writes one
 
 ## Architecture
 
-```
-+--------------------+      +------------------+
-| AgentHarness       |----->| GateChain        |
-|  (lessons 20-24)   |      |                  |
-+--------------------+      |  WhitelistGate   |
-       |                    |  RegexGate       |
-       v                    |  RecencyGate     |
-+------+-------+             |  BudgetGate      |
-| tool_dispatch|<-- ALLOW ---|                  |
-+--------------+             +---------+--------+
-       |                               |
-       v                               |
-+--------------+    write              |
-| Tool result  |---------------------->|
-+------+-------+                       v
-       |                       +-----------------+
-       v                       | ObservationLedger|
-+--------------+    record     |  per-tool count  |
-| MessageStore |<--------------|  cumulative      |
-+--------------+               +-----------------+
+```mermaid
+flowchart TD
+  Harness[AgentHarness<br/>lessons 20-24] --> Chain[GateChain<br/>WhitelistGate / RegexGate<br/>RecencyGate / BudgetGate]
+  Chain -->|ALLOW| Dispatch[tool_dispatch]
+  Dispatch --> Result[Tool result]
+  Result -->|write| Ledger[ObservationLedger<br/>per-tool count<br/>cumulative]
+  Ledger -->|record| Store[MessageStore]
 ```
 
 The harness asks the chain. The chain either nods or refuses. If it nods, the tool runs, the ledger ticks, and the result is appended to the message store. If it refuses, the model is handed the refusal as a system message and the loop decides whether to retry or abort.
