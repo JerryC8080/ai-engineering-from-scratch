@@ -150,7 +150,7 @@ This lesson produces `outputs/skill-mcp-handshake-tracer.md`. Given a pcap-style
 | `tools/list` | "Discovery" | Client asks server for its current tool set |
 | `tools/call` | "Invocation" | Client asks server to execute a tool with arguments |
 | `notifications/*_changed` | "Mutation events" | Server tells client that its primitive list has changed |
-| Content block | "Typed result" | `{type: "text" | "image" | "resource" | "ui_resource"}` in tool result |
+| Content block | "Typed result" | `{type: "text" \| "image" \| "resource" \| "ui_resource"}` in tool result |
 | SEP | "Spec Evolution Proposal" | Named draft proposal (e.g. SEP-1686 for async Tasks) |
 
 ## Further Reading
