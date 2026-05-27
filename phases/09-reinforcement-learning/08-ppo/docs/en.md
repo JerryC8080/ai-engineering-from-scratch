@@ -184,10 +184,10 @@ Refuse `K > 30` or `ε > 0.3` (unsafe trust region). Refuse any PPO run without 
 
 | Term | What people say | What it actually means |
 |------|-----------------|-----------------------|
-| Importance ratio | "r_t(θ)" | `π_θ(a|s) / π_old(a|s)`; deviation from the policy that collected the data. |
+| Importance ratio | "r_t(θ)" | `π_θ(a\|s) / π_old(a\|s)`; deviation from the policy that collected the data. |
 | Clipped surrogate | "PPO's main trick" | `min(r·A, clip(r, 1-ε, 1+ε)·A)`; flat gradient past the clip on beneficial side. |
 | Trust region | "TRPO / PPO intent" | Limit each update's KL to guarantee monotone improvement. |
-| KL penalty | "Soft trust region" | Alternative PPO: `L - β · KL(π_θ || π_old)`. Adaptive `β`. |
+| KL penalty | "Soft trust region" | Alternative PPO: `L - β · KL(π_θ \|\| π_old)`. Adaptive `β`. |
 | Clip fraction | "How often clipping triggers" | Diagnostic — should be 0.1-0.3; outside means mistuned. |
 | Multi-epoch training | "Data reuse" | K epochs on each rollout; variance cost traded for sample efficiency. |
 | On-policy-ish | "Mostly on-policy" | PPO is nominally on-policy but K>1 epochs uses slightly-off-policy data safely. |
