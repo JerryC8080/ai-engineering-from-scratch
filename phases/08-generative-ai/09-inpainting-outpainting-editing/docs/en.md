@@ -129,7 +129,7 @@ Save `outputs/skill-editing-pipeline.md`. Skill takes an original image + edit d
 |------|-----------------|-----------------------|
 | Inpainting | "Fill the hole" | Regenerate inside a mask; keep outside pixels. |
 | Outpainting | "Extend the canvas" | Regenerate outside the canvas; keep inside. |
-| 9-channel U-Net | "Proper inpainting model" | U-Net with `noisy | encoded-source | mask` as input. |
+| 9-channel U-Net | "Proper inpainting model" | U-Net with `noisy \| encoded-source \| mask` as input. |
 | SDEdit | "Img2img with noise level" | Noise to time `t`, denoise with new prompt. |
 | InstructPix2Pix | "Text-only edits" | Fine-tuned diffusion on (image, instruction, output) triples. |
 | RePaint | "No retraining" | Re-noise periodically during reverse to reduce seams. |
