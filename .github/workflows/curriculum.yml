@@ -72,7 +72,24 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md
           git commit -m "$BOT_COMMIT_PREFIX"
-          git push
+          # Retry on non-fast-forward when another merge to main races us
+          branch="${GITHUB_REF#refs/heads/}"
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${branch}"; then
+              echo "push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "push attempt $attempt rejected; rebasing onto origin/${branch}"
+            git fetch origin "${branch}"
+            if ! git rebase "origin/${branch}"; then
+              echo "rebase produced a conflict; aborting and giving up cleanly"
+              git rebase --abort || true
+              exit 0
+            fi
+            sleep "$((attempt * 2))"
+          done
+          echo "push failed after 5 attempts; main will self-heal on next push"
+          exit 0
 
   readme-counts-drift:
     name: README.md counts drift advisory
