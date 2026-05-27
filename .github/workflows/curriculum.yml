@@ -9,6 +9,9 @@ on:
       - "scripts/build_catalog.py"
       - "scripts/check_readme_counts.py"
       - "README.md"
+      - "ROADMAP.md"
+      - "glossary/**"
+      - "site/build.js"
       - ".github/workflows/curriculum.yml"
   pull_request:
     branches: [main]
@@ -18,6 +21,9 @@ on:
       - "scripts/build_catalog.py"
       - "scripts/check_readme_counts.py"
       - "README.md"
+      - "ROADMAP.md"
+      - "glossary/**"
+      - "site/build.js"
       - ".github/workflows/curriculum.yml"
 
 permissions:
@@ -73,6 +79,55 @@ jobs:
           git add README.md
           git commit -m "$BOT_COMMIT_PREFIX"
           # Retry on non-fast-forward when another merge to main races us
+          branch="${GITHUB_REF#refs/heads/}"
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${branch}"; then
+              echo "push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "push attempt $attempt rejected; rebasing onto origin/${branch}"
+            git fetch origin "${branch}"
+            if ! git rebase "origin/${branch}"; then
+              echo "rebase produced a conflict; aborting and giving up cleanly"
+              git rebase --abort || true
+              exit 0
+            fi
+            sleep "$((attempt * 2))"
+          done
+          echo "push failed after 5 attempts; main will self-heal on next push"
+          exit 0
+
+  site-rebuild:
+    name: site/data.js auto-rebuild (main only)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: readme-counts-sync
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: rebuild site/data.js
+        run: node site/build.js
+      - name: commit + push if site/data.js changed
+        env:
+          BOT_COMMIT_PREFIX: "chore(site): rebuild data.js"
+        run: |
+          if git diff --quiet site/data.js; then
+            echo "site/data.js already in sync"
+            exit 0
+          fi
+          last_msg=$(git log -1 --pretty=%s)
+          if [[ "$last_msg" == "$BOT_COMMIT_PREFIX"* ]]; then
+            echo "last commit was already a bot regen; not pushing to avoid loop"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data.js
+          git commit -m "$BOT_COMMIT_PREFIX"
           branch="${GITHUB_REF#refs/heads/}"
           for attempt in 1 2 3 4 5; do
             if git push origin "HEAD:${branch}"; then
