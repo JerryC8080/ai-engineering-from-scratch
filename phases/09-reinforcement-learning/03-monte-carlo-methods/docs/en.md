@@ -191,7 +191,7 @@ Refuse to run MC on non-episodic tasks without a finite horizon cap. Refuse to r
 | First-visit MC | "Count each state once" | Only the first visit in an episode contributes to the value estimate. |
 | Every-visit MC | "Use all visits" | Every visit contributes; slightly biased but more sample-efficient. |
 | ε-greedy | "Exploration noise" | Pick greedy action with prob `1-ε`; random action with prob `ε`. |
-| Importance sampling | "Correcting for sampling from the wrong distribution" | Reweight returns by `π(a|s)/μ(a|s)` products to estimate `V^π` from `μ` data. |
+| Importance sampling | "Correcting for sampling from the wrong distribution" | Reweight returns by `π(a\|s)/μ(a\|s)` products to estimate `V^π` from `μ` data. |
 | On-policy | "Learn from my own data" | Target policy = behavior policy. Vanilla MC, PPO, SARSA. |
 | Off-policy | "Learn from someone else's data" | Target policy ≠ behavior policy. Importance-sampled MC, Q-learning, DQN. |
 
