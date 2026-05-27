@@ -164,7 +164,7 @@ See `outputs/skill-positional-encoding-picker.md`. The skill picks an encoding s
 | Positional encoding | "Tells attention about order" | Any signal added to embeddings or attention that encodes position. |
 | Sinusoidal | "The original one" | `sin/cos` at geometric frequencies added to embeddings; doesn't extrapolate. |
 | RoPE | "Rotary embeddings" | Rotate Q, K by position-dependent angle; dot product encodes relative distance. |
-| ALiBi | "Linear bias trick" | Add `-m·|i-j|` to attention scores; no embedding needed, great extrapolation. |
+| ALiBi | "Linear bias trick" | Add `-m·\|i-j\|` to attention scores; no embedding needed, great extrapolation. |
 | base | "RoPE's knob" | The frequency scaler in RoPE; increase to extend context at inference. |
 | NTK-aware | "A RoPE scaling trick" | Rescale `base` so high-frequency dims aren't squeezed when context expands. |
 | YaRN | "The fancy one" | Per-dimension interpolation+extrapolation that preserves attention entropy. |
