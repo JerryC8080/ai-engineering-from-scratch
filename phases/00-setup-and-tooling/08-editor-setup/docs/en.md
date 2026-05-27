@@ -122,7 +122,7 @@ Useful shortcuts:
 
 | Action | macOS | Linux/Windows |
 |--------|-------|---------------|
-| Toggle terminal | `` Ctrl+` `` \| `` Ctrl+` `` |
+| Toggle terminal | `` Ctrl+` `` | `` Ctrl+` `` |
 | New terminal | `Ctrl+Shift+`` ` | `Ctrl+Shift+`` ` |
 | Split terminal | `Cmd+\` | `Ctrl+\` |
 
