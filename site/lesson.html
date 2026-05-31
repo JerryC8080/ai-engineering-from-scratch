@@ -1740,6 +1740,12 @@
         }
       }
 
+      // Language config — must be assigned before the first fetchLesson() call
+      // below (var declarations hoist, but assignments do not).
+      var LANG_KEY = 'aiefs:lang';
+      var ZH_REPO = 'JerryC8080/ai-engineering-from-scratch';
+      var EN_REPO = 'rohitg00/ai-engineering-from-scratch';
+
       buildSidebar();
       initSidebarToggle();
       initScrollProgress();
@@ -1862,9 +1868,6 @@
         }, { passive: true });
       }
 
-      var LANG_KEY = 'aiefs:lang';
-      var ZH_REPO = 'JerryC8080/ai-engineering-from-scratch';
-      var EN_REPO = 'rohitg00/ai-engineering-from-scratch';
       function getLang() {
         try { return localStorage.getItem(LANG_KEY) === 'zh' ? 'zh' : 'en'; }
         catch (e) { return 'en'; }
