@@ -340,13 +340,15 @@
 
         var allRows = [];
         var phaseSelect = document.getElementById('catalogPhase');
+        var phaseOpts = [];
 
         for (var i = 0; i < PHASES.length; i++) {
           var p = PHASES[i];
           var opt = document.createElement('option');
           opt.value = String(p.id);
-          opt.textContent = String(p.id).padStart(2, '0') + ' - ' + p.name;
+          opt.textContent = String(p.id).padStart(2, '0') + ' - ' + AIEFS_I18N.L(p, 'name');
           phaseSelect.appendChild(opt);
+          phaseOpts.push({ el: opt, phase: p });
 
           for (var j = 0; j < p.lessons.length; j++) {
             var l = p.lessons[j];
@@ -357,7 +359,9 @@
               type: l.type,
               lang: l.lang,
               status: l.status,
-              url: l.url || ''
+              url: l.url || '',
+              _l: l,
+              _p: p
             });
           }
         }
@@ -384,7 +388,13 @@
             if (phaseFilter && String(r.phase) !== phaseFilter) return false;
             if (statusFilter && r.status !== statusFilter) return false;
             if (query) {
-              return r.name.toLowerCase().indexOf(query) !== -1 ||
+              // Match against both English canonical fields and the localized
+              // display strings so search works in either language.
+              var name = (AIEFS_I18N.L(r._l, 'name') || r.name).toLowerCase();
+              var phaseName = (AIEFS_I18N.L(r._p, 'name') || r.phaseName).toLowerCase();
+              return name.indexOf(query) !== -1 ||
+                r.name.toLowerCase().indexOf(query) !== -1 ||
+                phaseName.indexOf(query) !== -1 ||
                 r.phaseName.toLowerCase().indexOf(query) !== -1 ||
                 r.type.toLowerCase().indexOf(query) !== -1 ||
                 r.lang.toLowerCase().indexOf(query) !== -1;
@@ -425,12 +435,13 @@
           var html = '';
           for (var i = 0; i < rows.length; i++) {
             var r = rows[i];
+            var displayName = AIEFS_I18N.L(r._l, 'name') || r.name;
             html += '<tr>';
             html += '<td><span class="catalog-phase-label">' + String(r.phase).padStart(2, '0') + '</span></td>';
             if (r.url) {
-              html += '<td><a href="' + r.url + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + '</a></td>';
+              html += '<td><a href="' + r.url + '" target="_blank" rel="noopener">' + escapeHtml(displayName) + '</a></td>';
             } else {
-              html += '<td>' + escapeHtml(r.name) + '</td>';
+              html += '<td>' + escapeHtml(displayName) + '</td>';
             }
             html += '<td>' + escapeHtml(r.type) + '</td>';
             html += '<td><span class="catalog-lang">' + escapeHtml(r.lang) + '</span></td>';
@@ -469,6 +480,17 @@
         });
 
         render();
+
+        if (window.AIEFS_I18N) {
+          AIEFS_I18N.initLangToggle(function () {
+            // Repaint phase dropdown labels, then re-render the table.
+            for (var pi = 0; pi < phaseOpts.length; pi++) {
+              phaseOpts[pi].el.textContent =
+                String(phaseOpts[pi].phase.id).padStart(2, '0') + ' - ' + AIEFS_I18N.L(phaseOpts[pi].phase, 'name');
+            }
+            render();
+          });
+        }
       });
     })();
   </script>

@@ -283,7 +283,14 @@
           if (filter) {
             var q = filter.toLowerCase();
             terms = terms.filter(function (t) {
-              return t.term.toLowerCase().indexOf(q) !== -1 ||
+              // Match against both English canonical and localized strings.
+              var term = (AIEFS_I18N.L(t, 'term') || t.term).toLowerCase();
+              var says = (AIEFS_I18N.L(t, 'says') || t.says).toLowerCase();
+              var means = (AIEFS_I18N.L(t, 'means') || t.means).toLowerCase();
+              return term.indexOf(q) !== -1 ||
+                says.indexOf(q) !== -1 ||
+                means.indexOf(q) !== -1 ||
+                t.term.toLowerCase().indexOf(q) !== -1 ||
                 t.says.toLowerCase().indexOf(q) !== -1 ||
                 t.means.toLowerCase().indexOf(q) !== -1;
             });
@@ -300,15 +307,15 @@
           for (var i = 0; i < terms.length; i++) {
             var t = terms[i];
             html += '<div class="glossary-card">';
-            html += '<div class="glossary-term">' + escapeHtml(t.term) + '</div>';
+            html += '<div class="glossary-term">' + escapeHtml(AIEFS_I18N.L(t, 'term')) + '</div>';
             html += '<div class="glossary-row">';
             html += '<div class="glossary-col">';
             html += '<div class="glossary-col-label">What people say</div>';
-            html += '<div class="glossary-col-says">"' + escapeHtml(t.says) + '"</div>';
+            html += '<div class="glossary-col-says">"' + escapeHtml(AIEFS_I18N.L(t, 'says')) + '"</div>';
             html += '</div>';
             html += '<div class="glossary-col">';
             html += '<div class="glossary-col-label">What it actually means</div>';
-            html += '<div class="glossary-col-means">' + escapeHtml(t.means) + '</div>';
+            html += '<div class="glossary-col-means">' + escapeHtml(AIEFS_I18N.L(t, 'means')) + '</div>';
             html += '</div>';
             html += '</div>';
             html += '</div>';
@@ -330,6 +337,13 @@
         if (searchInput) {
           searchInput.addEventListener('input', function () {
             renderGlossary(searchInput.value.trim());
+          });
+        }
+
+        if (window.AIEFS_I18N) {
+          AIEFS_I18N.initLangToggle(function () {
+            // Preserve the current search filter across the re-render.
+            renderGlossary(searchInput ? searchInput.value.trim() : '');
           });
         }
       });

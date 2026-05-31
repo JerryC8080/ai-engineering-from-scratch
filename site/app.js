@@ -20,6 +20,19 @@
     initSmoothScroll();
     initFadeObserver();
     initScrollExplode();
+
+    if (window.AIEFS_I18N) {
+      AIEFS_I18N.initLangToggle(function () {
+        renderPhases();
+        // If the phase modal is currently open, re-render its contents too.
+        if (currentPhaseIdx >= 0 && PHASES[currentPhaseIdx]) {
+          var op = PHASES[currentPhaseIdx];
+          document.getElementById('modalTitle').textContent = AIEFS_I18N.L(op, 'name');
+          document.getElementById('modalDesc').textContent = AIEFS_I18N.L(op, 'desc');
+          renderModalLessons(op);
+        }
+      });
+    }
   });
 
   function updateThemeIcon() {
@@ -126,7 +139,7 @@
       var num = String(p.id).padStart(2, '0');
       html += '<div class="toc-row" data-phase="' + i + '">';
       html += '<span class="toc-num">' + roman + '.</span>';
-      html += '<div><span class="toc-status ' + statusClass + '"></span><span class="toc-name">' + escapeHtml(p.name) + '</span></div>';
+      html += '<div><span class="toc-status ' + statusClass + '"></span><span class="toc-name">' + escapeHtml(AIEFS_I18N.L(p, 'name')) + '</span></div>';
       html += '<span class="toc-meta">' + done + ' / ' + total + '</span>';
       html += '<span class="toc-meta">' + num + '</span>';
       html += '</div>';
@@ -210,8 +223,8 @@
     currentPhaseIdx = idx;
 
     document.getElementById('modalPhaseNum').textContent = 'PHASE ' + String(p.id).padStart(2, '0');
-    document.getElementById('modalTitle').textContent = p.name;
-    document.getElementById('modalDesc').textContent = p.desc;
+    document.getElementById('modalTitle').textContent = AIEFS_I18N.L(p, 'name');
+    document.getElementById('modalDesc').textContent = AIEFS_I18N.L(p, 'desc');
 
     renderModalLessons(p);
 
@@ -240,9 +253,9 @@
       html += '<div class="modal-lesson' + (userComplete ? ' user-done' : '') + '">';
       html += '<span class="modal-lesson-status ' + statusClass + '"' + (userComplete ? ' title="You completed this lesson"' : '') + '></span>';
       if (l.url) {
-        html += '<a href="' + l.url + '" target="_blank" rel="noopener">' + escapeHtml(l.name) + '</a>';
+        html += '<a href="' + l.url + '" target="_blank" rel="noopener">' + escapeHtml(AIEFS_I18N.L(l, 'name')) + '</a>';
       } else {
-        html += '<a>' + escapeHtml(l.name) + '</a>';
+        html += '<a>' + escapeHtml(AIEFS_I18N.L(l, 'name')) + '</a>';
       }
       html += '<span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '"' + (l.combines ? ' title="Combines: ' + escapeHtml(l.combines) + '"' : '') + '>' + escapeHtml(l.type) + '</span>';
       html += '<span class="modal-lesson-lang">' + escapeHtml(l.lang) + '</span>';
