@@ -448,92 +448,92 @@
 
 ## 18-ethics-safety-alignment
 
-- [ ] `01-instruction-following-alignment-signal`
-- [ ] `02-reward-hacking-goodhart`
-- [ ] `03-direct-preference-optimization-family`
-- [ ] `04-sycophancy-rlhf-amplification`
-- [ ] `05-constitutional-ai-rlaif`
-- [ ] `06-mesa-optimization-deceptive-alignment`
-- [ ] `07-sleeper-agents-persistent-deception`
-- [ ] `08-in-context-scheming-frontier-models`
-- [ ] `09-alignment-faking`
-- [ ] `10-ai-control-subversion`
-- [ ] `11-scalable-oversight-weak-to-strong`
-- [ ] `12-red-teaming-pair-automated-attacks`
-- [ ] `13-many-shot-jailbreaking`
-- [ ] `14-ascii-art-visual-jailbreaks`
-- [ ] `15-indirect-prompt-injection`
-- [ ] `16-red-team-tooling-garak-llamaguard-pyrit`
-- [ ] `17-wmdp-dual-use-evaluation`
-- [ ] `18-frontier-safety-frameworks-rsp-pf-fsf`
-- [ ] `19-model-welfare-research`
-- [ ] `20-bias-representational-harm`
-- [ ] `21-fairness-criteria-group-individual-counterfactual`
-- [ ] `22-differential-privacy-for-llms`
-- [ ] `23-watermarking-synthid-stable-signature-c2pa`
-- [ ] `24-regulatory-frameworks-eu-us-uk-korea`
-- [ ] `25-echoleak-cves-for-ai`
-- [ ] `26-model-system-dataset-cards`
-- [ ] `27-data-provenance-training-governance`
-- [ ] `28-alignment-research-ecosystem`
-- [ ] `29-moderation-systems-openai-perspective-llamaguard`
-- [ ] `30-dual-use-risk-cyber-bio-chem-nuclear`
+- [x] `01-instruction-following-alignment-signal`
+- [x] `02-reward-hacking-goodhart`
+- [x] `03-direct-preference-optimization-family`
+- [x] `04-sycophancy-rlhf-amplification`
+- [x] `05-constitutional-ai-rlaif`
+- [x] `06-mesa-optimization-deceptive-alignment`
+- [x] `07-sleeper-agents-persistent-deception`
+- [x] `08-in-context-scheming-frontier-models`
+- [x] `09-alignment-faking`
+- [x] `10-ai-control-subversion`
+- [x] `11-scalable-oversight-weak-to-strong`
+- [x] `12-red-teaming-pair-automated-attacks`
+- [x] `13-many-shot-jailbreaking`
+- [x] `14-ascii-art-visual-jailbreaks`
+- [x] `15-indirect-prompt-injection`
+- [x] `16-red-team-tooling-garak-llamaguard-pyrit`
+- [x] `17-wmdp-dual-use-evaluation`
+- [x] `18-frontier-safety-frameworks-rsp-pf-fsf`
+- [x] `19-model-welfare-research`
+- [x] `20-bias-representational-harm`
+- [x] `21-fairness-criteria-group-individual-counterfactual`
+- [x] `22-differential-privacy-for-llms`
+- [x] `23-watermarking-synthid-stable-signature-c2pa`
+- [x] `24-regulatory-frameworks-eu-us-uk-korea`
+- [x] `25-echoleak-cves-for-ai`
+- [x] `26-model-system-dataset-cards`
+- [x] `27-data-provenance-training-governance`
+- [x] `28-alignment-research-ecosystem`
+- [x] `29-moderation-systems-openai-perspective-llamaguard`
+- [x] `30-dual-use-risk-cyber-bio-chem-nuclear`
 
 ## 19-capstone-projects
 
-- [ ] `01-terminal-native-coding-agent`
-- [ ] `02-rag-over-codebase`
-- [ ] `03-realtime-voice-assistant`
-- [ ] `04-multimodal-document-qa`
-- [ ] `05-autonomous-research-agent`
-- [ ] `06-devops-troubleshooting-agent`
-- [ ] `07-end-to-end-fine-tuning-pipeline`
-- [ ] `08-production-rag-chatbot`
-- [ ] `09-code-migration-agent`
-- [ ] `10-multi-agent-software-team`
-- [ ] `11-llm-observability-dashboard`
-- [ ] `12-video-understanding-pipeline`
-- [ ] `13-mcp-server-with-registry`
-- [ ] `14-speculative-decoding-server`
-- [ ] `15-constitutional-safety-harness`
-- [ ] `16-github-issue-to-pr-agent`
-- [ ] `17-personal-ai-tutor`
-- [ ] `20-agent-harness-loop-contract`
-- [ ] `21-tool-registry-schema-validation`
-- [ ] `22-jsonrpc-stdio-transport`
-- [ ] `23-function-call-dispatcher`
-- [ ] `24-plan-execute-control-flow`
-- [ ] `25-verification-gates-observation-budget`
-- [ ] `26-sandbox-runner-denylist`
-- [ ] `27-eval-harness-fixture-tasks`
-- [ ] `28-observability-otel-traces`
-- [ ] `29-end-to-end-coding-task-demo`
-- [ ] `30-bpe-tokenizer-from-scratch`
-- [ ] `31-tokenized-dataset-sliding-window`
-- [ ] `32-token-positional-embeddings`
-- [ ] `33-multihead-self-attention`
-- [ ] `34-transformer-block`
-- [ ] `35-gpt-model-assembly`
-- [ ] `36-training-loop-eval`
-- [ ] `37-loading-pretrained-weights`
-- [ ] `38-classifier-finetuning`
-- [ ] `39-instruction-tuning-sft`
-- [ ] `40-dpo-from-scratch`
-- [ ] `41-eval-pipeline`
-- [ ] `42-large-corpus-downloader`
-- [ ] `43-hdf5-tokenized-corpus`
-- [ ] `44-cosine-lr-warmup`
-- [ ] `45-gradient-clipping-amp`
-- [ ] `46-gradient-accumulation`
-- [ ] `47-checkpoint-save-resume`
-- [ ] `48-distributed-fsdp-ddp`
-- [ ] `49-lm-eval-harness`
-- [ ] `50-hypothesis-generator`
-- [ ] `51-literature-retrieval`
-- [ ] `52-experiment-runner`
-- [ ] `53-result-evaluator`
-- [ ] `54-paper-writer`
-- [ ] `55-critic-loop`
-- [ ] `56-iteration-scheduler`
-- [ ] `57-end-to-end-research-demo`
+- [x] `01-terminal-native-coding-agent`
+- [x] `02-rag-over-codebase`
+- [x] `03-realtime-voice-assistant`
+- [x] `04-multimodal-document-qa`
+- [x] `05-autonomous-research-agent`
+- [x] `06-devops-troubleshooting-agent`
+- [x] `07-end-to-end-fine-tuning-pipeline`
+- [x] `08-production-rag-chatbot`
+- [x] `09-code-migration-agent`
+- [x] `10-multi-agent-software-team`
+- [x] `11-llm-observability-dashboard`
+- [x] `12-video-understanding-pipeline`
+- [x] `13-mcp-server-with-registry`
+- [x] `14-speculative-decoding-server`
+- [x] `15-constitutional-safety-harness`
+- [x] `16-github-issue-to-pr-agent`
+- [x] `17-personal-ai-tutor`
+- [x] `20-agent-harness-loop-contract`
+- [x] `21-tool-registry-schema-validation`
+- [x] `22-jsonrpc-stdio-transport`
+- [x] `23-function-call-dispatcher`
+- [x] `24-plan-execute-control-flow`
+- [x] `25-verification-gates-observation-budget`
+- [x] `26-sandbox-runner-denylist`
+- [x] `27-eval-harness-fixture-tasks`
+- [x] `28-observability-otel-traces`
+- [x] `29-end-to-end-coding-task-demo`
+- [x] `30-bpe-tokenizer-from-scratch`
+- [x] `31-tokenized-dataset-sliding-window`
+- [x] `32-token-positional-embeddings`
+- [x] `33-multihead-self-attention`
+- [x] `34-transformer-block`
+- [x] `35-gpt-model-assembly`
+- [x] `36-training-loop-eval`
+- [x] `37-loading-pretrained-weights`
+- [x] `38-classifier-finetuning`
+- [x] `39-instruction-tuning-sft`
+- [x] `40-dpo-from-scratch`
+- [x] `41-eval-pipeline`
+- [x] `42-large-corpus-downloader`
+- [x] `43-hdf5-tokenized-corpus`
+- [x] `44-cosine-lr-warmup`
+- [x] `45-gradient-clipping-amp`
+- [x] `46-gradient-accumulation`
+- [x] `47-checkpoint-save-resume`
+- [x] `48-distributed-fsdp-ddp`
+- [x] `49-lm-eval-harness`
+- [x] `50-hypothesis-generator`
+- [x] `51-literature-retrieval`
+- [x] `52-experiment-runner`
+- [x] `53-result-evaluator`
+- [x] `54-paper-writer`
+- [x] `55-critic-loop`
+- [x] `56-iteration-scheduler`
+- [x] `57-end-to-end-research-demo`
 
