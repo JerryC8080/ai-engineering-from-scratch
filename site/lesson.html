@@ -1635,6 +1635,7 @@
   </div>
 
   <script src="data.js?v=20260525a"></script>
+  <script src="i18n.js?v=20260531a"></script>
   <script src="progress.js?v=20260525a"></script>
   <script src="header.js?v=20260525a" defer></script>
   <script src="cmdpalette.js?v=20260525a" defer></script>
@@ -1741,34 +1742,17 @@
       }
 
       // Language config — must be assigned before the first fetchLesson() call
-      // below (var declarations hoist, but assignments do not).
-      var LANG_KEY = 'aiefs:lang';
+      // below (var declarations hoist, but assignments do not). Language state
+      // (getLang/setLang/initLangToggle) now lives in the shared i18n.js
+      // (AIEFS_I18N), keyed on the shared 'aiefs:lang' storage key.
       var ZH_REPO = 'JerryC8080/ai-engineering-from-scratch';
       var EN_REPO = 'rohitg00/ai-engineering-from-scratch';
 
       buildSidebar();
       initSidebarToggle();
       initScrollProgress();
-      initLangToggle();
+      AIEFS_I18N.initLangToggle(function () { fetchLesson(lessonPath); });
       fetchLesson(lessonPath);
-
-      function initLangToggle() {
-        var btn = document.getElementById('langToggle');
-        var label = document.getElementById('langLabel');
-        if (!btn || !label) return;
-        function paint() {
-          var lang = getLang();
-          // button shows the language you'll switch TO
-          label.textContent = lang === 'zh' ? 'EN' : '中';
-          try { document.documentElement.setAttribute('lang', lang); } catch (e) {}
-        }
-        paint();
-        btn.addEventListener('click', function () {
-          setLang(getLang() === 'zh' ? 'en' : 'zh');
-          paint();
-          fetchLesson(lessonPath);
-        });
-      }
 
       function extractPhaseSlug(phase, index) {
         if (phase.url) {
@@ -1868,14 +1852,6 @@
         }, { passive: true });
       }
 
-      function getLang() {
-        try { return localStorage.getItem(LANG_KEY) === 'zh' ? 'zh' : 'en'; }
-        catch (e) { return 'en'; }
-      }
-      function setLang(l) {
-        try { localStorage.setItem(LANG_KEY, l === 'zh' ? 'zh' : 'en'); } catch (e) {}
-      }
-
       function docFile(lang) {
         return lang === 'zh' ? 'zh.md' : 'en.md';
       }
@@ -1910,7 +1886,7 @@
         // quiz is not translated — always load English; local-first then upstream.
         var quizUrls = ['../' + path + '/quiz.json',
           'https://raw.githubusercontent.com/' + EN_REPO + '/main/' + path + '/quiz.json'];
-        var lang = getLang();
+        var lang = AIEFS_I18N.getLang();
 
         function loadQuiz() {
           fetchFirst(quizUrls)
