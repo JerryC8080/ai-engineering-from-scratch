@@ -450,7 +450,7 @@
     "name": "Mixture of Experts（MoE）"
   },
   "phases/07-transformers-deep-dive/12-kv-cache-flash-attention": {
-    "name": "KV cache、Flash Attention 与 inference 优化"
+    "name": "KV cache、Flash Attention 与 推理优化"
   },
   "phases/07-transformers-deep-dive/13-scaling-laws": {
     "name": "Scaling Laws（缩放定律）"
@@ -564,7 +564,7 @@
     "name": "Constitutional AI 与自我改进"
   },
   "phases/10-llms-from-scratch/10-evaluation": {
-    "name": "评估 — benchmark 与 evals"
+    "name": "评估 — 基准测试与 evals"
   },
   "phases/10-llms-from-scratch/11-quantization": {
     "name": "量化：INT8、GPTQ、AWQ、GGUF"
@@ -1068,7 +1068,7 @@
     "name": "托管 LLM 平台 — Bedrock、Azure OpenAI、Vertex AI"
   },
   "phases/17-infrastructure-and-production/02-inference-platform-economics": {
-    "name": "inference 平台经济学 — Fireworks、Together、Baseten、Modal"
+    "name": "推理平台经济学 — Fireworks、Together、Baseten、Modal"
   },
   "phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes": {
     "name": "Kubernetes 上的 GPU 自动扩缩 — Karpenter、KAI Scheduler"
@@ -1086,7 +1086,7 @@
     "name": "Blackwell 上的 TensorRT-LLM 与 FP8、NVFP4"
   },
   "phases/17-infrastructure-and-production/08-inference-metrics-goodput": {
-    "name": "inference 指标 — TTFT、TPOT、ITL、Goodput、P99"
+    "name": "推理指标 — TTFT、TPOT、ITL、Goodput、P99"
   },
   "phases/17-infrastructure-and-production/09-production-quantization": {
     "name": "生产级量化 — AWQ、GPTQ、GGUF、FP8、NVFP4"
@@ -1098,7 +1098,7 @@
     "name": "多区域 LLM 服务与 KV cache 局部性"
   },
   "phases/17-infrastructure-and-production/12-edge-inference": {
-    "name": "边缘 inference — ANE、Hexagon、WebGPU、Jetson"
+    "name": "边缘推理 — ANE、Hexagon、WebGPU、Jetson"
   },
   "phases/17-infrastructure-and-production/13-llm-observability": {
     "name": "LLM 可观测性技术栈选型"
@@ -1278,7 +1278,7 @@
     "name": "带注册表与治理的 MCP 服务器"
   },
   "phases/19-capstone-projects/14-speculative-decoding-server": {
-    "name": "投机解码 inference 服务器"
+    "name": "投机解码推理服务器"
   },
   "phases/19-capstone-projects/15-constitutional-safety-harness": {
     "name": "Constitutional 安全测试框架 + 红队靶场"
@@ -1323,7 +1323,7 @@
     "name": "从零实现 BPE tokenizer"
   },
   "phases/19-capstone-projects/31-tokenized-dataset-sliding-window": {
-    "name": "带滑动窗口的 token 化 dataset"
+    "name": "带滑动窗口的 token 化数据集"
   },
   "phases/19-capstone-projects/32-token-positional-embeddings": {
     "name": "token embedding 与位置 embedding"
