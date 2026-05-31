@@ -319,132 +319,132 @@
 
 ## 14-agent-engineering
 
-- [ ] `01-the-agent-loop`
+- [x] `01-the-agent-loop`
 - [x] `02-rewoo-plan-and-execute`
-- [ ] `03-reflexion-verbal-rl`
-- [ ] `04-tree-of-thoughts-lats`
+- [x] `03-reflexion-verbal-rl`
+- [x] `04-tree-of-thoughts-lats`
 - [x] `05-self-refine-and-critic`
-- [ ] `06-tool-use-and-function-calling`
-- [ ] `07-memory-virtual-context-memgpt`
-- [ ] `08-memory-blocks-sleep-time-compute`
-- [ ] `09-hybrid-memory-mem0`
-- [ ] `10-skill-libraries-voyager`
-- [ ] `11-planning-htn-and-evolutionary`
-- [ ] `12-anthropic-workflow-patterns`
-- [ ] `13-langgraph-stateful-graphs`
-- [ ] `14-autogen-actor-model`
-- [ ] `15-crewai-role-based-crews`
-- [ ] `16-openai-agents-sdk`
-- [ ] `17-claude-agent-sdk`
-- [ ] `18-agno-and-mastra-runtimes`
-- [ ] `19-benchmarks-swebench-gaia`
-- [ ] `20-benchmarks-webarena-osworld`
+- [x] `06-tool-use-and-function-calling`
+- [x] `07-memory-virtual-context-memgpt`
+- [x] `08-memory-blocks-sleep-time-compute`
+- [x] `09-hybrid-memory-mem0`
+- [x] `10-skill-libraries-voyager`
+- [x] `11-planning-htn-and-evolutionary`
+- [x] `12-anthropic-workflow-patterns`
+- [x] `13-langgraph-stateful-graphs`
+- [x] `14-autogen-actor-model`
+- [x] `15-crewai-role-based-crews`
+- [x] `16-openai-agents-sdk`
+- [x] `17-claude-agent-sdk`
+- [x] `18-agno-and-mastra-runtimes`
+- [x] `19-benchmarks-swebench-gaia`
+- [x] `20-benchmarks-webarena-osworld`
 - [x] `21-computer-use-agents`
-- [ ] `22-voice-agents-pipecat-livekit`
-- [ ] `23-otel-genai-conventions`
-- [ ] `24-agent-observability-platforms`
-- [ ] `25-multi-agent-debate`
-- [ ] `26-failure-modes-agentic`
-- [ ] `27-prompt-injection-defense`
+- [x] `22-voice-agents-pipecat-livekit`
+- [x] `23-otel-genai-conventions`
+- [x] `24-agent-observability-platforms`
+- [x] `25-multi-agent-debate`
+- [x] `26-failure-modes-agentic`
+- [x] `27-prompt-injection-defense`
 - [x] `28-orchestration-patterns`
-- [ ] `29-production-runtimes`
-- [ ] `30-eval-driven-agent-development`
-- [ ] `31-agent-workbench-why-models-fail`
-- [ ] `32-minimal-agent-workbench`
-- [ ] `33-instructions-as-executable-constraints`
-- [ ] `34-repo-memory-and-state`
-- [ ] `35-initialization-scripts`
-- [ ] `36-scope-contracts`
-- [ ] `37-runtime-feedback-loops`
-- [ ] `38-verification-gates`
-- [ ] `39-reviewer-agent`
+- [x] `29-production-runtimes`
+- [x] `30-eval-driven-agent-development`
+- [x] `31-agent-workbench-why-models-fail`
+- [x] `32-minimal-agent-workbench`
+- [x] `33-instructions-as-executable-constraints`
+- [x] `34-repo-memory-and-state`
+- [x] `35-initialization-scripts`
+- [x] `36-scope-contracts`
+- [x] `37-runtime-feedback-loops`
+- [x] `38-verification-gates`
+- [x] `39-reviewer-agent`
 - [x] `40-multi-session-handoff`
-- [ ] `41-workbench-for-real-repos`
-- [ ] `42-agent-workbench-capstone`
+- [x] `41-workbench-for-real-repos`
+- [x] `42-agent-workbench-capstone`
 
 ## 15-autonomous-systems
 
-- [ ] `01-long-horizon-agents`
-- [ ] `02-star-family-reasoning`
-- [ ] `03-alphaevolve-evolutionary-coding`
-- [ ] `04-darwin-godel-machine`
-- [ ] `05-ai-scientist-v2`
-- [ ] `06-automated-alignment-research`
-- [ ] `07-recursive-self-improvement`
-- [ ] `08-bounded-self-improvement`
-- [ ] `09-coding-agent-landscape`
-- [ ] `10-claude-code-permission-modes`
-- [ ] `11-browser-agents`
-- [ ] `12-durable-execution`
-- [ ] `13-cost-governors`
-- [ ] `14-kill-switches-canaries`
-- [ ] `15-propose-then-commit`
-- [ ] `16-checkpoints-rollback`
-- [ ] `17-constitutional-ai`
-- [ ] `18-llama-guard`
-- [ ] `19-anthropic-rsp`
-- [ ] `20-openai-preparedness-deepmind-fsf`
-- [ ] `21-metr-external-evaluation`
-- [ ] `22-cais-caisi-societal-risk`
+- [x] `01-long-horizon-agents`
+- [x] `02-star-family-reasoning`
+- [x] `03-alphaevolve-evolutionary-coding`
+- [x] `04-darwin-godel-machine`
+- [x] `05-ai-scientist-v2`
+- [x] `06-automated-alignment-research`
+- [x] `07-recursive-self-improvement`
+- [x] `08-bounded-self-improvement`
+- [x] `09-coding-agent-landscape`
+- [x] `10-claude-code-permission-modes`
+- [x] `11-browser-agents`
+- [x] `12-durable-execution`
+- [x] `13-cost-governors`
+- [x] `14-kill-switches-canaries`
+- [x] `15-propose-then-commit`
+- [x] `16-checkpoints-rollback`
+- [x] `17-constitutional-ai`
+- [x] `18-llama-guard`
+- [x] `19-anthropic-rsp`
+- [x] `20-openai-preparedness-deepmind-fsf`
+- [x] `21-metr-external-evaluation`
+- [x] `22-cais-caisi-societal-risk`
 
 ## 16-multi-agent-and-swarms
 
-- [ ] `01-why-multi-agent`
-- [ ] `02-fipa-acl-heritage`
-- [ ] `03-communication-protocols`
-- [ ] `04-primitive-model`
-- [ ] `05-supervisor-orchestrator-pattern`
-- [ ] `06-hierarchical-architecture`
-- [ ] `07-society-of-mind-debate`
-- [ ] `08-role-specialization`
-- [ ] `09-parallel-swarm-networks`
-- [ ] `10-group-chat-speaker-selection`
-- [ ] `11-handoffs-and-routines`
-- [ ] `12-a2a-protocol`
-- [ ] `13-shared-memory-blackboard`
-- [ ] `14-consensus-and-bft`
-- [ ] `15-voting-debate-topology`
-- [ ] `16-negotiation-bargaining`
-- [ ] `17-generative-agents-simulation`
-- [ ] `18-theory-of-mind-coordination`
-- [ ] `19-swarm-optimization-pso-aco`
-- [ ] `20-marl-maddpg-qmix-mappo`
-- [ ] `21-agent-economies`
-- [ ] `22-production-scaling-queues-checkpoints`
-- [ ] `23-failure-modes-mast-groupthink`
-- [ ] `24-evaluation-coordination-benchmarks`
-- [ ] `25-case-studies-2026-sota`
+- [x] `01-why-multi-agent`
+- [x] `02-fipa-acl-heritage`
+- [x] `03-communication-protocols`
+- [x] `04-primitive-model`
+- [x] `05-supervisor-orchestrator-pattern`
+- [x] `06-hierarchical-architecture`
+- [x] `07-society-of-mind-debate`
+- [x] `08-role-specialization`
+- [x] `09-parallel-swarm-networks`
+- [x] `10-group-chat-speaker-selection`
+- [x] `11-handoffs-and-routines`
+- [x] `12-a2a-protocol`
+- [x] `13-shared-memory-blackboard`
+- [x] `14-consensus-and-bft`
+- [x] `15-voting-debate-topology`
+- [x] `16-negotiation-bargaining`
+- [x] `17-generative-agents-simulation`
+- [x] `18-theory-of-mind-coordination`
+- [x] `19-swarm-optimization-pso-aco`
+- [x] `20-marl-maddpg-qmix-mappo`
+- [x] `21-agent-economies`
+- [x] `22-production-scaling-queues-checkpoints`
+- [x] `23-failure-modes-mast-groupthink`
+- [x] `24-evaluation-coordination-benchmarks`
+- [x] `25-case-studies-2026-sota`
 
 ## 17-infrastructure-and-production
 
-- [ ] `01-managed-llm-platforms`
-- [ ] `02-inference-platform-economics`
-- [ ] `03-gpu-autoscaling-kubernetes`
-- [ ] `04-vllm-serving-internals`
-- [ ] `05-eagle3-speculative-decoding`
-- [ ] `06-sglang-radixattention`
-- [ ] `07-tensorrt-llm-blackwell`
-- [ ] `08-inference-metrics-goodput`
-- [ ] `09-production-quantization`
-- [ ] `10-cold-start-mitigation`
-- [ ] `11-multi-region-kv-locality`
-- [ ] `12-edge-inference`
-- [ ] `13-llm-observability`
-- [ ] `14-prompt-semantic-caching`
-- [ ] `15-batch-apis`
-- [ ] `16-model-routing`
-- [ ] `17-disaggregated-prefill-decode`
-- [ ] `18-vllm-production-stack-lmcache`
-- [ ] `19-ai-gateways`
-- [ ] `20-shadow-canary-progressive`
-- [ ] `21-ab-testing-llm-features`
-- [ ] `22-load-testing-llm-apis`
-- [ ] `23-sre-for-ai`
-- [ ] `24-chaos-engineering-llm`
-- [ ] `25-security-secrets-audit`
-- [ ] `26-compliance-frameworks`
-- [ ] `27-finops-llms`
-- [ ] `28-self-hosted-serving-selection`
+- [x] `01-managed-llm-platforms`
+- [x] `02-inference-platform-economics`
+- [x] `03-gpu-autoscaling-kubernetes`
+- [x] `04-vllm-serving-internals`
+- [x] `05-eagle3-speculative-decoding`
+- [x] `06-sglang-radixattention`
+- [x] `07-tensorrt-llm-blackwell`
+- [x] `08-inference-metrics-goodput`
+- [x] `09-production-quantization`
+- [x] `10-cold-start-mitigation`
+- [x] `11-multi-region-kv-locality`
+- [x] `12-edge-inference`
+- [x] `13-llm-observability`
+- [x] `14-prompt-semantic-caching`
+- [x] `15-batch-apis`
+- [x] `16-model-routing`
+- [x] `17-disaggregated-prefill-decode`
+- [x] `18-vllm-production-stack-lmcache`
+- [x] `19-ai-gateways`
+- [x] `20-shadow-canary-progressive`
+- [x] `21-ab-testing-llm-features`
+- [x] `22-load-testing-llm-apis`
+- [x] `23-sre-for-ai`
+- [x] `24-chaos-engineering-llm`
+- [x] `25-security-secrets-audit`
+- [x] `26-compliance-frameworks`
+- [x] `27-finops-llms`
+- [x] `28-self-hosted-serving-selection`
 
 ## 18-ethics-safety-alignment
 
