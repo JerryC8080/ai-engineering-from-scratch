@@ -98,6 +98,7 @@
 | tool use / function call | 同左 | ✓ |
 | MCP | MCP | ✓ |
 | ReAct | ReAct | ✓ |
+| ReWOO | ReWOO | ✓ |
 | CoT / ToT | 同左 | ✓ |
 | RAG | RAG | ✓ |
 | vector database | 向量数据库 | |
@@ -109,7 +110,32 @@
 | benchmark | 基准（测试） | |
 | latency / throughput | 延迟 / 吞吐 | |
 | observability | 可观测性 | |
-| guardrail | guardrail / 护栏 | ✓ |
+| guardrail / output guardrail | guardrail / 护栏（首次括注） | ✓ |
+| handoff / handoff packet | handoff / 交接包（首次括注） | ✓ |
+| compaction | compaction / 压缩（首次括注） | ✓ |
+| workbench | workbench / 工作台（首次括注） | ✓ |
+| reviewer / validator | reviewer / 验证器（首次括注） | ✓ |
+| verdict | verdict / 裁决（首次括注） | ✓ |
+| trajectory | 轨迹 | |
+| long-horizon | 长链路 | |
+| computer-use / computer use | computer-use | ✓ |
+| human-in-the-loop | human-in-the-loop（首次括注 人工确认） | ✓ |
+| supervisor-worker / swarm / hierarchical / debate | 同左（多 agent 范式） | ✓ |
+| router / topology / subgraph | 路由器 / 拓扑 / 子图 | |
+| hop / hop counter | hop / hop 计数器 | ✓ |
+| trace / span | trace / span | ✓ |
+| schema / payload | schema / payload | ✓ |
+| allowlist / blocklist | allowlist / blocklist（首次括注 白/黑名单） | ✓ |
+| accessibility API | accessibility API | ✓ |
+| virtual display / Xvfb | 虚拟显示 / Xvfb | |
+| CAPTCHA | CAPTCHA | ✓ |
+| ablation | 消融实验（首次括注） | |
+| idempotent | 幂等 | |
+| DAG | DAG（首次括注 有向无环图） | ✓ |
+| replanner | replanner | ✓ |
+| recipe | recipe / 配方（首次括注） | ✓ |
+| evaluator-optimizer | evaluator-optimizer | ✓ |
+| tripwire | 在代码标识符中保留英文，正文译为「触发」 | |
 
 ## 数据 / 工程通用
 

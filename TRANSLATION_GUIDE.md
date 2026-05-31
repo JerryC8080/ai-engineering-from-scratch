@@ -62,7 +62,7 @@ diffusion, latent, manifold, gradient descent, momentum, weight decay
 
 ## 4. 节奏标题（每节 6 拍）
 
-每个 lesson 的 6 个节奏标题统一中译并括注英文：
+**所有 H2 / H3 章节标题，统一中译并括注英文**（包括 Learning Objectives / Exercises 这类）：
 
 | 英文标题 | 译为 |
 |---|---|
@@ -72,16 +72,17 @@ diffusion, latent, manifold, gradient descent, momentum, weight decay
 | ## Build It | ## 动手实现（Build It） |
 | ## Use It | ## 用起来（Use It） |
 | ## Ship It | ## 上线部署（Ship It） |
+| ## Learning Objectives | ## 学习目标（Learning Objectives） |
+| ## Prerequisites | ## 前置（Prerequisites） |
+| ## Summary | ## 小结（Summary） |
+| ## References | ## 参考资料（References） |
+| ## Further Reading | ## 延伸阅读（Further Reading） |
+| ## Exercises | ## 练习（Exercises） |
+| ## Key Terms | ## 关键术语（Key Terms） |
+| ## Glossary | ## 术语表（Glossary） |
+| ## FAQ | ## 常见问题（FAQ） |
 
-其它常见标题：
-
-| 英文 | 中文 |
-|---|---|
-| ## Learning Objectives | ## 学习目标 |
-| ## Prerequisites | ## 前置 |
-| ## Summary | ## 小结 |
-| ## References | ## 参考资料 |
-| ## Exercises | ## 练习 |
+> 风格统一规则：英文版里出现的所有 H2 / H3 标题，中译后**都括注英文**，确保读者可以通过英文标题在原文 / 论文 / 仓库里精确搜索。
 
 ## 5. 风格
 
