@@ -21,65 +21,65 @@
 
 ## 01-math-foundations
 
-- [ ] `01-linear-algebra-intuition`
-- [ ] `02-vectors-matrices-operations`
-- [ ] `03-matrix-transformations`
-- [ ] `04-calculus-for-ml`
-- [ ] `05-chain-rule-and-autodiff`
-- [ ] `06-probability-and-distributions`
-- [ ] `07-bayes-theorem`
-- [ ] `08-optimization`
-- [ ] `09-information-theory`
-- [ ] `10-dimensionality-reduction`
-- [ ] `11-singular-value-decomposition`
-- [ ] `12-tensor-operations`
-- [ ] `13-numerical-stability`
-- [ ] `14-norms-and-distances`
-- [ ] `15-statistics-for-ml`
-- [ ] `16-sampling-methods`
-- [ ] `17-linear-systems`
-- [ ] `18-convex-optimization`
-- [ ] `19-complex-numbers`
-- [ ] `20-fourier-transform`
-- [ ] `21-graph-theory`
-- [ ] `22-stochastic-processes`
+- [x] `01-linear-algebra-intuition`
+- [x] `02-vectors-matrices-operations`
+- [x] `03-matrix-transformations`
+- [x] `04-calculus-for-ml`
+- [x] `05-chain-rule-and-autodiff`
+- [x] `06-probability-and-distributions`
+- [x] `07-bayes-theorem`
+- [x] `08-optimization`
+- [x] `09-information-theory`
+- [x] `10-dimensionality-reduction`
+- [x] `11-singular-value-decomposition`
+- [x] `12-tensor-operations`
+- [x] `13-numerical-stability`
+- [x] `14-norms-and-distances`
+- [x] `15-statistics-for-ml`
+- [x] `16-sampling-methods`
+- [x] `17-linear-systems`
+- [x] `18-convex-optimization`
+- [x] `19-complex-numbers`
+- [x] `20-fourier-transform`
+- [x] `21-graph-theory`
+- [x] `22-stochastic-processes`
 
 ## 02-ml-fundamentals
 
-- [ ] `01-what-is-machine-learning`
-- [ ] `02-linear-regression`
-- [ ] `03-logistic-regression`
-- [ ] `04-decision-trees`
-- [ ] `05-support-vector-machines`
-- [ ] `06-knn-and-distances`
-- [ ] `07-unsupervised-learning`
-- [ ] `08-feature-engineering`
-- [ ] `09-model-evaluation`
-- [ ] `10-bias-variance`
-- [ ] `11-ensemble-methods`
-- [ ] `12-hyperparameter-tuning`
-- [ ] `13-ml-pipelines`
-- [ ] `14-naive-bayes`
-- [ ] `15-time-series`
-- [ ] `16-anomaly-detection`
-- [ ] `17-imbalanced-data`
-- [ ] `18-feature-selection`
+- [x] `01-what-is-machine-learning`
+- [x] `02-linear-regression`
+- [x] `03-logistic-regression`
+- [x] `04-decision-trees`
+- [x] `05-support-vector-machines`
+- [x] `06-knn-and-distances`
+- [x] `07-unsupervised-learning`
+- [x] `08-feature-engineering`
+- [x] `09-model-evaluation`
+- [x] `10-bias-variance`
+- [x] `11-ensemble-methods`
+- [x] `12-hyperparameter-tuning`
+- [x] `13-ml-pipelines`
+- [x] `14-naive-bayes`
+- [x] `15-time-series`
+- [x] `16-anomaly-detection`
+- [x] `17-imbalanced-data`
+- [x] `18-feature-selection`
 
 ## 03-deep-learning-core
 
-- [ ] `01-the-perceptron`
-- [ ] `02-multi-layer-networks`
-- [ ] `03-backpropagation`
-- [ ] `04-activation-functions`
-- [ ] `05-loss-functions`
-- [ ] `06-optimizers`
-- [ ] `07-regularization`
-- [ ] `08-weight-initialization`
-- [ ] `09-learning-rate-schedules`
-- [ ] `10-mini-framework`
-- [ ] `11-intro-to-pytorch`
-- [ ] `12-intro-to-jax`
-- [ ] `13-debugging-neural-networks`
+- [x] `01-the-perceptron`
+- [x] `02-multi-layer-networks`
+- [x] `03-backpropagation`
+- [x] `04-activation-functions`
+- [x] `05-loss-functions`
+- [x] `06-optimizers`
+- [x] `07-regularization`
+- [x] `08-weight-initialization`
+- [x] `09-learning-rate-schedules`
+- [x] `10-mini-framework`
+- [x] `11-intro-to-pytorch`
+- [x] `12-intro-to-jax`
+- [x] `13-debugging-neural-networks`
 
 ## 04-computer-vision
 
